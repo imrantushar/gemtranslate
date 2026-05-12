@@ -24,7 +24,7 @@ class TermTranslations extends Controller {
 			[
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'index' ],
-				'permission_callback' => [ $this, 'permissions_check' ],
+				'permission_callback' => [ $this, 'permissions_translate' ],
 				'args'                => [
 					'taxonomy' => [ 'type' => 'string', 'default' => 'category' ],
 					'page'     => [ 'type' => 'integer', 'default' => 1 ],
@@ -40,7 +40,7 @@ class TermTranslations extends Controller {
 			[
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_translations' ],
-				'permission_callback' => [ $this, 'permissions_check' ],
+				'permission_callback' => [ $this, 'permissions_translate' ],
 			]
 		);
 
@@ -51,12 +51,12 @@ class TermTranslations extends Controller {
 				[
 					'methods'             => 'PUT',
 					'callback'            => [ $this, 'save' ],
-					'permission_callback' => [ $this, 'permissions_check' ],
+					'permission_callback' => [ $this, 'permissions_translate' ],
 				],
 				[
 					'methods'             => \WP_REST_Server::DELETABLE,
 					'callback'            => [ $this, 'delete' ],
-					'permission_callback' => [ $this, 'permissions_check' ],
+					'permission_callback' => [ $this, 'permissions_translate' ],
 				],
 			]
 		);

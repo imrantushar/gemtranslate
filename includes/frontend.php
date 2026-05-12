@@ -8,5 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Frontend {
 	public static function init() {
 		Frontend\LanguageSwitcher::init();
+		Frontend\LanguageSwitcherBlock::init();
+		Frontend\LanguageSwitcherWidget::init();
 	}
 }

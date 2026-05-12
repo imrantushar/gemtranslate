@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-05-12T04:22:28+00:00\n"
+"POT-Creation-Date: 2026-05-12T05:07:31+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: zentranslate\n"
@@ -93,8 +93,25 @@ msgstr ""
 msgid "Could not add glossary term."
 msgstr ""
 
-#: includes/api/controller.php:27
+#: includes/api/controller.php:31
 msgid "You do not have permission to perform this action."
+msgstr ""
+
+#: includes/api/controller.php:47
+msgid "You do not have permission to translate content."
+msgstr ""
+
+#: includes/api/jobs.php:118
+#: includes/api/jobs.php:160
+msgid "Job not found."
+msgstr ""
+
+#: includes/api/jobs.php:129
+msgid "post_id and active target_lang are required."
+msgstr ""
+
+#: includes/api/jobs.php:142
+msgid "post_ids and languages are required."
 msgstr ""
 
 #: includes/api/languages.php:31
@@ -133,27 +150,27 @@ msgid "Menu not found."
 msgstr ""
 
 #: includes/api/menus.php:96
-#: includes/api/post-translations.php:149
+#: includes/api/post-translations.php:181
 #: includes/api/seo.php:63
-#: includes/api/settings.php:90
+#: includes/api/settings.php:91
 #: includes/api/strings.php:107
 #: includes/api/term-translations.php:138
 msgid "Language is not active."
 msgstr ""
 
 #: includes/api/menus.php:101
-#: includes/api/post-translations.php:164
+#: includes/api/post-translations.php:196
 #: includes/api/strings.php:114
 #: includes/api/term-translations.php:143
 msgid "Could not save translation."
 msgstr ""
 
-#: includes/api/post-translations.php:104
-#: includes/api/post-translations.php:152
+#: includes/api/post-translations.php:136
+#: includes/api/post-translations.php:184
 msgid "Post not found."
 msgstr ""
 
-#: includes/api/post-translations.php:142
+#: includes/api/post-translations.php:174
 msgid "Translation not found."
 msgstr ""
 
@@ -165,7 +182,7 @@ msgstr ""
 msgid "Could not save SEO meta."
 msgstr ""
 
-#: includes/api/settings.php:68
+#: includes/api/settings.php:69
 msgid "Login required."
 msgstr ""
 
@@ -181,47 +198,108 @@ msgstr ""
 msgid "Term not found."
 msgstr ""
 
+#: includes/frontend/language-switcher-block.php:33
+#: includes/frontend/language-switcher-widget.php:17
+msgid "Zentranslate language switcher"
+msgstr ""
+
+#: includes/frontend/language-switcher-block.php:36
+msgid "Show a switcher between all active languages."
+msgstr ""
+
+#: includes/frontend/language-switcher-widget.php:18
+msgid "Switch between all active languages."
+msgstr ""
+
+#: includes/frontend/language-switcher-widget.php:51
+#: dev_zentranslate/containers/Posts/index.jsx:168
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:191
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:219
+msgid "Title"
+msgstr ""
+
+#: includes/frontend/language-switcher-widget.php:55
+#: dev_zentranslate/containers/Settings/index.jsx:56
+msgid "Display"
+msgstr ""
+
+#: includes/frontend/language-switcher-widget.php:57
+msgid "Inline list"
+msgstr ""
+
+#: includes/frontend/language-switcher-widget.php:58
+msgid "Dropdown"
+msgstr ""
+
+#: includes/frontend/language-switcher-widget.php:63
+msgid "Show flag"
+msgstr ""
+
+#: includes/frontend/language-switcher-widget.php:67
+msgid "Show English name"
+msgstr ""
+
+#: includes/frontend/language-switcher-widget.php:71
+msgid "Show native name"
+msgstr ""
+
 #: dev_zentranslate/components/Modal.jsx:29
 msgid "Close"
 msgstr ""
 
-#: dev_zentranslate/components/Sidebar.jsx:8
+#: dev_zentranslate/components/Sidebar.jsx:9
 #: dev_zentranslate/containers/Dashboard/index.jsx:34
 msgid "Dashboard"
 msgstr ""
 
-#: dev_zentranslate/components/Sidebar.jsx:9
+#: dev_zentranslate/components/Sidebar.jsx:10
 #: dev_zentranslate/containers/Dashboard/index.jsx:55
 #: dev_zentranslate/containers/Languages/index.jsx:95
+#: dev_zentranslate/containers/Onboarding/index.jsx:29
 msgid "Languages"
 msgstr ""
 
-#: dev_zentranslate/components/Sidebar.jsx:10
-#: dev_zentranslate/containers/Posts/index.jsx:31
+#: dev_zentranslate/components/Sidebar.jsx:11
+#: dev_zentranslate/containers/Posts/index.jsx:92
 msgid "Posts & Pages"
 msgstr ""
 
-#: dev_zentranslate/components/Sidebar.jsx:11
+#: dev_zentranslate/components/Sidebar.jsx:12
+#: dev_zentranslate/containers/Terms/index.jsx:105
+msgid "Taxonomies"
+msgstr ""
+
+#: dev_zentranslate/components/Sidebar.jsx:13
 #: dev_zentranslate/containers/Strings/index.jsx:92
 msgid "Strings"
 msgstr ""
 
-#: dev_zentranslate/components/Sidebar.jsx:12
+#: dev_zentranslate/components/Sidebar.jsx:14
 #: dev_zentranslate/containers/Menus/index.jsx:77
 msgid "Menus"
 msgstr ""
 
-#: dev_zentranslate/components/Sidebar.jsx:13
+#: dev_zentranslate/components/Sidebar.jsx:15
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:163
 #: dev_zentranslate/containers/SEO/index.jsx:10
 msgid "SEO"
 msgstr ""
 
-#: dev_zentranslate/components/Sidebar.jsx:14
+#: dev_zentranslate/components/Sidebar.jsx:16
 #: dev_zentranslate/containers/AI/index.jsx:85
 msgid "AI Translation"
 msgstr ""
 
-#: dev_zentranslate/components/Sidebar.jsx:15
+#: dev_zentranslate/components/Sidebar.jsx:17
+#: dev_zentranslate/containers/Glossary/index.jsx:63
+msgid "Glossary"
+msgstr ""
+
+#: dev_zentranslate/components/Sidebar.jsx:18
+msgid "Jobs"
+msgstr ""
+
+#: dev_zentranslate/components/Sidebar.jsx:19
 #: dev_zentranslate/containers/Settings/index.jsx:39
 msgid "Settings"
 msgstr ""
@@ -231,6 +309,8 @@ msgid "Loading"
 msgstr ""
 
 #: dev_zentranslate/components/Spinner.jsx:17
+#: dev_zentranslate/containers/Onboarding/index.jsx:51
+#: dev_zentranslate/containers/Terms/index.jsx:100
 msgid "Loading…"
 msgstr ""
 
@@ -282,6 +362,7 @@ msgid "— Pick one —"
 msgstr ""
 
 #: dev_zentranslate/containers/AI/index.jsx:109
+#: dev_zentranslate/containers/Onboarding/index.jsx:216
 msgid "API key"
 msgstr ""
 
@@ -294,10 +375,12 @@ msgid "Required."
 msgstr ""
 
 #: dev_zentranslate/containers/AI/index.jsx:120
+#: dev_zentranslate/containers/Onboarding/index.jsx:220
 msgid "Model"
 msgstr ""
 
 #: dev_zentranslate/containers/AI/index.jsx:120
+#: dev_zentranslate/containers/Onboarding/index.jsx:220
 msgid "Default: gpt-4o-mini"
 msgstr ""
 
@@ -385,6 +468,200 @@ msgstr ""
 msgid "posts"
 msgstr ""
 
+#: dev_zentranslate/containers/Glossary/index.jsx:36
+msgid "Source term is required."
+msgstr ""
+
+#: dev_zentranslate/containers/Glossary/index.jsx:42
+msgid "Glossary term added."
+msgstr ""
+
+#: dev_zentranslate/containers/Glossary/index.jsx:49
+msgid "Delete this glossary entry?"
+msgstr ""
+
+#: dev_zentranslate/containers/Glossary/index.jsx:52
+msgid "Removed."
+msgstr ""
+
+#: dev_zentranslate/containers/Glossary/index.jsx:58
+msgid "Loading glossary…"
+msgstr ""
+
+#: dev_zentranslate/containers/Glossary/index.jsx:64
+msgid "Define brand terms and protected phrases so AI translations stay consistent."
+msgstr ""
+
+#: dev_zentranslate/containers/Glossary/index.jsx:67
+msgid "Add a term"
+msgstr ""
+
+#: dev_zentranslate/containers/Glossary/index.jsx:69
+msgid "Source language"
+msgstr ""
+
+#: dev_zentranslate/containers/Glossary/index.jsx:76
+#: dev_zentranslate/containers/Menus/index.jsx:89
+#: dev_zentranslate/containers/Strings/index.jsx:109
+msgid "Target language"
+msgstr ""
+
+#: dev_zentranslate/containers/Glossary/index.jsx:83
+msgid "Source term"
+msgstr ""
+
+#: dev_zentranslate/containers/Glossary/index.jsx:83
+msgid "e.g. Acme Cloud"
+msgstr ""
+
+#: dev_zentranslate/containers/Glossary/index.jsx:86
+msgid "Target term"
+msgstr ""
+
+#: dev_zentranslate/containers/Glossary/index.jsx:86
+msgid "Leave empty if do-not-translate."
+msgstr ""
+
+#: dev_zentranslate/containers/Glossary/index.jsx:95
+msgid "Case sensitive"
+msgstr ""
+
+#: dev_zentranslate/containers/Glossary/index.jsx:100
+msgid "Do not translate (keep source verbatim)"
+msgstr ""
+
+#: dev_zentranslate/containers/Glossary/index.jsx:106
+msgid "Add term"
+msgstr ""
+
+#: dev_zentranslate/containers/Glossary/index.jsx:111
+msgid "Existing terms"
+msgstr ""
+
+#: dev_zentranslate/containers/Glossary/index.jsx:114
+msgid "No glossary entries yet."
+msgstr ""
+
+#: dev_zentranslate/containers/Glossary/index.jsx:120
+#: dev_zentranslate/containers/Strings/index.jsx:149
+msgid "Source"
+msgstr ""
+
+#: dev_zentranslate/containers/Glossary/index.jsx:121
+msgid "Target"
+msgstr ""
+
+#: dev_zentranslate/containers/Glossary/index.jsx:122
+msgid "Pair"
+msgstr ""
+
+#: dev_zentranslate/containers/Glossary/index.jsx:123
+msgid "Flags"
+msgstr ""
+
+#: dev_zentranslate/containers/Glossary/index.jsx:131
+msgid "(do not translate)"
+msgstr ""
+
+#: dev_zentranslate/containers/Glossary/index.jsx:136
+msgid "Aa"
+msgstr ""
+
+#: dev_zentranslate/containers/Glossary/index.jsx:137
+msgid "DNT"
+msgstr ""
+
+#: dev_zentranslate/containers/Glossary/index.jsx:141
+#: dev_zentranslate/containers/Jobs/index.jsx:133
+#: dev_zentranslate/containers/Languages/index.jsx:140
+msgid "Delete"
+msgstr ""
+
+#: dev_zentranslate/containers/Jobs/index.jsx:32
+msgid "Re-queued."
+msgstr ""
+
+#: dev_zentranslate/containers/Jobs/index.jsx:39
+msgid "Remove this job from the list?"
+msgstr ""
+
+#: dev_zentranslate/containers/Jobs/index.jsx:42
+msgid "Job removed."
+msgstr ""
+
+#: dev_zentranslate/containers/Jobs/index.jsx:51
+msgid "Translation jobs"
+msgstr ""
+
+#: dev_zentranslate/containers/Jobs/index.jsx:52
+msgid "Monitor async AI translation jobs. Pending and running jobs poll for updates."
+msgstr ""
+
+#: dev_zentranslate/containers/Jobs/index.jsx:56
+#: dev_zentranslate/containers/Jobs/index.jsx:76
+msgid "Pending"
+msgstr ""
+
+#: dev_zentranslate/containers/Jobs/index.jsx:59
+#: dev_zentranslate/containers/Jobs/index.jsx:77
+msgid "Running"
+msgstr ""
+
+#: dev_zentranslate/containers/Jobs/index.jsx:62
+#: dev_zentranslate/containers/Jobs/index.jsx:78
+msgid "Success"
+msgstr ""
+
+#: dev_zentranslate/containers/Jobs/index.jsx:65
+#: dev_zentranslate/containers/Jobs/index.jsx:79
+msgid "Failed"
+msgstr ""
+
+#: dev_zentranslate/containers/Jobs/index.jsx:73
+#: dev_zentranslate/containers/Jobs/index.jsx:96
+#: dev_zentranslate/containers/Languages/index.jsx:107
+#: dev_zentranslate/containers/Posts/index.jsx:169
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:250
+msgid "Status"
+msgstr ""
+
+#: dev_zentranslate/containers/Jobs/index.jsx:75
+msgid "All"
+msgstr ""
+
+#: dev_zentranslate/containers/Jobs/index.jsx:85
+msgid "Loading jobs…"
+msgstr ""
+
+#: dev_zentranslate/containers/Jobs/index.jsx:88
+msgid "No jobs in this view."
+msgstr ""
+
+#: dev_zentranslate/containers/Jobs/index.jsx:95
+msgid "Type"
+msgstr ""
+
+#: dev_zentranslate/containers/Jobs/index.jsx:97
+msgid "Payload"
+msgstr ""
+
+#: dev_zentranslate/containers/Jobs/index.jsx:98
+msgid "Attempts"
+msgstr ""
+
+#: dev_zentranslate/containers/Jobs/index.jsx:99
+msgid "Updated"
+msgstr ""
+
+#. translators: 1: post ID, 2: target language.
+#: dev_zentranslate/containers/Jobs/index.jsx:113
+msgid "post #%1$d → %2$s"
+msgstr ""
+
+#: dev_zentranslate/containers/Jobs/index.jsx:129
+msgid "Retry"
+msgstr ""
+
 #: dev_zentranslate/containers/Languages/index.jsx:46
 msgid "Language updated."
 msgstr ""
@@ -435,12 +712,6 @@ msgstr ""
 msgid "Locale"
 msgstr ""
 
-#: dev_zentranslate/containers/Languages/index.jsx:107
-#: dev_zentranslate/containers/Posts/index.jsx:65
-#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:220
-msgid "Status"
-msgstr ""
-
 #: dev_zentranslate/containers/Languages/index.jsx:108
 msgid "Actions"
 msgstr ""
@@ -455,10 +726,6 @@ msgstr ""
 
 #: dev_zentranslate/containers/Languages/index.jsx:136
 msgid "Edit"
-msgstr ""
-
-#: dev_zentranslate/containers/Languages/index.jsx:140
-msgid "Delete"
 msgstr ""
 
 #: dev_zentranslate/containers/Languages/index.jsx:153
@@ -529,11 +796,6 @@ msgstr ""
 msgid "Menu"
 msgstr ""
 
-#: dev_zentranslate/containers/Menus/index.jsx:89
-#: dev_zentranslate/containers/Strings/index.jsx:109
-msgid "Target language"
-msgstr ""
-
 #: dev_zentranslate/containers/Menus/index.jsx:100
 msgid "Loading items…"
 msgstr ""
@@ -561,157 +823,315 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-#: dev_zentranslate/containers/Posts/index.jsx:32
-msgid "Pick a post to translate it into your active languages."
+#: dev_zentranslate/containers/Onboarding/index.jsx:28
+msgid "Welcome"
 msgstr ""
 
-#: dev_zentranslate/containers/Posts/index.jsx:38
+#: dev_zentranslate/containers/Onboarding/index.jsx:30
+msgid "AI provider"
+msgstr ""
+
+#: dev_zentranslate/containers/Onboarding/index.jsx:31
+msgid "Done"
+msgstr ""
+
+#: dev_zentranslate/containers/Onboarding/index.jsx:84
+msgid "Languages added."
+msgstr ""
+
+#: dev_zentranslate/containers/Onboarding/index.jsx:107
+msgid "AI provider configured."
+msgstr ""
+
+#: dev_zentranslate/containers/Onboarding/index.jsx:131
+msgid "Welcome to Zentranslate"
+msgstr ""
+
+#: dev_zentranslate/containers/Onboarding/index.jsx:132
+msgid "Quick setup — pick languages, add an AI key (optional), done."
+msgstr ""
+
+#: dev_zentranslate/containers/Onboarding/index.jsx:156
+msgid "Zentranslate makes your WordPress site multilingual without slowing it down. We'll set up your languages, optionally connect an AI translator, and you'll be ready to translate."
+msgstr ""
+
+#: dev_zentranslate/containers/Onboarding/index.jsx:159
+msgid "Get started"
+msgstr ""
+
+#: dev_zentranslate/containers/Onboarding/index.jsx:165
+msgid "Pick the languages you want to support"
+msgstr ""
+
+#: dev_zentranslate/containers/Onboarding/index.jsx:186
+msgid "(already added)"
+msgstr ""
+
+#: dev_zentranslate/containers/Onboarding/index.jsx:192
+#: dev_zentranslate/containers/Onboarding/index.jsx:226
+msgid "Back"
+msgstr ""
+
+#: dev_zentranslate/containers/Onboarding/index.jsx:194
+#: dev_zentranslate/containers/Onboarding/index.jsx:228
+msgid "Skip"
+msgstr ""
+
+#: dev_zentranslate/containers/Onboarding/index.jsx:196
+msgid "Add and continue"
+msgstr ""
+
+#: dev_zentranslate/containers/Onboarding/index.jsx:204
+msgid "Optional: connect an AI translator"
+msgstr ""
+
+#: dev_zentranslate/containers/Onboarding/index.jsx:206
+msgid "Bring your own API key. Skip to set up later from AI Translation."
+msgstr ""
+
+#: dev_zentranslate/containers/Onboarding/index.jsx:209
+msgid "Provider"
+msgstr ""
+
+#: dev_zentranslate/containers/Onboarding/index.jsx:229
+msgid "Test & save"
+msgstr ""
+
+#: dev_zentranslate/containers/Onboarding/index.jsx:238
+msgid "All set! Head to Posts to translate your first article, or Strings to translate theme/plugin labels."
+msgstr ""
+
+#: dev_zentranslate/containers/Onboarding/index.jsx:241
+msgid "Go to dashboard"
+msgstr ""
+
+#. translators: %d: number of jobs queued.
+#: dev_zentranslate/containers/Posts/index.jsx:80
+msgid "%d translation jobs queued. See Jobs page for progress."
+msgstr ""
+
+#: dev_zentranslate/containers/Posts/index.jsx:93
+msgid "Pick a post to translate it into your active languages, or bulk-translate with AI."
+msgstr ""
+
+#: dev_zentranslate/containers/Posts/index.jsx:99
 msgid "Post type"
 msgstr ""
 
-#: dev_zentranslate/containers/Posts/index.jsx:40
+#: dev_zentranslate/containers/Posts/index.jsx:103
 msgid "Posts"
 msgstr ""
 
-#: dev_zentranslate/containers/Posts/index.jsx:41
+#: dev_zentranslate/containers/Posts/index.jsx:104
 msgid "Pages"
 msgstr ""
 
-#: dev_zentranslate/containers/Posts/index.jsx:42
-msgid "Products (Woo)"
-msgstr ""
-
-#: dev_zentranslate/containers/Posts/index.jsx:47
+#: dev_zentranslate/containers/Posts/index.jsx:115
+#: dev_zentranslate/containers/Terms/index.jsx:120
 msgid "Search"
 msgstr ""
 
-#: dev_zentranslate/containers/Posts/index.jsx:48
+#: dev_zentranslate/containers/Posts/index.jsx:116
 msgid "Search by title…"
 msgstr ""
 
-#: dev_zentranslate/containers/Posts/index.jsx:51
+#: dev_zentranslate/containers/Posts/index.jsx:119
 #: dev_zentranslate/containers/Strings/index.jsx:136
+#: dev_zentranslate/containers/Terms/index.jsx:124
 msgid "Filter"
 msgstr ""
 
-#: dev_zentranslate/containers/Posts/index.jsx:55
+#. translators: %d: number of selected posts.
+#: dev_zentranslate/containers/Posts/index.jsx:128
+msgid "%d selected"
+msgstr ""
+
+#: dev_zentranslate/containers/Posts/index.jsx:142
+msgid "Overwrite existing"
+msgstr ""
+
+#: dev_zentranslate/containers/Posts/index.jsx:146
+msgid "Clear"
+msgstr ""
+
+#: dev_zentranslate/containers/Posts/index.jsx:149
+msgid "Translate selected with AI"
+msgstr ""
+
+#: dev_zentranslate/containers/Posts/index.jsx:156
 msgid "Loading posts…"
 msgstr ""
 
-#: dev_zentranslate/containers/Posts/index.jsx:58
+#: dev_zentranslate/containers/Posts/index.jsx:159
 msgid "No posts found."
 msgstr ""
 
-#: dev_zentranslate/containers/Posts/index.jsx:64
-#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:161
-#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:189
-msgid "Title"
+#: dev_zentranslate/containers/Posts/index.jsx:166
+msgid "Select all visible"
 msgstr ""
 
-#: dev_zentranslate/containers/Posts/index.jsx:96
+#: dev_zentranslate/containers/Posts/index.jsx:195
+msgid "stale"
+msgstr ""
+
+#: dev_zentranslate/containers/Posts/index.jsx:205
+#: dev_zentranslate/containers/Terms/index.jsx:163
 msgid "Translate"
 msgstr ""
 
 #. translators: 1: current page, 2: total pages.
-#: dev_zentranslate/containers/Posts/index.jsx:110
+#: dev_zentranslate/containers/Posts/index.jsx:219
 msgid "Page %1$d of %2$d"
 msgstr ""
 
-#: dev_zentranslate/containers/Posts/index.jsx:117
+#: dev_zentranslate/containers/Posts/index.jsx:226
 #: dev_zentranslate/containers/Strings/index.jsx:213
 msgid "Previous"
 msgstr ""
 
-#: dev_zentranslate/containers/Posts/index.jsx:120
+#: dev_zentranslate/containers/Posts/index.jsx:229
 #: dev_zentranslate/containers/Strings/index.jsx:216
 msgid "Next"
 msgstr ""
 
-#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:42
+#: dev_zentranslate/containers/Posts/SeoTab.jsx:13
+msgid "Meta title"
+msgstr ""
+
+#: dev_zentranslate/containers/Posts/SeoTab.jsx:14
+msgid "Meta description"
+msgstr ""
+
+#: dev_zentranslate/containers/Posts/SeoTab.jsx:15
+msgid "OpenGraph title"
+msgstr ""
+
+#: dev_zentranslate/containers/Posts/SeoTab.jsx:16
+msgid "OpenGraph description"
+msgstr ""
+
+#: dev_zentranslate/containers/Posts/SeoTab.jsx:17
+msgid "Canonical override"
+msgstr ""
+
+#: dev_zentranslate/containers/Posts/SeoTab.jsx:43
+msgid "SEO meta saved."
+msgstr ""
+
+#: dev_zentranslate/containers/Posts/SeoTab.jsx:51
+msgid "(no source)"
+msgstr ""
+
+#: dev_zentranslate/containers/Posts/SeoTab.jsx:67
+msgid "Loading SEO meta…"
+msgstr ""
+
+#: dev_zentranslate/containers/Posts/SeoTab.jsx:70
+msgid "SEO meta for this translation"
+msgstr ""
+
+#: dev_zentranslate/containers/Posts/SeoTab.jsx:84
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:224
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:237
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:247
+#: dev_zentranslate/containers/Strings/index.jsx:191
+#: dev_zentranslate/containers/Terms/index.jsx:207
+#: dev_zentranslate/containers/Terms/index.jsx:220
+msgid "AI"
+msgstr ""
+
+#: dev_zentranslate/containers/Posts/SeoTab.jsx:89
+msgid "Save SEO meta"
+msgstr ""
+
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:44
 msgid "Loading translation editor…"
 msgstr ""
 
-#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:56
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:58
 #: dev_zentranslate/containers/Strings/index.jsx:51
 msgid "Translation saved."
 msgstr ""
 
 #. translators: %s: field name like title, excerpt, content.
-#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:76
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:78
 msgid "AI filled %s."
 msgstr ""
 
-#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:100
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:102
 msgid "AI translation applied to all fields."
 msgstr ""
 
 #. translators: %s: post title.
-#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:111
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:113
 msgid "Translate: %s"
 msgstr ""
 
 #. translators: %s: source language code.
-#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:116
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:118
 msgid "Source language: %s. Pick a target language and edit the translation."
 msgstr ""
 
-#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:121
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:123
 msgid "← Back to posts"
 msgstr ""
 
-#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:129
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:131
 msgid "Add at least one non-default language to start translating posts."
 msgstr ""
 
-#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:154
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:156
+#: dev_zentranslate/containers/Terms/index.jsx:225
 msgid "Translate all with AI"
 msgstr ""
 
-#. translators: %s: language code.
-#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:159
-msgid "Source — %s"
-msgstr ""
-
-#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:164
-#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:197
-msgid "Slug"
-msgstr ""
-
-#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:167
-#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:202
-msgid "Excerpt"
-msgstr ""
-
-#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:170
-#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:212
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:162
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:200
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:242
 msgid "Content"
 msgstr ""
 
 #. translators: %s: language code.
-#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:177
-msgid "Translation — %s"
+#. translators: %s: lang code.
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:189
+#: dev_zentranslate/containers/Terms/index.jsx:175
+msgid "Source — %s"
 msgstr ""
 
 #: dev_zentranslate/containers/Posts/TranslationEditor.jsx:194
-#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:207
-#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:217
-#: dev_zentranslate/containers/Strings/index.jsx:191
-msgid "AI"
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:227
+#: dev_zentranslate/containers/Terms/index.jsx:138
+#: dev_zentranslate/containers/Terms/index.jsx:180
+#: dev_zentranslate/containers/Terms/index.jsx:210
+msgid "Slug"
 msgstr ""
 
 #: dev_zentranslate/containers/Posts/TranslationEditor.jsx:197
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:232
+msgid "Excerpt"
+msgstr ""
+
+#. translators: %s: language code.
+#. translators: %s: lang code.
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:207
+#: dev_zentranslate/containers/Terms/index.jsx:190
+msgid "Translation — %s"
+msgstr ""
+
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:227
 msgid "Used for SEO-friendly URLs."
 msgstr ""
 
-#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:222
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:252
 msgid "Draft"
 msgstr ""
 
-#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:223
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:253
 msgid "Published"
 msgstr ""
 
-#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:228
+#: dev_zentranslate/containers/Posts/TranslationEditor.jsx:258
+#: dev_zentranslate/containers/Terms/index.jsx:228
 msgid "Save translation"
 msgstr ""
 
@@ -761,10 +1181,6 @@ msgstr ""
 
 #: dev_zentranslate/containers/Settings/index.jsx:52
 msgid "Subdirectory URLs cache cleanly with page-cache plugins. Subdomain and per-domain modes are planned for v2."
-msgstr ""
-
-#: dev_zentranslate/containers/Settings/index.jsx:56
-msgid "Display"
 msgstr ""
 
 #: dev_zentranslate/containers/Settings/index.jsx:58
@@ -830,6 +1246,7 @@ msgid "Search source"
 msgstr ""
 
 #: dev_zentranslate/containers/Strings/index.jsx:133
+#: dev_zentranslate/containers/Terms/index.jsx:121
 msgid "Search…"
 msgstr ""
 
@@ -841,11 +1258,58 @@ msgstr ""
 msgid "No strings yet. Scan a theme or plugin to populate this list."
 msgstr ""
 
-#: dev_zentranslate/containers/Strings/index.jsx:149
-msgid "Source"
-msgstr ""
-
 #. translators: %d: total count.
 #: dev_zentranslate/containers/Strings/index.jsx:207
 msgid "%d total"
+msgstr ""
+
+#: dev_zentranslate/containers/Terms/index.jsx:53
+msgid "Term translation saved."
+msgstr ""
+
+#: dev_zentranslate/containers/Terms/index.jsx:106
+msgid "Translate categories, tags, and other taxonomy terms."
+msgstr ""
+
+#: dev_zentranslate/containers/Terms/index.jsx:111
+msgid "Taxonomy"
+msgstr ""
+
+#: dev_zentranslate/containers/Terms/index.jsx:113
+msgid "Categories"
+msgstr ""
+
+#: dev_zentranslate/containers/Terms/index.jsx:114
+msgid "Tags"
+msgstr ""
+
+#: dev_zentranslate/containers/Terms/index.jsx:115
+msgid "Product categories"
+msgstr ""
+
+#: dev_zentranslate/containers/Terms/index.jsx:116
+msgid "Product tags"
+msgstr ""
+
+#: dev_zentranslate/containers/Terms/index.jsx:128
+msgid "Loading terms…"
+msgstr ""
+
+#: dev_zentranslate/containers/Terms/index.jsx:131
+msgid "No terms found."
+msgstr ""
+
+#: dev_zentranslate/containers/Terms/index.jsx:137
+#: dev_zentranslate/containers/Terms/index.jsx:177
+#: dev_zentranslate/containers/Terms/index.jsx:202
+msgid "Name"
+msgstr ""
+
+#: dev_zentranslate/containers/Terms/index.jsx:139
+msgid "Count"
+msgstr ""
+
+#: dev_zentranslate/containers/Terms/index.jsx:183
+#: dev_zentranslate/containers/Terms/index.jsx:215
+msgid "Description"
 msgstr ""

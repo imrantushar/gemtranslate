@@ -7,6 +7,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class AI {
 	public static function init() {
-		// AI is REST-driven only; no boot-time hooks needed.
+		AI\JobRunner::init();
 	}
 }

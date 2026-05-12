@@ -21,6 +21,9 @@ class Invalidator {
 		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
 			return;
 		}
+		// Recompute the source hash. If it changed, existing translations
+		// become "stale" — surfaced by TranslationLoader::status_map().
+		TranslationLoader::refresh_source_hash( $post_id );
 		TranslationLoader::invalidate_post( $post_id );
 		do_action( 'ztrans_translation_saved', $post_id );
 	}

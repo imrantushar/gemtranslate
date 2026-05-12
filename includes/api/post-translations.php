@@ -18,6 +18,16 @@ class PostTranslations extends Controller {
 	}
 
 	public function register_routes() {
+		register_rest_route(
+			$this->namespace,
+			'/post-types',
+			[
+				'methods'             => \WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'list_post_types' ],
+				'permission_callback' => [ $this, 'permissions_translate' ],
+			]
+		);
+
 		// List posts with translation status per language.
 		register_rest_route(
 			$this->namespace,
@@ -25,7 +35,7 @@ class PostTranslations extends Controller {
 			[
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'index' ],
-				'permission_callback' => [ $this, 'permissions_check' ],
+				'permission_callback' => [ $this, 'permissions_translate' ],
 				'args'                => [
 					'page'      => [ 'type' => 'integer', 'default' => 1 ],
 					'per_page'  => [ 'type' => 'integer', 'default' => 20 ],
@@ -42,7 +52,7 @@ class PostTranslations extends Controller {
 			[
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_translations' ],
-				'permission_callback' => [ $this, 'permissions_check' ],
+				'permission_callback' => [ $this, 'permissions_translate' ],
 			]
 		);
 
@@ -53,20 +63,42 @@ class PostTranslations extends Controller {
 				[
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'show_translation' ],
-					'permission_callback' => [ $this, 'permissions_check' ],
+					'permission_callback' => [ $this, 'permissions_translate' ],
 				],
 				[
 					'methods'             => 'PUT',
 					'callback'            => [ $this, 'save_translation' ],
-					'permission_callback' => [ $this, 'permissions_check' ],
+					'permission_callback' => [ $this, 'permissions_translate' ],
 				],
 				[
 					'methods'             => \WP_REST_Server::DELETABLE,
 					'callback'            => [ $this, 'delete_translation' ],
-					'permission_callback' => [ $this, 'permissions_check' ],
+					'permission_callback' => [ $this, 'permissions_translate' ],
 				],
 			]
 		);
+	}
+
+	/**
+	 * Public post types the user can edit. Used to populate the filter
+	 * dropdown in the React Posts page.
+	 */
+	public function list_post_types() {
+		$out = [];
+		$post_types = get_post_types( [ 'public' => true ], 'objects' );
+		foreach ( $post_types as $type ) {
+			if ( 'attachment' === $type->name ) {
+				continue;
+			}
+			if ( ! current_user_can( $type->cap->edit_posts ?? 'edit_posts' ) ) {
+				continue;
+			}
+			$out[] = [
+				'name'  => $type->name,
+				'label' => $type->labels->name ?? $type->label,
+			];
+		}
+		return $this->ok( $out );
 	}
 
 	public function index( $request ) {
@@ -174,12 +206,6 @@ class PostTranslations extends Controller {
 	}
 
 	private function prepare_post_row( $post, $full = false ) {
-		$translations = TranslationLoader::all_for_post( $post->ID );
-		$status_by_lang = [];
-		foreach ( $translations as $row ) {
-			$status_by_lang[ $row['language_code'] ] = (string) $row['status'];
-		}
-
 		$out = [
 			'id'                  => (int) $post->ID,
 			'title'               => get_the_title( $post ),
@@ -187,7 +213,7 @@ class PostTranslations extends Controller {
 			'status'              => $post->post_status,
 			'type'                => $post->post_type,
 			'modified'            => $post->post_modified_gmt,
-			'translations_status' => $status_by_lang,
+			'translations_status' => TranslationLoader::status_map( $post->ID ),
 		];
 
 		if ( $full ) {

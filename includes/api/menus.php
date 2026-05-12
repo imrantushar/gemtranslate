@@ -24,7 +24,7 @@ class Menus extends Controller {
 			[
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'index' ],
-				'permission_callback' => [ $this, 'permissions_check' ],
+				'permission_callback' => [ $this, 'permissions_translate' ],
 			]
 		);
 
@@ -34,7 +34,7 @@ class Menus extends Controller {
 			[
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'items' ],
-				'permission_callback' => [ $this, 'permissions_check' ],
+				'permission_callback' => [ $this, 'permissions_translate' ],
 			]
 		);
 
@@ -44,7 +44,7 @@ class Menus extends Controller {
 			[
 				'methods'             => 'PUT',
 				'callback'            => [ $this, 'save_item' ],
-				'permission_callback' => [ $this, 'permissions_check' ],
+				'permission_callback' => [ $this, 'permissions_translate' ],
 			]
 		);
 	}

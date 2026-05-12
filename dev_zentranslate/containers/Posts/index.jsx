@@ -1,35 +1,96 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { __, sprintf } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import StatusPill from '../../components/StatusPill';
-import { Field, Select, TextInput } from '../../components/Input';
+import { Field, Select, TextInput, Checkbox } from '../../components/Input';
 import { LoadingBlock } from '../../components/Spinner';
 import Button from '../../components/Button';
+import Toast from '../../components/Toast';
 import { usePosts } from '../../hooks/usePosts';
 import { useLanguages } from '../../hooks/useLanguages';
-import { truncate } from '../../lib/format';
+import { usePostTypes } from '../../hooks/usePostTypes';
+import { useBulkTranslate } from '../../hooks/useJobs';
+import { formatErrorMessage, truncate } from '../../lib/format';
+
+const STATUS_TONE = {
+	publish: 'publish',
+	translated: 'translated',
+	pending: 'pending',
+	draft: 'draft',
+	stale: 'draft',
+};
 
 export default function PostsPage() {
 	const [filters, setFilters] = useState({ post_type: 'post', page: 1, per_page: 20, search: '' });
 	const [search, setSearch] = useState('');
 	const posts = usePosts(filters);
 	const languages = useLanguages();
+	const postTypes = usePostTypes();
+	const bulk = useBulkTranslate();
 	const langs = languages.data || [];
 	const nonDefault = langs.filter((l) => !l.is_default);
+	const types = postTypes.data || [];
+
+	const [selectedIds, setSelectedIds] = useState([]);
+	const [selectedLangs, setSelectedLangs] = useState([]);
+	const [overwrite, setOverwrite] = useState(false);
+	const [toast, setToast] = useState(null);
+
+	// Default selected langs to all non-default whenever language list changes.
+	useEffect(() => {
+		if (selectedLangs.length === 0 && nonDefault.length) {
+			setSelectedLangs(nonDefault.map((l) => l.code));
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [languages.data]);
+
+	const visibleIds = useMemo(() => (posts.data?.rows || []).map((r) => r.id), [posts.data]);
+	const allVisibleSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedIds.includes(id));
+
+	const toggleSelectAll = () => {
+		setSelectedIds((s) => allVisibleSelected ? s.filter((id) => !visibleIds.includes(id)) : Array.from(new Set([ ...s, ...visibleIds ])));
+	};
+	const toggleOne = (id) =>
+		setSelectedIds((s) => s.includes(id) ? s.filter((x) => x !== id) : [ ...s, id ]);
+
+	const toggleLang = (code) =>
+		setSelectedLangs((s) => s.includes(code) ? s.filter((x) => x !== code) : [ ...s, code ]);
 
 	const runSearch = (e) => {
 		e.preventDefault();
 		setFilters((f) => ({ ...f, search, page: 1 }));
 	};
 
+	const runBulk = async () => {
+		if (selectedIds.length === 0 || selectedLangs.length === 0) return;
+		try {
+			const result = await bulk.mutateAsync({
+				post_ids: selectedIds,
+				languages: selectedLangs,
+				options: { use_memory: true, preserve_html: true, overwrite },
+			});
+			setSelectedIds([]);
+			setToast({
+				tone: 'success',
+				message: sprintf(
+					/* translators: %d: number of jobs queued. */
+					__('%d translation jobs queued. See Jobs page for progress.', 'zentranslate'),
+					result.queued
+				),
+			});
+		} catch (err) {
+			setToast({ tone: 'error', message: formatErrorMessage(err) });
+		}
+	};
+
 	return (
 		<>
 			<PageHeader
 				title={__('Posts & Pages', 'zentranslate')}
-				description={__('Pick a post to translate it into your active languages.', 'zentranslate')}
+				description={__('Pick a post to translate it into your active languages, or bulk-translate with AI.', 'zentranslate')}
 			/>
 
 			<Card padded={false}>
@@ -37,9 +98,16 @@ export default function PostsPage() {
 					<div className="ztrans-min-w-[160px]">
 						<Field label={__('Post type', 'zentranslate')}>
 							<Select value={filters.post_type} onChange={(e) => setFilters((f) => ({ ...f, post_type: e.target.value, page: 1 }))}>
-								<option value="post">{__('Posts', 'zentranslate')}</option>
-								<option value="page">{__('Pages', 'zentranslate')}</option>
-								<option value="product">{__('Products (Woo)', 'zentranslate')}</option>
+								{types.length === 0 ? (
+									<>
+										<option value="post">{__('Posts', 'zentranslate')}</option>
+										<option value="page">{__('Pages', 'zentranslate')}</option>
+									</>
+								) : (
+									types.map((t) => (
+										<option key={t.name} value={t.name}>{t.label}</option>
+									))
+								)}
 							</Select>
 						</Field>
 					</div>
@@ -51,6 +119,39 @@ export default function PostsPage() {
 					<Button type="submit" variant="secondary">{__('Filter', 'zentranslate')}</Button>
 				</form>
 
+				{selectedIds.length > 0 && (
+					<div className="ztrans-flex ztrans-flex-wrap ztrans-items-center ztrans-justify-between ztrans-gap-3 ztrans-border-b ztrans-border-ztrans-border ztrans-bg-blue-50 ztrans-px-4 ztrans-py-3 ztrans-text-sm">
+						<div className="ztrans-flex ztrans-flex-wrap ztrans-items-center ztrans-gap-3">
+							<strong>
+								{sprintf(
+									/* translators: %d: number of selected posts. */
+									__('%d selected', 'zentranslate'),
+									selectedIds.length
+								)}
+							</strong>
+							<div className="ztrans-flex ztrans-gap-2">
+								{nonDefault.map((l) => (
+									<Checkbox
+										key={l.code}
+										label={l.code}
+										checked={selectedLangs.includes(l.code)}
+										onChange={() => toggleLang(l.code)}
+									/>
+								))}
+							</div>
+							<Checkbox label={__('Overwrite existing', 'zentranslate')} checked={overwrite} onChange={(e) => setOverwrite(e.target.checked)} />
+						</div>
+						<div className="ztrans-flex ztrans-gap-2">
+							<Button variant="ghost" size="sm" onClick={() => setSelectedIds([])}>
+								{__('Clear', 'zentranslate')}
+							</Button>
+							<Button size="sm" onClick={runBulk} loading={bulk.isPending} disabled={selectedLangs.length === 0}>
+								{__('Translate selected with AI', 'zentranslate')}
+							</Button>
+						</div>
+					</div>
+				)}
+
 				{posts.isLoading ? (
 					<LoadingBlock>{__('Loading posts…', 'zentranslate')}</LoadingBlock>
 				) : posts.data?.rows.length === 0 ? (
@@ -61,6 +162,9 @@ export default function PostsPage() {
 					<table className="ztrans-w-full ztrans-text-sm">
 						<thead className="ztrans-bg-ztrans-bg ztrans-text-left ztrans-text-xs ztrans-uppercase ztrans-text-ztrans-muted">
 							<tr>
+								<th className="ztrans-px-4 ztrans-py-3 ztrans-w-10">
+									<input type="checkbox" checked={allVisibleSelected} onChange={toggleSelectAll} aria-label={__('Select all visible', 'zentranslate')} />
+								</th>
 								<th className="ztrans-px-4 ztrans-py-3">{__('Title', 'zentranslate')}</th>
 								<th className="ztrans-px-4 ztrans-py-3">{__('Status', 'zentranslate')}</th>
 								{nonDefault.map((l) => (
@@ -72,19 +176,24 @@ export default function PostsPage() {
 						<tbody>
 							{(posts.data?.rows || []).map((row) => (
 								<tr key={row.id} className="ztrans-border-t ztrans-border-ztrans-border">
+									<td className="ztrans-px-4 ztrans-py-3">
+										<input type="checkbox" checked={selectedIds.includes(row.id)} onChange={() => toggleOne(row.id)} aria-label={`Select post ${row.id}`} />
+									</td>
 									<td className="ztrans-px-4 ztrans-py-3 ztrans-max-w-[360px]">
 										<div className="ztrans-font-medium ztrans-text-gray-900">{truncate(row.title, 60)}</div>
 										<div className="ztrans-text-xs ztrans-text-ztrans-muted">/{row.slug}</div>
 									</td>
 									<td className="ztrans-px-4 ztrans-py-3">
-										<StatusPill tone={row.status === 'publish' ? 'publish' : 'draft'}>{row.status}</StatusPill>
+										<StatusPill tone={STATUS_TONE[row.status] || 'none'}>{row.status}</StatusPill>
 									</td>
 									{nonDefault.map((l) => {
 										const status = row.translations_status?.[l.code];
 										return (
 											<td key={l.code} className="ztrans-px-4 ztrans-py-3">
 												{status ? (
-													<StatusPill tone={status === 'publish' ? 'translated' : 'pending'}>{status}</StatusPill>
+													<StatusPill tone={STATUS_TONE[status] || 'pending'}>
+														{status === 'stale' ? __('stale', 'zentranslate') : status}
+													</StatusPill>
 												) : (
 													<StatusPill tone="none">—</StatusPill>
 												)}
@@ -123,6 +232,8 @@ export default function PostsPage() {
 					</div>
 				)}
 			</Card>
+
+			<Toast message={toast?.message} tone={toast?.tone} onClear={() => setToast(null)} />
 		</>
 	);
 }

@@ -3,19 +3,26 @@ import { __ } from '@wordpress/i18n';
 import clsx from 'clsx';
 
 import LanguagePicker from './LanguagePicker';
+import { useJobCounts } from '../hooks/useJobs';
 
 const NAV = [
 	{ to: '/dashboard', label: () => __('Dashboard', 'zentranslate'), icon: '◆' },
 	{ to: '/languages', label: () => __('Languages', 'zentranslate'), icon: '🌐' },
 	{ to: '/posts', label: () => __('Posts & Pages', 'zentranslate'), icon: '📝' },
+	{ to: '/terms', label: () => __('Taxonomies', 'zentranslate'), icon: '🏷' },
 	{ to: '/strings', label: () => __('Strings', 'zentranslate'), icon: '🔤' },
 	{ to: '/menus', label: () => __('Menus', 'zentranslate'), icon: '☰' },
 	{ to: '/seo', label: () => __('SEO', 'zentranslate'), icon: '🔍' },
 	{ to: '/ai', label: () => __('AI Translation', 'zentranslate'), icon: '✨' },
+	{ to: '/glossary', label: () => __('Glossary', 'zentranslate'), icon: '📖' },
+	{ to: '/jobs', label: () => __('Jobs', 'zentranslate'), icon: '⏱', badge: 'jobs' },
 	{ to: '/settings', label: () => __('Settings', 'zentranslate'), icon: '⚙' },
 ];
 
 export default function Sidebar() {
+	const counts = useJobCounts();
+	const liveJobs = (counts.data?.pending ?? 0) + (counts.data?.running ?? 0);
+
 	return (
 		<aside className="ztrans-w-60 ztrans-flex-shrink-0 ztrans-border-r ztrans-border-ztrans-border ztrans-bg-white ztrans-px-4 ztrans-py-6">
 			<div className="ztrans-mb-6 ztrans-px-2">
@@ -42,7 +49,12 @@ export default function Sidebar() {
 						<span className="ztrans-text-base" aria-hidden="true">
 							{item.icon}
 						</span>
-						{item.label()}
+						<span className="ztrans-flex-1">{item.label()}</span>
+						{item.badge === 'jobs' && liveJobs > 0 && (
+							<span className="ztrans-rounded-full ztrans-bg-blue-100 ztrans-px-2 ztrans-py-0.5 ztrans-text-xs ztrans-text-blue-800">
+								{liveJobs}
+							</span>
+						)}
 					</NavLink>
 				))}
 			</nav>

@@ -12,6 +12,7 @@ import { LoadingBlock } from '../../components/Spinner';
 import { usePostTranslations, useSaveTranslation } from '../../hooks/usePosts';
 import { useTranslateWithAI } from '../../hooks/useAI';
 import { formatErrorMessage } from '../../lib/format';
+import SeoTab from './SeoTab';
 
 export default function TranslationEditor() {
 	const { id } = useParams();
@@ -19,6 +20,7 @@ export default function TranslationEditor() {
 	const save = useSaveTranslation();
 	const aiTranslate = useTranslateWithAI();
 	const [selectedLang, setSelectedLang] = useState('');
+	const [tab, setTab] = useState('content');
 	const [form, setForm] = useState({ title: '', content: '', excerpt: '', slug: '', status: 'publish' });
 	const [toast, setToast] = useState(null);
 
@@ -155,6 +157,34 @@ export default function TranslationEditor() {
 						</Button>
 					</div>
 
+					<div className="ztrans-mb-4 ztrans-flex ztrans-border-b ztrans-border-ztrans-border">
+						{[
+							{ key: 'content', label: __('Content', 'zentranslate') },
+							{ key: 'seo', label: __('SEO', 'zentranslate') },
+						].map((t) => (
+							<button
+								key={t.key}
+								type="button"
+								onClick={() => setTab(t.key)}
+								className={`ztrans-bare ztrans-px-4 ztrans-py-2 ztrans-text-sm ztrans-border-b-2 ${
+									tab === t.key
+										? 'ztrans-border-ztrans-primary ztrans-text-ztrans-primary ztrans-font-semibold'
+										: 'ztrans-border-transparent ztrans-text-gray-600 hover:ztrans-text-gray-900'
+								}`}
+							>
+								{t.label}
+							</button>
+						))}
+					</div>
+
+					{tab === 'seo' ? (
+						<SeoTab
+							postId={post.id}
+							sourceLang={defaultLang}
+							targetLang={selectedLang}
+							onToast={setToast}
+						/>
+					) : (
 					<div className="ztrans-grid ztrans-grid-cols-1 lg:ztrans-grid-cols-2 ztrans-gap-6">
 						<Card title={sprintf(/* translators: %s: language code. */ __('Source — %s', 'zentranslate'), defaultLang)}>
 							<div className="ztrans-flex ztrans-flex-col ztrans-gap-3">
@@ -231,6 +261,7 @@ export default function TranslationEditor() {
 							</form>
 						</Card>
 					</div>
+					)}
 				</>
 			)}
 

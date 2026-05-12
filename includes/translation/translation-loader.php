@@ -144,6 +144,57 @@ class TranslationLoader {
 	}
 
 	/**
+	 * Hash of the source content. Stored as `_ztrans_source_hash` post meta on
+	 * the source post; translations record the hash they were derived from in
+	 * the `source_hash` column. Translation is "stale" when those differ.
+	 */
+	public static function hash_source( $post ) {
+		if ( is_numeric( $post ) ) {
+			$post = get_post( $post );
+		}
+		if ( ! $post ) {
+			return '';
+		}
+		return md5( $post->post_title . "\x1f" . $post->post_content . "\x1f" . $post->post_excerpt );
+	}
+
+	public static function get_source_hash( $post_id ) {
+		return (string) get_post_meta( (int) $post_id, '_ztrans_source_hash', true );
+	}
+
+	/**
+	 * Recompute and store the source hash. Returns true when it actually
+	 * changed (i.e., source content was edited).
+	 */
+	public static function refresh_source_hash( $post_id ) {
+		$current = self::get_source_hash( $post_id );
+		$fresh   = self::hash_source( $post_id );
+		if ( $fresh === $current ) {
+			return false;
+		}
+		update_post_meta( (int) $post_id, '_ztrans_source_hash', $fresh );
+		return true;
+	}
+
+	/**
+	 * Map of language_code => 'translated' | 'stale' | 'missing' for a post.
+	 */
+	public static function status_map( $post_id ) {
+		$post_id      = (int) $post_id;
+		$source_hash  = self::get_source_hash( $post_id );
+		$translations = self::all_for_post( $post_id );
+		$map          = [];
+		foreach ( $translations as $row ) {
+			if ( $source_hash && $row['source_hash'] && $row['source_hash'] !== $source_hash ) {
+				$map[ $row['language_code'] ] = 'stale';
+			} else {
+				$map[ $row['language_code'] ] = (string) $row['status'];
+			}
+		}
+		return $map;
+	}
+
+	/**
 	 * Save or update a translation for a post. Creates the group if needed.
 	 *
 	 * @return bool
@@ -163,6 +214,13 @@ class TranslationLoader {
 		global $wpdb;
 		$table = Helper::table( 'post_translations' );
 
+		// Stamp the current source hash so we can detect staleness later.
+		$source_hash = self::get_source_hash( $post_id );
+		if ( '' === $source_hash ) {
+			self::refresh_source_hash( $post_id );
+			$source_hash = self::get_source_hash( $post_id );
+		}
+
 		$data = [
 			'group_id'      => $group_id,
 			'language_code' => $language,
@@ -172,7 +230,7 @@ class TranslationLoader {
 			'excerpt'       => (string) ( $fields['excerpt'] ?? '' ),
 			'slug'          => sanitize_title( $fields['slug'] ?? '' ),
 			'status'        => (string) ( $fields['status'] ?? 'publish' ),
-			'source_hash'   => (string) ( $fields['source_hash'] ?? '' ),
+			'source_hash'   => (string) ( $fields['source_hash'] ?? $source_hash ),
 			'updated_at'    => Helper::get_time(),
 		];
 

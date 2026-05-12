@@ -11,8 +11,22 @@ class Installer {
 		$self = new self();
 		$self->run_migrator();
 		$self->seed_default_language();
+		$self->add_capabilities();
 		$self->save_option();
 		Helper::flush_rewrite_rules();
+	}
+
+	/**
+	 * Grant translator capability to admin and editor roles. Idempotent.
+	 */
+	public function add_capabilities() {
+		$cap = 'ztrans_translate_content';
+		foreach ( [ 'administrator', 'editor' ] as $role_name ) {
+			$role = get_role( $role_name );
+			if ( $role && ! $role->has_cap( $cap ) ) {
+				$role->add_cap( $cap );
+			}
+		}
 	}
 
 	public function run_migrator() {

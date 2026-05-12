@@ -25,7 +25,7 @@ class Strings extends Controller {
 			[
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'index' ],
-				'permission_callback' => [ $this, 'permissions_check' ],
+				'permission_callback' => [ $this, 'permissions_translate' ],
 				'args'                => [
 					'page'     => [ 'type' => 'integer', 'default' => 1 ],
 					'per_page' => [ 'type' => 'integer', 'default' => 50 ],
@@ -42,7 +42,7 @@ class Strings extends Controller {
 			[
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'domains' ],
-				'permission_callback' => [ $this, 'permissions_check' ],
+				'permission_callback' => [ $this, 'permissions_translate' ],
 			]
 		);
 
@@ -52,7 +52,7 @@ class Strings extends Controller {
 			[
 				'methods'             => 'PUT',
 				'callback'            => [ $this, 'save_translation' ],
-				'permission_callback' => [ $this, 'permissions_check' ],
+				'permission_callback' => [ $this, 'permissions_translate' ],
 			]
 		);
 
@@ -62,7 +62,7 @@ class Strings extends Controller {
 			[
 				'methods'             => 'PATCH',
 				'callback'            => [ $this, 'bulk_save' ],
-				'permission_callback' => [ $this, 'permissions_check' ],
+				'permission_callback' => [ $this, 'permissions_translate' ],
 			]
 		);
 
@@ -72,7 +72,7 @@ class Strings extends Controller {
 			[
 				'methods'             => \WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'scan' ],
-				'permission_callback' => [ $this, 'permissions_check' ],
+				'permission_callback' => [ $this, 'permissions_translate' ],
 				'args'                => [
 					'target' => [ 'type' => 'string', 'default' => 'active_theme' ],
 					'path'   => [ 'type' => 'string' ],

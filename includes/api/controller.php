@@ -15,8 +15,12 @@ abstract class Controller {
 
 	abstract public function register_routes();
 
+	const CAP_TRANSLATE = 'ztrans_translate_content';
+
 	/**
-	 * Default permission: manage_options. Subclasses can override.
+	 * Admin-only permission. Used for managing languages, AI provider
+	 * credentials, plugin settings — anything where leaking creds or
+	 * destabilising the site matters.
 	 */
 	public function permissions_check( $request ) {
 		if ( current_user_can( 'manage_options' ) ) {
@@ -25,6 +29,22 @@ abstract class Controller {
 		return new \WP_Error(
 			'ztrans_forbidden',
 			__( 'You do not have permission to perform this action.', 'zentranslate' ),
+			[ 'status' => rest_authorization_required_code() ]
+		);
+	}
+
+	/**
+	 * Translator permission. Used for translation surfaces (posts, terms,
+	 * menus, strings, SEO) so editors with the `ztrans_translate_content`
+	 * cap can work without being granted full admin rights.
+	 */
+	public function permissions_translate( $request ) {
+		if ( current_user_can( self::CAP_TRANSLATE ) || current_user_can( 'manage_options' ) ) {
+			return true;
+		}
+		return new \WP_Error(
+			'ztrans_forbidden',
+			__( 'You do not have permission to translate content.', 'zentranslate' ),
 			[ 'status' => rest_authorization_required_code() ]
 		);
 	}

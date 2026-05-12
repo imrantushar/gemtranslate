@@ -25,7 +25,7 @@ class Stats extends Controller {
 			[
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'show' ],
-				'permission_callback' => [ $this, 'permissions_check' ],
+				'permission_callback' => [ $this, 'permissions_translate' ],
 			]
 		);
 	}

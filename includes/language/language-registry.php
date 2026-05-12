@@ -77,7 +77,11 @@ class LanguageRegistry {
 		$data['created_at'] = Helper::get_time();
 		$result = $wpdb->insert( $this->table(), $data );
 		$this->flush_cache();
-		return $result ? $data['code'] : false;
+		if ( $result ) {
+			do_action( 'ztrans_language_changed', 'inserted', $data['code'] );
+			return $data['code'];
+		}
+		return false;
 	}
 
 	public function update( $code, array $data ) {
@@ -89,7 +93,11 @@ class LanguageRegistry {
 		}
 		$result = $wpdb->update( $this->table(), $data, [ 'code' => $code ] );
 		$this->flush_cache();
-		return $result !== false;
+		if ( $result !== false ) {
+			do_action( 'ztrans_language_changed', 'updated', $code );
+			return true;
+		}
+		return false;
 	}
 
 	public function delete( $code ) {
@@ -100,7 +108,11 @@ class LanguageRegistry {
 		}
 		$result = $wpdb->delete( $this->table(), [ 'code' => $code ] );
 		$this->flush_cache();
-		return $result !== false;
+		if ( $result !== false ) {
+			do_action( 'ztrans_language_changed', 'deleted', $code );
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -111,6 +123,7 @@ class LanguageRegistry {
 		$wpdb->update( $this->table(), [ 'is_default' => 0 ], [ 'is_default' => 1 ] );
 		$wpdb->update( $this->table(), [ 'is_default' => 1, 'active' => 1 ], [ 'code' => $code ] );
 		$this->flush_cache();
+		do_action( 'ztrans_language_changed', 'default_set', $code );
 	}
 
 	public function flush_cache() {

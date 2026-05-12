@@ -14,6 +14,7 @@ class API {
 		API\Strings::init();
 		API\SEO::init();
 		API\AI::init();
+		API\Jobs::init();
 		API\Settings::init();
 		API\Stats::init();
 	}

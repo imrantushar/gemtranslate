@@ -16,6 +16,7 @@ class Settings extends Controller {
 		'object_cache_enabled',
 		'debug_log_enabled',
 		'remove_data_on_uninstall',
+		'onboarding_complete',
 	];
 
 	public static function init() {
@@ -119,6 +120,7 @@ class Settings extends Controller {
 			'object_cache_enabled'     => true,
 			'debug_log_enabled'        => false,
 			'remove_data_on_uninstall' => false,
+			'onboarding_complete'      => false,
 		];
 		$saved = json_decode( get_option( ZTRANS_SETTINGS_NAME, '{}' ), true );
 		if ( ! is_array( $saved ) ) {
