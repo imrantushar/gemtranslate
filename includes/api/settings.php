@@ -17,6 +17,8 @@ class Settings extends Controller {
 		'debug_log_enabled',
 		'remove_data_on_uninstall',
 		'onboarding_complete',
+		'auto_redirect_browser_lang',
+		'translate_emails',
 	];
 
 	public static function init() {
@@ -121,6 +123,8 @@ class Settings extends Controller {
 			'debug_log_enabled'        => false,
 			'remove_data_on_uninstall' => false,
 			'onboarding_complete'      => false,
+			'auto_redirect_browser_lang' => false,
+			'translate_emails'          => false,
 		];
 		$saved = json_decode( get_option( ZTRANS_SETTINGS_NAME, '{}' ), true );
 		if ( ! is_array( $saved ) ) {

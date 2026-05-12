@@ -7,6 +7,7 @@ module.exports = {
 	...defaultConfig,
 	entry: {
 		backend: path.resolve(__dirname, 'dev_zentranslate/index.jsx'),
+		editor: path.resolve(__dirname, 'dev_zentranslate/editor/index.jsx'),
 	},
 	output: {
 		filename: `[name].${ZTRANS_VERSION}.js`,

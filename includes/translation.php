@@ -11,5 +11,6 @@ class Translation {
 		Translation\TermTranslator::init();
 		Translation\MenuTranslator::init();
 		Translation\StringTranslator::init();
+		Translation\MetaTranslator::init();
 	}
 }

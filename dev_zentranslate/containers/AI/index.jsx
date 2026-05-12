@@ -19,6 +19,7 @@ const PROVIDERS = [
 	{ key: 'openai', label: 'OpenAI', hint: () => __('Uses GPT models. Best quality, BYOK.', 'zentranslate') },
 	{ key: 'deepl', label: 'DeepL', hint: () => __('Specialized translation API. BYOK.', 'zentranslate') },
 	{ key: 'google', label: 'Google', hint: () => __('Cloud Translation v2 (API key auth).', 'zentranslate') },
+	{ key: 'cloud', label: 'Zentranslate Cloud', hint: () => __('Hosted proxy with credit packs. Set the endpoint and license key.', 'zentranslate') },
 ];
 
 export default function AIPage() {
@@ -63,6 +64,7 @@ export default function AIPage() {
 		}
 		if (cfg.model) payload.model = cfg.model;
 		if (cfg.use_pro) payload.use_pro = cfg.use_pro;
+		if (cfg.endpoint) payload.endpoint = cfg.endpoint;
 
 		try {
 			await test.mutateAsync({ name, ...payload });
@@ -131,6 +133,15 @@ export default function AIPage() {
 										checked={!!cfg.use_pro}
 										onChange={(e) => update(p.key, 'use_pro', e.target.checked)}
 									/>
+								)}
+								{p.key === 'cloud' && (
+									<Field label={__('Cloud endpoint', 'zentranslate')} hint={__('https://your-zentranslate-cloud.example.com', 'zentranslate')}>
+										<TextInput
+											value={cfg.endpoint || ''}
+											onChange={(e) => update(p.key, 'endpoint', e.target.value)}
+											placeholder="https://"
+										/>
+									</Field>
 								)}
 								<Button variant="secondary" size="sm" onClick={() => onTest(p.key)} loading={test.isPending}>
 									{__('Test credentials', 'zentranslate')}

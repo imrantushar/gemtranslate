@@ -39,7 +39,7 @@ class AI extends Controller {
 
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/providers/(?P<name>openai|deepl|google)/test',
+			'/' . $this->rest_base . '/providers/(?P<name>openai|deepl|google|cloud)/test',
 			[
 				'methods'             => \WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'test_provider' ],
@@ -138,7 +138,7 @@ class AI extends Controller {
 					$current['api_key'] = '';
 				}
 
-				foreach ( [ 'model', 'use_pro' ] as $k ) {
+				foreach ( [ 'model', 'use_pro', 'endpoint' ] as $k ) {
 					if ( array_key_exists( $k, $cfg ) ) {
 						$current[ $k ] = $cfg[ $k ];
 					}
@@ -156,16 +156,19 @@ class AI extends Controller {
 		$body      = $request->get_json_params() ?: $request->get_params();
 
 		// Allow inline credentials for a transient test before saving.
-		if ( ! empty( $body['api_key'] ) ) {
+		if ( ! empty( $body['api_key'] ) || ! empty( $body['endpoint'] ) ) {
 			switch ( $name ) {
 				case 'openai':
-					$translator = new \Zentranslate\AI\OpenAiTranslator( $body['api_key'], $body['model'] ?? '' );
+					$translator = new \Zentranslate\AI\OpenAiTranslator( $body['api_key'] ?? '', $body['model'] ?? '' );
 					break;
 				case 'deepl':
-					$translator = new \Zentranslate\AI\DeeplTranslator( $body['api_key'], ! empty( $body['use_pro'] ) );
+					$translator = new \Zentranslate\AI\DeeplTranslator( $body['api_key'] ?? '', ! empty( $body['use_pro'] ) );
 					break;
 				case 'google':
-					$translator = new \Zentranslate\AI\GoogleTranslator( $body['api_key'] );
+					$translator = new \Zentranslate\AI\GoogleTranslator( $body['api_key'] ?? '' );
+					break;
+				case 'cloud':
+					$translator = new \Zentranslate\AI\CloudTranslator( $body['api_key'] ?? '', $body['endpoint'] ?? '' );
 					break;
 				default:
 					return $this->fail( 'ztrans_unknown_provider', __( 'Unknown provider.', 'zentranslate' ), 400 );

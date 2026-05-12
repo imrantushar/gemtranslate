@@ -13,6 +13,9 @@ import { usePostTranslations, useSaveTranslation } from '../../hooks/usePosts';
 import { useTranslateWithAI } from '../../hooks/useAI';
 import { formatErrorMessage } from '../../lib/format';
 import SeoTab from './SeoTab';
+import MetaTab from './MetaTab';
+import BlocksTab from './BlocksTab';
+import HistoryTab from './HistoryTab';
 
 export default function TranslationEditor() {
 	const { id } = useParams();
@@ -160,7 +163,10 @@ export default function TranslationEditor() {
 					<div className="ztrans-mb-4 ztrans-flex ztrans-border-b ztrans-border-ztrans-border">
 						{[
 							{ key: 'content', label: __('Content', 'zentranslate') },
+							{ key: 'blocks', label: __('Blocks', 'zentranslate') },
+							{ key: 'meta', label: __('Fields', 'zentranslate') },
 							{ key: 'seo', label: __('SEO', 'zentranslate') },
+							{ key: 'history', label: __('History', 'zentranslate') },
 						].map((t) => (
 							<button
 								key={t.key}
@@ -178,12 +184,13 @@ export default function TranslationEditor() {
 					</div>
 
 					{tab === 'seo' ? (
-						<SeoTab
-							postId={post.id}
-							sourceLang={defaultLang}
-							targetLang={selectedLang}
-							onToast={setToast}
-						/>
+						<SeoTab postId={post.id} sourceLang={defaultLang} targetLang={selectedLang} onToast={setToast} />
+					) : tab === 'meta' ? (
+						<MetaTab postId={post.id} sourceLang={defaultLang} targetLang={selectedLang} />
+					) : tab === 'blocks' ? (
+						<BlocksTab postId={post.id} sourceLang={defaultLang} targetLang={selectedLang} />
+					) : tab === 'history' ? (
+						<HistoryTab postId={post.id} targetLang={selectedLang} />
 					) : (
 					<div className="ztrans-grid ztrans-grid-cols-1 lg:ztrans-grid-cols-2 ztrans-gap-6">
 						<Card title={sprintf(/* translators: %s: language code. */ __('Source — %s', 'zentranslate'), defaultLang)}>

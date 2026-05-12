@@ -42,6 +42,25 @@ export default function SettingsPage() {
 			/>
 
 			<div className="ztrans-grid ztrans-gap-6 md:ztrans-grid-cols-2">
+				<Card title={__('Visitor experience', 'zentranslate')}>
+					<Checkbox
+						label={__('Auto-redirect first visit by browser language', 'zentranslate')}
+						checked={!!values.auto_redirect_browser_lang}
+						onChange={(e) => set('auto_redirect_browser_lang', e.target.checked)}
+					/>
+					<p className="ztrans-mt-1 ztrans-mb-3 ztrans-text-xs ztrans-text-ztrans-muted">
+						{__('Matches Accept-Language against active languages; 302s once and remembers the choice in a cookie.', 'zentranslate')}
+					</p>
+					<Checkbox
+						label={__('Translate transactional emails per recipient', 'zentranslate')}
+						checked={!!values.translate_emails}
+						onChange={(e) => set('translate_emails', e.target.checked)}
+					/>
+					<p className="ztrans-mt-1 ztrans-mb-0 ztrans-text-xs ztrans-text-ztrans-muted">
+						{__('Switches WP locale for the duration of each wp_mail() call to match the recipient\'s Zentranslate preferred language.', 'zentranslate')}
+					</p>
+				</Card>
+
 				<Card title={__('URL strategy', 'zentranslate')}>
 					<Field label={__('Pattern', 'zentranslate')}>
 						<Select value={values.url_strategy} onChange={(e) => set('url_strategy', e.target.value)} disabled>

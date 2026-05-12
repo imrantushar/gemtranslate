@@ -10,6 +10,52 @@ class Assets {
 	public static function init() {
 		$self = new self();
 		add_action( 'admin_enqueue_scripts', [ $self, 'enqueue_admin' ] );
+		add_action( 'enqueue_block_editor_assets', [ $self, 'enqueue_block_editor' ] );
+	}
+
+	/**
+	 * Load the Zentranslate Gutenberg sidebar plugin on the post editor.
+	 */
+	public function enqueue_block_editor() {
+		$build_dir  = ZTRANS_ASSETS_DIR_PATH . 'build/';
+		$asset_file = $build_dir . 'editor.' . ZTRANS_VERSION . '.asset.php';
+		$bundle_js  = $build_dir . 'editor.' . ZTRANS_VERSION . '.js';
+		$bundle_css = $build_dir . 'editor.css';
+
+		if ( ! file_exists( $bundle_js ) ) {
+			return;
+		}
+		$asset = file_exists( $asset_file ) ? include $asset_file : [];
+		$deps  = $asset['dependencies'] ?? [ 'wp-plugins', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-i18n' ];
+		$ver   = $asset['version'] ?? ZTRANS_VERSION;
+
+		wp_enqueue_script(
+			'zentranslate-editor',
+			ZTRANS_ASSETS_URI . 'build/editor.' . ZTRANS_VERSION . '.js',
+			$deps,
+			$ver,
+			true
+		);
+		wp_localize_script(
+			'zentranslate-editor',
+			'ztrans',
+			[
+				'root'      => esc_url_raw( rest_url( ZTRANS_REST_NAMESPACE . '/' ) ),
+				'nonce'     => wp_create_nonce( 'wp_rest' ),
+				'adminUrl'  => admin_url(),
+				'version'   => ZTRANS_VERSION,
+			]
+		);
+		wp_set_script_translations( 'zentranslate-editor', 'zentranslate', ZTRANS_ROOT_DIR_PATH . 'languages' );
+
+		if ( file_exists( $bundle_css ) ) {
+			wp_enqueue_style(
+				'zentranslate-editor',
+				ZTRANS_ASSETS_URI . 'build/editor.css',
+				[],
+				$ver
+			);
+		}
 	}
 
 	/**

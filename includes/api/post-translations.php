@@ -6,6 +6,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Zentranslate\Language\Context;
+use Zentranslate\Translation\BlockParser;
+use Zentranslate\Translation\MetaTranslator;
 use Zentranslate\Translation\TranslationLoader;
 
 class PostTranslations extends Controller {
@@ -53,6 +55,40 @@ class PostTranslations extends Controller {
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_translations' ],
 				'permission_callback' => [ $this, 'permissions_translate' ],
+			]
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>\d+)/blocks/(?P<lang>[a-z0-9\-]{2,10})',
+			[
+				[
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'get_blocks' ],
+					'permission_callback' => [ $this, 'permissions_translate' ],
+				],
+				[
+					'methods'             => 'PUT',
+					'callback'            => [ $this, 'save_blocks' ],
+					'permission_callback' => [ $this, 'permissions_translate' ],
+				],
+			]
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>\d+)/meta-translations/(?P<lang>[a-z0-9\-]{2,10})',
+			[
+				[
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'get_meta' ],
+					'permission_callback' => [ $this, 'permissions_translate' ],
+				],
+				[
+					'methods'             => 'PUT',
+					'callback'            => [ $this, 'save_meta' ],
+					'permission_callback' => [ $this, 'permissions_translate' ],
+				],
 			]
 		);
 
@@ -203,6 +239,160 @@ class PostTranslations extends Controller {
 		$lang    = strtolower( $request['lang'] );
 		TranslationLoader::delete_translation( $post_id, $lang );
 		return $this->ok( [ 'deleted' => true, 'post_id' => $post_id, 'language_code' => $lang ] );
+	}
+
+	public function get_blocks( $request ) {
+		$post_id = (int) $request['id'];
+		$lang    = strtolower( $request['lang'] );
+		$post    = get_post( $post_id );
+		if ( ! $post ) {
+			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
+		}
+
+		$source_fields = BlockParser::extract( $post->post_content );
+		if ( empty( $source_fields ) ) {
+			return $this->ok( [
+				'is_block_content' => false,
+				'fields'           => [],
+			] );
+		}
+
+		// Map existing translation content to source paths.
+		$translated_content = '';
+		foreach ( TranslationLoader::all_for_post( $post_id ) as $row ) {
+			if ( $row['language_code'] === $lang ) {
+				$translated_content = (string) $row['content'];
+				break;
+			}
+		}
+
+		$translated_paths = [];
+		if ( BlockParser::is_block_content( $translated_content ) ) {
+			foreach ( BlockParser::extract( $translated_content ) as $f ) {
+				$translated_paths[ $f['path'] ] = $f['value'];
+			}
+		}
+
+		$out = [];
+		foreach ( $source_fields as $f ) {
+			$out[] = [
+				'path'        => $f['path'],
+				'block'       => $f['block'],
+				'kind'        => $f['kind'],
+				'attr'        => $f['attr'],
+				'source'      => $f['value'],
+				'translation' => $translated_paths[ $f['path'] ] ?? '',
+			];
+		}
+
+		return $this->ok( [
+			'is_block_content' => true,
+			'fields'           => $out,
+		] );
+	}
+
+	public function save_blocks( $request ) {
+		$post_id = (int) $request['id'];
+		$lang    = strtolower( $request['lang'] );
+		if ( ! Context::is_active( $lang ) ) {
+			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );
+		}
+		$post = get_post( $post_id );
+		if ( ! $post ) {
+			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
+		}
+
+		$body   = $request->get_json_params() ?: $request->get_params();
+		$fields = (array) ( $body['fields'] ?? [] );
+		$map    = [];
+		foreach ( $fields as $f ) {
+			$path = (string) ( $f['path'] ?? '' );
+			if ( '' === $path ) {
+				continue;
+			}
+			$map[ $path ] = (string) ( $f['value'] ?? '' );
+		}
+
+		$rebuilt = BlockParser::apply( $post->post_content, $map );
+
+		// Merge with existing title/excerpt if a translation already exists,
+		// otherwise seed those fields from the source so the post can be
+		// rendered immediately.
+		$existing = null;
+		foreach ( TranslationLoader::all_for_post( $post_id ) as $row ) {
+			if ( $row['language_code'] === $lang ) {
+				$existing = $row;
+				break;
+			}
+		}
+
+		$ok = TranslationLoader::save_translation(
+			$post_id,
+			$lang,
+			[
+				'title'   => $existing['title']   ?? $post->post_title,
+				'content' => $rebuilt,
+				'excerpt' => $existing['excerpt'] ?? $post->post_excerpt,
+				'slug'    => $existing['slug']    ?? $post->post_name,
+				'status'  => $existing['status']  ?? 'publish',
+			]
+		);
+		if ( ! $ok ) {
+			return $this->fail( 'ztrans_save_failed', __( 'Could not save block translation.', 'zentranslate' ), 500 );
+		}
+		return $this->get_blocks( $request );
+	}
+
+	public function get_meta( $request ) {
+		$post_id = (int) $request['id'];
+		$lang    = strtolower( $request['lang'] );
+		if ( ! get_post( $post_id ) ) {
+			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
+		}
+
+		$fields       = MetaTranslator::enumerate_fields( $post_id );
+		$translations = MetaTranslator::all_for_post( $post_id, $lang );
+		$by_key       = [];
+		foreach ( $translations as $row ) {
+			$by_key[ $row['meta_key'] ] = $row['meta_value'];
+		}
+		$out = [];
+		foreach ( $fields as $f ) {
+			$out[] = [
+				'key'         => $f['key'],
+				'label'       => $f['label'],
+				'type'        => $f['type'],
+				'source'      => $f['value'],
+				'translation' => $by_key[ $f['key'] ] ?? '',
+			];
+		}
+		return $this->ok( $out );
+	}
+
+	public function save_meta( $request ) {
+		$post_id = (int) $request['id'];
+		$lang    = strtolower( $request['lang'] );
+		if ( ! Context::is_active( $lang ) ) {
+			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );
+		}
+		$body = $request->get_json_params() ?: $request->get_params();
+		$rows = (array) ( $body['fields'] ?? [] );
+		$saved = 0;
+		foreach ( $rows as $r ) {
+			$key   = (string) ( $r['key'] ?? '' );
+			$value = (string) ( $r['value'] ?? '' );
+			if ( '' === $key ) {
+				continue;
+			}
+			if ( '' === $value ) {
+				MetaTranslator::delete( $post_id, $lang, $key );
+				continue;
+			}
+			if ( MetaTranslator::save( $post_id, $lang, $key, $value ) ) {
+				$saved++;
+			}
+		}
+		return $this->ok( [ 'saved' => $saved ] );
 	}
 
 	private function prepare_post_row( $post, $full = false ) {

@@ -16,6 +16,10 @@ const NAV = [
 	{ to: '/ai', label: () => __('AI Translation', 'zentranslate'), icon: '✨' },
 	{ to: '/glossary', label: () => __('Glossary', 'zentranslate'), icon: '📖' },
 	{ to: '/jobs', label: () => __('Jobs', 'zentranslate'), icon: '⏱', badge: 'jobs' },
+	{ to: '/plugin-translations', label: () => __('Plugin translations', 'zentranslate'), icon: '🪄' },
+	{ to: '/translators', label: () => __('Translators', 'zentranslate'), icon: '👥' },
+	{ to: '/migration', label: () => __('Migration', 'zentranslate'), icon: '⇆' },
+	{ to: '/io', label: () => __('Import & Export', 'zentranslate'), icon: '⇪' },
 	{ to: '/settings', label: () => __('Settings', 'zentranslate'), icon: '⚙' },
 ];
 

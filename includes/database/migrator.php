@@ -32,6 +32,8 @@ class Migrator {
 		CreateJobsTable::up( $prefix, $charset_collate );
 		CreateTranslationMemoryTable::up( $prefix, $charset_collate );
 		CreateGlossaryTable::up( $prefix, $charset_collate );
+		CreatePostMetaTranslationsTable::up( $prefix, $charset_collate );
+		CreatePostTranslationRevisionsTable::up( $prefix, $charset_collate );
 
 		update_option( 'ztrans_db_version', ZTRANS_DB_VERSION );
 	}

@@ -13,6 +13,10 @@ import SeoPage from './containers/SEO';
 import AIPage from './containers/AI';
 import GlossaryPage from './containers/Glossary';
 import JobsPage from './containers/Jobs';
+import PluginTranslationsPage from './containers/PluginTranslations';
+import TranslatorsPage from './containers/Translators';
+import MigrationPage from './containers/Migration';
+import ImportExportPage from './containers/ImportExport';
 import SettingsPage from './containers/Settings';
 import Onboarding from './containers/Onboarding';
 import { useSettings } from './hooks/useSettings';
@@ -54,6 +58,10 @@ export default function App() {
 				<Route path="/ai" element={<AIPage />} />
 				<Route path="/glossary" element={<GlossaryPage />} />
 				<Route path="/jobs" element={<JobsPage />} />
+				<Route path="/plugin-translations" element={<PluginTranslationsPage />} />
+				<Route path="/translators" element={<TranslatorsPage />} />
+				<Route path="/migration" element={<MigrationPage />} />
+				<Route path="/io" element={<ImportExportPage />} />
 				<Route path="/settings" element={<SettingsPage />} />
 			</Routes>
 		</Layout>

@@ -48,6 +48,8 @@ class TranslatorFactory {
 				return new DeeplTranslator( $cfg['api_key'] ?? '', ! empty( $cfg['use_pro'] ) );
 			case 'google':
 				return new GoogleTranslator( $cfg['api_key'] ?? '' );
+			case 'cloud':
+				return new CloudTranslator( $cfg['api_key'] ?? '', $cfg['endpoint'] ?? '' );
 		}
 		return null;
 	}
@@ -59,6 +61,6 @@ class TranslatorFactory {
 	}
 
 	public static function provider_names() {
-		return [ 'openai', 'deepl', 'google' ];
+		return [ 'openai', 'deepl', 'google', 'cloud' ];
 	}
 }

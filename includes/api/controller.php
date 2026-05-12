@@ -40,6 +40,17 @@ abstract class Controller {
 	 */
 	public function permissions_translate( $request ) {
 		if ( current_user_can( self::CAP_TRANSLATE ) || current_user_can( 'manage_options' ) ) {
+			// If the URL carries a `:lang` segment, enforce language scope.
+			if ( $request instanceof \WP_REST_Request ) {
+				$lang = $request->get_param( 'lang' );
+				if ( $lang && ! \Zentranslate\Admin\LanguageScope::can_translate( $lang ) ) {
+					return new \WP_Error(
+						'ztrans_lang_scope',
+						__( 'You are not assigned to translate this language.', 'zentranslate' ),
+						[ 'status' => rest_authorization_required_code() ]
+					);
+				}
+			}
 			return true;
 		}
 		return new \WP_Error(

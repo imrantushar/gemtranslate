@@ -17,7 +17,8 @@ class Installer {
 	}
 
 	/**
-	 * Grant translator capability to admin and editor roles. Idempotent.
+	 * Grant translator capability to admin and editor roles, and create a
+	 * dedicated `ztrans_translator` role. Idempotent.
 	 */
 	public function add_capabilities() {
 		$cap = 'ztrans_translate_content';
@@ -26,6 +27,17 @@ class Installer {
 			if ( $role && ! $role->has_cap( $cap ) ) {
 				$role->add_cap( $cap );
 			}
+		}
+		// Dedicated translator role.
+		if ( ! get_role( 'ztrans_translator' ) ) {
+			add_role(
+				'ztrans_translator',
+				__( 'Translator', 'zentranslate' ),
+				[
+					'read'                     => true,
+					'ztrans_translate_content' => true,
+				]
+			);
 		}
 	}
 

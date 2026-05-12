@@ -361,6 +361,9 @@ input:where([type='file']):focus {
 #zentranslate-admin-root .ztrans-h-6 {
 	height: 1.5rem;
 }
+#zentranslate-admin-root .ztrans-max-h-72 {
+	max-height: 18rem;
+}
 #zentranslate-admin-root .ztrans-w-1\/3 {
 	width: 33.333333%;
 }
@@ -423,6 +426,9 @@ input:where([type='file']):focus {
 #zentranslate-admin-root .ztrans-cursor-not-allowed {
 	cursor: not-allowed;
 }
+#zentranslate-admin-root .ztrans-cursor-pointer {
+	cursor: pointer;
+}
 #zentranslate-admin-root .ztrans-list-disc {
 	list-style-type: disc;
 }
@@ -471,8 +477,14 @@ input:where([type='file']):focus {
 #zentranslate-admin-root .ztrans-gap-6 {
 	gap: 1.5rem;
 }
+#zentranslate-admin-root .ztrans-overflow-auto {
+	overflow: auto;
+}
 #zentranslate-admin-root .ztrans-overflow-x-auto {
 	overflow-x: auto;
+}
+#zentranslate-admin-root .ztrans-whitespace-pre-wrap {
+	white-space: pre-wrap;
 }
 #zentranslate-admin-root .ztrans-rounded {
 	border-radius: 0.25rem;
@@ -592,6 +604,12 @@ input:where([type='file']):focus {
 }
 #zentranslate-admin-root .ztrans-p-1 {
 	padding: 0.25rem;
+}
+#zentranslate-admin-root .ztrans-p-2 {
+	padding: 0.5rem;
+}
+#zentranslate-admin-root .ztrans-p-3 {
+	padding: 0.75rem;
 }
 #zentranslate-admin-root .ztrans-p-4 {
 	padding: 1rem;
@@ -870,6 +888,11 @@ input:where([type='file']):focus {
 #zentranslate-admin-root .hover\:ztrans-bg-red-700:hover {
 	--tw-bg-opacity: 1;
 	background-color: rgb(185 28 28 / var(--tw-bg-opacity, 1));
+}
+
+#zentranslate-admin-root .hover\:ztrans-bg-ztrans-bg:hover {
+	--tw-bg-opacity: 1;
+	background-color: rgb(248 250 252 / var(--tw-bg-opacity, 1));
 }
 
 #zentranslate-admin-root .hover\:ztrans-bg-ztrans-primary-hover:hover {

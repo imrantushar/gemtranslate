@@ -11,5 +11,6 @@ class Admin {
 		Admin\AdminMenu::init();
 		Admin\ProfileField::init();
 		Admin\AdminBar::init();
+		Admin\MailLocalizer::init();
 	}
 }

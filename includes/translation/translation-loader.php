@@ -243,6 +243,18 @@ class TranslationLoader {
 		);
 
 		if ( $exists ) {
+			// Snapshot the previous row before overwriting.
+			$prev = $wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT * FROM $table WHERE group_id = %d AND language_code = %s",
+					$group_id,
+					$language
+				),
+				ARRAY_A
+			);
+			if ( $prev ) {
+				TranslationHistory::snapshot_existing( $prev );
+			}
 			$ok = $wpdb->update( $table, $data, [ 'group_id' => $group_id, 'language_code' => $language ] );
 		} else {
 			$ok = $wpdb->insert( $table, $data );
