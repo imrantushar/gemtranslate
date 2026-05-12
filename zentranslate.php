@@ -89,9 +89,10 @@ final class Zentranslate {
 		Zentranslate\API::init();
 		Zentranslate\Assets::init();
 		Zentranslate\Frontend::init();
-		if ( is_admin() ) {
-			Zentranslate\Admin::init();
-		}
+		// Admin classes self-guard their hooks (admin_menu, admin_bar_menu, etc.)
+		// so init runs unconditionally — keeps the admin bar switcher visible
+		// when logged-in users browse the frontend too.
+		Zentranslate\Admin::init();
 	}
 
 	public function activate() {

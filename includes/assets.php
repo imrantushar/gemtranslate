@@ -46,12 +46,24 @@ class Assets {
 			'zentranslate-backend',
 			'ztrans',
 			[
-				'root'      => esc_url_raw( rest_url( ZTRANS_REST_NAMESPACE . '/' ) ),
-				'nonce'     => wp_create_nonce( 'wp_rest' ),
-				'adminUrl'  => admin_url(),
-				'pluginUrl' => ZTRANS_PLUGIN_ROOT_URI,
-				'version'   => ZTRANS_VERSION,
+				'root'         => esc_url_raw( rest_url( ZTRANS_REST_NAMESPACE . '/' ) ),
+				'nonce'        => wp_create_nonce( 'wp_rest' ),
+				'adminUrl'     => admin_url(),
+				'pluginUrl'    => ZTRANS_PLUGIN_ROOT_URI,
+				'version'      => ZTRANS_VERSION,
+				'currentUser'  => [
+					'id'       => get_current_user_id(),
+					'language' => (string) get_user_meta( get_current_user_id(), 'ztrans_preferred_language', true ),
+				],
 			]
+		);
+
+		// Load translations for the React UI from /languages/. Generates the
+		// `-{locale}-{handle}.json` lookup automatically.
+		wp_set_script_translations(
+			'zentranslate-backend',
+			'zentranslate',
+			ZTRANS_ROOT_DIR_PATH . 'languages'
 		);
 
 		if ( file_exists( $bundle_css ) ) {

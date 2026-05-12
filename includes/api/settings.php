@@ -40,6 +40,57 @@ class Settings extends Controller {
 				],
 			]
 		);
+
+		// Current-user preference. Any logged-in user can set their own
+		// admin language; permission_check just verifies they're logged in.
+		register_rest_route(
+			$this->namespace,
+			'/me/language',
+			[
+				[
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'show_my_language' ],
+					'permission_callback' => [ $this, 'me_permissions' ],
+				],
+				[
+					'methods'             => 'PUT',
+					'callback'            => [ $this, 'update_my_language' ],
+					'permission_callback' => [ $this, 'me_permissions' ],
+				],
+			]
+		);
+	}
+
+	public function me_permissions() {
+		if ( is_user_logged_in() ) {
+			return true;
+		}
+		return new \WP_Error( 'ztrans_unauth', __( 'Login required.', 'zentranslate' ), [ 'status' => 401 ] );
+	}
+
+	public function show_my_language() {
+		$user_id = get_current_user_id();
+		return $this->ok(
+			[
+				'language' => (string) get_user_meta( $user_id, \Zentranslate\Admin\ProfileField::META_KEY, true ),
+			]
+		);
+	}
+
+	public function update_my_language( $request ) {
+		$user_id = get_current_user_id();
+		$body    = $request->get_json_params() ?: $request->get_params();
+		$lang    = isset( $body['language'] ) ? sanitize_key( $body['language'] ) : '';
+
+		if ( '' === $lang ) {
+			delete_user_meta( $user_id, \Zentranslate\Admin\ProfileField::META_KEY );
+		} elseif ( \Zentranslate\Language\Context::is_active( $lang ) ) {
+			update_user_meta( $user_id, \Zentranslate\Admin\ProfileField::META_KEY, $lang );
+		} else {
+			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );
+		}
+
+		return $this->show_my_language();
 	}
 
 	public function show() {

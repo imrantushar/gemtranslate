@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { __, sprintf } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
@@ -42,10 +43,10 @@ export default function LanguagesPage() {
 		try {
 			if (editing) {
 				await update.mutateAsync({ code: editing.code, ...values });
-				setToast({ tone: 'success', message: 'Language updated.' });
+				setToast({ tone: 'success', message: __('Language updated.', 'zentranslate') });
 			} else {
 				await create.mutateAsync(values);
-				setToast({ tone: 'success', message: 'Language added.' });
+				setToast({ tone: 'success', message: __('Language added.', 'zentranslate') });
 			}
 			close();
 		} catch (e) {
@@ -54,10 +55,15 @@ export default function LanguagesPage() {
 	};
 
 	const onDelete = async (lang) => {
-		if (!window.confirm(`Delete ${lang.name}? This will remove all of its translations.`)) return;
+		const confirmMsg = sprintf(
+			/* translators: %s: language name. */
+			__('Delete %s? This will remove all of its translations.', 'zentranslate'),
+			lang.name
+		);
+		if (!window.confirm(confirmMsg)) return;
 		try {
 			await remove.mutateAsync(lang.code);
-			setToast({ tone: 'success', message: 'Language deleted.' });
+			setToast({ tone: 'success', message: __('Language deleted.', 'zentranslate') });
 		} catch (e) {
 			setToast({ tone: 'error', message: formatErrorMessage(e) });
 		}
@@ -66,33 +72,40 @@ export default function LanguagesPage() {
 	const onMakeDefault = async (lang) => {
 		try {
 			await setDefault.mutateAsync(lang.code);
-			setToast({ tone: 'success', message: `${lang.name} is now the default.` });
+			setToast({
+				tone: 'success',
+				message: sprintf(
+					/* translators: %s: language name. */
+					__('%s is now the default.', 'zentranslate'),
+					lang.name
+				),
+			});
 		} catch (e) {
 			setToast({ tone: 'error', message: formatErrorMessage(e) });
 		}
 	};
 
 	if (languages.isLoading) {
-		return <LoadingBlock>Loading languages…</LoadingBlock>;
+		return <LoadingBlock>{__('Loading languages…', 'zentranslate')}</LoadingBlock>;
 	}
 
 	return (
 		<>
 			<PageHeader
-				title="Languages"
-				description="Manage the languages your site supports."
-				actions={<Button onClick={openCreate}>Add language</Button>}
+				title={__('Languages', 'zentranslate')}
+				description={__('Manage the languages your site supports.', 'zentranslate')}
+				actions={<Button onClick={openCreate}>{__('Add language', 'zentranslate')}</Button>}
 			/>
 
 			<Card padded={false}>
 				<table className="ztrans-w-full ztrans-text-sm">
 					<thead className="ztrans-bg-ztrans-bg ztrans-text-left ztrans-text-xs ztrans-uppercase ztrans-text-ztrans-muted">
 						<tr>
-							<th className="ztrans-px-4 ztrans-py-3">Language</th>
-							<th className="ztrans-px-4 ztrans-py-3">Code</th>
-							<th className="ztrans-px-4 ztrans-py-3">Locale</th>
-							<th className="ztrans-px-4 ztrans-py-3">Status</th>
-							<th className="ztrans-px-4 ztrans-py-3 ztrans-text-right">Actions</th>
+							<th className="ztrans-px-4 ztrans-py-3">{__('Language', 'zentranslate')}</th>
+							<th className="ztrans-px-4 ztrans-py-3">{__('Code', 'zentranslate')}</th>
+							<th className="ztrans-px-4 ztrans-py-3">{__('Locale', 'zentranslate')}</th>
+							<th className="ztrans-px-4 ztrans-py-3">{__('Status', 'zentranslate')}</th>
+							<th className="ztrans-px-4 ztrans-py-3 ztrans-text-right">{__('Actions', 'zentranslate')}</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -107,24 +120,24 @@ export default function LanguagesPage() {
 								<td className="ztrans-px-4 ztrans-py-3"><code>{lang.code}</code></td>
 								<td className="ztrans-px-4 ztrans-py-3 ztrans-text-ztrans-muted">{lang.locale}</td>
 								<td className="ztrans-px-4 ztrans-py-3">
-									{lang.is_default && <StatusPill tone="publish">Default</StatusPill>}
-									{!lang.is_default && lang.active && <StatusPill tone="pending">Active</StatusPill>}
-									{!lang.active && <StatusPill tone="draft">Inactive</StatusPill>}
-									{lang.is_rtl && <StatusPill>RTL</StatusPill>}
+									{lang.is_default && <StatusPill tone="publish">{__('Default', 'zentranslate')}</StatusPill>}
+									{!lang.is_default && lang.active && <StatusPill tone="pending">{__('Active', 'zentranslate')}</StatusPill>}
+									{!lang.active && <StatusPill tone="draft">{__('Inactive', 'zentranslate')}</StatusPill>}
+									{lang.is_rtl && <StatusPill>{__('RTL', 'zentranslate')}</StatusPill>}
 								</td>
 								<td className="ztrans-px-4 ztrans-py-3 ztrans-text-right">
 									<div className="ztrans-flex ztrans-justify-end ztrans-gap-2">
 										{!lang.is_default && (
 											<Button variant="ghost" size="sm" onClick={() => onMakeDefault(lang)}>
-												Make default
+												{__('Make default', 'zentranslate')}
 											</Button>
 										)}
 										<Button variant="secondary" size="sm" onClick={() => openEdit(lang)}>
-											Edit
+											{__('Edit', 'zentranslate')}
 										</Button>
 										{!lang.is_default && (
 											<Button variant="ghost" size="sm" onClick={() => onDelete(lang)}>
-												Delete
+												{__('Delete', 'zentranslate')}
 											</Button>
 										)}
 									</div>
@@ -135,7 +148,11 @@ export default function LanguagesPage() {
 				</table>
 			</Card>
 
-			<Modal open={modalOpen} title={editing ? 'Edit language' : 'Add language'} onClose={close}>
+			<Modal
+				open={modalOpen}
+				title={editing ? __('Edit language', 'zentranslate') : __('Add language', 'zentranslate')}
+				onClose={close}
+			>
 				<LanguageForm
 					initial={editing}
 					onCancel={close}

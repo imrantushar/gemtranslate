@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { __, sprintf } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
@@ -31,7 +32,7 @@ function useSaveMenuItem() {
 	return useMutation({
 		mutationFn: async ({ itemId, lang, payload }) =>
 			unwrap(await api.put(`menus/items/${itemId}/translations/${lang}`, payload)),
-		onSuccess: (_d, vars) => qc.invalidateQueries({ queryKey: ['menus'] }),
+		onSuccess: () => qc.invalidateQueries({ queryKey: ['menus'] }),
 	});
 }
 
@@ -51,7 +52,7 @@ export default function MenusPage() {
 		if (!selectedLang && nonDefault.length) setSelectedLang(nonDefault[0].code);
 	}, [menus.data, nonDefault, selectedMenu, selectedLang]);
 
-	if (menus.isLoading || langs.isLoading) return <LoadingBlock>Loading menus…</LoadingBlock>;
+	if (menus.isLoading || langs.isLoading) return <LoadingBlock>{__('Loading menus…', 'zentranslate')}</LoadingBlock>;
 
 	const onSave = async (item) => {
 		const draft = drafts[item.id] || {};
@@ -64,7 +65,7 @@ export default function MenusPage() {
 					url_override: draft.url_override ?? item.translations?.[selectedLang]?.url_override ?? '',
 				},
 			});
-			setToast({ tone: 'success', message: 'Menu item saved.' });
+			setToast({ tone: 'success', message: __('Menu item saved.', 'zentranslate') });
 		} catch (err) {
 			setToast({ tone: 'error', message: formatErrorMessage(err) });
 		}
@@ -72,17 +73,20 @@ export default function MenusPage() {
 
 	return (
 		<>
-			<PageHeader title="Menus" description="Translate WordPress nav menu items per language." />
+			<PageHeader
+				title={__('Menus', 'zentranslate')}
+				description={__('Translate WordPress nav menu items per language.', 'zentranslate')}
+			/>
 
 			<div className="ztrans-mb-4 ztrans-flex ztrans-flex-wrap ztrans-gap-3">
-				<Field label="Menu">
+				<Field label={__('Menu', 'zentranslate')}>
 					<Select value={selectedMenu} onChange={(e) => setSelectedMenu(e.target.value)}>
 						{(menus.data || []).map((m) => (
 							<option key={m.id} value={m.id}>{m.name}</option>
 						))}
 					</Select>
 				</Field>
-				<Field label="Target language">
+				<Field label={__('Target language', 'zentranslate')}>
 					<Select value={selectedLang} onChange={(e) => setSelectedLang(e.target.value)}>
 						{nonDefault.map((l) => (
 							<option key={l.code} value={l.code}>{l.name}</option>
@@ -93,18 +97,20 @@ export default function MenusPage() {
 
 			<Card padded={false}>
 				{items.isLoading ? (
-					<LoadingBlock>Loading items…</LoadingBlock>
+					<LoadingBlock>{__('Loading items…', 'zentranslate')}</LoadingBlock>
 				) : (items.data || []).length === 0 ? (
 					<p className="ztrans-px-5 ztrans-py-8 ztrans-text-center ztrans-text-sm ztrans-text-ztrans-muted">
-						No menu items.
+						{__('No menu items.', 'zentranslate')}
 					</p>
 				) : (
 					<table className="ztrans-w-full ztrans-text-sm">
 						<thead className="ztrans-bg-ztrans-bg ztrans-text-left ztrans-text-xs ztrans-uppercase ztrans-text-ztrans-muted">
 							<tr>
-								<th className="ztrans-px-4 ztrans-py-3">Original</th>
-								<th className="ztrans-px-4 ztrans-py-3">Translation ({selectedLang})</th>
-								<th className="ztrans-px-4 ztrans-py-3">URL override</th>
+								<th className="ztrans-px-4 ztrans-py-3">{__('Original', 'zentranslate')}</th>
+								<th className="ztrans-px-4 ztrans-py-3">
+									{sprintf(/* translators: %s: language code. */ __('Translation (%s)', 'zentranslate'), selectedLang)}
+								</th>
+								<th className="ztrans-px-4 ztrans-py-3">{__('URL override', 'zentranslate')}</th>
 								<th className="ztrans-px-4 ztrans-py-3 ztrans-w-24" />
 							</tr>
 						</thead>
@@ -132,7 +138,7 @@ export default function MenusPage() {
 										</td>
 										<td className="ztrans-px-4 ztrans-py-3 ztrans-text-right">
 											<Button size="sm" onClick={() => onSave(item)} loading={save.isPending}>
-												Save
+												{__('Save', 'zentranslate')}
 											</Button>
 										</td>
 									</tr>

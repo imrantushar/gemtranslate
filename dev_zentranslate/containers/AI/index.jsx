@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { __, sprintf } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
@@ -15,9 +16,9 @@ import {
 import { formatErrorMessage } from '../../lib/format';
 
 const PROVIDERS = [
-	{ key: 'openai', label: 'OpenAI', hint: 'Uses GPT models. Best quality, BYOK.' },
-	{ key: 'deepl', label: 'DeepL', hint: 'Specialized translation API. BYOK.' },
-	{ key: 'google', label: 'Google', hint: 'Cloud Translation v2 (API key auth).' },
+	{ key: 'openai', label: 'OpenAI', hint: () => __('Uses GPT models. Best quality, BYOK.', 'zentranslate') },
+	{ key: 'deepl', label: 'DeepL', hint: () => __('Specialized translation API. BYOK.', 'zentranslate') },
+	{ key: 'google', label: 'Google', hint: () => __('Cloud Translation v2 (API key auth).', 'zentranslate') },
 ];
 
 export default function AIPage() {
@@ -34,7 +35,7 @@ export default function AIPage() {
 		}
 	}, [providers.data, state]);
 
-	if (providers.isLoading || !state) return <LoadingBlock>Loading AI providers…</LoadingBlock>;
+	if (providers.isLoading || !state) return <LoadingBlock>{__('Loading AI providers…', 'zentranslate')}</LoadingBlock>;
 
 	const update = (name, key, value) =>
 		setState((s) => ({
@@ -48,7 +49,7 @@ export default function AIPage() {
 	const onSave = async () => {
 		try {
 			await save.mutateAsync(state);
-			setToast({ tone: 'success', message: 'AI providers saved.' });
+			setToast({ tone: 'success', message: __('AI providers saved.', 'zentranslate') });
 		} catch (err) {
 			setToast({ tone: 'error', message: formatErrorMessage(err) });
 		}
@@ -65,7 +66,14 @@ export default function AIPage() {
 
 		try {
 			await test.mutateAsync({ name, ...payload });
-			setToast({ tone: 'success', message: `${name} credentials work.` });
+			setToast({
+				tone: 'success',
+				message: sprintf(
+					/* translators: %s: provider name (openai, deepl, google). */
+					__('%s credentials work.', 'zentranslate'),
+					name
+				),
+			});
 		} catch (err) {
 			setToast({ tone: 'error', message: formatErrorMessage(err) });
 		}
@@ -74,15 +82,15 @@ export default function AIPage() {
 	return (
 		<>
 			<PageHeader
-				title="AI Translation"
-				description="Connect your own AI provider keys. Translations stay on your site."
-				actions={<Button onClick={onSave} loading={save.isPending}>Save changes</Button>}
+				title={__('AI Translation', 'zentranslate')}
+				description={__('Connect your own AI provider keys. Translations stay on your site.', 'zentranslate')}
+				actions={<Button onClick={onSave} loading={save.isPending}>{__('Save changes', 'zentranslate')}</Button>}
 			/>
 
-			<Card title="Default provider" className="ztrans-mb-6">
-				<Field label="Used when 'Translate with AI' is clicked">
+			<Card title={__('Default provider', 'zentranslate')} className="ztrans-mb-6">
+				<Field label={__("Used when 'Translate with AI' is clicked", 'zentranslate')}>
 					<Select value={state.default || ''} onChange={(e) => setState((s) => ({ ...s, default: e.target.value }))}>
-						<option value="">— Pick one —</option>
+						<option value="">{__('— Pick one —', 'zentranslate')}</option>
 						{PROVIDERS.map((p) => (
 							<option key={p.key} value={p.key}>{p.label}</option>
 						))}
@@ -95,9 +103,12 @@ export default function AIPage() {
 					const cfg = state.providers[p.key] || {};
 					return (
 						<Card key={p.key} title={p.label}>
-							<p className="ztrans-mb-3 ztrans-text-xs ztrans-text-ztrans-muted">{p.hint}</p>
+							<p className="ztrans-mb-3 ztrans-text-xs ztrans-text-ztrans-muted">{p.hint()}</p>
 							<div className="ztrans-flex ztrans-flex-col ztrans-gap-3">
-								<Field label="API key" hint={cfg.has_key ? 'Key saved. Enter a new value to replace.' : 'Required.'}>
+								<Field
+									label={__('API key', 'zentranslate')}
+									hint={cfg.has_key ? __('Key saved. Enter a new value to replace.', 'zentranslate') : __('Required.', 'zentranslate')}
+								>
 									<TextInput
 										value={cfg.api_key || ''}
 										onChange={(e) => update(p.key, 'api_key', e.target.value)}
@@ -106,7 +117,7 @@ export default function AIPage() {
 									/>
 								</Field>
 								{p.key === 'openai' && (
-									<Field label="Model" hint="Default: gpt-4o-mini">
+									<Field label={__('Model', 'zentranslate')} hint={__('Default: gpt-4o-mini', 'zentranslate')}>
 										<TextInput
 											value={cfg.model || ''}
 											onChange={(e) => update(p.key, 'model', e.target.value)}
@@ -116,13 +127,13 @@ export default function AIPage() {
 								)}
 								{p.key === 'deepl' && (
 									<Checkbox
-										label="Use DeepL Pro endpoint"
+										label={__('Use DeepL Pro endpoint', 'zentranslate')}
 										checked={!!cfg.use_pro}
 										onChange={(e) => update(p.key, 'use_pro', e.target.checked)}
 									/>
 								)}
 								<Button variant="secondary" size="sm" onClick={() => onTest(p.key)} loading={test.isPending}>
-									Test credentials
+									{__('Test credentials', 'zentranslate')}
 								</Button>
 							</div>
 						</Card>
@@ -130,17 +141,17 @@ export default function AIPage() {
 				})}
 			</div>
 
-			<Card title="Translation memory" className="ztrans-mt-6">
+			<Card title={__('Translation memory', 'zentranslate')} className="ztrans-mt-6">
 				{memory.isLoading ? (
-					<LoadingBlock>Loading memory stats…</LoadingBlock>
+					<LoadingBlock>{__('Loading memory stats…', 'zentranslate')}</LoadingBlock>
 				) : (
 					<div className="ztrans-grid ztrans-grid-cols-2 ztrans-gap-4 ztrans-text-sm">
 						<div>
-							<div className="ztrans-text-xs ztrans-uppercase ztrans-text-ztrans-muted">Cached entries</div>
+							<div className="ztrans-text-xs ztrans-uppercase ztrans-text-ztrans-muted">{__('Cached entries', 'zentranslate')}</div>
 							<div className="ztrans-mt-1 ztrans-text-xl ztrans-font-semibold">{memory.data?.entries ?? 0}</div>
 						</div>
 						<div>
-							<div className="ztrans-text-xs ztrans-uppercase ztrans-text-ztrans-muted">Reuse hits</div>
+							<div className="ztrans-text-xs ztrans-uppercase ztrans-text-ztrans-muted">{__('Reuse hits', 'zentranslate')}</div>
 							<div className="ztrans-mt-1 ztrans-text-xl ztrans-font-semibold">{memory.data?.hits ?? 0}</div>
 						</div>
 					</div>

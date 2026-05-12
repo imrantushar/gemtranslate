@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { __, sprintf } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
@@ -47,7 +48,7 @@ export default function StringsPage() {
 		const value = drafts[id] ?? '';
 		try {
 			await save.mutateAsync({ id, lang: filters.lang, value, status: 'translated' });
-			setToast({ tone: 'success', message: 'Translation saved.' });
+			setToast({ tone: 'success', message: __('Translation saved.', 'zentranslate') });
 		} catch (err) {
 			setToast({ tone: 'error', message: formatErrorMessage(err) });
 		}
@@ -71,7 +72,15 @@ export default function StringsPage() {
 	const onScan = async (target) => {
 		try {
 			const result = await scan.mutateAsync({ target });
-			setToast({ tone: 'success', message: `Scanned ${result.files} files, found ${result.strings} strings.` });
+			setToast({
+				tone: 'success',
+				message: sprintf(
+					/* translators: 1: file count, 2: string count. */
+					__('Scanned %1$d files, found %2$d strings.', 'zentranslate'),
+					result.files,
+					result.strings
+				),
+			});
 		} catch (err) {
 			setToast({ tone: 'error', message: formatErrorMessage(err) });
 		}
@@ -80,15 +89,15 @@ export default function StringsPage() {
 	return (
 		<>
 			<PageHeader
-				title="Strings"
-				description="Translate hardcoded UI strings from your active theme and plugins."
+				title={__('Strings', 'zentranslate')}
+				description={__('Translate hardcoded UI strings from your active theme and plugins.', 'zentranslate')}
 				actions={
 					<>
 						<Button variant="secondary" onClick={() => onScan('active_theme')} loading={scan.isPending}>
-							Scan active theme
+							{__('Scan active theme', 'zentranslate')}
 						</Button>
 						<Button onClick={() => onScan('all_plugins')} loading={scan.isPending}>
-							Scan all plugins
+							{__('Scan all plugins', 'zentranslate')}
 						</Button>
 					</>
 				}
@@ -97,7 +106,7 @@ export default function StringsPage() {
 			<Card padded={false}>
 				<form onSubmit={runSearch} className="ztrans-flex ztrans-flex-wrap ztrans-items-end ztrans-gap-3 ztrans-border-b ztrans-border-ztrans-border ztrans-px-4 ztrans-py-3">
 					<div className="ztrans-min-w-[160px]">
-						<Field label="Target language">
+						<Field label={__('Target language', 'zentranslate')}>
 							<Select value={filters.lang} onChange={(e) => setFilters((f) => ({ ...f, lang: e.target.value, page: 1 }))}>
 								{nonDefault.map((l) => (
 									<option key={l.code} value={l.code}>
@@ -108,38 +117,44 @@ export default function StringsPage() {
 						</Field>
 					</div>
 					<div className="ztrans-min-w-[160px]">
-						<Field label="Domain">
+						<Field label={__('Domain', 'zentranslate')}>
 							<Select value={filters.domain} onChange={(e) => setFilters((f) => ({ ...f, domain: e.target.value, page: 1 }))}>
-								<option value="">All domains</option>
+								<option value="">{__('All domains', 'zentranslate')}</option>
 								{(domains.data || []).map((d) => (
 									<option key={d} value={d}>
-										{d || '(empty)'}
+										{d || __('(empty)', 'zentranslate')}
 									</option>
 								))}
 							</Select>
 						</Field>
 					</div>
 					<div className="ztrans-min-w-[200px] ztrans-flex-1">
-						<Field label="Search source">
-							<TextInput value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search…" />
+						<Field label={__('Search source', 'zentranslate')}>
+							<TextInput value={search} onChange={(e) => setSearch(e.target.value)} placeholder={__('Search…', 'zentranslate')} />
 						</Field>
 					</div>
-					<Button type="submit" variant="secondary">Filter</Button>
+					<Button type="submit" variant="secondary">{__('Filter', 'zentranslate')}</Button>
 				</form>
 
 				{strings.isLoading ? (
-					<LoadingBlock>Loading strings…</LoadingBlock>
+					<LoadingBlock>{__('Loading strings…', 'zentranslate')}</LoadingBlock>
 				) : (strings.data?.rows || []).length === 0 ? (
 					<p className="ztrans-px-5 ztrans-py-8 ztrans-text-center ztrans-text-sm ztrans-text-ztrans-muted">
-						No strings yet. Scan a theme or plugin to populate this list.
+						{__('No strings yet. Scan a theme or plugin to populate this list.', 'zentranslate')}
 					</p>
 				) : (
 					<table className="ztrans-w-full ztrans-text-sm">
 						<thead className="ztrans-bg-ztrans-bg ztrans-text-left ztrans-text-xs ztrans-uppercase ztrans-text-ztrans-muted">
 							<tr>
-								<th className="ztrans-px-4 ztrans-py-3 ztrans-w-1/3">Source</th>
-								<th className="ztrans-px-4 ztrans-py-3">Translation ({filters.lang})</th>
-								<th className="ztrans-px-4 ztrans-py-3 ztrans-w-32">Domain</th>
+								<th className="ztrans-px-4 ztrans-py-3 ztrans-w-1/3">{__('Source', 'zentranslate')}</th>
+								<th className="ztrans-px-4 ztrans-py-3">
+									{sprintf(
+										/* translators: %s: language code. */
+										__('Translation (%s)', 'zentranslate'),
+										filters.lang
+									)}
+								</th>
+								<th className="ztrans-px-4 ztrans-py-3 ztrans-w-32">{__('Domain', 'zentranslate')}</th>
 								<th className="ztrans-px-4 ztrans-py-3 ztrans-w-32" />
 							</tr>
 						</thead>
@@ -161,17 +176,19 @@ export default function StringsPage() {
 												onChange={(e) => setDrafts((d) => ({ ...d, [row.string_id]: e.target.value }))}
 											/>
 											{row.translation_status && (
-												<div className="ztrans-mt-1"><StatusPill tone="translated">{row.translation_status}</StatusPill></div>
+												<div className="ztrans-mt-1">
+													<StatusPill tone="translated">{row.translation_status}</StatusPill>
+												</div>
 											)}
 										</td>
 										<td className="ztrans-px-4 ztrans-py-3 ztrans-text-xs ztrans-text-ztrans-muted">{row.domain || '—'}</td>
 										<td className="ztrans-px-4 ztrans-py-3 ztrans-text-right">
 											<div className="ztrans-flex ztrans-flex-col ztrans-gap-1">
 												<Button size="sm" onClick={() => onSave(row.string_id)}>
-													Save
+													{__('Save', 'zentranslate')}
 												</Button>
 												<Button size="sm" variant="ghost" onClick={() => onAI(row)}>
-													AI
+													{__('AI', 'zentranslate')}
 												</Button>
 											</div>
 										</td>
@@ -185,14 +202,18 @@ export default function StringsPage() {
 				{strings.data?.meta?.total > strings.data?.meta?.per_page && (
 					<div className="ztrans-flex ztrans-justify-between ztrans-border-t ztrans-border-ztrans-border ztrans-px-4 ztrans-py-3 ztrans-text-sm">
 						<span className="ztrans-text-ztrans-muted">
-							{strings.data?.meta?.total} total
+							{sprintf(
+								/* translators: %d: total count. */
+								__('%d total', 'zentranslate'),
+								strings.data?.meta?.total
+							)}
 						</span>
 						<div className="ztrans-flex ztrans-gap-2">
 							<Button variant="ghost" size="sm" disabled={filters.page <= 1} onClick={() => setFilters((f) => ({ ...f, page: f.page - 1 }))}>
-								Previous
+								{__('Previous', 'zentranslate')}
 							</Button>
 							<Button variant="ghost" size="sm" onClick={() => setFilters((f) => ({ ...f, page: f.page + 1 }))}>
-								Next
+								{__('Next', 'zentranslate')}
 							</Button>
 						</div>
 					</div>

@@ -25,9 +25,17 @@ class RequestParser {
 	 * @param \WP $wp
 	 */
 	public function detect_and_strip( $wp ) {
-		// Skip admin / REST / cron — these are not language-prefixed routes.
-		if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) || ( defined( 'DOING_CRON' ) && DOING_CRON ) ) {
+		// REST / cron paths don't carry a URL language prefix — they handle
+		// language explicitly via params or default to the site default.
+		if ( ( defined( 'REST_REQUEST' ) && REST_REQUEST ) || ( defined( 'DOING_CRON' ) && DOING_CRON ) ) {
 			Context::set( Context::default_code() );
+			return;
+		}
+
+		// Admin: read per-user preference from user meta, with an optional
+		// `?ztrans_lang=xx` override for one-off testing.
+		if ( is_admin() ) {
+			$this->detect_admin_language();
 			return;
 		}
 
@@ -43,6 +51,28 @@ class RequestParser {
 			// Also adjust REQUEST_URI so plugins that read it directly stay aligned.
 			$this->rewrite_request_uri( $first );
 			return;
+		}
+
+		Context::set( Context::default_code() );
+	}
+
+	/**
+	 * Pick the admin language from query param or user meta.
+	 */
+	private function detect_admin_language() {
+		$override = isset( $_GET['ztrans_lang'] ) ? sanitize_key( wp_unslash( $_GET['ztrans_lang'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( $override && Context::is_active( $override ) ) {
+			Context::set( $override );
+			return;
+		}
+
+		$user_id = get_current_user_id();
+		if ( $user_id ) {
+			$pref = (string) get_user_meta( $user_id, 'ztrans_preferred_language', true );
+			if ( $pref && Context::is_active( $pref ) ) {
+				Context::set( $pref );
+				return;
+			}
 		}
 
 		Context::set( Context::default_code() );

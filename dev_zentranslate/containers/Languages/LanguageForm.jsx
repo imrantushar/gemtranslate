@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { __ } from '@wordpress/i18n';
+
 import Button from '../../components/Button';
 import { Field, TextInput, Checkbox } from '../../components/Input';
 
@@ -51,7 +53,9 @@ export default function LanguageForm({ initial, onSubmit, onCancel, busy }) {
 		<form onSubmit={submit} className="ztrans-flex ztrans-flex-col ztrans-gap-4">
 			{!initial && (
 				<div>
-					<div className="ztrans-mb-2 ztrans-text-xs ztrans-font-medium ztrans-text-gray-700">Pick a preset (optional)</div>
+					<div className="ztrans-mb-2 ztrans-text-xs ztrans-font-medium ztrans-text-gray-700">
+						{__('Pick a preset (optional)', 'zentranslate')}
+					</div>
 					<div className="ztrans-flex ztrans-flex-wrap ztrans-gap-2">
 						{PRESETS.map((p) => (
 							<button
@@ -68,34 +72,36 @@ export default function LanguageForm({ initial, onSubmit, onCancel, busy }) {
 			)}
 
 			<div className="ztrans-grid ztrans-grid-cols-2 ztrans-gap-4">
-				<Field label="Code" hint="e.g. en, es, pt-br">
+				<Field label={__('Code', 'zentranslate')} hint={__('e.g. en, es, pt-br', 'zentranslate')}>
 					<TextInput value={values.code} onChange={set('code')} required disabled={!!initial} />
 				</Field>
-				<Field label="Locale" hint="WP locale: en_US, es_ES, pt_BR">
+				<Field label={__('Locale', 'zentranslate')} hint={__('WP locale: en_US, es_ES, pt_BR', 'zentranslate')}>
 					<TextInput value={values.locale} onChange={set('locale')} required />
 				</Field>
-				<Field label="Name (English)">
+				<Field label={__('Name (English)', 'zentranslate')}>
 					<TextInput value={values.name} onChange={set('name')} required />
 				</Field>
-				<Field label="Native name">
+				<Field label={__('Native name', 'zentranslate')}>
 					<TextInput value={values.native_name} onChange={set('native_name')} />
 				</Field>
-				<Field label="Flag code" hint="Country code, e.g. ES, FR">
+				<Field label={__('Flag code', 'zentranslate')} hint={__('Country code, e.g. ES, FR', 'zentranslate')}>
 					<TextInput value={values.flag} onChange={set('flag')} />
 				</Field>
-				<Field label="Position" hint="Sort order in the switcher">
+				<Field label={__('Position', 'zentranslate')} hint={__('Sort order in the switcher', 'zentranslate')}>
 					<TextInput type="number" value={values.position} onChange={set('position')} />
 				</Field>
 			</div>
 
 			<div className="ztrans-flex ztrans-flex-col ztrans-gap-2">
-				<Checkbox label="Right-to-left script" checked={values.is_rtl} onChange={set('is_rtl')} />
-				<Checkbox label="Active (shown in switcher)" checked={values.active} onChange={set('active')} />
+				<Checkbox label={__('Right-to-left script', 'zentranslate')} checked={values.is_rtl} onChange={set('is_rtl')} />
+				<Checkbox label={__('Active (shown in switcher)', 'zentranslate')} checked={values.active} onChange={set('active')} />
 			</div>
 
 			<div className="ztrans-flex ztrans-justify-end ztrans-gap-2">
-				<Button variant="ghost" type="button" onClick={onCancel}>Cancel</Button>
-				<Button type="submit" loading={busy}>{initial ? 'Save changes' : 'Add language'}</Button>
+				<Button variant="ghost" type="button" onClick={onCancel}>{__('Cancel', 'zentranslate')}</Button>
+				<Button type="submit" loading={busy}>
+					{initial ? __('Save changes', 'zentranslate') : __('Add language', 'zentranslate')}
+				</Button>
 			</div>
 		</form>
 	);

@@ -1,25 +1,31 @@
 import { NavLink } from 'react-router-dom';
+import { __ } from '@wordpress/i18n';
 import clsx from 'clsx';
 
+import LanguagePicker from './LanguagePicker';
+
 const NAV = [
-	{ to: '/dashboard', label: 'Dashboard', icon: '◆' },
-	{ to: '/languages', label: 'Languages', icon: '🌐' },
-	{ to: '/posts', label: 'Posts & Pages', icon: '📝' },
-	{ to: '/strings', label: 'Strings', icon: '🔤' },
-	{ to: '/menus', label: 'Menus', icon: '☰' },
-	{ to: '/seo', label: 'SEO', icon: '🔍' },
-	{ to: '/ai', label: 'AI Translation', icon: '✨' },
-	{ to: '/settings', label: 'Settings', icon: '⚙' },
+	{ to: '/dashboard', label: () => __('Dashboard', 'zentranslate'), icon: '◆' },
+	{ to: '/languages', label: () => __('Languages', 'zentranslate'), icon: '🌐' },
+	{ to: '/posts', label: () => __('Posts & Pages', 'zentranslate'), icon: '📝' },
+	{ to: '/strings', label: () => __('Strings', 'zentranslate'), icon: '🔤' },
+	{ to: '/menus', label: () => __('Menus', 'zentranslate'), icon: '☰' },
+	{ to: '/seo', label: () => __('SEO', 'zentranslate'), icon: '🔍' },
+	{ to: '/ai', label: () => __('AI Translation', 'zentranslate'), icon: '✨' },
+	{ to: '/settings', label: () => __('Settings', 'zentranslate'), icon: '⚙' },
 ];
 
 export default function Sidebar() {
 	return (
 		<aside className="ztrans-w-60 ztrans-flex-shrink-0 ztrans-border-r ztrans-border-ztrans-border ztrans-bg-white ztrans-px-4 ztrans-py-6">
-			<div className="ztrans-mb-8 ztrans-px-2">
+			<div className="ztrans-mb-6 ztrans-px-2">
 				<div className="ztrans-text-lg ztrans-font-semibold ztrans-text-ztrans-primary">Zentranslate</div>
 				<div className="ztrans-text-xs ztrans-text-ztrans-muted">v{window.ztrans?.version || '1.0.0'}</div>
 			</div>
-			<nav className="ztrans-flex ztrans-flex-col ztrans-gap-1">
+
+			<LanguagePicker />
+
+			<nav className="ztrans-mt-6 ztrans-flex ztrans-flex-col ztrans-gap-1">
 				{NAV.map((item) => (
 					<NavLink
 						key={item.to}
@@ -36,7 +42,7 @@ export default function Sidebar() {
 						<span className="ztrans-text-base" aria-hidden="true">
 							{item.icon}
 						</span>
-						{item.label}
+						{item.label()}
 					</NavLink>
 				))}
 			</nav>

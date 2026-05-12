@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { __, sprintf } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
@@ -38,7 +39,7 @@ export default function TranslationEditor() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [data.data, selectedLang]);
 
-	if (data.isLoading) return <LoadingBlock>Loading translation editor…</LoadingBlock>;
+	if (data.isLoading) return <LoadingBlock>{__('Loading translation editor…', 'zentranslate')}</LoadingBlock>;
 	if (data.error) return <p className="ztrans-text-red-600">{formatErrorMessage(data.error)}</p>;
 	if (!data.data) return null;
 
@@ -52,7 +53,7 @@ export default function TranslationEditor() {
 		e.preventDefault();
 		try {
 			await save.mutateAsync({ postId: post.id, lang: selectedLang, payload: form });
-			setToast({ tone: 'success', message: 'Translation saved.' });
+			setToast({ tone: 'success', message: __('Translation saved.', 'zentranslate') });
 		} catch (err) {
 			setToast({ tone: 'error', message: formatErrorMessage(err) });
 		}
@@ -68,7 +69,14 @@ export default function TranslationEditor() {
 				use_memory: true,
 			});
 			setForm((f) => ({ ...f, [field]: result.translations }));
-			setToast({ tone: 'success', message: `AI filled ${field}.` });
+			setToast({
+				tone: 'success',
+				message: sprintf(
+					/* translators: %s: field name like title, excerpt, content. */
+					__('AI filled %s.', 'zentranslate'),
+					field
+				),
+			});
 		} catch (err) {
 			setToast({ tone: 'error', message: formatErrorMessage(err) });
 		}
@@ -89,7 +97,7 @@ export default function TranslationEditor() {
 				excerpt: res.translations[1] || f.excerpt,
 				content: res.translations[2] || f.content,
 			}));
-			setToast({ tone: 'success', message: 'AI translation applied to all fields.' });
+			setToast({ tone: 'success', message: __('AI translation applied to all fields.', 'zentranslate') });
 		} catch (err) {
 			setToast({ tone: 'error', message: formatErrorMessage(err) });
 		}
@@ -98,11 +106,19 @@ export default function TranslationEditor() {
 	return (
 		<>
 			<PageHeader
-				title={`Translate: ${post.title}`}
-				description={`Source language: ${defaultLang}. Pick a target language and edit the translation.`}
+				title={sprintf(
+					/* translators: %s: post title. */
+					__('Translate: %s', 'zentranslate'),
+					post.title
+				)}
+				description={sprintf(
+					/* translators: %s: source language code. */
+					__('Source language: %s. Pick a target language and edit the translation.', 'zentranslate'),
+					defaultLang
+				)}
 				actions={
 					<Link to="/posts" className="ztrans-text-sm ztrans-text-ztrans-primary ztrans-no-underline">
-						← Back to posts
+						{__('← Back to posts', 'zentranslate')}
 					</Link>
 				}
 			/>
@@ -110,7 +126,7 @@ export default function TranslationEditor() {
 			{targetLangs.length === 0 ? (
 				<Card>
 					<p className="ztrans-m-0 ztrans-text-sm ztrans-text-ztrans-muted">
-						Add at least one non-default language to start translating posts.
+						{__('Add at least one non-default language to start translating posts.', 'zentranslate')}
 					</p>
 				</Card>
 			) : (
@@ -135,30 +151,30 @@ export default function TranslationEditor() {
 							</button>
 						))}
 						<Button variant="secondary" size="sm" onClick={aiFillAll} loading={aiTranslate.isPending}>
-							Translate all with AI
+							{__('Translate all with AI', 'zentranslate')}
 						</Button>
 					</div>
 
 					<div className="ztrans-grid ztrans-grid-cols-1 lg:ztrans-grid-cols-2 ztrans-gap-6">
-						<Card title={`Source — ${defaultLang}`}>
+						<Card title={sprintf(/* translators: %s: language code. */ __('Source — %s', 'zentranslate'), defaultLang)}>
 							<div className="ztrans-flex ztrans-flex-col ztrans-gap-3">
-								<Field label="Title">
+								<Field label={__('Title', 'zentranslate')}>
 									<TextInput value={post.title || ''} readOnly />
 								</Field>
-								<Field label="Slug">
+								<Field label={__('Slug', 'zentranslate')}>
 									<TextInput value={post.slug || ''} readOnly />
 								</Field>
-								<Field label="Excerpt">
+								<Field label={__('Excerpt', 'zentranslate')}>
 									<TextArea rows={3} value={post.excerpt || ''} readOnly />
 								</Field>
-								<Field label="Content">
+								<Field label={__('Content', 'zentranslate')}>
 									<TextArea rows={14} value={post.content || ''} readOnly />
 								</Field>
 							</div>
 						</Card>
 
 						<Card
-							title={`Translation — ${selectedLang}`}
+							title={sprintf(/* translators: %s: language code. */ __('Translation — %s', 'zentranslate'), selectedLang)}
 							action={
 								targetRow?.translation && (
 									<StatusPill tone={targetRow.translation.status === 'publish' ? 'translated' : 'pending'}>
@@ -170,45 +186,47 @@ export default function TranslationEditor() {
 							<form onSubmit={submit} className="ztrans-flex ztrans-flex-col ztrans-gap-3">
 								<div className="ztrans-flex ztrans-items-end ztrans-gap-2">
 									<div className="ztrans-flex-1">
-										<Field label="Title">
+										<Field label={__('Title', 'zentranslate')}>
 											<TextInput value={form.title} onChange={set('title')} />
 										</Field>
 									</div>
 									<Button variant="ghost" size="sm" onClick={() => aiFill('title', post.title)}>
-										AI
+										{__('AI', 'zentranslate')}
 									</Button>
 								</div>
-								<Field label="Slug" hint="Used for SEO-friendly URLs.">
+								<Field label={__('Slug', 'zentranslate')} hint={__('Used for SEO-friendly URLs.', 'zentranslate')}>
 									<TextInput value={form.slug} onChange={set('slug')} />
 								</Field>
 								<div className="ztrans-flex ztrans-items-end ztrans-gap-2">
 									<div className="ztrans-flex-1">
-										<Field label="Excerpt">
+										<Field label={__('Excerpt', 'zentranslate')}>
 											<TextArea rows={3} value={form.excerpt} onChange={set('excerpt')} />
 										</Field>
 									</div>
 									<Button variant="ghost" size="sm" onClick={() => aiFill('excerpt', post.excerpt || '')}>
-										AI
+										{__('AI', 'zentranslate')}
 									</Button>
 								</div>
 								<div className="ztrans-flex ztrans-items-end ztrans-gap-2">
 									<div className="ztrans-flex-1">
-										<Field label="Content">
+										<Field label={__('Content', 'zentranslate')}>
 											<TextArea rows={14} value={form.content} onChange={set('content')} />
 										</Field>
 									</div>
 									<Button variant="ghost" size="sm" onClick={() => aiFill('content', post.content || '')}>
-										AI
+										{__('AI', 'zentranslate')}
 									</Button>
 								</div>
-								<Field label="Status">
+								<Field label={__('Status', 'zentranslate')}>
 									<Select value={form.status} onChange={set('status')}>
-										<option value="draft">Draft</option>
-										<option value="publish">Published</option>
+										<option value="draft">{__('Draft', 'zentranslate')}</option>
+										<option value="publish">{__('Published', 'zentranslate')}</option>
 									</Select>
 								</Field>
 								<div className="ztrans-mt-2 ztrans-flex ztrans-justify-end">
-									<Button type="submit" loading={save.isPending}>Save translation</Button>
+									<Button type="submit" loading={save.isPending}>
+										{__('Save translation', 'zentranslate')}
+									</Button>
 								</div>
 							</form>
 						</Card>

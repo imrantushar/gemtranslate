@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { __ } from '@wordpress/i18n';
 import clsx from 'clsx';
 
 export default function Modal({ open, title, onClose, children, footer, size = 'md' }) {
@@ -25,7 +26,7 @@ export default function Modal({ open, title, onClose, children, footer, size = '
 							type="button"
 							onClick={onClose}
 							className="ztrans-bare ztrans-rounded ztrans-p-1 ztrans-text-gray-500 hover:ztrans-bg-gray-100"
-							aria-label="Close"
+							aria-label={__('Close', 'zentranslate')}
 						>
 							✕
 						</button>
