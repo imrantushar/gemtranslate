@@ -8,9 +8,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Holds the current request's language state.
  *
- * Set once early (during parse_request) and read from many places (filters,
- * URL builders, hreflang output). Static by design — language is a per-request
- * singleton, never plural within one PHP process.
+ * Set once early (during do_parse_request, before WordPress URL matching) and
+ * read from many places (filters, URL builders, hreflang output). Static by
+ * design — language is a per-request singleton, never plural within one PHP process.
  */
 class Context {
 

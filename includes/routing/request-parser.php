@@ -13,54 +13,111 @@ use Zentranslate\Language\Context;
  *
  * Subdirectory strategy: example.com/es/sample-page/ → Context = 'es',
  * WP routes as if URI were /sample-page/.
+ *
+ * We hook into `do_parse_request` (fires at the very start of
+ * WP::parse_request(), line 148 of class-wp.php) which runs BEFORE
+ * WordPress reads $_SERVER['REQUEST_URI'] for rewrite-rule matching at
+ * line 174. Stripping the language prefix here means WordPress URL
+ * matching sees the unprefixed path and resolves the correct post/page.
+ *
+ * The old approach (hooking `parse_request` action, line 418) fired AFTER
+ * URL matching was complete, so modifying $wp->request had no effect on
+ * the query vars — the wrong (or 404) content was loaded every time.
  */
 class RequestParser {
 
 	public static function init() {
 		$self = new self();
-		add_action( 'parse_request', [ $self, 'detect_and_strip' ], 0 );
+		add_filter( 'do_parse_request', [ $self, 'detect_and_strip' ], 0, 3 );
 	}
 
 	/**
-	 * @param \WP $wp
+	 * Called via the `do_parse_request` filter — before WordPress reads
+	 * REQUEST_URI for rewrite-rule matching.
+	 *
+	 * Strips the language prefix from $_SERVER['REQUEST_URI'] so WordPress
+	 * routes the bare path, and sets the language Context for the request.
+	 *
+	 * @param bool             $do_parse         Whether to run URL parsing (almost always true).
+	 * @param \WP              $wp               Current WP environment (unused here).
+	 * @param array|string     $extra_query_vars Extra query variables (unused here).
+	 * @return bool Pass-through — we never short-circuit WordPress URL matching.
 	 */
-	public function detect_and_strip( $wp ) {
-		// REST / cron paths don't carry a URL language prefix — they handle
-		// language explicitly via params or default to the site default.
+	public function detect_and_strip( $do_parse, $wp, $extra_query_vars = '' ) {
+		// If another plugin already short-circuited parsing, respect it.
+		if ( ! $do_parse ) {
+			Context::set( Context::default_code() );
+			return $do_parse;
+		}
+
+		// REST / cron paths carry language via params, not URL prefixes.
 		if ( ( defined( 'REST_REQUEST' ) && REST_REQUEST ) || ( defined( 'DOING_CRON' ) && DOING_CRON ) ) {
 			Context::set( Context::default_code() );
-			return;
+			return $do_parse;
 		}
 
-		// Admin: read per-user preference from user meta, with an optional
-		// `?ztrans_lang=xx` override for one-off testing.
+		// Admin: WP::parse_request() is not invoked for standard wp-admin
+		// page loads, so this branch only fires for admin-bar / admin-post
+		// style requests that do go through WP::main().
 		if ( is_admin() ) {
 			$this->detect_admin_language();
-			return;
+			return $do_parse;
 		}
 
-		$request = (string) $wp->request;
-		$first   = $this->first_segment( $request );
+		// --- Frontend language detection from REQUEST_URI ---
+
+		$uri  = (string) ( $_SERVER['REQUEST_URI'] ?? '' );
+		$path = (string) ( wp_parse_url( $uri, PHP_URL_PATH ) ?: '' );
+
+		if ( '' === $path ) {
+			Context::set( Context::default_code() );
+			return $do_parse;
+		}
+
+		// Strip the WordPress home path (for sub-directory installs).
+		// home_url() is safe here: Context is not yet 'es', so
+		// UrlRewriter::filter_home_url() returns the URL unchanged.
+		$home_path     = (string) ( wp_parse_url( home_url( '/' ), PHP_URL_PATH ) ?: '/' );
+		$home_path_trimmed = rtrim( $home_path, '/' );
+
+		// Build relative path (strip home prefix, ensure leading slash).
+		if ( '' !== $home_path_trimmed && 0 === strpos( $path, $home_path_trimmed ) ) {
+			$relative = '/' . ltrim( substr( $path, strlen( $home_path_trimmed ) ), '/' );
+		} else {
+			$relative = '/' . ltrim( $path, '/' );
+		}
+
+		$first = $this->first_segment( ltrim( $relative, '/' ) );
 
 		if ( $first && Context::is_active( $first ) ) {
-			// Strip the prefix.
-			$stripped     = ltrim( substr( $request, strlen( $first ) ), '/' );
-			$wp->request  = $stripped;
 			Context::set( $first );
 
-			// Also adjust REQUEST_URI so plugins that read it directly stay aligned.
-			$this->rewrite_request_uri( $first );
-			return;
+			// Strip /{lang}/ from the relative path.
+			$stripped_relative = preg_replace(
+				'#^/' . preg_quote( $first, '#' ) . '(/|$)#',
+				'/',
+				$relative
+			);
+
+			// Rebuild the full path and rewrite REQUEST_URI BEFORE
+			// WordPress reads it at WP::parse_request() line 174.
+			$new_path = $home_path_trimmed . $stripped_relative;
+			$query    = wp_parse_url( $uri, PHP_URL_QUERY );
+			$_SERVER['REQUEST_URI'] = $new_path . ( $query ? '?' . $query : '' );
+
+			return $do_parse;
 		}
 
 		Context::set( Context::default_code() );
+		return $do_parse;
 	}
 
 	/**
 	 * Pick the admin language from query param or user meta.
 	 */
 	private function detect_admin_language() {
-		$override = isset( $_GET['ztrans_lang'] ) ? sanitize_key( wp_unslash( $_GET['ztrans_lang'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$override = isset( $_GET['ztrans_lang'] ) ? sanitize_key( wp_unslash( $_GET['ztrans_lang'] ) ) : '';
 		if ( $override && Context::is_active( $override ) ) {
 			Context::set( $override );
 			return;
@@ -84,29 +141,5 @@ class RequestParser {
 		}
 		$parts = explode( '/', $request, 2 );
 		return strtolower( $parts[0] );
-	}
-
-	private function rewrite_request_uri( $lang_prefix ) {
-		if ( empty( $_SERVER['REQUEST_URI'] ) ) {
-			return;
-		}
-		$uri  = (string) $_SERVER['REQUEST_URI']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
-		$path = wp_parse_url( $uri, PHP_URL_PATH );
-		if ( ! $path ) {
-			return;
-		}
-		$home_path = wp_parse_url( home_url( '/' ), PHP_URL_PATH ) ?: '/';
-		$relative  = preg_replace( '#^' . preg_quote( $home_path, '#' ) . '#', '/', $path );
-
-		// Strip /{lang}/ from the relative path.
-		$new_relative = preg_replace( '#^/' . preg_quote( $lang_prefix, '#' ) . '(/|$)#', '/', $relative );
-		if ( $new_relative === $relative ) {
-			return;
-		}
-
-		$new_path  = rtrim( $home_path, '/' ) . $new_relative;
-		$query     = wp_parse_url( $uri, PHP_URL_QUERY );
-		$new_uri   = $new_path . ( $query ? '?' . $query : '' );
-		$_SERVER['REQUEST_URI'] = $new_uri;
 	}
 }

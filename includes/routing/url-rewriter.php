@@ -60,6 +60,9 @@ class UrlRewriter {
 	/**
 	 * Insert `/{lang}` after the site root in any absolute or root-relative URL.
 	 *
+	 * Uses get_option('home') for the base-URL comparison instead of home_url()
+	 * to avoid re-triggering this filter and causing infinite recursion.
+	 *
 	 * @param string $url
 	 * @param string $lang
 	 * @return string
@@ -69,7 +72,10 @@ class UrlRewriter {
 			return $url;
 		}
 
-		$home          = home_url( '/' );
+		// get_option('home') gives us the raw stored URL without going through
+		// the home_url filter, preventing the recursive call that home_url('/')
+		// would cause here (filter_home_url → prepend_language → home_url('/') → loop).
+		$home          = untrailingslashit( get_option( 'home' ) ) . '/';
 		$home_parsed   = wp_parse_url( $home );
 		$home_host     = $home_parsed['host'] ?? '';
 		$home_path     = isset( $home_parsed['path'] ) ? rtrim( $home_parsed['path'], '/' ) : '';
@@ -113,18 +119,24 @@ class UrlRewriter {
 
 	/**
 	 * Build a language-specific URL for the current request (used by switcher).
+	 *
+	 * Bypasses the home_url filter entirely by building from get_option('home')
+	 * directly, so the current language is not prepended on top of the target
+	 * language (which would produce /es/fr/sample-page instead of /fr/sample-page).
 	 */
 	public function current_url_for_language( $lang ) {
 		$default = Context::default_code();
 		$path    = $this->current_path_without_lang();
 
+		// set_url_scheme() normalises http/https to match the current request,
+		// the same way home_url() does internally.
+		$home = set_url_scheme( untrailingslashit( get_option( 'home' ) ) );
+
 		if ( $lang === $default ) {
-			return home_url( $path );
+			return $home . $path;
 		}
-		// Use home_url with explicit prefix — bypass filter to avoid double prefix.
-		$prefix = '/' . $lang;
-		$url    = home_url( $prefix . ( '/' === $path ? '/' : $path ) );
-		return $url;
+
+		return $home . '/' . $lang . ( '/' === $path ? '/' : $path );
 	}
 
 	private function current_path_without_lang() {
@@ -137,7 +149,9 @@ class UrlRewriter {
 		}
 		$home_path = wp_parse_url( home_url( '/' ), PHP_URL_PATH ) ?: '/';
 		$relative  = preg_replace( '#^' . preg_quote( $home_path, '#' ) . '#', '/', $path );
-		// Strip lang prefix if present.
+
+		// After the do_parse_request fix, REQUEST_URI is already stripped of
+		// the language prefix, so this regex is a no-op safety measure.
 		$current = Context::current();
 		if ( $current ) {
 			$relative = preg_replace( '#^/' . preg_quote( $current, '#' ) . '(/|$)#', '/', $relative );
