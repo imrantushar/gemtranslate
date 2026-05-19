@@ -40,6 +40,15 @@ class Context {
 	}
 
 	/**
+	 * Returns the raw internal value — null if nothing has called set() yet.
+	 * Use this to test whether Context has been initialised for the request
+	 * without triggering the default-language fallback.
+	 */
+	public static function current_raw() {
+		return self::$current;
+	}
+
+	/**
 	 * Returns the current language code, falling back to the default.
 	 */
 	public static function current() {

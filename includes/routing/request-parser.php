@@ -29,6 +29,14 @@ class RequestParser {
 	public static function init() {
 		$self = new self();
 		add_filter( 'do_parse_request', [ $self, 'detect_and_strip' ], 0, 3 );
+
+		// `do_parse_request` fires inside WP::parse_request() which is only
+		// called by WP::main(). Standard wp-admin page loads bypass WP::main()
+		// entirely, so Context is never set via the filter above.
+		// Hooking `init` (which fires for every request type, including all
+		// wp-admin pages) lets us apply the admin language preference from
+		// user meta before anything renders.
+		add_action( 'init', [ $self, 'set_admin_context_from_meta' ] );
 	}
 
 	/**
@@ -110,6 +118,27 @@ class RequestParser {
 
 		Context::set( Context::default_code() );
 		return $do_parse;
+	}
+
+	/**
+	 * Called on `init` for every request. For admin page loads that never go
+	 * through WP::main() (so `do_parse_request` never fires), this is the
+	 * only opportunity to set the admin language Context from user meta.
+	 *
+	 * The method is a no-op on the frontend — the `do_parse_request` filter
+	 * already set Context there before `init` fires.
+	 *
+	 * We unconditionally overwrite whatever Context was set to before `init`.
+	 * Between `plugins_loaded` and `init`, hooks like UrlRewriter::filter_home_url()
+	 * can call Context::current(), which would set $current to the site default
+	 * before we have a chance to read user meta. Overwriting here is safe because
+	 * nothing meaningful has rendered yet at priority-10 init.
+	 */
+	public function set_admin_context_from_meta() {
+		if ( ! is_admin() ) {
+			return;
+		}
+		$this->detect_admin_language();
 	}
 
 	/**

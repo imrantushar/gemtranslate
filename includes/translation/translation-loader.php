@@ -221,6 +221,15 @@ class TranslationLoader {
 			$source_hash = self::get_source_hash( $post_id );
 		}
 
+		$raw_slug = (string) ( $fields['slug'] ?? '' );
+		$slug     = sanitize_title( $raw_slug );
+		// sanitize_title() strips all non-ASCII via [^%a-z0-9 _-], so Devanagari,
+		// Arabic, CJK, etc. produce an empty string. Fall back to the source
+		// post's slug so the translated URL stays valid.
+		if ( '' === $slug && '' !== $raw_slug ) {
+			$slug = (string) get_post_field( 'post_name', $post_id );
+		}
+
 		$data = [
 			'group_id'      => $group_id,
 			'language_code' => $language,
@@ -228,7 +237,7 @@ class TranslationLoader {
 			'title'         => (string) ( $fields['title'] ?? '' ),
 			'content'       => (string) ( $fields['content'] ?? '' ),
 			'excerpt'       => (string) ( $fields['excerpt'] ?? '' ),
-			'slug'          => sanitize_title( $fields['slug'] ?? '' ),
+			'slug'          => $slug,
 			'status'        => (string) ( $fields['status'] ?? 'publish' ),
 			'source_hash'   => (string) ( $fields['source_hash'] ?? $source_hash ),
 			'updated_at'    => Helper::get_time(),

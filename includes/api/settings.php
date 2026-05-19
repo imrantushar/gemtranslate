@@ -19,6 +19,14 @@ class Settings extends Controller {
 		'onboarding_complete',
 		'auto_redirect_browser_lang',
 		'translate_emails',
+		// Language switcher appearance.
+		'switcher_display',
+		'switcher_show_flag',
+		'switcher_show_name',
+		'switcher_show_native',
+		'switcher_show_code',
+		'switcher_hide_current',
+		'switcher_show_if_single',
 	];
 
 	public static function init() {
@@ -125,6 +133,14 @@ class Settings extends Controller {
 			'onboarding_complete'      => false,
 			'auto_redirect_browser_lang' => false,
 			'translate_emails'          => false,
+			// Language switcher appearance.
+			'switcher_display'          => 'inline',
+			'switcher_show_flag'        => true,
+			'switcher_show_name'        => true,
+			'switcher_show_native'      => false,
+			'switcher_show_code'        => false,
+			'switcher_hide_current'     => false,
+			'switcher_show_if_single'   => false,
 		];
 		$saved = json_decode( get_option( ZTRANS_SETTINGS_NAME, '{}' ), true );
 		if ( ! is_array( $saved ) ) {
