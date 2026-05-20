@@ -66,8 +66,28 @@ class AdminBar {
 
 		if ( '' === $lang ) {
 			delete_user_meta( $user_id, ProfileField::META_KEY );
+			// Clear the WP native user locale so it falls back to the site default.
+			delete_user_meta( $user_id, 'locale' );
 		} elseif ( Context::is_active( $lang ) ) {
 			update_user_meta( $user_id, ProfileField::META_KEY, $lang );
+			// Sync to WP's native user locale meta. WordPress reads this in
+			// determine_locale() during wp-settings.php boot — before plugins
+			// load — so load_default_textdomain() uses the correct locale from
+			// the very first request after the switch.
+			$languages = Context::active_languages();
+			$locale    = $languages[ $lang ]['locale'] ?? '';
+			if ( $locale ) {
+				$site_locale = get_option( 'WPLANG', '' ) ?: 'en_US';
+				if ( $locale !== $site_locale ) {
+					update_user_meta( $user_id, 'locale', $locale );
+					// Download the WP core language pack if it is not yet installed.
+					// admin-post.php loads wp-admin/includes/admin.php so
+					// wp_download_language_pack() is available here.
+					self::maybe_install_language_pack( $locale );
+				} else {
+					delete_user_meta( $user_id, 'locale' );
+				}
+			}
 		}
 
 		$redirect = remove_query_arg( [ 'ztrans_lang' ], wp_get_referer() ?: admin_url() );
@@ -80,6 +100,28 @@ class AdminBar {
 
 		wp_safe_redirect( $redirect );
 		exit;
+	}
+
+	/**
+	 * Download and install the WP core language pack for $locale if it is
+	 * missing. Called once when the user switches their admin language, so the
+	 * slight delay (HTTP to api.wordpress.org) happens on the redirect request,
+	 * not on normal page loads.
+	 */
+	private static function maybe_install_language_pack( $locale ) {
+		$mo = WP_LANG_DIR . '/' . $locale . '.mo';
+		if ( file_exists( $mo ) ) {
+			return;
+		}
+		if ( ! function_exists( 'wp_download_language_pack' ) ) {
+			$install_file = ABSPATH . 'wp-admin/includes/translation-install.php';
+			if ( file_exists( $install_file ) ) {
+				require_once $install_file;
+			}
+		}
+		if ( function_exists( 'wp_download_language_pack' ) ) {
+			wp_download_language_pack( $locale );
+		}
 	}
 
 	/**

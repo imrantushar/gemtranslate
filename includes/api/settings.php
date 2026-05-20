@@ -95,8 +95,20 @@ class Settings extends Controller {
 
 		if ( '' === $lang ) {
 			delete_user_meta( $user_id, \Zentranslate\Admin\ProfileField::META_KEY );
+			delete_user_meta( $user_id, 'locale' );
 		} elseif ( \Zentranslate\Language\Context::is_active( $lang ) ) {
 			update_user_meta( $user_id, \Zentranslate\Admin\ProfileField::META_KEY, $lang );
+			// Sync to WP's native user locale so determine_locale() at boot uses it.
+			$languages = \Zentranslate\Language\Context::active_languages();
+			$locale    = $languages[ $lang ]['locale'] ?? '';
+			if ( $locale ) {
+				$site_locale = get_option( 'WPLANG', '' ) ?: 'en_US';
+				if ( $locale !== $site_locale ) {
+					update_user_meta( $user_id, 'locale', $locale );
+				} else {
+					delete_user_meta( $user_id, 'locale' );
+				}
+			}
 		} else {
 			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );
 		}
