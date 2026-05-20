@@ -256,6 +256,36 @@ export default function SettingsPage() {
 				</Card>
 			</div>
 
+			{/* ---- Floating language switcher ---- */}
+			<div className="ztrans-mt-6">
+				<Card title={__('Floating language switcher', 'zentranslate')}>
+					<div className="ztrans-flex ztrans-flex-col ztrans-gap-3">
+						<Checkbox
+							label={__('Show floating switcher on every page', 'zentranslate')}
+							checked={!!values.float_switcher_enabled}
+							onChange={(e) => set('float_switcher_enabled', e.target.checked)}
+						/>
+						<p className="ztrans-mt-1 ztrans-mb-0 ztrans-text-xs ztrans-text-ztrans-muted">
+							{__('Injects a fixed-position language button on every frontend page — no shortcode or theme edits needed. Visible to all visitors including logged-out users.', 'zentranslate')}
+						</p>
+
+						{!!values.float_switcher_enabled && (
+							<Field label={__('Position', 'zentranslate')}>
+								<Select
+									value={values.float_switcher_position ?? 'bottom-right'}
+									onChange={(e) => set('float_switcher_position', e.target.value)}
+								>
+									<option value="bottom-right">{__('Bottom right', 'zentranslate')}</option>
+									<option value="bottom-left">{__('Bottom left', 'zentranslate')}</option>
+									<option value="top-right">{__('Top right', 'zentranslate')}</option>
+									<option value="top-left">{__('Top left', 'zentranslate')}</option>
+								</Select>
+							</Field>
+						)}
+					</div>
+				</Card>
+			</div>
+
 			<Toast message={toast?.message} tone={toast?.tone} onClear={() => setToast(null)} />
 		</>
 	);

@@ -1,0 +1,174 @@
+<?php
+namespace Zentranslate\Frontend;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+use Zentranslate\Language\Context;
+use Zentranslate\Routing\UrlRewriter;
+
+/**
+ * Injects a floating language-switcher button on every frontend page via
+ * wp_footer. Zero configuration required from the theme — works for all
+ * visitors including logged-out users.
+ *
+ * Controlled by the `float_switcher_enabled` setting. Position is set by
+ * `float_switcher_position` (bottom-right | bottom-left | top-right | top-left).
+ */
+class FloatingSwitcher {
+
+	public static function init() {
+		$self = new self();
+		add_action( 'wp_footer', [ $self, 'render' ] );
+	}
+
+	public function render() {
+		if ( is_admin() ) {
+			return;
+		}
+
+		$g       = $GLOBALS['ztrans_settings'] ?? null;
+		$enabled = isset( $g->float_switcher_enabled ) ? (bool) $g->float_switcher_enabled : false;
+		if ( ! $enabled ) {
+			return;
+		}
+
+		$languages = Context::active_languages();
+		if ( count( $languages ) <= 1 ) {
+			return;
+		}
+
+		$position    = sanitize_key( (string) ( $g->float_switcher_position ?? 'bottom-right' ) );
+		$show_flag   = isset( $g->switcher_show_flag ) ? (bool) $g->switcher_show_flag : true;
+		$show_name   = isset( $g->switcher_show_name ) ? (bool) $g->switcher_show_name : true;
+		$show_native = isset( $g->switcher_show_native ) ? (bool) $g->switcher_show_native : false;
+
+		$current  = Context::current();
+		$rewriter = new UrlRewriter();
+
+		// Build current language label for the trigger button.
+		$current_lang = $languages[ $current ] ?? reset( $languages );
+		$trigger_label = $this->build_label( $current_lang, $show_flag, $show_name, $show_native );
+
+		// Build list items.
+		$items_html = '';
+		foreach ( $languages as $row ) {
+			$is_current = ( $row['code'] === $current );
+			$url        = $rewriter->current_url_for_language( $row['code'] );
+			$label      = $this->build_label( $row, $show_flag, $show_name, $show_native );
+			$items_html .= sprintf(
+				'<li class="%s"><a href="%s" hreflang="%s" lang="%s"%s>%s</a></li>',
+				$is_current ? 'ztrans-float__item is-current' : 'ztrans-float__item',
+				esc_url( $url ),
+				esc_attr( $row['code'] ),
+				esc_attr( str_replace( '_', '-', $row['locale'] ) ),
+				$is_current ? ' aria-current="true"' : '',
+				$label
+			);
+		}
+
+		$pos_class = 'ztrans-float ztrans-float--' . esc_attr( $position );
+
+		echo $this->styles(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		?>
+		<div id="ztrans-float" class="<?php echo esc_attr( $pos_class ); ?>" dir="auto">
+			<button
+				class="ztrans-float__trigger"
+				aria-haspopup="listbox"
+				aria-expanded="false"
+				aria-label="<?php esc_attr_e( 'Switch language', 'zentranslate' ); ?>"
+			><?php echo $trigger_label; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></button>
+			<ul class="ztrans-float__menu" role="listbox" aria-label="<?php esc_attr_e( 'Languages', 'zentranslate' ); ?>">
+				<?php echo $items_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			</ul>
+		</div>
+		<?php
+		echo $this->script(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	}
+
+	private function build_label( $row, $show_flag, $show_name, $show_native ) {
+		$parts = [];
+		if ( $show_flag && ! empty( $row['flag'] ) ) {
+			$emoji = esc_html( self::flag_emoji( $row['flag'] ) );
+			$parts[]  = '<span class="ztrans-float__flag" aria-hidden="true">' . $emoji . '</span>';
+		}
+		if ( $show_name ) {
+			$parts[] = '<span class="ztrans-float__name">' . esc_html( $row['name'] ) . '</span>';
+		} elseif ( $show_native ) {
+			$parts[] = '<span class="ztrans-float__name">' . esc_html( $row['native_name'] ) . '</span>';
+		}
+		if ( ! $show_name && ! $show_native ) {
+			$parts[] = '<span class="ztrans-float__name">' . esc_html( strtoupper( $row['code'] ) ) . '</span>';
+		}
+		return implode( ' ', $parts );
+	}
+
+	private static function flag_emoji( $code ) {
+		$code = strtolower( $code );
+		if ( false !== strpos( $code, '-' ) ) {
+			$region = strtoupper( substr( strrchr( $code, '-' ), 1 ) );
+		} else {
+			$map    = [
+				'en' => 'GB', 'es' => 'ES', 'fr' => 'FR', 'de' => 'DE', 'it' => 'IT',
+				'pt' => 'PT', 'ru' => 'RU', 'ja' => 'JP', 'zh' => 'CN', 'ar' => 'SA',
+				'he' => 'IL', 'hi' => 'IN', 'bn' => 'BD', 'ko' => 'KR', 'tr' => 'TR',
+				'nl' => 'NL', 'pl' => 'PL',
+			];
+			$region = $map[ $code ] ?? strtoupper( $code );
+		}
+		if ( strlen( $region ) !== 2 ) {
+			return strtoupper( $code );
+		}
+		return mb_chr( 0x1F1E6 + ord( $region[0] ) - ord( 'A' ) )
+			. mb_chr( 0x1F1E6 + ord( $region[1] ) - ord( 'A' ) );
+	}
+
+	private function styles() {
+		return <<<'CSS'
+<style id="ztrans-float-css">
+#ztrans-float{position:fixed;z-index:99999;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.4}
+#ztrans-float.ztrans-float--bottom-right{bottom:20px;right:20px}
+#ztrans-float.ztrans-float--bottom-left{bottom:20px;left:20px}
+#ztrans-float.ztrans-float--top-right{top:20px;right:20px}
+#ztrans-float.ztrans-float--top-left{top:20px;left:20px}
+.ztrans-float__trigger{display:flex;align-items:center;gap:6px;padding:9px 16px;background:#1d2327;color:#fff;border:none;border-radius:999px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35);font-size:14px;font-family:inherit;white-space:nowrap;transition:background .15s}
+.ztrans-float__trigger:hover,.ztrans-float__trigger:focus-visible{background:#2c3338;outline:none}
+.ztrans-float__trigger:focus-visible{box-shadow:0 0 0 3px rgba(30,115,190,.6)}
+.ztrans-float__menu{list-style:none;margin:0;padding:4px 0;background:#fff;border:1px solid #dcdcde;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.18);min-width:150px;position:absolute;display:none}
+.ztrans-float__menu.is-open{display:block}
+.ztrans-float--bottom-right .ztrans-float__menu,.ztrans-float--bottom-left .ztrans-float__menu{bottom:calc(100% + 8px)}
+.ztrans-float--top-right .ztrans-float__menu,.ztrans-float--top-left .ztrans-float__menu{top:calc(100% + 8px)}
+.ztrans-float--bottom-right .ztrans-float__menu,.ztrans-float--top-right .ztrans-float__menu{right:0}
+.ztrans-float--bottom-left .ztrans-float__menu,.ztrans-float--top-left .ztrans-float__menu{left:0}
+.ztrans-float__item a{display:flex;align-items:center;gap:8px;padding:8px 14px;color:#1d2327;text-decoration:none;white-space:nowrap}
+.ztrans-float__item a:hover{background:#f0f0f1}
+.ztrans-float__item.is-current a{font-weight:700;color:#135e96}
+</style>
+CSS;
+	}
+
+	private function script() {
+		return <<<'JS'
+<script id="ztrans-float-js">
+(function(){
+var btn=document.getElementById('ztrans-float')&&document.querySelector('#ztrans-float .ztrans-float__trigger');
+var menu=document.getElementById('ztrans-float')&&document.querySelector('#ztrans-float .ztrans-float__menu');
+if(!btn||!menu)return;
+btn.addEventListener('click',function(e){
+  e.stopPropagation();
+  var open=menu.classList.toggle('is-open');
+  btn.setAttribute('aria-expanded',open?'true':'false');
+});
+document.addEventListener('click',function(){
+  menu.classList.remove('is-open');
+  btn.setAttribute('aria-expanded','false');
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){menu.classList.remove('is-open');btn.setAttribute('aria-expanded','false');}
+});
+})();
+</script>
+JS;
+	}
+}

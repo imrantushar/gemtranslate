@@ -27,6 +27,9 @@ class Settings extends Controller {
 		'switcher_show_code',
 		'switcher_hide_current',
 		'switcher_show_if_single',
+		// Floating switcher.
+		'float_switcher_enabled',
+		'float_switcher_position',
 	];
 
 	public static function init() {
@@ -153,6 +156,9 @@ class Settings extends Controller {
 			'switcher_show_code'        => false,
 			'switcher_hide_current'     => false,
 			'switcher_show_if_single'   => false,
+			// Floating switcher.
+			'float_switcher_enabled'    => false,
+			'float_switcher_position'   => 'bottom-right',
 		];
 		$saved = json_decode( get_option( ZTRANS_SETTINGS_NAME, '{}' ), true );
 		if ( ! is_array( $saved ) ) {

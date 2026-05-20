@@ -31,7 +31,7 @@ export default function PostsPage() {
 	const postTypes = usePostTypes();
 	const bulk = useBulkTranslate();
 	const langs = languages.data || [];
-	const nonDefault = langs.filter((l) => !l.is_default);
+	const nonDefault = langs.filter((l) => !l.is_default && l.active);
 	const types = postTypes.data || [];
 
 	const [selectedIds, setSelectedIds] = useState([]);

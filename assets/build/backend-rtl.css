@@ -334,6 +334,9 @@ input:where([type='file']):focus {
 #zentranslate-admin-root .ztrans-mt-4 {
 	margin-top: 1rem;
 }
+#zentranslate-admin-root .ztrans-mt-5 {
+	margin-top: 1.25rem;
+}
 #zentranslate-admin-root .ztrans-mt-6 {
 	margin-top: 1.5rem;
 }
@@ -428,6 +431,11 @@ input:where([type='file']):focus {
 }
 #zentranslate-admin-root .ztrans-cursor-pointer {
 	cursor: pointer;
+}
+#zentranslate-admin-root .ztrans-select-all {
+	-webkit-user-select: all;
+	   -moz-user-select: all;
+	        user-select: all;
 }
 #zentranslate-admin-root .ztrans-list-disc {
 	list-style-type: disc;
@@ -726,6 +734,9 @@ input:where([type='file']):focus {
 }
 #zentranslate-admin-root .ztrans-uppercase {
 	text-transform: uppercase;
+}
+#zentranslate-admin-root .ztrans-italic {
+	font-style: italic;
 }
 #zentranslate-admin-root .ztrans-tracking-wide {
 	letter-spacing: 0.025em;
