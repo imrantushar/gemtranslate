@@ -5,7 +5,7 @@ import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
-import { Checkbox, Field, Select } from '../../components/Input';
+import { Checkbox, Field, Select, TextInput } from '../../components/Input';
 import { LoadingBlock } from '../../components/Spinner';
 import { useSettings, useSaveSettings } from '../../hooks/useSettings';
 import { useLanguages } from '../../hooks/useLanguages';
@@ -252,6 +252,79 @@ export default function SettingsPage() {
 						<p className="ztrans-mt-2 ztrans-mb-0 ztrans-text-xs ztrans-text-ztrans-muted">
 							{__('Paste anywhere in a post, page, or text widget. Accepts display, show_flag, show_name, show_native, show_code, hide_current attributes to override the defaults above.', 'zentranslate')}
 						</p>
+					</div>
+				</Card>
+			</div>
+
+			{/* ---- Country detection ---- */}
+			<div className="ztrans-mt-6">
+				<Card title={__('Country detection', 'zentranslate')}>
+					<div className="ztrans-flex ztrans-flex-col ztrans-gap-3">
+						<Checkbox
+							label={__('Detect visitor country', 'zentranslate')}
+							checked={!!values.geo_enabled}
+							onChange={(e) => set('geo_enabled', e.target.checked)}
+						/>
+						<p className="ztrans-mt-1 ztrans-mb-0 ztrans-text-xs ztrans-text-ztrans-muted">
+							{__(
+								'When enabled, the visitor\'s country is detected once per session and used to pick country-specific page variants and (optionally) the default language.',
+								'zentranslate'
+							)}
+						</p>
+
+						{!!values.geo_enabled && (
+							<>
+								<Field
+									label={__('Detection source priority', 'zentranslate')}
+									hint={__('First match wins. Comma-separated, in order. Options: cf_header, maxmind, cookie.', 'zentranslate')}
+								>
+									<TextInput
+										value={Array.isArray(values.geo_sources) ? values.geo_sources.join(',') : String(values.geo_sources ?? '')}
+										onChange={(e) =>
+											set(
+												'geo_sources',
+												e.target.value
+													.split(',')
+													.map((s) => s.trim())
+													.filter(Boolean)
+											)
+										}
+									/>
+								</Field>
+
+								<Field
+									label={__('MaxMind GeoLite2 DB path', 'zentranslate')}
+									hint={__('Absolute path on the server to GeoLite2-Country.mmdb. Leave empty to skip MaxMind.', 'zentranslate')}
+								>
+									<TextInput
+										value={values.geo_maxmind_db_path || ''}
+										onChange={(e) => set('geo_maxmind_db_path', e.target.value)}
+									/>
+								</Field>
+
+								<Checkbox
+									label={__('Auto-redirect first visit to country\'s default language', 'zentranslate')}
+									checked={!!values.geo_auto_redirect_country}
+									onChange={(e) => set('geo_auto_redirect_country', e.target.checked)}
+								/>
+								<Checkbox
+									label={__('Show manual country picker banner when geo source has no match', 'zentranslate')}
+									checked={!!values.geo_country_picker_banner}
+									onChange={(e) => set('geo_country_picker_banner', e.target.checked)}
+								/>
+
+								<Field
+									label={__('Country cookie TTL (days)', 'zentranslate')}
+									hint={__('How long to remember the detected country in the visitor\'s browser.', 'zentranslate')}
+								>
+									<TextInput
+										type="number"
+										value={values.geo_cookie_ttl_days ?? 90}
+										onChange={(e) => set('geo_cookie_ttl_days', Number(e.target.value) || 0)}
+									/>
+								</Field>
+							</>
+						)}
 					</div>
 				</Card>
 			</div>

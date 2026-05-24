@@ -12,5 +12,6 @@ class Translation {
 		Translation\MenuTranslator::init();
 		Translation\StringTranslator::init();
 		Translation\MetaTranslator::init();
+		Translation\ShadowPostSync::init();
 	}
 }

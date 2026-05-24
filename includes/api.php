@@ -22,5 +22,6 @@ class API {
 		API\Io::init();
 		API\Settings::init();
 		API\Stats::init();
+		API\Geo::init();
 	}
 }

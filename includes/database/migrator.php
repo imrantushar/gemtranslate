@@ -20,6 +20,14 @@ class Migrator {
 		$prefix          = $wpdb->prefix . ZTRANS_DB_PREFIX;
 		$charset_collate = $wpdb->get_charset_collate();
 
+		// dbDelta can add columns and indexes but cannot drop or replace a
+		// PRIMARY KEY. Widen the post_translations PK to include country_code
+		// BEFORE dbDelta runs — otherwise dbDelta tries to ADD a second
+		// PRIMARY KEY and MySQL rejects the ALTER.
+		// Requires the country_code column to exist; create it first if not.
+		self::ensure_country_code_column( $prefix );
+		self::ensure_post_translations_pk( $prefix );
+
 		CreateLanguagesTable::up( $prefix, $charset_collate );
 		CreateTranslationGroupsTable::up( $prefix, $charset_collate );
 		CreatePostTranslationsTable::up( $prefix, $charset_collate );
@@ -38,6 +46,28 @@ class Migrator {
 		update_option( 'ztrans_db_version', ZTRANS_DB_VERSION );
 	}
 
+	private static function ensure_country_code_column( $prefix ) {
+		global $wpdb;
+		$table = $prefix . 'post_translations';
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$exists = (bool) $wpdb->get_var( "SHOW TABLES LIKE '$table'" );
+		if ( ! $exists ) {
+			return; // Fresh install: dbDelta will create the table with the column.
+		}
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$cols = $wpdb->get_col( "SHOW COLUMNS FROM `$table` LIKE 'country_code'" );
+		if ( empty( $cols ) ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$wpdb->query( "ALTER TABLE `$table` ADD COLUMN country_code VARCHAR(2) NOT NULL DEFAULT '' AFTER language_code" );
+		}
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$cols = $wpdb->get_col( "SHOW COLUMNS FROM `$table` LIKE 'shadow_post_id'" );
+		if ( empty( $cols ) ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$wpdb->query( "ALTER TABLE `$table` ADD COLUMN shadow_post_id BIGINT(20) UNSIGNED NOT NULL DEFAULT 0 AFTER post_id" );
+		}
+	}
+
 	/**
 	 * Run schema upgrades on `init` if the stored db version is behind.
 	 */
@@ -47,5 +77,27 @@ class Migrator {
 			return;
 		}
 		self::install();
+	}
+
+	/**
+	 * Ensure the post_translations PRIMARY KEY includes country_code.
+	 * Safe to re-run — only ALTERs when the existing PK is missing the column.
+	 */
+	private static function ensure_post_translations_pk( $prefix ) {
+		global $wpdb;
+		$table = $prefix . 'post_translations';
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$rows = $wpdb->get_results( "SHOW KEYS FROM `$table` WHERE Key_name = 'PRIMARY'", ARRAY_A );
+		if ( ! is_array( $rows ) || empty( $rows ) ) {
+			return;
+		}
+		foreach ( $rows as $row ) {
+			if ( ( $row['Column_name'] ?? '' ) === 'country_code' ) {
+				return; // Already widened.
+			}
+		}
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$wpdb->query( "ALTER TABLE `$table` DROP PRIMARY KEY, ADD PRIMARY KEY (group_id, language_code, country_code)" );
 	}
 }

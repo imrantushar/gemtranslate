@@ -155,29 +155,38 @@ class Languages extends Controller {
 		if ( ! $row ) {
 			return null;
 		}
+		$country_codes = $row['country_codes'] ?? '';
+		if ( is_string( $country_codes ) && '' !== $country_codes ) {
+			$decoded = json_decode( $country_codes, true );
+			$country_codes = is_array( $decoded ) ? $decoded : [];
+		} elseif ( ! is_array( $country_codes ) ) {
+			$country_codes = [];
+		}
 		return [
-			'code'        => $row['code'],
-			'locale'      => $row['locale'],
-			'name'        => $row['name'],
-			'native_name' => $row['native_name'],
-			'flag'        => $row['flag'],
-			'is_rtl'      => (bool) $row['is_rtl'],
-			'is_default'  => (bool) $row['is_default'],
-			'active'      => (bool) $row['active'],
-			'position'    => (int) $row['position'],
+			'code'          => $row['code'],
+			'locale'        => $row['locale'],
+			'name'          => $row['name'],
+			'native_name'   => $row['native_name'],
+			'flag'          => $row['flag'],
+			'is_rtl'        => (bool) $row['is_rtl'],
+			'is_default'    => (bool) $row['is_default'],
+			'active'        => (bool) $row['active'],
+			'position'      => (int) $row['position'],
+			'country_codes' => $country_codes,
 		];
 	}
 
 	private function writable_args( $require_required ) {
 		$args = [
-			'code'        => [ 'type' => 'string', 'required' => $require_required ],
-			'locale'      => [ 'type' => 'string', 'required' => $require_required ],
-			'name'        => [ 'type' => 'string', 'required' => $require_required ],
-			'native_name' => [ 'type' => 'string' ],
-			'flag'        => [ 'type' => 'string' ],
-			'is_rtl'      => [ 'type' => 'boolean' ],
-			'active'      => [ 'type' => 'boolean' ],
-			'position'    => [ 'type' => 'integer' ],
+			'code'          => [ 'type' => 'string', 'required' => $require_required ],
+			'locale'        => [ 'type' => 'string', 'required' => $require_required ],
+			'name'          => [ 'type' => 'string', 'required' => $require_required ],
+			'native_name'   => [ 'type' => 'string' ],
+			'flag'          => [ 'type' => 'string' ],
+			'is_rtl'        => [ 'type' => 'boolean' ],
+			'active'        => [ 'type' => 'boolean' ],
+			'position'      => [ 'type' => 'integer' ],
+			'country_codes' => [ 'type' => 'array' ],
 		];
 		return $args;
 	}

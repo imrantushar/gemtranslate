@@ -8,6 +8,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Zentranslate\Language\Context;
 use Zentranslate\Translation\BlockParser;
 use Zentranslate\Translation\MetaTranslator;
+use Zentranslate\Translation\PostFieldTranslator;
+use Zentranslate\Translation\ShadowPostSync;
 use Zentranslate\Translation\TranslationLoader;
 
 class PostTranslations extends Controller {
@@ -58,18 +60,57 @@ class PostTranslations extends Controller {
 			]
 		);
 
+		// String-only field list endpoints (v1.3).
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/(?P<id>\d+)/blocks/(?P<lang>[a-z0-9\-]{2,10})',
+			'/' . $this->rest_base . '/(?P<id>\d+)/fields/(?P<lang>[a-z0-9\-]{2,10})',
 			[
 				[
 					'methods'             => \WP_REST_Server::READABLE,
-					'callback'            => [ $this, 'get_blocks' ],
+					'callback'            => [ $this, 'get_fields' ],
 					'permission_callback' => [ $this, 'permissions_translate' ],
 				],
 				[
 					'methods'             => 'PUT',
-					'callback'            => [ $this, 'save_blocks' ],
+					'callback'            => [ $this, 'save_fields' ],
+					'permission_callback' => [ $this, 'permissions_translate' ],
+				],
+			]
+		);
+
+		// Mode-flip endpoints.
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>\d+)/translations/(?P<lang>[a-z0-9\-]{2,10})/promote-to-layout',
+			[
+				'methods'             => \WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'promote_to_layout' ],
+				'permission_callback' => [ $this, 'permissions_translate' ],
+			]
+		);
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>\d+)/translations/(?P<lang>[a-z0-9\-]{2,10})/demote-to-strings',
+			[
+				'methods'             => \WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'demote_to_strings' ],
+				'permission_callback' => [ $this, 'permissions_translate' ],
+			]
+		);
+
+		// Country-variant management.
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>\d+)/variants/(?P<lang>[a-z0-9\-]{2,10})',
+			[
+				[
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'list_variants' ],
+					'permission_callback' => [ $this, 'permissions_translate' ],
+				],
+				[
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => [ $this, 'create_variant' ],
 					'permission_callback' => [ $this, 'permissions_translate' ],
 				],
 			]
@@ -281,9 +322,14 @@ class PostTranslations extends Controller {
 			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
 		}
 
+		// Group rows by language; default-country row is the "primary".
 		$existing  = [];
 		foreach ( TranslationLoader::all_for_post( $post_id ) as $row ) {
-			$existing[ $row['language_code'] ] = $this->prepare_translation_row( $row );
+			$lang    = (string) $row['language_code'];
+			$country = (string) ( $row['country_code'] ?? '' );
+			if ( ! isset( $existing[ $lang ] ) || '' === $country ) {
+				$existing[ $lang ] = $this->prepare_translation_row( $row );
+			}
 		}
 
 		$languages = Context::active_languages();
@@ -310,13 +356,29 @@ class PostTranslations extends Controller {
 	public function show_translation( $request ) {
 		$post_id = (int) $request['id'];
 		$lang    = strtolower( $request['lang'] );
-		$rows    = TranslationLoader::all_for_post( $post_id );
+		$country = $this->country_param( $request );
+		$rows    = TranslationLoader::variants_for_post( $post_id, $lang );
+
+		// Exact (lang, country) match first; fall back to language-default.
+		$match = null;
 		foreach ( $rows as $row ) {
-			if ( $row['language_code'] === $lang ) {
-				return $this->ok( $this->prepare_translation_row( $row ) );
+			if ( (string) $row['country_code'] === $country ) {
+				$match = $row;
+				break;
 			}
 		}
-		return $this->fail( 'ztrans_not_found', __( 'Translation not found.', 'zentranslate' ), 404 );
+		if ( ! $match ) {
+			foreach ( $rows as $row ) {
+				if ( '' === (string) $row['country_code'] ) {
+					$match = $row;
+					break;
+				}
+			}
+		}
+		if ( ! $match ) {
+			return $this->fail( 'ztrans_not_found', __( 'Translation not found.', 'zentranslate' ), 404 );
+		}
+		return $this->ok( $this->prepare_translation_row( $match ) );
 	}
 
 	public function save_translation( $request ) {
@@ -329,13 +391,16 @@ class PostTranslations extends Controller {
 			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
 		}
 
-		$body = $request->get_json_params() ?: $request->get_params();
-		$ok   = TranslationLoader::save_translation( $post_id, $lang, [
-			'title'   => $body['title']   ?? '',
-			'content' => $body['content'] ?? '',
-			'excerpt' => $body['excerpt'] ?? '',
-			'slug'    => $body['slug']    ?? '',
-			'status'  => $body['status']  ?? 'publish',
+		$body    = $request->get_json_params() ?: $request->get_params();
+		$country = $this->country_param( $request );
+		$ok      = TranslationLoader::save_translation( $post_id, $lang, [
+			'title'            => $body['title']            ?? '',
+			'content'          => $body['content']          ?? '',
+			'excerpt'          => $body['excerpt']          ?? '',
+			'slug'             => $body['slug']             ?? '',
+			'status'           => $body['status']           ?? 'publish',
+			'country_code'     => $body['country_code']     ?? $country,
+			'translation_mode' => $body['translation_mode'] ?? TranslationLoader::MODE_CUSTOM_LAYOUT,
 		] );
 		if ( ! $ok ) {
 			return $this->fail( 'ztrans_save_failed', __( 'Could not save translation.', 'zentranslate' ), 500 );
@@ -346,61 +411,34 @@ class PostTranslations extends Controller {
 	public function delete_translation( $request ) {
 		$post_id = (int) $request['id'];
 		$lang    = strtolower( $request['lang'] );
-		TranslationLoader::delete_translation( $post_id, $lang );
-		return $this->ok( [ 'deleted' => true, 'post_id' => $post_id, 'language_code' => $lang ] );
+		$country = $this->country_param( $request );
+		// If no explicit country was passed, drop every variant for the language;
+		// otherwise drop just that variant.
+		$has_explicit_country = null !== $request->get_param( 'country' );
+		TranslationLoader::delete_translation( $post_id, $lang, $has_explicit_country ? $country : null );
+		return $this->ok( [ 'deleted' => true, 'post_id' => $post_id, 'language_code' => $lang, 'country_code' => $country ] );
 	}
 
-	public function get_blocks( $request ) {
+	// -----------------------------------------------------------------------
+	// String-only field list (v1.3)
+	// -----------------------------------------------------------------------
+
+	public function get_fields( $request ) {
 		$post_id = (int) $request['id'];
 		$lang    = strtolower( $request['lang'] );
 		$post    = get_post( $post_id ) ?? $this->get_academy_hp_lesson_as_post( $post_id );
 		if ( ! $post ) {
 			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
 		}
-
-		$source_fields = BlockParser::extract( $post->post_content );
-		if ( empty( $source_fields ) ) {
-			return $this->ok( [
-				'is_block_content' => false,
-				'fields'           => [],
-			] );
-		}
-
-		// Map existing translation content to source paths.
-		$translated_content = '';
-		foreach ( TranslationLoader::all_for_post( $post_id ) as $row ) {
-			if ( $row['language_code'] === $lang ) {
-				$translated_content = (string) $row['content'];
-				break;
-			}
-		}
-
-		$translated_paths = [];
-		if ( BlockParser::is_block_content( $translated_content ) ) {
-			foreach ( BlockParser::extract( $translated_content ) as $f ) {
-				$translated_paths[ $f['path'] ] = $f['value'];
-			}
-		}
-
-		$out = [];
-		foreach ( $source_fields as $f ) {
-			$out[] = [
-				'path'        => $f['path'],
-				'block'       => $f['block'],
-				'kind'        => $f['kind'],
-				'attr'        => $f['attr'],
-				'source'      => $f['value'],
-				'translation' => $translated_paths[ $f['path'] ] ?? '',
-			];
-		}
-
+		$fields = PostFieldTranslator::enumerate_fields( $post, $lang );
 		return $this->ok( [
-			'is_block_content' => true,
-			'fields'           => $out,
+			'is_block_content' => BlockParser::is_block_content( (string) $post->post_content ),
+			'fields'           => $fields,
+			'mode'             => TranslationLoader::MODE_STRING_ONLY,
 		] );
 	}
 
-	public function save_blocks( $request ) {
+	public function save_fields( $request ) {
 		$post_id = (int) $request['id'];
 		$lang    = strtolower( $request['lang'] );
 		if ( ! Context::is_active( $lang ) ) {
@@ -411,27 +449,155 @@ class PostTranslations extends Controller {
 			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
 		}
 
-		$body   = $request->get_json_params() ?: $request->get_params();
-		$fields = (array) ( $body['fields'] ?? [] );
-		$map    = [];
-		foreach ( $fields as $f ) {
-			$path = (string) ( $f['path'] ?? '' );
+		$body    = $request->get_json_params() ?: $request->get_params();
+		$rows    = (array) ( $body['fields'] ?? [] );
+		$country = $this->country_param( $request );
+		$saved   = 0;
+
+		foreach ( $rows as $r ) {
+			$path        = (string) ( $r['path'] ?? '' );
+			$translation = (string) ( $r['value'] ?? '' );
+			$source      = (string) ( $r['source'] ?? '' );
 			if ( '' === $path ) {
 				continue;
 			}
-			$map[ $path ] = (string) ( $f['value'] ?? '' );
+			if ( '' === $source ) {
+				$source = $this->derive_source_for_path( $post, $path );
+			}
+			if ( TranslationLoader::save_string_translation( $post_id, $lang, $path, $source, $translation, $country ) ) {
+				$saved++;
+			}
 		}
+		PostFieldTranslator::flush_memo();
 
-		$rebuilt = BlockParser::apply( $post->post_content, $map );
+		return $this->get_fields( $request );
+	}
 
-		// Merge with existing title/excerpt if a translation already exists,
-		// otherwise seed those fields from the source so the post can be
-		// rendered immediately.
+	/**
+	 * Return the tokenised source value for a given path. This IS the storage
+	 * key used by `save_string_translation` — must match what the render path
+	 * (PostFieldTranslator) extracts from the same source.
+	 *
+	 * For block fields, the raw innerHTML is tokenised via TokenExtractor so
+	 * the key is `Hello {1}world{2}` rather than the raw `<p>Hello <strong>world</strong></p>`.
+	 */
+	private function derive_source_for_path( $post, $path ) {
+		$raw = '';
+		if ( PostFieldTranslator::PATH_TITLE === $path ) {
+			$raw = (string) $post->post_title;
+		} elseif ( PostFieldTranslator::PATH_EXCERPT === $path ) {
+			$raw = (string) $post->post_excerpt;
+		} elseif ( PostFieldTranslator::PATH_BODY === $path ) {
+			$raw = (string) $post->post_content;
+		} else {
+			foreach ( BlockParser::extract( (string) $post->post_content ) as $field ) {
+				if ( $field['path'] === $path ) {
+					$raw = (string) $field['value'];
+					break;
+				}
+			}
+		}
+		return PostFieldTranslator::tokenise( $raw );
+	}
+
+	// -----------------------------------------------------------------------
+	// Mode flips
+	// -----------------------------------------------------------------------
+
+	public function promote_to_layout( $request ) {
+		$post_id = (int) $request['id'];
+		$lang    = strtolower( $request['lang'] );
+		$country = $this->country_param( $request );
+		$post    = get_post( $post_id );
+		if ( ! $post ) {
+			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
+		}
+		// Snapshot current rendered string-only output as the starting custom layout.
+		$rebuilt = PostFieldTranslator::rebuild_content( $post_id, (string) $post->post_content, $lang );
+		$title   = PostFieldTranslator::translated_title( $post_id, (string) $post->post_title, $lang );
+		$excerpt = PostFieldTranslator::translated_excerpt( $post_id, (string) $post->post_excerpt, $lang );
+
+		// Create (or reuse) the shadow WP post that the admin will edit in
+		// Gutenberg / page builder. ensure_for() also writes the row.
+		$shadow_id = ShadowPostSync::ensure_for(
+			$post_id,
+			$lang,
+			$country,
+			[
+				'title'   => $title,
+				'content' => $rebuilt,
+				'excerpt' => $excerpt,
+				'slug'    => (string) $post->post_name,
+			]
+		);
+		if ( ! $shadow_id ) {
+			return $this->fail( 'ztrans_save_failed', __( 'Could not create shadow post.', 'zentranslate' ), 500 );
+		}
+		return $this->show_translation( $request );
+	}
+
+	public function demote_to_strings( $request ) {
+		$post_id = (int) $request['id'];
+		$lang    = strtolower( $request['lang'] );
+		$country = $this->country_param( $request );
+
+		// Extract per-field translations from the stored content blob, register
+		// them as strings, then clear the content so the render path falls
+		// through to string_only mode.
 		$existing = null;
-		foreach ( TranslationLoader::all_for_post( $post_id ) as $row ) {
-			if ( $row['language_code'] === $lang ) {
+		foreach ( TranslationLoader::variants_for_post( $post_id, $lang ) as $row ) {
+			if ( (string) $row['country_code'] === $country ) {
 				$existing = $row;
 				break;
+			}
+		}
+		if ( $existing ) {
+			$stored = (string) $existing['content'];
+			if ( BlockParser::is_block_content( $stored ) ) {
+				$src_post   = get_post( $post_id );
+				$stored_map = [];
+				foreach ( BlockParser::extract( $stored ) as $field ) {
+					$stored_map[ $field['path'] ] = (string) $field['value'];
+				}
+				foreach ( BlockParser::extract( (string) $src_post->post_content ) as $field ) {
+					$src_key = $this->derive_source_for_path( $src_post, $field['path'] );
+					$value   = PostFieldTranslator::tokenise( $stored_map[ $field['path'] ] ?? '' );
+					if ( '' === $src_key || '' === $value ) {
+						continue;
+					}
+					TranslationLoader::save_string_translation( $post_id, $lang, $field['path'], $src_key, $value, $country );
+				}
+			} elseif ( '' !== $stored ) {
+				TranslationLoader::save_string_translation(
+					$post_id,
+					$lang,
+					PostFieldTranslator::PATH_BODY,
+					$this->derive_source_for_path( get_post( $post_id ), PostFieldTranslator::PATH_BODY ),
+					PostFieldTranslator::tokenise( $stored ),
+					$country
+				);
+			}
+			$title = (string) $existing['title'];
+			if ( '' !== $title ) {
+				TranslationLoader::save_string_translation(
+					$post_id,
+					$lang,
+					PostFieldTranslator::PATH_TITLE,
+					$this->derive_source_for_path( get_post( $post_id ), PostFieldTranslator::PATH_TITLE ),
+					PostFieldTranslator::tokenise( $title ),
+					$country
+				);
+			}
+			$excerpt = (string) $existing['excerpt'];
+			if ( '' !== $excerpt ) {
+				TranslationLoader::save_string_translation(
+					$post_id,
+					$lang,
+					PostFieldTranslator::PATH_EXCERPT,
+					$this->derive_source_for_path( get_post( $post_id ), PostFieldTranslator::PATH_EXCERPT ),
+					PostFieldTranslator::tokenise( $excerpt ),
+					$country
+				);
 			}
 		}
 
@@ -439,18 +605,75 @@ class PostTranslations extends Controller {
 			$post_id,
 			$lang,
 			[
-				'title'   => $existing['title']   ?? $post->post_title,
-				'content' => $rebuilt,
-				'excerpt' => $existing['excerpt'] ?? $post->post_excerpt,
-				'slug'    => $existing['slug']    ?? $post->post_name,
-				'status'  => $existing['status']  ?? 'publish',
+				'title'            => '',
+				'content'          => '',
+				'excerpt'          => '',
+				'slug'             => $existing['slug']   ?? (string) get_post_field( 'post_name', $post_id ),
+				'status'           => $existing['status'] ?? 'publish',
+				'country_code'     => $country,
+				'translation_mode' => TranslationLoader::MODE_STRING_ONLY,
+				'shadow_post_id'   => 0,
 			]
 		);
 		if ( ! $ok ) {
-			return $this->fail( 'ztrans_save_failed', __( 'Could not save block translation.', 'zentranslate' ), 500 );
+			return $this->fail( 'ztrans_save_failed', __( 'Could not demote translation.', 'zentranslate' ), 500 );
 		}
-		return $this->get_blocks( $request );
+		// Trash the shadow post; admin can restore from wp-admin Trash if needed.
+		ShadowPostSync::trash_for( $post_id, $lang, $country );
+		PostFieldTranslator::flush_memo();
+		return $this->show_translation( $request );
 	}
+
+	// -----------------------------------------------------------------------
+	// Country variants
+	// -----------------------------------------------------------------------
+
+	public function list_variants( $request ) {
+		$post_id = (int) $request['id'];
+		$lang    = strtolower( $request['lang'] );
+		$rows    = TranslationLoader::variants_for_post( $post_id, $lang );
+		$out     = array_map( [ $this, 'prepare_translation_row' ], $rows );
+		return $this->ok( $out );
+	}
+
+	public function create_variant( $request ) {
+		$post_id = (int) $request['id'];
+		$lang    = strtolower( $request['lang'] );
+		$body    = $request->get_json_params() ?: $request->get_params();
+		$country = strtoupper( (string) ( $body['country_code'] ?? '' ) );
+		if ( ! preg_match( '/^[A-Z]{2}$/', $country ) ) {
+			return $this->fail( 'ztrans_invalid_country', __( 'country_code must be an ISO 3166-1 alpha-2 code.', 'zentranslate' ), 422 );
+		}
+		// Seed from the language-default row if one exists.
+		$seed = null;
+		foreach ( TranslationLoader::variants_for_post( $post_id, $lang ) as $row ) {
+			if ( '' === (string) $row['country_code'] ) {
+				$seed = $row;
+				break;
+			}
+		}
+		$ok = TranslationLoader::save_translation(
+			$post_id,
+			$lang,
+			[
+				'title'            => $seed['title']   ?? '',
+				'content'          => $seed['content'] ?? '',
+				'excerpt'          => $seed['excerpt'] ?? '',
+				'slug'             => $seed['slug']    ?? '',
+				'status'           => $seed['status']  ?? 'publish',
+				'country_code'     => $country,
+				'translation_mode' => $seed['translation_mode'] ?? TranslationLoader::MODE_STRING_ONLY,
+			]
+		);
+		if ( ! $ok ) {
+			return $this->fail( 'ztrans_save_failed', __( 'Could not create country variant.', 'zentranslate' ), 500 );
+		}
+		return $this->list_variants( $request );
+	}
+
+	// -----------------------------------------------------------------------
+	// Custom meta (unchanged)
+	// -----------------------------------------------------------------------
 
 	public function get_meta( $request ) {
 		$post_id = (int) $request['id'];
@@ -504,6 +727,19 @@ class PostTranslations extends Controller {
 		return $this->ok( [ 'saved' => $saved ] );
 	}
 
+	// -----------------------------------------------------------------------
+	// Helpers
+	// -----------------------------------------------------------------------
+
+	private function country_param( $request ) {
+		$raw = (string) $request->get_param( 'country' );
+		if ( '' === $raw && ! ( $request instanceof \WP_REST_Request ) ) {
+			return '';
+		}
+		$raw = strtoupper( $raw );
+		return preg_match( '/^[A-Z]{2}$/', $raw ) ? $raw : '';
+	}
+
 	private function prepare_post_row( $post, $full = false ) {
 		$out = [
 			'id'                  => (int) $post->ID,
@@ -523,16 +759,21 @@ class PostTranslations extends Controller {
 	}
 
 	private function prepare_translation_row( $row ) {
+		$shadow_id = (int) ( $row['shadow_post_id'] ?? 0 );
 		return [
-			'group_id'      => (int) $row['group_id'],
-			'language_code' => $row['language_code'],
-			'post_id'       => (int) $row['post_id'],
-			'title'         => $row['title'],
-			'content'       => $row['content'],
-			'excerpt'       => $row['excerpt'],
-			'slug'          => $row['slug'],
-			'status'        => $row['status'],
-			'updated_at'    => $row['updated_at'],
+			'group_id'         => (int) $row['group_id'],
+			'language_code'    => $row['language_code'],
+			'country_code'     => (string) ( $row['country_code'] ?? '' ),
+			'post_id'          => (int) $row['post_id'],
+			'shadow_post_id'   => $shadow_id,
+			'shadow_edit_url'  => $shadow_id ? ShadowPostSync::edit_url( $shadow_id ) : '',
+			'title'            => $row['title'],
+			'content'          => $row['content'],
+			'excerpt'          => $row['excerpt'],
+			'slug'             => $row['slug'],
+			'status'           => $row['status'],
+			'translation_mode' => $row['translation_mode'] ?? TranslationLoader::MODE_CUSTOM_LAYOUT,
+			'updated_at'       => $row['updated_at'],
 		];
 	}
 }

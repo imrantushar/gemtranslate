@@ -27,7 +27,9 @@ export default function LanguageForm({ initial, onSubmit, onCancel, busy }) {
 		is_rtl: !!initial?.is_rtl,
 		active: initial?.active ?? true,
 		position: initial?.position ?? 10,
+		country_codes: Array.isArray(initial?.country_codes) ? initial.country_codes : [],
 	}));
+	const [countryDraft, setCountryDraft] = useState('');
 
 	const set = (key) => (e) =>
 		setValues((v) => ({ ...v, [key]: e.target.type === 'checkbox' ? e.target.checked : e.target.value }));
@@ -43,6 +45,18 @@ export default function LanguageForm({ initial, onSubmit, onCancel, busy }) {
 			is_rtl: !!preset.is_rtl,
 		}));
 	};
+
+	const addCountry = () => {
+		const next = countryDraft.trim().toUpperCase();
+		if (!/^[A-Z]{2}$/.test(next)) return;
+		setValues((v) =>
+			v.country_codes.includes(next) ? v : { ...v, country_codes: [...v.country_codes, next] }
+		);
+		setCountryDraft('');
+	};
+
+	const removeCountry = (code) =>
+		setValues((v) => ({ ...v, country_codes: v.country_codes.filter((c) => c !== code) }));
 
 	const submit = (e) => {
 		e.preventDefault();
@@ -96,6 +110,46 @@ export default function LanguageForm({ initial, onSubmit, onCancel, busy }) {
 				<Checkbox label={__('Right-to-left script', 'zentranslate')} checked={values.is_rtl} onChange={set('is_rtl')} />
 				<Checkbox label={__('Active (shown in switcher)', 'zentranslate')} checked={values.active} onChange={set('active')} />
 			</div>
+
+			<Field
+				label={__('Countries where this is the default language', 'zentranslate')}
+				hint={__('ISO 3166-1 alpha-2 codes (e.g. MX, ES, AR). Used for country-based auto-redirect.', 'zentranslate')}
+			>
+				<div className="ztrans-flex ztrans-flex-wrap ztrans-items-center ztrans-gap-2">
+					{values.country_codes.map((c) => (
+						<span
+							key={c}
+							className="ztrans-inline-flex ztrans-items-center ztrans-gap-1 ztrans-rounded-full ztrans-bg-gray-100 ztrans-px-2 ztrans-py-0.5 ztrans-text-xs ztrans-text-gray-700"
+						>
+							{c}
+							<button
+								type="button"
+								onClick={() => removeCountry(c)}
+								className="ztrans-bare ztrans-text-gray-500 hover:ztrans-text-red-600"
+								aria-label={__('Remove', 'zentranslate')}
+							>
+								×
+							</button>
+						</span>
+					))}
+					<TextInput
+						value={countryDraft}
+						maxLength={2}
+						placeholder={__('e.g. MX', 'zentranslate')}
+						onChange={(e) => setCountryDraft(e.target.value)}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter') {
+								e.preventDefault();
+								addCountry();
+							}
+						}}
+						style={{ width: '6rem' }}
+					/>
+					<Button type="button" variant="ghost" size="sm" onClick={addCountry}>
+						{__('Add', 'zentranslate')}
+					</Button>
+				</div>
+			</Field>
 
 			<div className="ztrans-flex ztrans-justify-end ztrans-gap-2">
 				<Button variant="ghost" type="button" onClick={onCancel}>{__('Cancel', 'zentranslate')}</Button>

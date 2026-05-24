@@ -6,43 +6,44 @@ import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
-import StatusPill from '../../components/StatusPill';
-import { Field, TextInput, TextArea, Select } from '../../components/Input';
 import { LoadingBlock } from '../../components/Spinner';
-import { usePostTranslations, useSaveTranslation } from '../../hooks/usePosts';
-import { useTranslateWithAI } from '../../hooks/useAI';
+import { usePostTranslations } from '../../hooks/usePosts';
+import {
+	usePostVariants,
+	useCreateVariant,
+	usePromoteToLayout,
+	useDemoteToStrings,
+} from '../../hooks/usePostFields';
 import { formatErrorMessage } from '../../lib/format';
 import SeoTab from './SeoTab';
 import MetaTab from './MetaTab';
-import BlocksTab from './BlocksTab';
+import FieldsTab from './FieldsTab';
 import HistoryTab from './HistoryTab';
+import ModeSwitcher from './ModeSwitcher';
 
 export default function TranslationEditor() {
 	const { id } = useParams();
 	const data = usePostTranslations(id);
-	const save = useSaveTranslation();
-	const aiTranslate = useTranslateWithAI();
+	const promote = usePromoteToLayout();
+	const demote = useDemoteToStrings();
+	const createVariant = useCreateVariant();
 	const [selectedLang, setSelectedLang] = useState('');
+	const [country, setCountry] = useState('');
 	const [tab, setTab] = useState('content');
-	const [form, setForm] = useState({ title: '', content: '', excerpt: '', slug: '', status: 'publish' });
 	const [toast, setToast] = useState(null);
+	const variants = usePostVariants(id, selectedLang);
+
+	// Mode for the selected (lang, country) row. Defaults to string_only for
+	// new translations; reads from the row when it exists.
+	const variantRow = (variants.data || []).find((v) => (v.country_code || '') === country) || null;
+	const mode = variantRow?.translation_mode || 'string_only';
 
 	useEffect(() => {
 		if (!data.data) return;
 		const langs = data.data.translations || [];
 		if (langs.length === 0) return;
-		const target = selectedLang || langs[0].language.code;
-		setSelectedLang(target);
-		const row = langs.find((l) => l.language.code === target);
-		setForm({
-			title: row?.translation?.title ?? '',
-			content: row?.translation?.content ?? '',
-			excerpt: row?.translation?.excerpt ?? '',
-			slug: row?.translation?.slug ?? '',
-			status: row?.translation?.status ?? 'publish',
-		});
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [data.data, selectedLang]);
+		setSelectedLang((current) => current || langs[0].language.code);
+	}, [data.data]);
 
 	if (data.isLoading) return <LoadingBlock>{__('Loading translation editor…', 'zentranslate')}</LoadingBlock>;
 	if (data.error) return <p className="ztrans-text-red-600">{formatErrorMessage(data.error)}</p>;
@@ -51,62 +52,6 @@ export default function TranslationEditor() {
 	const { post, translations, default_lang: defaultLang } = data.data;
 	const targetLangs = translations || [];
 	const targetRow = targetLangs.find((l) => l.language.code === selectedLang);
-
-	const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
-
-	const submit = async (e) => {
-		e.preventDefault();
-		try {
-			await save.mutateAsync({ postId: post.id, lang: selectedLang, payload: form });
-			setToast({ tone: 'success', message: __('Translation saved.', 'zentranslate') });
-		} catch (err) {
-			setToast({ tone: 'error', message: formatErrorMessage(err) });
-		}
-	};
-
-	const aiFill = async (field, sourceText) => {
-		try {
-			const result = await aiTranslate.mutateAsync({
-				text: sourceText,
-				source_lang: defaultLang,
-				target_lang: selectedLang,
-				preserve_html: field === 'content',
-				use_memory: true,
-			});
-			setForm((f) => ({ ...f, [field]: result.translations }));
-			setToast({
-				tone: 'success',
-				message: sprintf(
-					/* translators: %s: field name like title, excerpt, content. */
-					__('AI filled %s.', 'zentranslate'),
-					field
-				),
-			});
-		} catch (err) {
-			setToast({ tone: 'error', message: formatErrorMessage(err) });
-		}
-	};
-
-	const aiFillAll = async () => {
-		try {
-			const res = await aiTranslate.mutateAsync({
-				text: [post.title, post.excerpt || '', post.content || ''],
-				source_lang: defaultLang,
-				target_lang: selectedLang,
-				preserve_html: true,
-				use_memory: true,
-			});
-			setForm((f) => ({
-				...f,
-				title: res.translations[0] || f.title,
-				excerpt: res.translations[1] || f.excerpt,
-				content: res.translations[2] || f.content,
-			}));
-			setToast({ tone: 'success', message: __('AI translation applied to all fields.', 'zentranslate') });
-		} catch (err) {
-			setToast({ tone: 'error', message: formatErrorMessage(err) });
-		}
-	};
 
 	return (
 		<>
@@ -140,7 +85,10 @@ export default function TranslationEditor() {
 						{targetLangs.map((t) => (
 							<button
 								key={t.language.code}
-								onClick={() => setSelectedLang(t.language.code)}
+								onClick={() => {
+									setSelectedLang(t.language.code);
+									setCountry('');
+								}}
 								className={`ztrans-bare ztrans-rounded-md ztrans-px-3 ztrans-py-1.5 ztrans-text-sm ${
 									selectedLang === t.language.code
 										? 'ztrans-bg-ztrans-primary ztrans-text-white'
@@ -155,16 +103,84 @@ export default function TranslationEditor() {
 								)}
 							</button>
 						))}
-						<Button variant="secondary" size="sm" onClick={aiFillAll} loading={aiTranslate.isPending}>
-							{__('Translate all with AI', 'zentranslate')}
+					</div>
+
+					{/* ---- Country variant strip (tightened) ---- */}
+					<div className="ztrans-mb-4 ztrans-flex ztrans-flex-wrap ztrans-items-center ztrans-gap-2">
+						<span className="ztrans-text-xs ztrans-font-medium ztrans-text-gray-600 ztrans-mr-1">
+							{__('Country variant:', 'zentranslate')}
+						</span>
+						<VariantPill active={country === ''} onClick={() => setCountry('')}>
+							{__('Default', 'zentranslate')}
+						</VariantPill>
+						{(variants.data || [])
+							.filter((v) => (v.country_code || '') !== '')
+							.map((v) => (
+								<VariantPill
+									key={v.country_code}
+									active={country === v.country_code}
+									onClick={() => setCountry(v.country_code)}
+								>
+									{v.country_code}
+								</VariantPill>
+							))}
+						<Button
+							type="button"
+							variant="ghost"
+							size="sm"
+							loading={createVariant.isPending}
+							onClick={async () => {
+								// eslint-disable-next-line no-alert
+								const next = (window.prompt(__('ISO 2-letter country code (e.g. MX)', 'zentranslate')) || '')
+									.trim()
+									.toUpperCase();
+								if (!/^[A-Z]{2}$/.test(next)) return;
+								try {
+									await createVariant.mutateAsync({ postId: post.id, lang: selectedLang, country_code: next });
+									setCountry(next);
+									setToast({ tone: 'success', message: __('Country variant added.', 'zentranslate') });
+								} catch (err) {
+									setToast({ tone: 'error', message: formatErrorMessage(err) });
+								}
+							}}
+						>
+							{__('+ Add country', 'zentranslate')}
 						</Button>
 					</div>
 
+					{/* ---- Mode switcher (cards) ---- */}
+					<ModeSwitcher
+						mode={mode}
+						language={targetRow?.language?.name || selectedLang}
+						country={country}
+						variantRow={variantRow}
+						isPromoting={promote.isPending}
+						isDemoting={demote.isPending}
+						onPromote={async () => {
+							try {
+								await promote.mutateAsync({ postId: post.id, lang: selectedLang, country });
+								setTab('content');
+								setToast({ tone: 'success', message: __('Switched to custom layout. Open it in your editor to design the page.', 'zentranslate') });
+							} catch (err) {
+								setToast({ tone: 'error', message: formatErrorMessage(err) });
+							}
+						}}
+						onDemote={async () => {
+							try {
+								await demote.mutateAsync({ postId: post.id, lang: selectedLang, country });
+								setTab('content');
+								setToast({ tone: 'success', message: __('Reverted to strings-only mode.', 'zentranslate') });
+							} catch (err) {
+								setToast({ tone: 'error', message: formatErrorMessage(err) });
+							}
+						}}
+					/>
+
+					{/* ---- Tabs ---- */}
 					<div className="ztrans-mb-4 ztrans-flex ztrans-border-b ztrans-border-ztrans-border">
 						{[
 							{ key: 'content', label: __('Content', 'zentranslate') },
-							{ key: 'blocks', label: __('Blocks', 'zentranslate') },
-							{ key: 'meta', label: __('Fields', 'zentranslate') },
+							{ key: 'meta', label: __('Custom fields', 'zentranslate') },
 							{ key: 'seo', label: __('SEO', 'zentranslate') },
 							{ key: 'history', label: __('History', 'zentranslate') },
 						].map((t) => (
@@ -183,96 +199,78 @@ export default function TranslationEditor() {
 						))}
 					</div>
 
-					{tab === 'seo' ? (
-						<SeoTab postId={post.id} sourceLang={defaultLang} targetLang={selectedLang} onToast={setToast} />
-					) : tab === 'meta' ? (
+					{/* ---- Tab content ---- */}
+					{tab === 'meta' ? (
 						<MetaTab postId={post.id} sourceLang={defaultLang} targetLang={selectedLang} />
-					) : tab === 'blocks' ? (
-						<BlocksTab postId={post.id} sourceLang={defaultLang} targetLang={selectedLang} />
+					) : tab === 'seo' ? (
+						<SeoTab postId={post.id} sourceLang={defaultLang} targetLang={selectedLang} onToast={setToast} />
 					) : tab === 'history' ? (
 						<HistoryTab postId={post.id} targetLang={selectedLang} />
+					) : mode === 'string_only' ? (
+						<FieldsTab postId={post.id} sourceLang={defaultLang} targetLang={selectedLang} country={country} />
 					) : (
-					<div className="ztrans-grid ztrans-grid-cols-1 lg:ztrans-grid-cols-2 ztrans-gap-6">
-						<Card title={sprintf(/* translators: %s: language code. */ __('Source — %s', 'zentranslate'), defaultLang)}>
-							<div className="ztrans-flex ztrans-flex-col ztrans-gap-3">
-								<Field label={__('Title', 'zentranslate')}>
-									<TextInput value={post.title || ''} readOnly />
-								</Field>
-								<Field label={__('Slug', 'zentranslate')}>
-									<TextInput value={post.slug || ''} readOnly />
-								</Field>
-								<Field label={__('Excerpt', 'zentranslate')}>
-									<TextArea rows={3} value={post.excerpt || ''} readOnly />
-								</Field>
-								<Field label={__('Content', 'zentranslate')}>
-									<TextArea rows={14} value={post.content || ''} readOnly />
-								</Field>
-							</div>
-						</Card>
-
-						<Card
-							title={sprintf(/* translators: %s: language code. */ __('Translation — %s', 'zentranslate'), selectedLang)}
-							action={
-								targetRow?.translation && (
-									<StatusPill tone={targetRow.translation.status === 'publish' ? 'translated' : 'pending'}>
-										{targetRow.translation.status}
-									</StatusPill>
-								)
-							}
-						>
-							<form onSubmit={submit} className="ztrans-flex ztrans-flex-col ztrans-gap-3">
-								<div className="ztrans-flex ztrans-items-end ztrans-gap-2">
-									<div className="ztrans-flex-1">
-										<Field label={__('Title', 'zentranslate')}>
-											<TextInput value={form.title} onChange={set('title')} />
-										</Field>
-									</div>
-									<Button variant="ghost" size="sm" onClick={() => aiFill('title', post.title)}>
-										{__('AI', 'zentranslate')}
-									</Button>
-								</div>
-								<Field label={__('Slug', 'zentranslate')} hint={__('Used for SEO-friendly URLs.', 'zentranslate')}>
-									<TextInput value={form.slug} onChange={set('slug')} />
-								</Field>
-								<div className="ztrans-flex ztrans-items-end ztrans-gap-2">
-									<div className="ztrans-flex-1">
-										<Field label={__('Excerpt', 'zentranslate')}>
-											<TextArea rows={3} value={form.excerpt} onChange={set('excerpt')} />
-										</Field>
-									</div>
-									<Button variant="ghost" size="sm" onClick={() => aiFill('excerpt', post.excerpt || '')}>
-										{__('AI', 'zentranslate')}
-									</Button>
-								</div>
-								<div className="ztrans-flex ztrans-items-end ztrans-gap-2">
-									<div className="ztrans-flex-1">
-										<Field label={__('Content', 'zentranslate')}>
-											<TextArea rows={14} value={form.content} onChange={set('content')} />
-										</Field>
-									</div>
-									<Button variant="ghost" size="sm" onClick={() => aiFill('content', post.content || '')}>
-										{__('AI', 'zentranslate')}
-									</Button>
-								</div>
-								<Field label={__('Status', 'zentranslate')}>
-									<Select value={form.status} onChange={set('status')}>
-										<option value="draft">{__('Draft', 'zentranslate')}</option>
-										<option value="publish">{__('Published', 'zentranslate')}</option>
-									</Select>
-								</Field>
-								<div className="ztrans-mt-2 ztrans-flex ztrans-justify-end">
-									<Button type="submit" loading={save.isPending}>
-										{__('Save translation', 'zentranslate')}
-									</Button>
-								</div>
-							</form>
-						</Card>
-					</div>
+						<CustomLayoutPanel variantRow={variantRow} updatedAt={targetRow?.translation?.updated_at} />
 					)}
 				</>
 			)}
 
 			<Toast message={toast?.message} tone={toast?.tone} onClear={() => setToast(null)} />
 		</>
+	);
+}
+
+function VariantPill({ active, onClick, children }) {
+	return (
+		<button
+			type="button"
+			onClick={onClick}
+			className={`ztrans-bare ztrans-rounded-full ztrans-px-3 ztrans-py-1 ztrans-text-xs ${
+				active
+					? 'ztrans-bg-ztrans-primary ztrans-text-white'
+					: 'ztrans-bg-white ztrans-border ztrans-border-ztrans-border ztrans-text-gray-700'
+			}`}
+		>
+			{children}
+		</button>
+	);
+}
+
+function CustomLayoutPanel({ variantRow, updatedAt }) {
+	if (!variantRow?.shadow_edit_url) {
+		return (
+			<Card>
+				<p className="ztrans-m-0 ztrans-text-sm ztrans-text-ztrans-muted">
+					{__('Setting up the custom layout… this should only take a moment.', 'zentranslate')}
+				</p>
+			</Card>
+		);
+	}
+	return (
+		<Card title={__('Edit in WordPress', 'zentranslate')}>
+			<p className="ztrans-mb-3 ztrans-text-sm ztrans-text-gray-700">
+				{__('This translation is a real WordPress post — edit it in Gutenberg, Elementor, Beaver, Divi, Bricks, or any builder you have installed.', 'zentranslate')}
+			</p>
+			<div className="ztrans-flex ztrans-flex-wrap ztrans-items-center ztrans-gap-3">
+				<a
+					href={variantRow.shadow_edit_url}
+					target="_blank"
+					rel="noopener noreferrer"
+					className="ztrans-inline-flex ztrans-items-center ztrans-gap-2 ztrans-rounded-md ztrans-bg-ztrans-primary ztrans-px-4 ztrans-py-2 ztrans-text-sm ztrans-font-medium ztrans-text-white ztrans-no-underline hover:ztrans-bg-ztrans-primary-hover"
+				>
+					{__('Open in editor →', 'zentranslate')}
+				</a>
+				{updatedAt && (
+					<span className="ztrans-text-xs ztrans-text-ztrans-muted">
+						{sprintf(/* translators: %s: ISO timestamp. */ __('Last edited %s', 'zentranslate'), updatedAt)}
+					</span>
+				)}
+				<span className="ztrans-ml-auto ztrans-text-xs ztrans-text-ztrans-muted">
+					{__('Shadow post ID', 'zentranslate')}: <code>{variantRow.shadow_post_id}</code>
+				</span>
+			</div>
+			<p className="ztrans-mt-4 ztrans-mb-0 ztrans-text-xs ztrans-text-ztrans-muted">
+				{__('Use "Revert to strings" in the mode switcher above to discard this layout and switch back to text-only translation.', 'zentranslate')}
+			</p>
+		</Card>
 	);
 }

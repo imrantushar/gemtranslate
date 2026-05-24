@@ -42,7 +42,7 @@ final class Zentranslate {
 
 	public function define_constants() {
 		define( 'ZTRANS_VERSION', '1.0.0' );
-		define( 'ZTRANS_DB_VERSION', '1.2' );
+		define( 'ZTRANS_DB_VERSION', '1.4' );
 		define( 'ZTRANS_SETTINGS_NAME', 'ztrans_settings' );
 		define( 'ZTRANS_PLUGIN_FILE', __FILE__ );
 		define( 'ZTRANS_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -80,6 +80,7 @@ final class Zentranslate {
 	public function dispatch_hooks() {
 		Zentranslate\Database::init();
 		Zentranslate\Language::init();
+		Zentranslate\Geo::init();
 		Zentranslate\Routing::init();
 		Zentranslate\Translation::init();
 		Zentranslate\SEO::init();

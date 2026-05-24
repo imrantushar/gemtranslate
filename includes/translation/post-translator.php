@@ -10,6 +10,13 @@ use Zentranslate\Language\Context;
 /**
  * Swaps post fields (title, content, excerpt) for the current language via
  * post-fetch filters. Never modifies WP_Query.
+ *
+ * Two render modes:
+ *   - `custom_layout` — returns the stored translated content blob as-is.
+ *   - `string_only`   — re-walks the *current* source blocks and applies stored
+ *                       string translations on the fly via PostFieldTranslator.
+ *                       Layout edits to the source self-heal on the translated
+ *                       page because the structure always tracks the source.
  */
 class PostTranslator {
 
@@ -35,7 +42,13 @@ class PostTranslator {
 			return $title;
 		}
 		$row = TranslationLoader::get_for_post( $post_id );
-		if ( $row && '' !== (string) $row['title'] ) {
+		if ( ! $row ) {
+			return $title;
+		}
+		if ( TranslationLoader::MODE_STRING_ONLY === ( $row['translation_mode'] ?? '' ) ) {
+			return PostFieldTranslator::translated_title( $post_id, $title, Context::current() );
+		}
+		if ( '' !== (string) $row['title'] ) {
 			return $row['title'];
 		}
 		return $title;
@@ -50,7 +63,13 @@ class PostTranslator {
 			return $content;
 		}
 		$row = TranslationLoader::get_for_post( $post->ID );
-		if ( $row && '' !== (string) $row['content'] ) {
+		if ( ! $row ) {
+			return $content;
+		}
+		if ( TranslationLoader::MODE_STRING_ONLY === ( $row['translation_mode'] ?? '' ) ) {
+			return PostFieldTranslator::rebuild_content( $post->ID, $content, Context::current() );
+		}
+		if ( '' !== (string) $row['content'] ) {
 			return $row['content'];
 		}
 		return $content;
@@ -69,7 +88,13 @@ class PostTranslator {
 			return $excerpt;
 		}
 		$row = TranslationLoader::get_for_post( $post_id );
-		if ( $row && '' !== (string) $row['excerpt'] ) {
+		if ( ! $row ) {
+			return $excerpt;
+		}
+		if ( TranslationLoader::MODE_STRING_ONLY === ( $row['translation_mode'] ?? '' ) ) {
+			return PostFieldTranslator::translated_excerpt( $post_id, $excerpt, Context::current() );
+		}
+		if ( '' !== (string) $row['excerpt'] ) {
 			return $row['excerpt'];
 		}
 		return $excerpt;
@@ -80,10 +105,12 @@ class PostTranslator {
 			return;
 		}
 		TranslationLoader::invalidate_post( $post_id );
+		PostFieldTranslator::flush_memo();
 	}
 
 	public function on_post_deleted( $post_id ) {
 		TranslationLoader::invalidate_post( $post_id );
+		PostFieldTranslator::flush_memo();
 	}
 
 	private function resolve_post_id( $maybe ) {

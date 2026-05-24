@@ -133,7 +133,7 @@ class LanguageRegistry {
 	}
 
 	private function normalize( array $data, $require_required = true ) {
-		$allowed = [ 'code', 'locale', 'name', 'native_name', 'flag', 'is_rtl', 'is_default', 'active', 'position' ];
+		$allowed = [ 'code', 'locale', 'name', 'native_name', 'flag', 'is_rtl', 'is_default', 'active', 'position', 'country_codes' ];
 		$out = array_intersect_key( $data, array_flip( $allowed ) );
 
 		foreach ( [ 'is_rtl', 'is_default', 'active' ] as $bool_key ) {
@@ -147,7 +147,35 @@ class LanguageRegistry {
 		if ( isset( $out['code'] ) ) {
 			$out['code'] = strtolower( sanitize_key( $out['code'] ) );
 		}
+		if ( array_key_exists( 'country_codes', $out ) ) {
+			$out['country_codes'] = self::normalize_country_codes( $out['country_codes'] );
+		}
 
 		return $out;
+	}
+
+	/**
+	 * Accepts an array of ISO codes, a JSON string, or a comma-separated string.
+	 * Returns a JSON-encoded array of uppercase 2-letter codes, or '' for empty.
+	 */
+	private static function normalize_country_codes( $value ) {
+		if ( is_string( $value ) ) {
+			$decoded = json_decode( $value, true );
+			$value   = is_array( $decoded ) ? $decoded : array_map( 'trim', explode( ',', $value ) );
+		}
+		if ( ! is_array( $value ) ) {
+			return '';
+		}
+		$clean = [];
+		foreach ( $value as $code ) {
+			$code = strtoupper( trim( (string) $code ) );
+			if ( preg_match( '/^[A-Z]{2}$/', $code ) ) {
+				$clean[ $code ] = true;
+			}
+		}
+		if ( empty( $clean ) ) {
+			return '';
+		}
+		return wp_json_encode( array_keys( $clean ) );
 	}
 }

@@ -30,6 +30,13 @@ class Settings extends Controller {
 		// Floating switcher.
 		'float_switcher_enabled',
 		'float_switcher_position',
+		// Geo / country detection (v1.3).
+		'geo_enabled',
+		'geo_sources',
+		'geo_maxmind_db_path',
+		'geo_country_picker_banner',
+		'geo_cookie_ttl_days',
+		'geo_auto_redirect_country',
 	];
 
 	public static function init() {
@@ -159,6 +166,13 @@ class Settings extends Controller {
 			// Floating switcher.
 			'float_switcher_enabled'    => false,
 			'float_switcher_position'   => 'bottom-right',
+			// Geo / country detection (v1.3).
+			'geo_enabled'               => false,
+			'geo_sources'               => [ 'cf_header', 'maxmind', 'cookie' ],
+			'geo_maxmind_db_path'       => '',
+			'geo_country_picker_banner' => false,
+			'geo_cookie_ttl_days'       => 90,
+			'geo_auto_redirect_country' => false,
 		];
 		$saved = json_decode( get_option( ZTRANS_SETTINGS_NAME, '{}' ), true );
 		if ( ! is_array( $saved ) ) {
