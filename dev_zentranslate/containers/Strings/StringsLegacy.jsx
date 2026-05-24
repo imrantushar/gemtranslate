@@ -13,7 +13,7 @@ import { useLanguages } from '../../hooks/useLanguages';
 import { useTranslateWithAI } from '../../hooks/useAI';
 import { formatErrorMessage, truncate } from '../../lib/format';
 
-export default function StringsPage() {
+export default function StringsLegacy() {
 	const languages = useLanguages();
 	const langs = languages.data || [];
 	const nonDefault = langs.filter((l) => !l.is_default);

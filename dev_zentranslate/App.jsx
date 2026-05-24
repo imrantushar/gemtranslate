@@ -6,14 +6,15 @@ import Dashboard from './containers/Dashboard';
 import Languages from './containers/Languages';
 import Posts from './containers/Posts';
 import TranslationEditor from './containers/Posts/TranslationEditor';
-import Strings from './containers/Strings';
+import PackageList from './containers/Strings/PackageList';
+import PackageEditor from './containers/Strings/PackageEditor';
+import StringsLegacy from './containers/Strings/StringsLegacy';
 import Terms from './containers/Terms';
 import Menus from './containers/Menus';
 import SeoPage from './containers/SEO';
 import AIPage from './containers/AI';
 import GlossaryPage from './containers/Glossary';
 import JobsPage from './containers/Jobs';
-import PluginTranslationsPage from './containers/PluginTranslations';
 import TranslatorsPage from './containers/Translators';
 import MigrationPage from './containers/Migration';
 import ImportExportPage from './containers/ImportExport';
@@ -52,13 +53,14 @@ export default function App() {
 				<Route path="/posts" element={<Posts />} />
 				<Route path="/posts/:id" element={<TranslationEditor />} />
 				<Route path="/terms" element={<Terms />} />
-				<Route path="/strings" element={<Strings />} />
+				<Route path="/strings" element={<PackageList />} />
+				<Route path="/strings/legacy" element={<StringsLegacy />} />
+				<Route path="/strings/:slug/:lang" element={<PackageEditor />} />
 				<Route path="/menus" element={<Menus />} />
 				<Route path="/seo" element={<SeoPage />} />
 				<Route path="/ai" element={<AIPage />} />
 				<Route path="/glossary" element={<GlossaryPage />} />
 				<Route path="/jobs" element={<JobsPage />} />
-				<Route path="/plugin-translations" element={<PluginTranslationsPage />} />
 				<Route path="/translators" element={<TranslatorsPage />} />
 				<Route path="/migration" element={<MigrationPage />} />
 				<Route path="/io" element={<ImportExportPage />} />

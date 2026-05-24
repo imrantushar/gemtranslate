@@ -15,7 +15,6 @@ class API {
 		API\SEO::init();
 		API\AI::init();
 		API\Jobs::init();
-		API\I18n::init();
 		API\Translators::init();
 		API\Migration::init();
 		API\Revisions::init();

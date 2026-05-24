@@ -5145,22 +5145,24 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _containers_Languages__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./containers/Languages */ "./dev_zentranslate/containers/Languages/index.jsx");
 /* harmony import */ var _containers_Posts__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./containers/Posts */ "./dev_zentranslate/containers/Posts/index.jsx");
 /* harmony import */ var _containers_Posts_TranslationEditor__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./containers/Posts/TranslationEditor */ "./dev_zentranslate/containers/Posts/TranslationEditor.jsx");
-/* harmony import */ var _containers_Strings__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./containers/Strings */ "./dev_zentranslate/containers/Strings/index.jsx");
-/* harmony import */ var _containers_Terms__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./containers/Terms */ "./dev_zentranslate/containers/Terms/index.jsx");
-/* harmony import */ var _containers_Menus__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./containers/Menus */ "./dev_zentranslate/containers/Menus/index.jsx");
-/* harmony import */ var _containers_SEO__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./containers/SEO */ "./dev_zentranslate/containers/SEO/index.jsx");
-/* harmony import */ var _containers_AI__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./containers/AI */ "./dev_zentranslate/containers/AI/index.jsx");
-/* harmony import */ var _containers_Glossary__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./containers/Glossary */ "./dev_zentranslate/containers/Glossary/index.jsx");
-/* harmony import */ var _containers_Jobs__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./containers/Jobs */ "./dev_zentranslate/containers/Jobs/index.jsx");
-/* harmony import */ var _containers_PluginTranslations__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./containers/PluginTranslations */ "./dev_zentranslate/containers/PluginTranslations/index.jsx");
-/* harmony import */ var _containers_Translators__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./containers/Translators */ "./dev_zentranslate/containers/Translators/index.jsx");
-/* harmony import */ var _containers_Migration__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./containers/Migration */ "./dev_zentranslate/containers/Migration/index.jsx");
-/* harmony import */ var _containers_ImportExport__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./containers/ImportExport */ "./dev_zentranslate/containers/ImportExport/index.jsx");
-/* harmony import */ var _containers_Settings__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./containers/Settings */ "./dev_zentranslate/containers/Settings/index.jsx");
-/* harmony import */ var _containers_Onboarding__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./containers/Onboarding */ "./dev_zentranslate/containers/Onboarding/index.jsx");
-/* harmony import */ var _hooks_useSettings__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./hooks/useSettings */ "./dev_zentranslate/hooks/useSettings.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__);
+/* harmony import */ var _containers_Strings_PackageList__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./containers/Strings/PackageList */ "./dev_zentranslate/containers/Strings/PackageList.jsx");
+/* harmony import */ var _containers_Strings_PackageEditor__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./containers/Strings/PackageEditor */ "./dev_zentranslate/containers/Strings/PackageEditor.jsx");
+/* harmony import */ var _containers_Strings_StringsLegacy__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./containers/Strings/StringsLegacy */ "./dev_zentranslate/containers/Strings/StringsLegacy.jsx");
+/* harmony import */ var _containers_Terms__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./containers/Terms */ "./dev_zentranslate/containers/Terms/index.jsx");
+/* harmony import */ var _containers_Menus__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./containers/Menus */ "./dev_zentranslate/containers/Menus/index.jsx");
+/* harmony import */ var _containers_SEO__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./containers/SEO */ "./dev_zentranslate/containers/SEO/index.jsx");
+/* harmony import */ var _containers_AI__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./containers/AI */ "./dev_zentranslate/containers/AI/index.jsx");
+/* harmony import */ var _containers_Glossary__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./containers/Glossary */ "./dev_zentranslate/containers/Glossary/index.jsx");
+/* harmony import */ var _containers_Jobs__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./containers/Jobs */ "./dev_zentranslate/containers/Jobs/index.jsx");
+/* harmony import */ var _containers_Translators__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./containers/Translators */ "./dev_zentranslate/containers/Translators/index.jsx");
+/* harmony import */ var _containers_Migration__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./containers/Migration */ "./dev_zentranslate/containers/Migration/index.jsx");
+/* harmony import */ var _containers_ImportExport__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./containers/ImportExport */ "./dev_zentranslate/containers/ImportExport/index.jsx");
+/* harmony import */ var _containers_Settings__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./containers/Settings */ "./dev_zentranslate/containers/Settings/index.jsx");
+/* harmony import */ var _containers_Onboarding__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./containers/Onboarding */ "./dev_zentranslate/containers/Onboarding/index.jsx");
+/* harmony import */ var _hooks_useSettings__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./hooks/useSettings */ "./dev_zentranslate/hooks/useSettings.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__);
+
 
 
 
@@ -5184,7 +5186,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function FirstRunGate() {
-  const settings = (0,_hooks_useSettings__WEBPACK_IMPORTED_MODULE_20__.useSettings)();
+  const settings = (0,_hooks_useSettings__WEBPACK_IMPORTED_MODULE_21__.useSettings)();
   const location = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_1__.useLocation)();
   const navigate = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_1__.useNavigate)();
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
@@ -5202,65 +5204,68 @@ function FirstRunGate() {
   return null;
 }
 function App() {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsxs)(_components_Layout__WEBPACK_IMPORTED_MODULE_2__["default"], {
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(FirstRunGate, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsxs)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Routes, {
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsxs)(_components_Layout__WEBPACK_IMPORTED_MODULE_2__["default"], {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(FirstRunGate, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsxs)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Routes, {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
         path: "/",
-        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Navigate, {
+        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Navigate, {
           to: "/dashboard",
           replace: true
         })
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
         path: "/dashboard",
-        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_containers_Dashboard__WEBPACK_IMPORTED_MODULE_3__["default"], {})
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
+        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_containers_Dashboard__WEBPACK_IMPORTED_MODULE_3__["default"], {})
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
         path: "/onboarding",
-        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_containers_Onboarding__WEBPACK_IMPORTED_MODULE_19__["default"], {})
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
+        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_containers_Onboarding__WEBPACK_IMPORTED_MODULE_20__["default"], {})
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
         path: "/languages",
-        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_containers_Languages__WEBPACK_IMPORTED_MODULE_4__["default"], {})
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
+        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_containers_Languages__WEBPACK_IMPORTED_MODULE_4__["default"], {})
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
         path: "/posts",
-        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_containers_Posts__WEBPACK_IMPORTED_MODULE_5__["default"], {})
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
+        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_containers_Posts__WEBPACK_IMPORTED_MODULE_5__["default"], {})
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
         path: "/posts/:id",
-        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_containers_Posts_TranslationEditor__WEBPACK_IMPORTED_MODULE_6__["default"], {})
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
+        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_containers_Posts_TranslationEditor__WEBPACK_IMPORTED_MODULE_6__["default"], {})
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
         path: "/terms",
-        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_containers_Terms__WEBPACK_IMPORTED_MODULE_8__["default"], {})
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
+        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_containers_Terms__WEBPACK_IMPORTED_MODULE_10__["default"], {})
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
         path: "/strings",
-        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_containers_Strings__WEBPACK_IMPORTED_MODULE_7__["default"], {})
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
+        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_containers_Strings_PackageList__WEBPACK_IMPORTED_MODULE_7__["default"], {})
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
+        path: "/strings/legacy",
+        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_containers_Strings_StringsLegacy__WEBPACK_IMPORTED_MODULE_9__["default"], {})
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
+        path: "/strings/:slug/:lang",
+        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_containers_Strings_PackageEditor__WEBPACK_IMPORTED_MODULE_8__["default"], {})
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
         path: "/menus",
-        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_containers_Menus__WEBPACK_IMPORTED_MODULE_9__["default"], {})
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
+        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_containers_Menus__WEBPACK_IMPORTED_MODULE_11__["default"], {})
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
         path: "/seo",
-        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_containers_SEO__WEBPACK_IMPORTED_MODULE_10__["default"], {})
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
+        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_containers_SEO__WEBPACK_IMPORTED_MODULE_12__["default"], {})
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
         path: "/ai",
-        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_containers_AI__WEBPACK_IMPORTED_MODULE_11__["default"], {})
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
+        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_containers_AI__WEBPACK_IMPORTED_MODULE_13__["default"], {})
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
         path: "/glossary",
-        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_containers_Glossary__WEBPACK_IMPORTED_MODULE_12__["default"], {})
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
+        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_containers_Glossary__WEBPACK_IMPORTED_MODULE_14__["default"], {})
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
         path: "/jobs",
-        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_containers_Jobs__WEBPACK_IMPORTED_MODULE_13__["default"], {})
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
-        path: "/plugin-translations",
-        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_containers_PluginTranslations__WEBPACK_IMPORTED_MODULE_14__["default"], {})
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
+        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_containers_Jobs__WEBPACK_IMPORTED_MODULE_15__["default"], {})
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
         path: "/translators",
-        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_containers_Translators__WEBPACK_IMPORTED_MODULE_15__["default"], {})
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
+        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_containers_Translators__WEBPACK_IMPORTED_MODULE_16__["default"], {})
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
         path: "/migration",
-        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_containers_Migration__WEBPACK_IMPORTED_MODULE_16__["default"], {})
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
+        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_containers_Migration__WEBPACK_IMPORTED_MODULE_17__["default"], {})
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
         path: "/io",
-        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_containers_ImportExport__WEBPACK_IMPORTED_MODULE_17__["default"], {})
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
+        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_containers_ImportExport__WEBPACK_IMPORTED_MODULE_18__["default"], {})
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Route, {
         path: "/settings",
-        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_containers_Settings__WEBPACK_IMPORTED_MODULE_18__["default"], {})
+        element: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_22__.jsx)(_containers_Settings__WEBPACK_IMPORTED_MODULE_19__["default"], {})
       })]
     })]
   });
@@ -5719,10 +5724,6 @@ const NAV = [{
   label: () => (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Jobs', 'zentranslate'),
   icon: '⏱',
   badge: 'jobs'
-}, {
-  to: '/plugin-translations',
-  label: () => (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Plugin translations', 'zentranslate'),
-  icon: '🪄'
 }, {
   to: '/translators',
   label: () => (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Translators', 'zentranslate'),
@@ -8272,214 +8273,6 @@ function Onboarding() {
 
 /***/ },
 
-/***/ "./dev_zentranslate/containers/PluginTranslations/index.jsx"
-/*!******************************************************************!*\
-  !*** ./dev_zentranslate/containers/PluginTranslations/index.jsx ***!
-  \******************************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ PluginTranslationsPage)
-/* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _components_PageHeader__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components/PageHeader */ "./dev_zentranslate/components/PageHeader.jsx");
-/* harmony import */ var _components_Card__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../components/Card */ "./dev_zentranslate/components/Card.jsx");
-/* harmony import */ var _components_Button__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../components/Button */ "./dev_zentranslate/components/Button.jsx");
-/* harmony import */ var _components_Toast__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../components/Toast */ "./dev_zentranslate/components/Toast.jsx");
-/* harmony import */ var _components_StatusPill__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../components/StatusPill */ "./dev_zentranslate/components/StatusPill.jsx");
-/* harmony import */ var _components_Spinner__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../components/Spinner */ "./dev_zentranslate/components/Spinner.jsx");
-/* harmony import */ var _components_Input__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../components/Input */ "./dev_zentranslate/components/Input.jsx");
-/* harmony import */ var _hooks_useI18n__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../hooks/useI18n */ "./dev_zentranslate/hooks/useI18n.js");
-/* harmony import */ var _hooks_useLanguages__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../hooks/useLanguages */ "./dev_zentranslate/hooks/useLanguages.js");
-/* harmony import */ var _lib_format__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../lib/format */ "./dev_zentranslate/lib/format.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__);
-
-
-
-
-
-
-
-
-
-
-
-
-
-function PluginTranslationsPage() {
-  const packs = (0,_hooks_useI18n__WEBPACK_IMPORTED_MODULE_9__.useTranslationPacks)();
-  const generate = (0,_hooks_useI18n__WEBPACK_IMPORTED_MODULE_9__.useGenerateTranslationPack)();
-  const remove = (0,_hooks_useI18n__WEBPACK_IMPORTED_MODULE_9__.useDeleteTranslationPack)();
-  const langs = (0,_hooks_useLanguages__WEBPACK_IMPORTED_MODULE_10__.useLanguages)();
-  const nonDefault = (langs.data || []).filter(l => !l.is_default);
-  const [targetLang, setTargetLang] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(nonDefault[0]?.code || '');
-  const [locale, setLocale] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(nonDefault[0]?.locale || '');
-  const [toast, setToast] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
-  if (langs.isLoading || packs.isLoading) return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_components_Spinner__WEBPACK_IMPORTED_MODULE_7__.LoadingBlock, {
-    children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Loading…', 'zentranslate')
-  });
-  const onPickLang = code => {
-    setTargetLang(code);
-    const lang = nonDefault.find(l => l.code === code);
-    if (lang) setLocale(lang.locale);
-  };
-  const onGenerate = async () => {
-    if (!targetLang || !locale) return;
-    try {
-      const result = await generate.mutateAsync({
-        target_lang: targetLang,
-        locale
-      });
-      setToast({
-        tone: 'success',
-        message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.sprintf)(/* translators: 1: written, 2: total, 3: locale. */
-        (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('%1$d of %2$d strings translated into %3$s.', 'zentranslate'), result.written, result.total, result.locale)
-      });
-    } catch (err) {
-      setToast({
-        tone: 'error',
-        message: (0,_lib_format__WEBPACK_IMPORTED_MODULE_11__.formatErrorMessage)(err)
-      });
-    }
-  };
-  const onDelete = async loc => {
-    if (!window.confirm((0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Remove this translation pack?', 'zentranslate'))) return;
-    try {
-      await remove.mutateAsync(loc);
-      setToast({
-        tone: 'success',
-        message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Pack deleted.', 'zentranslate')
-      });
-    } catch (err) {
-      setToast({
-        tone: 'error',
-        message: (0,_lib_format__WEBPACK_IMPORTED_MODULE_11__.formatErrorMessage)(err)
-      });
-    }
-  };
-  const existing = Object.values(packs.data || {});
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.Fragment, {
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_components_PageHeader__WEBPACK_IMPORTED_MODULE_2__["default"], {
-      title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Plugin translations', 'zentranslate'),
-      description: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Auto-generate the Zentranslate admin in any active language using your configured AI provider.', 'zentranslate')
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(_components_Card__WEBPACK_IMPORTED_MODULE_3__["default"], {
-      title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Generate a new pack', 'zentranslate'),
-      className: "ztrans-mb-6",
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)("div", {
-        className: "ztrans-grid ztrans-grid-cols-1 md:ztrans-grid-cols-3 ztrans-gap-4",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_components_Input__WEBPACK_IMPORTED_MODULE_8__.Field, {
-          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Target language', 'zentranslate'),
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_components_Input__WEBPACK_IMPORTED_MODULE_8__.Select, {
-            value: targetLang,
-            onChange: e => onPickLang(e.target.value),
-            children: nonDefault.map(l => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)("option", {
-              value: l.code,
-              children: [l.name, " (", l.code, ")"]
-            }, l.code))
-          })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_components_Input__WEBPACK_IMPORTED_MODULE_8__.Field, {
-          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Locale', 'zentranslate'),
-          hint: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('WP locale like es_ES, fr_FR.', 'zentranslate'),
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_components_Input__WEBPACK_IMPORTED_MODULE_8__.TextInput, {
-            value: locale,
-            onChange: e => setLocale(e.target.value)
-          })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("div", {
-          className: "ztrans-flex ztrans-items-end",
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_components_Button__WEBPACK_IMPORTED_MODULE_4__["default"], {
-            onClick: onGenerate,
-            loading: generate.isPending,
-            disabled: !targetLang || !locale,
-            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Generate with AI', 'zentranslate')
-          })
-        })]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("p", {
-        className: "ztrans-mt-3 ztrans-text-xs ztrans-text-ztrans-muted",
-        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Reads languages/zentranslate.pot, translates each string in batches through the default AI provider, and writes PO + MO + JSON to languages/.', 'zentranslate')
-      })]
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_components_Card__WEBPACK_IMPORTED_MODULE_3__["default"], {
-      padded: false,
-      title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Existing packs', 'zentranslate'),
-      children: existing.length === 0 ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("p", {
-        className: "ztrans-px-5 ztrans-py-8 ztrans-text-center ztrans-text-sm ztrans-text-ztrans-muted",
-        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('No translation packs yet.', 'zentranslate')
-      }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)("table", {
-        className: "ztrans-w-full ztrans-text-sm",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("thead", {
-          className: "ztrans-bg-ztrans-bg ztrans-text-left ztrans-text-xs ztrans-uppercase ztrans-text-ztrans-muted",
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)("tr", {
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("th", {
-              className: "ztrans-px-4 ztrans-py-3",
-              children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Locale', 'zentranslate')
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("th", {
-              className: "ztrans-px-4 ztrans-py-3",
-              children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('PO', 'zentranslate')
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("th", {
-              className: "ztrans-px-4 ztrans-py-3",
-              children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('MO', 'zentranslate')
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("th", {
-              className: "ztrans-px-4 ztrans-py-3",
-              children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('JSON files', 'zentranslate')
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("th", {
-              className: "ztrans-px-4 ztrans-py-3"
-            })]
-          })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("tbody", {
-          children: existing.map(p => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)("tr", {
-            className: "ztrans-border-t ztrans-border-ztrans-border",
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("td", {
-              className: "ztrans-px-4 ztrans-py-3",
-              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("code", {
-                children: p.locale
-              })
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("td", {
-              className: "ztrans-px-4 ztrans-py-3",
-              children: p.po ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_components_StatusPill__WEBPACK_IMPORTED_MODULE_6__["default"], {
-                tone: "translated",
-                children: "\u2713"
-              }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_components_StatusPill__WEBPACK_IMPORTED_MODULE_6__["default"], {
-                tone: "none",
-                children: "\u2014"
-              })
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("td", {
-              className: "ztrans-px-4 ztrans-py-3",
-              children: p.mo ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_components_StatusPill__WEBPACK_IMPORTED_MODULE_6__["default"], {
-                tone: "translated",
-                children: "\u2713"
-              }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_components_StatusPill__WEBPACK_IMPORTED_MODULE_6__["default"], {
-                tone: "none",
-                children: "\u2014"
-              })
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("td", {
-              className: "ztrans-px-4 ztrans-py-3 ztrans-text-ztrans-muted",
-              children: p.json
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("td", {
-              className: "ztrans-px-4 ztrans-py-3 ztrans-text-right",
-              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_components_Button__WEBPACK_IMPORTED_MODULE_4__["default"], {
-                variant: "ghost",
-                size: "sm",
-                onClick: () => onDelete(p.locale),
-                children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Delete', 'zentranslate')
-              })
-            })]
-          }, p.locale))
-        })]
-      })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_components_Toast__WEBPACK_IMPORTED_MODULE_5__["default"], {
-      message: toast?.message,
-      tone: toast?.tone,
-      onClear: () => setToast(null)
-    })]
-  });
-}
-
-/***/ },
-
 /***/ "./dev_zentranslate/containers/Posts/FieldsTab.jsx"
 /*!*********************************************************!*\
   !*** ./dev_zentranslate/containers/Posts/FieldsTab.jsx ***!
@@ -10472,15 +10265,899 @@ function SettingsPage() {
 
 /***/ },
 
-/***/ "./dev_zentranslate/containers/Strings/index.jsx"
-/*!*******************************************************!*\
-  !*** ./dev_zentranslate/containers/Strings/index.jsx ***!
-  \*******************************************************/
+/***/ "./dev_zentranslate/containers/Strings/PackageEditor.jsx"
+/*!***************************************************************!*\
+  !*** ./dev_zentranslate/containers/Strings/PackageEditor.jsx ***!
+  \***************************************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ StringsPage)
+/* harmony export */   "default": () => (/* binding */ PackageEditor)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/dist/index.js");
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router/dist/index.js");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _components_PageHeader__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../components/PageHeader */ "./dev_zentranslate/components/PageHeader.jsx");
+/* harmony import */ var _components_Card__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../components/Card */ "./dev_zentranslate/components/Card.jsx");
+/* harmony import */ var _components_Button__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../components/Button */ "./dev_zentranslate/components/Button.jsx");
+/* harmony import */ var _components_Toast__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../components/Toast */ "./dev_zentranslate/components/Toast.jsx");
+/* harmony import */ var _components_Input__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../components/Input */ "./dev_zentranslate/components/Input.jsx");
+/* harmony import */ var _components_Spinner__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../components/Spinner */ "./dev_zentranslate/components/Spinner.jsx");
+/* harmony import */ var _hooks_useStrings__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../hooks/useStrings */ "./dev_zentranslate/hooks/useStrings.js");
+/* harmony import */ var _hooks_usePackages__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../hooks/usePackages */ "./dev_zentranslate/hooks/usePackages.js");
+/* harmony import */ var _hooks_useLanguages__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../../hooks/useLanguages */ "./dev_zentranslate/hooks/useLanguages.js");
+/* harmony import */ var _hooks_useAI__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../../hooks/useAI */ "./dev_zentranslate/hooks/useAI.js");
+/* harmony import */ var _lib_format__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../../lib/format */ "./dev_zentranslate/lib/format.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const PAGE_SIZE = 50;
+function PackageEditor() {
+  const {
+    slug,
+    lang
+  } = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_2__.useParams)();
+  const navigate = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_2__.useNavigate)();
+  const packages = (0,_hooks_usePackages__WEBPACK_IMPORTED_MODULE_11__.usePackages)();
+  const languages = (0,_hooks_useLanguages__WEBPACK_IMPORTED_MODULE_12__.useLanguages)();
+  const scan = (0,_hooks_usePackages__WEBPACK_IMPORTED_MODULE_11__.useScanPackage)();
+  const ai = (0,_hooks_useAI__WEBPACK_IMPORTED_MODULE_13__.useTranslateWithAI)();
+  const bulkAI = (0,_hooks_usePackages__WEBPACK_IMPORTED_MODULE_11__.useTranslateAllInPackage)();
+  const bulkSave = (0,_hooks_usePackages__WEBPACK_IMPORTED_MODULE_11__.useBulkSaveStrings)();
+  const exportPack = (0,_hooks_usePackages__WEBPACK_IMPORTED_MODULE_11__.useExportPackage)();
+  const memorySuggestions = (0,_hooks_usePackages__WEBPACK_IMPORTED_MODULE_11__.useMemorySuggestions)();
+  const [page, setPage] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(1);
+  const [search, setSearch] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
+  const [searchDraft, setSearchDraft] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
+  const [statusFilter, setStatusFilter] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('all'); // all | untranslated | translated
+  const [drafts, setDrafts] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({}); // string_id -> {value, dirty}
+  const [memoryHits, setMemoryHits] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({}); // string_id -> suggested value
+  const [toast, setToast] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
+  const pkg = (packages.data?.rows || []).find(p => p.slug === slug) || null;
+  const targetLangs = (languages.data || []).filter(l => !l.is_default);
+  const langRow = (languages.data || []).find(l => l.code === lang);
+  const defaultLang = (languages.data || []).find(l => l.is_default);
+  const apiStatus = statusFilter === 'all' ? '' : statusFilter;
+  const strings = (0,_hooks_useStrings__WEBPACK_IMPORTED_MODULE_10__.useStrings)({
+    domain: pkg?.text_domain || '',
+    lang,
+    page,
+    per_page: PAGE_SIZE,
+    search,
+    status: apiStatus
+  });
+
+  // On data load, pre-populate drafts from existing translations (so editing
+  // reflects current saved value) and request TM suggestions for empty rows.
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (!strings.data) return;
+    setDrafts(d => {
+      const next = {
+        ...d
+      };
+      (strings.data.rows || []).forEach(row => {
+        if (next[row.string_id]) return; // preserve dirty edits across page changes
+        next[row.string_id] = {
+          value: row.translation || '',
+          dirty: false,
+          status: row.translation_status || ''
+        };
+      });
+      return next;
+    });
+
+    // Request TM suggestions for rows that have NO translation in this language.
+    const candidates = (strings.data.rows || []).filter(r => !r.translation || r.translation === '').map(r => r.string_id);
+    if (candidates.length === 0 || !slug || !lang) return;
+    memorySuggestions.mutateAsync({
+      slug,
+      lang,
+      string_ids: candidates
+    }).then(hits => {
+      if (!hits || typeof hits !== 'object') return;
+      setMemoryHits(m => ({
+        ...m,
+        ...hits
+      }));
+    }).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [strings.data, slug, lang]);
+  if (packages.isLoading || strings.isLoading || languages.isLoading) {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Spinner__WEBPACK_IMPORTED_MODULE_9__.LoadingBlock, {
+      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Loading…', 'zentranslate')
+    });
+  }
+  if (!pkg) {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.Fragment, {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_PageHeader__WEBPACK_IMPORTED_MODULE_4__["default"], {
+        title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Strings', 'zentranslate')
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Card__WEBPACK_IMPORTED_MODULE_5__["default"], {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)("p", {
+          className: "ztrans-m-0 ztrans-text-sm ztrans-text-ztrans-muted",
+          children: [(0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Package not found. It may have been uninstalled.', 'zentranslate'), ' ', /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Link, {
+            to: "/strings",
+            className: "ztrans-text-ztrans-primary",
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('← Back to plugins & themes', 'zentranslate')
+          })]
+        })
+      })]
+    });
+  }
+  const rows = strings.data?.rows || [];
+  const total = strings.data?.meta?.total || 0;
+  const dirtyCount = Object.values(drafts).filter(d => d.dirty).length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const stats = pkg.per_lang?.[lang] || {
+    total: pkg.string_count,
+    translated: 0,
+    wp_org: 0,
+    draft: 0,
+    missing: pkg.string_count
+  };
+  const doneCount = stats.translated + stats.wp_org + stats.draft;
+  const onChange = (id, value) => {
+    setDrafts(d => ({
+      ...d,
+      [id]: {
+        ...(d[id] || {}),
+        value,
+        dirty: true
+      }
+    }));
+  };
+  const onAiOne = async row => {
+    try {
+      const res = await ai.mutateAsync({
+        text: row.source,
+        source_lang: defaultLang?.code || 'en',
+        target_lang: lang,
+        preserve_html: false,
+        use_memory: true
+      });
+      onChange(row.string_id, res.translations);
+    } catch (err) {
+      setToast({
+        tone: 'error',
+        message: (0,_lib_format__WEBPACK_IMPORTED_MODULE_14__.formatErrorMessage)(err)
+      });
+    }
+  };
+  const onUseSuggestion = (id, value) => {
+    onChange(id, value);
+  };
+  const runSearch = e => {
+    e.preventDefault();
+    setPage(1);
+    setSearch(searchDraft);
+  };
+  const onSaveAll = async () => {
+    const translations = Object.entries(drafts).filter(([, d]) => d.dirty).map(([id, d]) => ({
+      string_id: Number(id),
+      language_code: lang,
+      value: d.value,
+      status: 'translated'
+    }));
+    if (translations.length === 0) return;
+    try {
+      const result = await bulkSave.mutateAsync({
+        translations
+      });
+      setDrafts(d => {
+        const next = {
+          ...d
+        };
+        translations.forEach(t => {
+          if (next[t.string_id]) next[t.string_id] = {
+            ...next[t.string_id],
+            dirty: false,
+            status: 'translated'
+          };
+        });
+        return next;
+      });
+      setToast({
+        tone: 'success',
+        message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.sprintf)(/* translators: %d: count saved. */
+        (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Saved %d translations.', 'zentranslate'), result?.saved ?? translations.length)
+      });
+    } catch (err) {
+      setToast({
+        tone: 'error',
+        message: (0,_lib_format__WEBPACK_IMPORTED_MODULE_14__.formatErrorMessage)(err)
+      });
+    }
+  };
+  const onTranslateAll = async () => {
+    try {
+      const result = await bulkAI.mutateAsync({
+        slug,
+        lang,
+        status: 'draft'
+      });
+      setToast({
+        tone: 'success',
+        message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.sprintf)(/* translators: 1: total translated, 2: from memory, 3: from AI. */
+        (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Translated %1$d strings (%2$d from memory, %3$d from AI).', 'zentranslate'), result?.translated ?? 0, result?.from_memory ?? 0, result?.from_ai ?? 0)
+      });
+      // Drop drafts so the refetched data lands; React Query already invalidated.
+      setDrafts({});
+    } catch (err) {
+      setToast({
+        tone: 'error',
+        message: (0,_lib_format__WEBPACK_IMPORTED_MODULE_14__.formatErrorMessage)(err)
+      });
+    }
+  };
+  const onRescan = async () => {
+    try {
+      const result = await scan.mutateAsync({
+        slug
+      });
+      setToast({
+        tone: 'success',
+        message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.sprintf)(/* translators: 1: string count, 2: WP.org imports. */
+        (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Re-scanned — %1$d strings, %2$d community translations imported.', 'zentranslate'), result?.string_count ?? 0, result?.wporg?.imported ?? 0)
+      });
+    } catch (err) {
+      setToast({
+        tone: 'error',
+        message: (0,_lib_format__WEBPACK_IMPORTED_MODULE_14__.formatErrorMessage)(err)
+      });
+    }
+  };
+  const onExport = async (opts = {}) => {
+    try {
+      const result = await exportPack.mutateAsync({
+        slug,
+        lang,
+        ...opts
+      });
+      const where = (result?.paths || [])[0] || '';
+      setToast({
+        tone: 'success',
+        message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.sprintf)(/* translators: 1: written count, 2: file path. */
+        (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Wrote %1$d translations to %2$s', 'zentranslate'), result?.written ?? 0, where)
+      });
+    } catch (err) {
+      setToast({
+        tone: 'error',
+        message: (0,_lib_format__WEBPACK_IMPORTED_MODULE_14__.formatErrorMessage)(err)
+      });
+    }
+  };
+  const wpOrgProjectUrl = pkg.wp_org_hosted ? pkg.type === 'theme' ? `https://translate.wordpress.org/projects/wp-themes/${pkg.slug}/${lang}/default/` : `https://translate.wordpress.org/projects/wp-plugins/${pkg.slug}/dev/${lang}/default/` : '';
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.Fragment, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_PageHeader__WEBPACK_IMPORTED_MODULE_4__["default"], {
+      title: `${pkg.name} · ${langRow?.name || lang}`,
+      description: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)("span", {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("code", {
+          children: pkg.text_domain
+        }), " \xB7", ' ', (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.sprintf)(/* translators: 1: done count, 2: total. */
+        (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('%1$d / %2$d translated', 'zentranslate'), doneCount, stats.total || 0)]
+      }),
+      actions: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Link, {
+        to: "/strings",
+        className: "ztrans-text-sm ztrans-text-ztrans-primary ztrans-no-underline",
+        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('← Back to plugins', 'zentranslate')
+      })
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_components_Card__WEBPACK_IMPORTED_MODULE_5__["default"], {
+      padded: false,
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)("div", {
+        className: "ztrans-flex ztrans-flex-wrap ztrans-items-center ztrans-gap-2 ztrans-border-b ztrans-border-ztrans-border ztrans-px-4 ztrans-py-3",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)("div", {
+          className: "ztrans-flex ztrans-items-center ztrans-gap-1 ztrans-text-xs",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("span", {
+            className: "ztrans-mr-1 ztrans-text-ztrans-muted",
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Language:', 'zentranslate')
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("select", {
+            value: lang,
+            onChange: e => navigate(`/strings/${slug}/${e.target.value}`),
+            className: "ztrans-rounded-md ztrans-border ztrans-border-ztrans-border ztrans-bg-white ztrans-px-2 ztrans-py-1 ztrans-text-xs",
+            children: targetLangs.map(l => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)("option", {
+              value: l.code,
+              children: [l.name, " (", l.code, ")"]
+            }, l.code))
+          })]
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("div", {
+          className: "ztrans-flex ztrans-items-center ztrans-gap-1 ztrans-ml-2",
+          children: [{
+            key: 'all',
+            label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('All', 'zentranslate')
+          }, {
+            key: 'untranslated',
+            label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Untranslated', 'zentranslate')
+          }, {
+            key: 'translated',
+            label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Translated', 'zentranslate')
+          }].map(f => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("button", {
+            type: "button",
+            onClick: () => {
+              setStatusFilter(f.key);
+              setPage(1);
+            },
+            className: `ztrans-bare ztrans-rounded-full ztrans-px-3 ztrans-py-1 ztrans-text-xs ${statusFilter === f.key ? 'ztrans-bg-ztrans-primary ztrans-text-white' : 'ztrans-bg-white ztrans-border ztrans-border-ztrans-border ztrans-text-gray-700'}`,
+            children: f.label
+          }, f.key))
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)("form", {
+          onSubmit: runSearch,
+          className: "ztrans-flex ztrans-items-center ztrans-gap-1",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Input__WEBPACK_IMPORTED_MODULE_8__.TextInput, {
+            value: searchDraft,
+            onChange: e => setSearchDraft(e.target.value),
+            placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Search…', 'zentranslate')
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Button__WEBPACK_IMPORTED_MODULE_6__["default"], {
+            type: "submit",
+            variant: "ghost",
+            size: "sm",
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Filter', 'zentranslate')
+          })]
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)("span", {
+          className: "ztrans-ml-auto ztrans-flex ztrans-items-center ztrans-gap-2",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Button__WEBPACK_IMPORTED_MODULE_6__["default"], {
+            size: "sm",
+            variant: "secondary",
+            loading: bulkAI.isPending,
+            onClick: onTranslateAll,
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Translate all untranslated with AI', 'zentranslate')
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Button__WEBPACK_IMPORTED_MODULE_6__["default"], {
+            size: "sm",
+            variant: "ghost",
+            loading: scan.isPending,
+            onClick: onRescan,
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Re-scan', 'zentranslate')
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(ExportMenu, {
+            onExport: onExport,
+            loading: exportPack.isPending,
+            pkg: pkg,
+            lang: lang,
+            wpOrgProjectUrl: wpOrgProjectUrl
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Button__WEBPACK_IMPORTED_MODULE_6__["default"], {
+            size: "sm",
+            loading: bulkSave.isPending,
+            disabled: dirtyCount === 0,
+            onClick: onSaveAll,
+            children: dirtyCount > 0 ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.sprintf)(/* translators: %d: dirty count. */
+            (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Save all (%d)', 'zentranslate'), dirtyCount) : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Save all', 'zentranslate')
+          })]
+        })]
+      }), rows.length === 0 ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("p", {
+        className: "ztrans-px-5 ztrans-py-10 ztrans-text-center ztrans-text-sm ztrans-text-ztrans-muted",
+        children: statusFilter === 'untranslated' ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Nothing untranslated. Nice work.', 'zentranslate') : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('No strings match.', 'zentranslate')
+      }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)("table", {
+        className: "ztrans-w-full ztrans-text-sm",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("thead", {
+          className: "ztrans-bg-ztrans-bg ztrans-text-left ztrans-text-xs ztrans-uppercase ztrans-text-ztrans-muted",
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)("tr", {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("th", {
+              className: "ztrans-px-4 ztrans-py-3 ztrans-w-1/2",
+              children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Source', 'zentranslate')
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("th", {
+              className: "ztrans-px-4 ztrans-py-3",
+              children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Translation', 'zentranslate')
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("th", {
+              className: "ztrans-px-4 ztrans-py-3 ztrans-w-24"
+            })]
+          })
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("tbody", {
+          children: rows.map(row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(StringRow, {
+            row: row,
+            draft: drafts[row.string_id],
+            suggestion: memoryHits[row.string_id],
+            wpOrgProjectUrl: wpOrgProjectUrl,
+            onChange: onChange,
+            onAi: onAiOne,
+            onUseSuggestion: onUseSuggestion,
+            aiBusy: ai.isPending
+          }, row.string_id))
+        })]
+      }), total > PAGE_SIZE && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)("div", {
+        className: "ztrans-flex ztrans-items-center ztrans-justify-between ztrans-border-t ztrans-border-ztrans-border ztrans-px-4 ztrans-py-3 ztrans-text-sm",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("span", {
+          className: "ztrans-text-ztrans-muted",
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.sprintf)(/* translators: 1: current page, 2: total pages, 3: total rows. */
+          (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Page %1$d of %2$d · %3$d total', 'zentranslate'), page, totalPages, total)
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)("div", {
+          className: "ztrans-flex ztrans-gap-2",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Button__WEBPACK_IMPORTED_MODULE_6__["default"], {
+            variant: "ghost",
+            size: "sm",
+            disabled: page <= 1,
+            onClick: () => setPage(p => p - 1),
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Previous', 'zentranslate')
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Button__WEBPACK_IMPORTED_MODULE_6__["default"], {
+            variant: "ghost",
+            size: "sm",
+            disabled: page >= totalPages,
+            onClick: () => setPage(p => p + 1),
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Next', 'zentranslate')
+          })]
+        })]
+      })]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Toast__WEBPACK_IMPORTED_MODULE_7__["default"], {
+      message: toast?.message,
+      tone: toast?.tone,
+      onClear: () => setToast(null)
+    })]
+  });
+}
+function StringRow({
+  row,
+  draft,
+  suggestion,
+  wpOrgProjectUrl,
+  onChange,
+  onAi,
+  onUseSuggestion,
+  aiBusy
+}) {
+  const value = draft?.value ?? row.translation ?? '';
+  const dirty = draft?.dirty;
+  const status = draft?.status || row.translation_status || '';
+  const fromWpOrg = status === 'wp_org';
+  const hasSuggestion = !value && suggestion;
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)("tr", {
+    className: `ztrans-border-t ztrans-border-ztrans-border ztrans-align-top ${dirty ? 'ztrans-bg-amber-50' : ''}`,
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)("td", {
+      className: "ztrans-px-4 ztrans-py-3",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("div", {
+        className: "ztrans-text-gray-900",
+        children: row.source
+      }), row.file_ref && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("div", {
+        className: "ztrans-mt-1 ztrans-text-xs ztrans-text-ztrans-muted",
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("code", {
+          children: row.file_ref
+        })
+      }), row.context && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)("div", {
+        className: "ztrans-mt-1 ztrans-text-xs ztrans-text-ztrans-muted",
+        children: [(0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Context', 'zentranslate'), ": ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("code", {
+          children: row.context
+        })]
+      })]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)("td", {
+      className: "ztrans-px-4 ztrans-py-3",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Input__WEBPACK_IMPORTED_MODULE_8__.TextArea, {
+        rows: Math.min(6, Math.max(2, Math.ceil((row.source?.length || 0) / 80))),
+        value: value,
+        onChange: e => onChange(row.string_id, e.target.value)
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)("div", {
+        className: "ztrans-mt-1 ztrans-flex ztrans-flex-wrap ztrans-items-center ztrans-gap-2 ztrans-text-xs",
+        children: [fromWpOrg && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)("span", {
+          className: "ztrans-rounded ztrans-bg-emerald-100 ztrans-px-1.5 ztrans-py-0.5 ztrans-text-emerald-800",
+          children: ["\uD83C\uDF10 ", (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('From translate.wordpress.org', 'zentranslate')]
+        }), status === 'translated' && !dirty && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("span", {
+          className: "ztrans-rounded ztrans-bg-blue-100 ztrans-px-1.5 ztrans-py-0.5 ztrans-text-blue-800",
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Translated', 'zentranslate')
+        }), status === 'draft' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("span", {
+          className: "ztrans-rounded ztrans-bg-gray-100 ztrans-px-1.5 ztrans-py-0.5 ztrans-text-gray-700",
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Draft', 'zentranslate')
+        }), dirty && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("span", {
+          className: "ztrans-rounded ztrans-bg-amber-100 ztrans-px-1.5 ztrans-py-0.5 ztrans-text-amber-800",
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Unsaved', 'zentranslate')
+        }), hasSuggestion && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)("button", {
+          type: "button",
+          onClick: () => onUseSuggestion(row.string_id, suggestion),
+          className: "ztrans-bare ztrans-inline-flex ztrans-items-center ztrans-gap-1 ztrans-rounded ztrans-bg-indigo-50 ztrans-px-1.5 ztrans-py-0.5 ztrans-text-indigo-700 hover:ztrans-bg-indigo-100",
+          title: suggestion,
+          children: ["\uD83D\uDCA1 ", (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Used elsewhere:', 'zentranslate'), ' ', /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("span", {
+            className: "ztrans-italic",
+            children: truncate(suggestion, 40)
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("span", {
+            className: "ztrans-ml-1 ztrans-font-semibold",
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Use', 'zentranslate')
+          })]
+        }), wpOrgProjectUrl && status === 'translated' && !dirty && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("a", {
+          href: `${wpOrgProjectUrl}?filters[term]=${encodeURIComponent(row.source)}`,
+          target: "_blank",
+          rel: "noopener noreferrer",
+          className: "ztrans-text-[11px] ztrans-text-ztrans-muted ztrans-no-underline hover:ztrans-text-ztrans-primary",
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Suggest on WP.org →', 'zentranslate')
+        })]
+      })]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("td", {
+      className: "ztrans-px-4 ztrans-py-3 ztrans-text-right",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Button__WEBPACK_IMPORTED_MODULE_6__["default"], {
+        size: "sm",
+        variant: "ghost",
+        loading: aiBusy,
+        onClick: () => onAi(row),
+        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('AI', 'zentranslate')
+      })
+    })]
+  });
+}
+function ExportMenu({
+  onExport,
+  loading,
+  pkg,
+  lang,
+  wpOrgProjectUrl
+}) {
+  const [open, setOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const close = () => setOpen(false);
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)("div", {
+    className: "ztrans-relative",
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Button__WEBPACK_IMPORTED_MODULE_6__["default"], {
+      size: "sm",
+      variant: "ghost",
+      loading: loading,
+      onClick: () => setOpen(o => !o),
+      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Export ▾', 'zentranslate')
+    }), open && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)("div", {
+      className: "ztrans-absolute ztrans-right-0 ztrans-z-10 ztrans-mt-1 ztrans-w-72 ztrans-rounded-md ztrans-border ztrans-border-ztrans-border ztrans-bg-white ztrans-shadow-card",
+      onMouseLeave: close,
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)("button", {
+        type: "button",
+        onClick: () => {
+          close();
+          onExport({
+            exclude_status: ''
+          });
+        },
+        className: "ztrans-bare ztrans-block ztrans-w-full ztrans-px-3 ztrans-py-2 ztrans-text-left ztrans-text-sm hover:ztrans-bg-gray-50",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("div", {
+          className: "ztrans-font-medium",
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Generate PO/MO', 'zentranslate')
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("div", {
+          className: "ztrans-text-xs ztrans-text-ztrans-muted",
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.sprintf)(/* translators: %s: file path. */
+          (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Writes to wp-content/languages/plugins/%s-{locale}.mo', 'zentranslate'), pkg.text_domain)
+        })]
+      }), pkg.wp_org_hosted && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.Fragment, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)("button", {
+          type: "button",
+          onClick: () => {
+            close();
+            onExport({
+              exclude_status: 'wp_org'
+            });
+          },
+          className: "ztrans-bare ztrans-block ztrans-w-full ztrans-border-t ztrans-border-ztrans-border ztrans-px-3 ztrans-py-2 ztrans-text-left ztrans-text-sm hover:ztrans-bg-gray-50",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("div", {
+            className: "ztrans-font-medium",
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Export PO for WordPress.org', 'zentranslate')
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("div", {
+            className: "ztrans-text-xs ztrans-text-ztrans-muted",
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('PO file with only your edits (skips community translations). Upload to translate.wordpress.org.', 'zentranslate')
+          })]
+        }), wpOrgProjectUrl && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)("a", {
+          href: wpOrgProjectUrl,
+          target: "_blank",
+          rel: "noopener noreferrer",
+          className: "ztrans-block ztrans-border-t ztrans-border-ztrans-border ztrans-px-3 ztrans-py-2 ztrans-text-sm ztrans-no-underline hover:ztrans-bg-gray-50",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("div", {
+            className: "ztrans-font-medium ztrans-text-ztrans-primary",
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Contribute on translate.wordpress.org →', 'zentranslate')
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("div", {
+            className: "ztrans-text-xs ztrans-text-ztrans-muted",
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Opens the GlotPress project page in a new tab.', 'zentranslate')
+          })]
+        })]
+      })]
+    })]
+  });
+}
+function truncate(s, n) {
+  const str = String(s || '');
+  return str.length > n ? str.slice(0, n - 1) + '…' : str;
+}
+
+/***/ },
+
+/***/ "./dev_zentranslate/containers/Strings/PackageList.jsx"
+/*!*************************************************************!*\
+  !*** ./dev_zentranslate/containers/Strings/PackageList.jsx ***!
+  \*************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ PackageList)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/dist/index.js");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _components_PageHeader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../components/PageHeader */ "./dev_zentranslate/components/PageHeader.jsx");
+/* harmony import */ var _components_Card__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../components/Card */ "./dev_zentranslate/components/Card.jsx");
+/* harmony import */ var _components_Button__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../components/Button */ "./dev_zentranslate/components/Button.jsx");
+/* harmony import */ var _components_Toast__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../components/Toast */ "./dev_zentranslate/components/Toast.jsx");
+/* harmony import */ var _components_Input__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../components/Input */ "./dev_zentranslate/components/Input.jsx");
+/* harmony import */ var _components_Spinner__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../components/Spinner */ "./dev_zentranslate/components/Spinner.jsx");
+/* harmony import */ var _hooks_usePackages__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../hooks/usePackages */ "./dev_zentranslate/hooks/usePackages.js");
+/* harmony import */ var _hooks_useLanguages__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../hooks/useLanguages */ "./dev_zentranslate/hooks/useLanguages.js");
+/* harmony import */ var _lib_format__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../lib/format */ "./dev_zentranslate/lib/format.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__);
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * Loco-style landing page. One row per installed plugin/theme with a
+ * translation-progress strip per active language. Click a row to drill into
+ * its dedicated editor.
+ */
+
+function PackageList() {
+  const packages = (0,_hooks_usePackages__WEBPACK_IMPORTED_MODULE_9__.usePackages)();
+  const languages = (0,_hooks_useLanguages__WEBPACK_IMPORTED_MODULE_10__.useLanguages)();
+  const scan = (0,_hooks_usePackages__WEBPACK_IMPORTED_MODULE_9__.useScanPackage)();
+  const [filter, setFilter] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
+  const [typeFilter, setTypeFilter] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('all'); // all | plugin | theme
+  const [toast, setToast] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
+  const [scanningSlug, setScanningSlug] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
+  if (packages.isLoading) return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_components_Spinner__WEBPACK_IMPORTED_MODULE_8__.LoadingBlock, {
+    children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Loading plugins & themes…', 'zentranslate')
+  });
+  if (packages.error) return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("p", {
+    className: "ztrans-text-red-600",
+    children: (0,_lib_format__WEBPACK_IMPORTED_MODULE_11__.formatErrorMessage)(packages.error)
+  });
+  const langCodes = packages.data?.meta?.languages || [];
+  const langByCode = Object.fromEntries((languages.data || []).map(l => [l.code, l]));
+  const defaultLang = (languages.data || []).find(l => l.is_default);
+  const firstTargetLang = langCodes[0];
+  const rows = (packages.data?.rows || []).filter(r => {
+    if (typeFilter !== 'all' && r.type !== typeFilter) return false;
+    if (!filter) return true;
+    const q = filter.toLowerCase();
+    return r.name.toLowerCase().includes(q) || r.text_domain.toLowerCase().includes(q) || r.slug.toLowerCase().includes(q);
+  });
+  const onScan = async row => {
+    setScanningSlug(row.slug);
+    try {
+      const result = await scan.mutateAsync({
+        slug: row.slug
+      });
+      const wpOrg = result?.wporg?.imported || 0;
+      setToast({
+        tone: 'success',
+        message: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.sprintf)(/* translators: 1: plugin name, 2: string count, 3: WP.org imported count. */
+        (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Scanned %1$s — found %2$d strings, imported %3$d community translations.', 'zentranslate'), row.name, result?.string_count ?? 0, wpOrg)
+      });
+    } catch (err) {
+      setToast({
+        tone: 'error',
+        message: (0,_lib_format__WEBPACK_IMPORTED_MODULE_11__.formatErrorMessage)(err)
+      });
+    } finally {
+      setScanningSlug('');
+    }
+  };
+  if (langCodes.length === 0) {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.Fragment, {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_components_PageHeader__WEBPACK_IMPORTED_MODULE_3__["default"], {
+        title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Strings', 'zentranslate'),
+        description: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Translate strings from installed plugins and themes.', 'zentranslate')
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_components_Card__WEBPACK_IMPORTED_MODULE_4__["default"], {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("p", {
+          className: "ztrans-m-0 ztrans-text-sm ztrans-text-ztrans-muted",
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Add at least one non-default language to start translating plugins.', 'zentranslate')
+        })
+      })]
+    });
+  }
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.Fragment, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_components_PageHeader__WEBPACK_IMPORTED_MODULE_3__["default"], {
+      title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Strings', 'zentranslate'),
+      description: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Pick a plugin or theme to translate. Each one is scanned on demand and tracks its own progress.', 'zentranslate'),
+      actions: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Link, {
+        to: "/strings/legacy",
+        className: "ztrans-text-xs ztrans-text-ztrans-muted ztrans-no-underline hover:ztrans-text-gray-700",
+        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Advanced (flat view) →', 'zentranslate')
+      })
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(_components_Card__WEBPACK_IMPORTED_MODULE_4__["default"], {
+      padded: false,
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)("div", {
+        className: "ztrans-flex ztrans-flex-wrap ztrans-items-center ztrans-gap-3 ztrans-border-b ztrans-border-ztrans-border ztrans-px-4 ztrans-py-3",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("div", {
+          className: "ztrans-flex ztrans-items-center ztrans-gap-1 ztrans-text-xs",
+          children: ['all', 'plugin', 'theme'].map(t => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("button", {
+            type: "button",
+            onClick: () => setTypeFilter(t),
+            className: `ztrans-bare ztrans-rounded-full ztrans-px-3 ztrans-py-1 ${typeFilter === t ? 'ztrans-bg-ztrans-primary ztrans-text-white' : 'ztrans-bg-white ztrans-border ztrans-border-ztrans-border ztrans-text-gray-700'}`,
+            children: t === 'all' ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('All', 'zentranslate') : t === 'plugin' ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Plugins', 'zentranslate') : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Themes', 'zentranslate')
+          }, t))
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("div", {
+          className: "ztrans-flex-1 ztrans-min-w-[200px]",
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_components_Input__WEBPACK_IMPORTED_MODULE_7__.TextInput, {
+            value: filter,
+            onChange: e => setFilter(e.target.value),
+            placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Search plugins & themes…', 'zentranslate')
+          })
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("span", {
+          className: "ztrans-text-xs ztrans-text-ztrans-muted",
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.sprintf)(/* translators: %d: count. */
+          (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('%d installed', 'zentranslate'), packages.data?.rows?.length || 0)
+        })]
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)("table", {
+        className: "ztrans-w-full ztrans-text-sm",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("thead", {
+          className: "ztrans-bg-ztrans-bg ztrans-text-left ztrans-text-xs ztrans-uppercase ztrans-text-ztrans-muted",
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)("tr", {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("th", {
+              className: "ztrans-px-4 ztrans-py-3",
+              children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Plugin / Theme', 'zentranslate')
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("th", {
+              className: "ztrans-px-4 ztrans-py-3 ztrans-w-32",
+              children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Text domain', 'zentranslate')
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("th", {
+              className: "ztrans-px-4 ztrans-py-3 ztrans-w-24",
+              children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Strings', 'zentranslate')
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("th", {
+              className: "ztrans-px-4 ztrans-py-3",
+              children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Translation progress', 'zentranslate')
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("th", {
+              className: "ztrans-px-4 ztrans-py-3 ztrans-w-32"
+            })]
+          })
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)("tbody", {
+          children: [rows.map(row => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(PackageRow, {
+            row: row,
+            langCodes: langCodes,
+            langByCode: langByCode,
+            firstTargetLang: firstTargetLang,
+            onScan: onScan,
+            scanning: scanningSlug === row.slug,
+            defaultLang: defaultLang
+          }, `${row.type}-${row.slug}`)), rows.length === 0 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("tr", {
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("td", {
+              colSpan: 5,
+              className: "ztrans-px-4 ztrans-py-8 ztrans-text-center ztrans-text-sm ztrans-text-ztrans-muted",
+              children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('No matches.', 'zentranslate')
+            })
+          })]
+        })]
+      })]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_components_Toast__WEBPACK_IMPORTED_MODULE_6__["default"], {
+      message: toast?.message,
+      tone: toast?.tone,
+      onClear: () => setToast(null)
+    })]
+  });
+}
+function PackageRow({
+  row,
+  langCodes,
+  langByCode,
+  firstTargetLang,
+  onScan,
+  scanning,
+  defaultLang
+}) {
+  const hasStrings = row.string_count > 0;
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)("tr", {
+    className: "ztrans-border-t ztrans-border-ztrans-border ztrans-align-top",
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)("td", {
+      className: "ztrans-px-4 ztrans-py-3",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)("div", {
+        className: "ztrans-flex ztrans-items-center ztrans-gap-2",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("span", {
+          className: `ztrans-rounded ztrans-px-1.5 ztrans-py-0.5 ztrans-text-[10px] ztrans-font-semibold ztrans-uppercase ${row.type === 'theme' ? 'ztrans-bg-purple-100 ztrans-text-purple-800' : 'ztrans-bg-indigo-100 ztrans-text-indigo-800'}`,
+          children: row.type === 'theme' ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('theme', 'zentranslate') : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('plugin', 'zentranslate')
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("span", {
+          className: "ztrans-font-medium ztrans-text-gray-900",
+          children: row.name
+        }), row.wp_org_hosted && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("span", {
+          title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Hosted on wordpress.org/plugins/', 'zentranslate'),
+          className: "ztrans-text-[10px] ztrans-text-emerald-700",
+          children: "\uD83C\uDF10 WP.org"
+        })]
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)("div", {
+        className: "ztrans-mt-0.5 ztrans-text-xs ztrans-text-ztrans-muted",
+        children: ["v", row.version]
+      })]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("td", {
+      className: "ztrans-px-4 ztrans-py-3 ztrans-text-xs ztrans-text-ztrans-muted",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("code", {
+        children: row.text_domain
+      })
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("td", {
+      className: "ztrans-px-4 ztrans-py-3 ztrans-text-xs",
+      children: hasStrings ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("span", {
+        children: row.string_count
+      }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("span", {
+        className: "ztrans-text-ztrans-muted",
+        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Not scanned', 'zentranslate')
+      })
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("td", {
+      className: "ztrans-px-4 ztrans-py-3",
+      children: hasStrings ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("div", {
+        className: "ztrans-flex ztrans-flex-wrap ztrans-gap-2",
+        children: langCodes.map(code => {
+          const stats = row.per_lang?.[code] || {
+            total: 0,
+            translated: 0,
+            wp_org: 0,
+            draft: 0,
+            missing: 0
+          };
+          const done = stats.translated + stats.wp_org + stats.draft;
+          const total = stats.total || row.string_count;
+          const pct = total > 0 ? Math.round(done / total * 100) : 0;
+          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Link, {
+            to: `/strings/${row.slug}/${code}`,
+            className: "ztrans-inline-flex ztrans-items-center ztrans-gap-1.5 ztrans-rounded-full ztrans-border ztrans-border-ztrans-border ztrans-bg-white ztrans-px-2.5 ztrans-py-1 ztrans-text-xs ztrans-text-gray-700 ztrans-no-underline hover:ztrans-bg-gray-50",
+            title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.sprintf)(/* translators: 1: language name, 2: translated, 3: wp_org, 4: total. */
+            (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('%1$s — %2$d translated, %3$d from WP.org, %4$d total', 'zentranslate'), langByCode[code]?.name || code, stats.translated, stats.wp_org, total),
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("span", {
+              className: "ztrans-font-medium",
+              children: code
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)("span", {
+              className: "ztrans-text-[10px] ztrans-text-ztrans-muted",
+              children: [pct, "%"]
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("span", {
+              className: "ztrans-h-1.5 ztrans-w-12 ztrans-overflow-hidden ztrans-rounded-full ztrans-bg-gray-200",
+              "aria-hidden": "true",
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("span", {
+                className: "ztrans-block ztrans-h-full ztrans-bg-emerald-500",
+                style: {
+                  width: `${pct}%`
+                }
+              })
+            })]
+          }, code);
+        })
+      }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("span", {
+        className: "ztrans-text-xs ztrans-text-ztrans-muted",
+        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Click Scan to discover strings.', 'zentranslate')
+      })
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("td", {
+      className: "ztrans-px-4 ztrans-py-3 ztrans-text-right",
+      children: hasStrings ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_1__.Link, {
+        to: `/strings/${row.slug}/${firstTargetLang}`,
+        className: "ztrans-inline-flex ztrans-items-center ztrans-rounded-md ztrans-bg-ztrans-primary ztrans-px-3 ztrans-py-1.5 ztrans-text-xs ztrans-font-medium ztrans-text-white ztrans-no-underline hover:ztrans-bg-ztrans-primary-hover",
+        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Open', 'zentranslate')
+      }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_components_Button__WEBPACK_IMPORTED_MODULE_5__["default"], {
+        size: "sm",
+        variant: "secondary",
+        loading: scanning,
+        onClick: () => onScan(row),
+        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Scan', 'zentranslate')
+      })
+    })]
+  });
+}
+
+/***/ },
+
+/***/ "./dev_zentranslate/containers/Strings/StringsLegacy.jsx"
+/*!***************************************************************!*\
+  !*** ./dev_zentranslate/containers/Strings/StringsLegacy.jsx ***!
+  \***************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ StringsLegacy)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
@@ -10513,7 +11190,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-function StringsPage() {
+function StringsLegacy() {
   const languages = (0,_hooks_useLanguages__WEBPACK_IMPORTED_MODULE_10__.useLanguages)();
   const langs = languages.data || [];
   const nonDefault = langs.filter(l => !l.is_default);
@@ -11410,57 +12087,6 @@ function useDeleteGlossaryTerm() {
 
 /***/ },
 
-/***/ "./dev_zentranslate/hooks/useI18n.js"
-/*!*******************************************!*\
-  !*** ./dev_zentranslate/hooks/useI18n.js ***!
-  \*******************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   useDeleteTranslationPack: () => (/* binding */ useDeleteTranslationPack),
-/* harmony export */   useGenerateTranslationPack: () => (/* binding */ useGenerateTranslationPack),
-/* harmony export */   useTranslationPacks: () => (/* binding */ useTranslationPacks)
-/* harmony export */ });
-/* harmony import */ var _tanstack_react_query__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tanstack/react-query */ "./node_modules/@tanstack/react-query/build/modern/useQuery.js");
-/* harmony import */ var _tanstack_react_query__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tanstack/react-query */ "./node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js");
-/* harmony import */ var _tanstack_react_query__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @tanstack/react-query */ "./node_modules/@tanstack/react-query/build/modern/useMutation.js");
-/* harmony import */ var _lib_api__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../lib/api */ "./dev_zentranslate/lib/api.js");
-
-
-function useTranslationPacks() {
-  return (0,_tanstack_react_query__WEBPACK_IMPORTED_MODULE_0__.useQuery)({
-    queryKey: ['i18n', 'packs'],
-    queryFn: async () => (0,_lib_api__WEBPACK_IMPORTED_MODULE_3__.unwrap)(await _lib_api__WEBPACK_IMPORTED_MODULE_3__.api.get('i18n/packs'))
-  });
-}
-function useGenerateTranslationPack() {
-  const qc = (0,_tanstack_react_query__WEBPACK_IMPORTED_MODULE_1__.useQueryClient)();
-  return (0,_tanstack_react_query__WEBPACK_IMPORTED_MODULE_2__.useMutation)({
-    mutationFn: async ({
-      target_lang,
-      locale
-    }) => (0,_lib_api__WEBPACK_IMPORTED_MODULE_3__.unwrap)(await _lib_api__WEBPACK_IMPORTED_MODULE_3__.api.post('i18n/packs', {
-      target_lang,
-      locale
-    })),
-    onSuccess: () => qc.invalidateQueries({
-      queryKey: ['i18n', 'packs']
-    })
-  });
-}
-function useDeleteTranslationPack() {
-  const qc = (0,_tanstack_react_query__WEBPACK_IMPORTED_MODULE_1__.useQueryClient)();
-  return (0,_tanstack_react_query__WEBPACK_IMPORTED_MODULE_2__.useMutation)({
-    mutationFn: async locale => (0,_lib_api__WEBPACK_IMPORTED_MODULE_3__.unwrap)(await _lib_api__WEBPACK_IMPORTED_MODULE_3__.api.delete(`i18n/packs/${locale}`)),
-    onSuccess: () => qc.invalidateQueries({
-      queryKey: ['i18n', 'packs']
-    })
-  });
-}
-
-/***/ },
-
 /***/ "./dev_zentranslate/hooks/useIo.js"
 /*!*****************************************!*\
   !*** ./dev_zentranslate/hooks/useIo.js ***!
@@ -11702,6 +12328,105 @@ function useRunMigration() {
     mutationFn: async source => (0,_lib_api__WEBPACK_IMPORTED_MODULE_2__.unwrap)(await _lib_api__WEBPACK_IMPORTED_MODULE_2__.api.post('migration/import', {
       source
     }))
+  });
+}
+
+/***/ },
+
+/***/ "./dev_zentranslate/hooks/usePackages.js"
+/*!***********************************************!*\
+  !*** ./dev_zentranslate/hooks/usePackages.js ***!
+  \***********************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   useBulkSaveStrings: () => (/* binding */ useBulkSaveStrings),
+/* harmony export */   useExportPackage: () => (/* binding */ useExportPackage),
+/* harmony export */   useMemorySuggestions: () => (/* binding */ useMemorySuggestions),
+/* harmony export */   usePackages: () => (/* binding */ usePackages),
+/* harmony export */   useScanPackage: () => (/* binding */ useScanPackage),
+/* harmony export */   useTranslateAllInPackage: () => (/* binding */ useTranslateAllInPackage)
+/* harmony export */ });
+/* harmony import */ var _tanstack_react_query__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tanstack/react-query */ "./node_modules/@tanstack/react-query/build/modern/useQuery.js");
+/* harmony import */ var _tanstack_react_query__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tanstack/react-query */ "./node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js");
+/* harmony import */ var _tanstack_react_query__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @tanstack/react-query */ "./node_modules/@tanstack/react-query/build/modern/useMutation.js");
+/* harmony import */ var _lib_api__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../lib/api */ "./dev_zentranslate/lib/api.js");
+
+
+function usePackages() {
+  return (0,_tanstack_react_query__WEBPACK_IMPORTED_MODULE_0__.useQuery)({
+    queryKey: ['strings', 'packages'],
+    queryFn: async () => {
+      const res = await _lib_api__WEBPACK_IMPORTED_MODULE_3__.api.get('strings/packages');
+      return {
+        rows: (0,_lib_api__WEBPACK_IMPORTED_MODULE_3__.unwrap)(res) || [],
+        meta: (0,_lib_api__WEBPACK_IMPORTED_MODULE_3__.getMeta)(res)
+      };
+    }
+  });
+}
+function useScanPackage() {
+  const qc = (0,_tanstack_react_query__WEBPACK_IMPORTED_MODULE_1__.useQueryClient)();
+  return (0,_tanstack_react_query__WEBPACK_IMPORTED_MODULE_2__.useMutation)({
+    mutationFn: async ({
+      slug
+    }) => (0,_lib_api__WEBPACK_IMPORTED_MODULE_3__.unwrap)(await _lib_api__WEBPACK_IMPORTED_MODULE_3__.api.post(`strings/packages/${slug}/scan`)),
+    onSuccess: () => qc.invalidateQueries({
+      queryKey: ['strings']
+    })
+  });
+}
+function useTranslateAllInPackage() {
+  const qc = (0,_tanstack_react_query__WEBPACK_IMPORTED_MODULE_1__.useQueryClient)();
+  return (0,_tanstack_react_query__WEBPACK_IMPORTED_MODULE_2__.useMutation)({
+    mutationFn: async ({
+      slug,
+      lang,
+      status = 'draft'
+    }) => (0,_lib_api__WEBPACK_IMPORTED_MODULE_3__.unwrap)(await _lib_api__WEBPACK_IMPORTED_MODULE_3__.api.post(`strings/packages/${slug}/${lang}/translate-all`, {
+      status
+    })),
+    onSuccess: () => qc.invalidateQueries({
+      queryKey: ['strings']
+    })
+  });
+}
+function useExportPackage() {
+  return (0,_tanstack_react_query__WEBPACK_IMPORTED_MODULE_2__.useMutation)({
+    mutationFn: async ({
+      slug,
+      lang,
+      exclude_status = '',
+      ai_fill = false
+    }) => (0,_lib_api__WEBPACK_IMPORTED_MODULE_3__.unwrap)(await _lib_api__WEBPACK_IMPORTED_MODULE_3__.api.post(`strings/packages/${slug}/${lang}/export`, {
+      exclude_status,
+      ai_fill
+    }))
+  });
+}
+function useMemorySuggestions() {
+  return (0,_tanstack_react_query__WEBPACK_IMPORTED_MODULE_2__.useMutation)({
+    mutationFn: async ({
+      slug,
+      lang,
+      string_ids
+    }) => (0,_lib_api__WEBPACK_IMPORTED_MODULE_3__.unwrap)(await _lib_api__WEBPACK_IMPORTED_MODULE_3__.api.post(`strings/packages/${slug}/${lang}/memory-suggestions`, {
+      string_ids
+    }))
+  });
+}
+function useBulkSaveStrings() {
+  const qc = (0,_tanstack_react_query__WEBPACK_IMPORTED_MODULE_1__.useQueryClient)();
+  return (0,_tanstack_react_query__WEBPACK_IMPORTED_MODULE_2__.useMutation)({
+    mutationFn: async ({
+      translations
+    }) => (0,_lib_api__WEBPACK_IMPORTED_MODULE_3__.unwrap)(await _lib_api__WEBPACK_IMPORTED_MODULE_3__.api.patch('strings/bulk', {
+      translations
+    })),
+    onSuccess: () => qc.invalidateQueries({
+      queryKey: ['strings']
+    })
   });
 }
 
