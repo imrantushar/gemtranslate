@@ -886,44 +886,52 @@ input:where([type='file']):focus {
 	color: rgb(55 65 81 / var(--tw-text-opacity, 1));
 }
 
+/* Nav active state — override WP admin's global <a> colour/decoration rules. */
+#zentranslate-admin-root nav a[aria-current="page"],
+#zentranslate-admin-root nav a[aria-current="page"]:hover,
+#zentranslate-admin-root nav a[aria-current="page"]:focus,
+#zentranslate-admin-root nav a[aria-current="page"]:visited {
+	background-color: #4338ca !important;
+	color: #ffffff !important;
+	text-decoration: none !important;
+}
+
+/* Keep inactive nav links from inheriting WP admin link colours. */
+#zentranslate-admin-root nav a:not([aria-current="page"]),
+#zentranslate-admin-root nav a:not([aria-current="page"]):visited {
+	color: #374151 !important;
+	text-decoration: none !important;
+}
 #zentranslate-admin-root .hover\:ztrans-bg-gray-100:hover {
 	--tw-bg-opacity: 1;
 	background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1));
 }
-
 #zentranslate-admin-root .hover\:ztrans-bg-gray-50:hover {
 	--tw-bg-opacity: 1;
 	background-color: rgb(249 250 251 / var(--tw-bg-opacity, 1));
 }
-
 #zentranslate-admin-root .hover\:ztrans-bg-red-700:hover {
 	--tw-bg-opacity: 1;
 	background-color: rgb(185 28 28 / var(--tw-bg-opacity, 1));
 }
-
 #zentranslate-admin-root .hover\:ztrans-bg-ztrans-bg:hover {
 	--tw-bg-opacity: 1;
 	background-color: rgb(248 250 252 / var(--tw-bg-opacity, 1));
 }
-
 #zentranslate-admin-root .hover\:ztrans-bg-ztrans-primary-hover:hover {
 	--tw-bg-opacity: 1;
 	background-color: rgb(55 48 163 / var(--tw-bg-opacity, 1));
 }
-
 #zentranslate-admin-root .hover\:ztrans-text-gray-900:hover {
 	--tw-text-opacity: 1;
 	color: rgb(17 24 39 / var(--tw-text-opacity, 1));
 }
-
 #zentranslate-admin-root .disabled\:ztrans-cursor-not-allowed:disabled {
 	cursor: not-allowed;
 }
-
 #zentranslate-admin-root .disabled\:ztrans-opacity-60:disabled {
 	opacity: 0.6;
 }
-
 @media (min-width: 768px) {
 	#zentranslate-admin-root .md\:ztrans-col-span-2 {
 		grid-column: span 2 / span 2;
@@ -938,7 +946,6 @@ input:where([type='file']):focus {
 		grid-template-columns: repeat(4, minmax(0, 1fr));
 	}
 }
-
 @media (min-width: 1024px) {
 	#zentranslate-admin-root .lg\:ztrans-grid-cols-2 {
 		grid-template-columns: repeat(2, minmax(0, 1fr));

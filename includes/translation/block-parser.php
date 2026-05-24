@@ -164,4 +164,48 @@ class BlockParser {
 		}
 		return $out;
 	}
+
+	/**
+	 * Replace every HTML tag in $html with a numbered placeholder so that
+	 * an AI translator only sees visible text. Placeholders look like {ZT0},
+	 * {ZT1}, … which the AI system prompt already treats as preserved variables.
+	 *
+	 * @param  string $html
+	 * @return array{0: string, 1: array<int, string>}  [ protected_text, tag_map ]
+	 */
+	public static function protect_html( $html ) {
+		$tags = [];
+		$n    = 0;
+		$out  = preg_replace_callback(
+			'/<[^>]+>/s',
+			function ( $m ) use ( &$tags, &$n ) {
+				$key      = '{ZT' . $n . '}';
+				$tags[$n] = $m[0];
+				$n++;
+				return $key;
+			},
+			$html
+		);
+		return [ $out ?? $html, $tags ];
+	}
+
+	/**
+	 * Restore HTML tags that were replaced by protect_html().
+	 *
+	 * @param  string             $text    Translated (possibly modified) protected string.
+	 * @param  array<int, string> $tags    Tag map returned by protect_html().
+	 * @return string
+	 */
+	public static function restore_html( $text, array $tags ) {
+		if ( empty( $tags ) ) {
+			return $text;
+		}
+		return preg_replace_callback(
+			'/\{ZT(\d+)\}/',
+			function ( $m ) use ( $tags ) {
+				return $tags[ (int) $m[1] ] ?? $m[0];
+			},
+			$text
+		);
+	}
 }
