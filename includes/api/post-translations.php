@@ -138,8 +138,15 @@ class PostTranslations extends Controller {
 	}
 
 	public function index( $request ) {
+		$post_type = $request->get_param( 'post_type' ) ?: 'post';
+
+		// Academy LMS stores lessons in a custom table when HP lesson mode is active.
+		if ( 'academy_lessons' === $post_type && $this->is_academy_hp_mode() ) {
+			return $this->index_academy_hp_lessons( $request );
+		}
+
 		$args = [
-			'post_type'      => $request->get_param( 'post_type' ) ?: 'post',
+			'post_type'      => $post_type,
 			'post_status'    => $request->get_param( 'status' ) ?: 'any',
 			'posts_per_page' => max( 1, min( 100, (int) $request->get_param( 'per_page' ) ) ),
 			'paged'          => max( 1, (int) $request->get_param( 'page' ) ),
@@ -165,9 +172,111 @@ class PostTranslations extends Controller {
 		);
 	}
 
+	/**
+	 * Query the Academy LMS custom lessons table directly (HP lesson mode).
+	 * Called from index() when post_type=academy_lesson and HP mode is active.
+	 */
+	private function index_academy_hp_lessons( $request ) {
+		global $wpdb;
+		$per_page = max( 1, min( 100, (int) $request->get_param( 'per_page' ) ) );
+		$page     = max( 1, (int) $request->get_param( 'page' ) );
+		$search   = (string) $request->get_param( 'search' );
+		$status   = (string) ( $request->get_param( 'status' ) ?: 'any' );
+		$offset   = ( $page - 1 ) * $per_page;
+		$table    = $wpdb->prefix . 'academy_lessons';
+
+		$wheres = [];
+		$params = [];
+
+		if ( '' !== $search ) {
+			$wheres[] = 'lesson_title LIKE %s';
+			$params[] = '%' . $wpdb->esc_like( $search ) . '%';
+		}
+		if ( 'any' !== $status ) {
+			$wheres[] = 'lesson_status = %s';
+			$params[] = $status;
+		}
+
+		$where_sql    = $wheres ? 'WHERE ' . implode( ' AND ', $wheres ) : '';
+		$count_params = $params;
+
+		$params[] = $per_page;
+		$params[] = $offset;
+
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$list_sql  = "SELECT ID, lesson_title, lesson_name, lesson_status, lesson_modified_gmt FROM {$table} {$where_sql} ORDER BY ID DESC LIMIT %d OFFSET %d";
+		$count_sql = "SELECT COUNT(*) FROM {$table} {$where_sql}";
+		// phpcs:enable
+
+		$db_rows = $params
+			? $wpdb->get_results( $wpdb->prepare( $list_sql, ...$params ), ARRAY_A ) // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			: $wpdb->get_results( $list_sql, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$db_rows = $db_rows ?: [];
+
+		$total = $count_params
+			? (int) $wpdb->get_var( $wpdb->prepare( $count_sql, ...$count_params ) ) // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			: (int) $wpdb->get_var( $count_sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+
+		$rows = [];
+		foreach ( $db_rows as $row ) {
+			$id      = (int) $row['ID'];
+			$rows[] = [
+				'id'                  => $id,
+				'title'               => $row['lesson_title'],
+				'slug'                => $row['lesson_name'],
+				'status'              => $row['lesson_status'],
+				'type'                => 'academy_lessons',
+				'modified'            => $row['lesson_modified_gmt'],
+				'translations_status' => TranslationLoader::status_map( $id ),
+			];
+		}
+
+		return $this->ok(
+			$rows,
+			[
+				'total'       => $total,
+				'total_pages' => (int) ceil( $total / $per_page ),
+				'page'        => $page,
+				'per_page'    => $per_page,
+			]
+		);
+	}
+
+	/**
+	 * Return a fake WP_Post-like stdClass for an Academy HP lesson row.
+	 * Used so the translation endpoints can work with HP lesson IDs.
+	 */
+	private function get_academy_hp_lesson_as_post( int $id ): ?\stdClass {
+		if ( ! $this->is_academy_hp_mode() ) {
+			return null;
+		}
+		global $wpdb;
+		$table = $wpdb->prefix . 'academy_lessons';
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE ID = %d", $id ), ARRAY_A );
+		if ( ! $row ) {
+			return null;
+		}
+		$obj                     = new \stdClass();
+		$obj->ID                 = (int) $row['ID'];
+		$obj->post_title         = $row['lesson_title'];
+		$obj->post_name          = $row['lesson_name'];
+		$obj->post_status        = $row['lesson_status'];
+		$obj->post_type          = 'academy_lessons';
+		$obj->post_content       = $row['lesson_content'] ?? '';
+		$obj->post_excerpt       = $row['lesson_excerpt'] ?? '';
+		$obj->post_modified_gmt  = $row['lesson_modified_gmt'];
+		return $obj;
+	}
+
+	private function is_academy_hp_mode(): bool {
+		return defined( 'ACADEMY_PLUGIN_SLUG' )
+			&& (bool) ( $GLOBALS['academy_settings']->academy_is_hp_lesson_active ?? true );
+	}
+
 	public function get_translations( $request ) {
 		$post_id = (int) $request['id'];
-		$post    = get_post( $post_id );
+		$post    = get_post( $post_id ) ?? $this->get_academy_hp_lesson_as_post( $post_id );
 		if ( ! $post ) {
 			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
 		}
@@ -216,7 +325,7 @@ class PostTranslations extends Controller {
 		if ( ! Context::is_active( $lang ) ) {
 			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );
 		}
-		if ( ! get_post( $post_id ) ) {
+		if ( ! get_post( $post_id ) && ! $this->get_academy_hp_lesson_as_post( $post_id ) ) {
 			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
 		}
 
@@ -244,7 +353,7 @@ class PostTranslations extends Controller {
 	public function get_blocks( $request ) {
 		$post_id = (int) $request['id'];
 		$lang    = strtolower( $request['lang'] );
-		$post    = get_post( $post_id );
+		$post    = get_post( $post_id ) ?? $this->get_academy_hp_lesson_as_post( $post_id );
 		if ( ! $post ) {
 			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
 		}
@@ -297,7 +406,7 @@ class PostTranslations extends Controller {
 		if ( ! Context::is_active( $lang ) ) {
 			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );
 		}
-		$post = get_post( $post_id );
+		$post = get_post( $post_id ) ?? $this->get_academy_hp_lesson_as_post( $post_id );
 		if ( ! $post ) {
 			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
 		}
@@ -346,7 +455,7 @@ class PostTranslations extends Controller {
 	public function get_meta( $request ) {
 		$post_id = (int) $request['id'];
 		$lang    = strtolower( $request['lang'] );
-		if ( ! get_post( $post_id ) ) {
+		if ( ! get_post( $post_id ) && ! $this->get_academy_hp_lesson_as_post( $post_id ) ) {
 			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
 		}
 

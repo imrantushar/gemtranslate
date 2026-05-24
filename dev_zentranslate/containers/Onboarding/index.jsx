@@ -22,6 +22,11 @@ const QUICK_LANGS = [
 	{ code: 'ja', locale: 'ja', name: 'Japanese', native_name: '日本語' },
 	{ code: 'zh-cn', locale: 'zh_CN', name: 'Chinese (Simplified)', native_name: '简体中文' },
 	{ code: 'ar', locale: 'ar', name: 'Arabic', native_name: 'العربية', is_rtl: true },
+	{ code: 'hi', locale: 'hi_IN', name: 'Hindi', native_name: 'हिन्दी' },
+	{ code: 'ko', locale: 'ko_KR', name: 'Korean', native_name: '한국어' },
+	{ code: 'tr', locale: 'tr_TR', name: 'Turkish', native_name: 'Türkçe' },
+	{ code: 'nl', locale: 'nl_NL', name: 'Dutch', native_name: 'Nederlands' },
+	{ code: 'pl', locale: 'pl_PL', name: 'Polish', native_name: 'Polski' },
 ];
 
 const STEPS = [

@@ -19,6 +19,17 @@ class Settings extends Controller {
 		'onboarding_complete',
 		'auto_redirect_browser_lang',
 		'translate_emails',
+		// Language switcher appearance.
+		'switcher_display',
+		'switcher_show_flag',
+		'switcher_show_name',
+		'switcher_show_native',
+		'switcher_show_code',
+		'switcher_hide_current',
+		'switcher_show_if_single',
+		// Floating switcher.
+		'float_switcher_enabled',
+		'float_switcher_position',
 	];
 
 	public static function init() {
@@ -87,8 +98,20 @@ class Settings extends Controller {
 
 		if ( '' === $lang ) {
 			delete_user_meta( $user_id, \Zentranslate\Admin\ProfileField::META_KEY );
+			delete_user_meta( $user_id, 'locale' );
 		} elseif ( \Zentranslate\Language\Context::is_active( $lang ) ) {
 			update_user_meta( $user_id, \Zentranslate\Admin\ProfileField::META_KEY, $lang );
+			// Sync to WP's native user locale so determine_locale() at boot uses it.
+			$languages = \Zentranslate\Language\Context::active_languages();
+			$locale    = $languages[ $lang ]['locale'] ?? '';
+			if ( $locale ) {
+				$site_locale = get_option( 'WPLANG', '' ) ?: 'en_US';
+				if ( $locale !== $site_locale ) {
+					update_user_meta( $user_id, 'locale', $locale );
+				} else {
+					delete_user_meta( $user_id, 'locale' );
+				}
+			}
 		} else {
 			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );
 		}
@@ -125,6 +148,17 @@ class Settings extends Controller {
 			'onboarding_complete'      => false,
 			'auto_redirect_browser_lang' => false,
 			'translate_emails'          => false,
+			// Language switcher appearance.
+			'switcher_display'          => 'inline',
+			'switcher_show_flag'        => true,
+			'switcher_show_name'        => true,
+			'switcher_show_native'      => false,
+			'switcher_show_code'        => false,
+			'switcher_hide_current'     => false,
+			'switcher_show_if_single'   => false,
+			// Floating switcher.
+			'float_switcher_enabled'    => false,
+			'float_switcher_position'   => 'bottom-right',
 		];
 		$saved = json_decode( get_option( ZTRANS_SETTINGS_NAME, '{}' ), true );
 		if ( ! is_array( $saved ) ) {

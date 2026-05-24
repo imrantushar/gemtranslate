@@ -10,5 +10,6 @@ class Frontend {
 		Frontend\LanguageSwitcher::init();
 		Frontend\LanguageSwitcherBlock::init();
 		Frontend\LanguageSwitcherWidget::init();
+		Frontend\FloatingSwitcher::init();
 	}
 }

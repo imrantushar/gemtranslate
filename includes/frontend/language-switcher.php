@@ -25,12 +25,16 @@ class LanguageSwitcher {
 	}
 
 	public function render_shortcode( $atts ) {
+		$s = $this->saved_settings();
+
 		$atts = shortcode_atts(
 			[
-				'display'     => 'inline',
-				'show_flag'   => '1',
-				'show_name'   => '1',
-				'show_native' => '0',
+				'display'       => $s['switcher_display'],
+				'show_flag'     => $s['switcher_show_flag'] ? '1' : '0',
+				'show_name'     => $s['switcher_show_name'] ? '1' : '0',
+				'show_native'   => $s['switcher_show_native'] ? '1' : '0',
+				'show_code'     => $s['switcher_show_code'] ? '1' : '0',
+				'hide_current'  => $s['switcher_hide_current'] ? '1' : '0',
 			],
 			$atts,
 			'zentranslate_language_switcher'
@@ -41,14 +45,25 @@ class LanguageSwitcher {
 			return '';
 		}
 
+		// Respect "show even when only one language active" setting.
+		if ( count( $languages ) <= 1 && ! $s['switcher_show_if_single'] ) {
+			return '';
+		}
+
 		$current  = Context::current();
 		$rewriter = new UrlRewriter();
 
 		$items = [];
 		foreach ( $languages as $row ) {
 			$is_current = $row['code'] === $current;
-			$url        = $rewriter->current_url_for_language( $row['code'] );
-			$label      = $this->build_label( $row, $atts );
+
+			// Optionally hide the currently active language from the list.
+			if ( $is_current && '1' === (string) $atts['hide_current'] ) {
+				continue;
+			}
+
+			$url   = $rewriter->current_url_for_language( $row['code'] );
+			$label = $this->build_label( $row, $atts );
 
 			$items[] = sprintf(
 				'<li class="ztrans-switcher-item%s"><a href="%s" hreflang="%s" lang="%s"%s>%s</a></li>',
@@ -61,8 +76,39 @@ class LanguageSwitcher {
 			);
 		}
 
+		if ( empty( $items ) ) {
+			return '';
+		}
+
 		$class = 'ztrans-switcher ztrans-switcher--' . sanitize_html_class( $atts['display'] );
+
+		if ( 'dropdown' === $atts['display'] ) {
+			return $this->render_dropdown( $items, $class );
+		}
 		return '<ul class="' . esc_attr( $class ) . '">' . implode( '', $items ) . '</ul>';
+	}
+
+	private function render_dropdown( $items, $class ) {
+		$summary = '<summary class="ztrans-switcher-toggle">' . esc_html__( 'Language', 'zentranslate' ) . '</summary>';
+		return '<details class="' . esc_attr( $class ) . '">' . $summary . '<ul class="ztrans-switcher-dropdown-list">' . implode( '', $items ) . '</ul></details>';
+	}
+
+	/**
+	 * Read saved switcher settings from the global settings object.
+	 * Falls back to the same defaults that Settings::merged() uses so the
+	 * switcher works even before the settings API is called.
+	 */
+	private function saved_settings() {
+		$g = $GLOBALS['ztrans_settings'] ?? null;
+		return [
+			'switcher_display'        => isset( $g->switcher_display ) ? (string) $g->switcher_display : 'inline',
+			'switcher_show_flag'      => isset( $g->switcher_show_flag ) ? (bool) $g->switcher_show_flag : true,
+			'switcher_show_name'      => isset( $g->switcher_show_name ) ? (bool) $g->switcher_show_name : true,
+			'switcher_show_native'    => isset( $g->switcher_show_native ) ? (bool) $g->switcher_show_native : false,
+			'switcher_show_code'      => isset( $g->switcher_show_code ) ? (bool) $g->switcher_show_code : false,
+			'switcher_hide_current'   => isset( $g->switcher_hide_current ) ? (bool) $g->switcher_hide_current : false,
+			'switcher_show_if_single' => isset( $g->switcher_show_if_single ) ? (bool) $g->switcher_show_if_single : false,
+		];
 	}
 
 	private function build_label( $row, $atts ) {
@@ -81,6 +127,9 @@ class LanguageSwitcher {
 			$parts[] = '<span class="ztrans-switcher-native">' . esc_html( $row['native_name'] ) . '</span>';
 		} elseif ( '1' === (string) $atts['show_native'] ) {
 			$parts[] = '<span class="ztrans-switcher-native">(' . esc_html( $row['native_name'] ) . ')</span>';
+		}
+		if ( '1' === (string) ( $atts['show_code'] ?? '0' ) ) {
+			$parts[] = '<span class="ztrans-switcher-code">(' . esc_html( $row['code'] ) . ')</span>';
 		}
 
 		return implode( ' ', $parts );

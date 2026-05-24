@@ -32,13 +32,14 @@ function useSaveMenuItem() {
 	return useMutation({
 		mutationFn: async ({ itemId, lang, payload }) =>
 			unwrap(await api.put(`menus/items/${itemId}/translations/${lang}`, payload)),
-		onSuccess: () => qc.invalidateQueries({ queryKey: ['menus'] }),
+		onSuccess: (_data, { menuId }) =>
+			qc.invalidateQueries({ queryKey: ['menus', menuId, 'items'] }),
 	});
 }
 
 export default function MenusPage() {
 	const langs = useLanguages();
-	const nonDefault = (langs.data || []).filter((l) => !l.is_default);
+	const nonDefault = (langs.data || []).filter((l) => !l.is_default && l.active);
 	const menus = useMenus();
 	const [selectedMenu, setSelectedMenu] = useState('');
 	const [selectedLang, setSelectedLang] = useState('');
@@ -59,12 +60,14 @@ export default function MenusPage() {
 		try {
 			await save.mutateAsync({
 				itemId: item.id,
+				menuId: selectedMenu,
 				lang: selectedLang,
 				payload: {
 					title: draft.title ?? item.translations?.[selectedLang]?.title ?? '',
 					url_override: draft.url_override ?? item.translations?.[selectedLang]?.url_override ?? '',
 				},
 			});
+			setDrafts((d) => { const n = { ...d }; delete n[item.id]; return n; });
 			setToast({ tone: 'success', message: __('Menu item saved.', 'zentranslate') });
 		} catch (err) {
 			setToast({ tone: 'error', message: formatErrorMessage(err) });

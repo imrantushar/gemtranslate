@@ -31,3 +31,20 @@
 #zentranslate-admin-root code {
 	@apply ztrans-rounded ztrans-bg-gray-100 ztrans-px-1.5 ztrans-py-0.5 ztrans-text-xs ztrans-text-gray-700;
 }
+
+/* Nav active state — override WP admin's global <a> colour/decoration rules. */
+#zentranslate-admin-root nav a[aria-current="page"],
+#zentranslate-admin-root nav a[aria-current="page"]:hover,
+#zentranslate-admin-root nav a[aria-current="page"]:focus,
+#zentranslate-admin-root nav a[aria-current="page"]:visited {
+	background-color: #4338ca !important;
+	color: #ffffff !important;
+	text-decoration: none !important;
+}
+
+/* Keep inactive nav links from inheriting WP admin link colours. */
+#zentranslate-admin-root nav a:not([aria-current="page"]),
+#zentranslate-admin-root nav a:not([aria-current="page"]):visited {
+	color: #374151 !important;
+	text-decoration: none !important;
+}
