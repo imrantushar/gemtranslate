@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Zentranslate\Language\Context;
-use Zentranslate\Language\CountryContext;
+use Zentranslate\Translation\EditorContext;
 
 /**
  * Glue between custom-layout translations and the real WP post that backs them.
@@ -210,7 +210,11 @@ class ShadowPostSync {
 	 * the source.
 	 */
 	public static function swap_in_shadow_posts( $posts, $query = null ) {
-		if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+		// Editor surfaces (Gutenberg, classic, edit-tags, edit-list, and the
+		// REST `context=edit` fetch Gutenberg uses) MUST see the source post.
+		// Frontend rendering — including admin-bar "Preview" sessions where the
+		// visitor cookie is set — still gets the shadow swap.
+		if ( EditorContext::is_render_target() ) {
 			return $posts;
 		}
 		if ( Context::is_default() ) {

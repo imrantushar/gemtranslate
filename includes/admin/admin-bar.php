@@ -32,10 +32,25 @@ class AdminBar {
 		$active  = $languages[ $current ] ?? null;
 		$label   = $active ? $active['name'] : strtoupper( $current );
 
+		// When a logged-in admin is browsing the frontend, the switcher is a
+		// preview action — it sets a visitor cookie, not their admin UI
+		// preference. Hint at this in the label when the current frontend
+		// language differs from their admin preference.
+		$prefix = '';
+		if ( ! is_admin() && is_user_logged_in() ) {
+			$user_pref = (string) get_user_meta( get_current_user_id(), ProfileField::META_KEY, true );
+			if ( '' === $user_pref ) {
+				$user_pref = Context::default_code();
+			}
+			if ( $user_pref !== $current ) {
+				$prefix = esc_html__( 'Preview', 'zentranslate' ) . ' · ';
+			}
+		}
+
 		$bar->add_node(
 			[
 				'id'    => 'ztrans-language',
-				'title' => '<span class="ab-icon" style="margin-right:6px">🌐</span><span>' . esc_html( $label ) . '</span>',
+				'title' => '<span class="ab-icon" style="margin-right:6px">🌐</span><span>' . $prefix . esc_html( $label ) . '</span>',
 				'href'  => '#',
 			]
 		);
@@ -61,45 +76,93 @@ class AdminBar {
 		}
 		check_admin_referer( 'ztrans_set_user_lang' );
 
-		$lang    = isset( $_GET['lang'] ) ? sanitize_key( wp_unslash( $_GET['lang'] ) ) : '';
-		$user_id = get_current_user_id();
+		$lang     = isset( $_GET['lang'] ) ? sanitize_key( wp_unslash( $_GET['lang'] ) ) : '';
+		$user_id  = get_current_user_id();
+		$referer  = wp_get_referer() ?: admin_url();
+		$came_from_admin = 0 === strpos( $referer, admin_url() );
 
-		if ( '' === $lang ) {
-			delete_user_meta( $user_id, ProfileField::META_KEY );
-			// Clear the WP native user locale so it falls back to the site default.
-			delete_user_meta( $user_id, 'locale' );
-		} elseif ( Context::is_active( $lang ) ) {
-			update_user_meta( $user_id, ProfileField::META_KEY, $lang );
-			// Sync to WP's native user locale meta. WordPress reads this in
-			// determine_locale() during wp-settings.php boot — before plugins
-			// load — so load_default_textdomain() uses the correct locale from
-			// the very first request after the switch.
-			$languages = Context::active_languages();
-			$locale    = $languages[ $lang ]['locale'] ?? '';
-			if ( $locale ) {
-				$site_locale = get_option( 'WPLANG', '' ) ?: 'en_US';
-				if ( $locale !== $site_locale ) {
-					update_user_meta( $user_id, 'locale', $locale );
-					// Download the WP core language pack if it is not yet installed.
-					// admin-post.php loads wp-admin/includes/admin.php so
-					// wp_download_language_pack() is available here.
-					self::maybe_install_language_pack( $locale );
-				} else {
-					delete_user_meta( $user_id, 'locale' );
-				}
-			}
+		// Split behaviour by where the click came from:
+		//
+		//   - In wp-admin → set the admin's UI preference (user_meta). Persists
+		//     across sessions; takes effect on next admin page load.
+		//   - On the frontend → this is a preview action only. Drop a visitor
+		//     cookie (same shape BrowserRedirect would set on a visitor) and
+		//     redirect to /{lang}/. user_meta is left alone so the admin UI
+		//     language doesn't change behind the user's back.
+		if ( $came_from_admin ) {
+			$this->persist_admin_preference( $user_id, $lang );
+		} elseif ( '' !== $lang && Context::is_active( $lang ) ) {
+			$this->set_frontend_cookie( $lang );
+		} elseif ( '' === $lang ) {
+			$this->clear_frontend_cookie();
 		}
 
-		$redirect = remove_query_arg( [ 'ztrans_lang' ], wp_get_referer() ?: admin_url() );
-
-		// On frontend pages the language is carried in the URL prefix, not user meta.
-		// Redirect to the language-prefixed version so the correct content loads.
-		if ( $lang && 0 !== strpos( $redirect, admin_url() ) ) {
+		$redirect = remove_query_arg( [ 'ztrans_lang' ], $referer );
+		if ( $lang && ! $came_from_admin ) {
 			$redirect = $this->frontend_url_for_lang( $redirect, $lang );
 		}
 
 		wp_safe_redirect( $redirect );
 		exit;
+	}
+
+	/**
+	 * Persist the admin UI language preference for a user. Mirrors the value
+	 * into WP's native `locale` user_meta so `determine_locale()` picks it up
+	 * during the next admin page load.
+	 */
+	private function persist_admin_preference( $user_id, $lang ) {
+		if ( '' === $lang ) {
+			delete_user_meta( $user_id, ProfileField::META_KEY );
+			delete_user_meta( $user_id, 'locale' );
+			return;
+		}
+		if ( ! Context::is_active( $lang ) ) {
+			return;
+		}
+		update_user_meta( $user_id, ProfileField::META_KEY, $lang );
+		$languages = Context::active_languages();
+		$locale    = $languages[ $lang ]['locale'] ?? '';
+		if ( ! $locale ) {
+			return;
+		}
+		$site_locale = get_option( 'WPLANG', '' ) ?: 'en_US';
+		if ( $locale !== $site_locale ) {
+			update_user_meta( $user_id, 'locale', $locale );
+			self::maybe_install_language_pack( $locale );
+		} else {
+			delete_user_meta( $user_id, 'locale' );
+		}
+	}
+
+	/**
+	 * Write the visitor-style language cookie that BrowserRedirect reads.
+	 * Used for frontend-side previewing by logged-in admins.
+	 */
+	private function set_frontend_cookie( $lang ) {
+		if ( headers_sent() ) {
+			return;
+		}
+		setcookie(
+			\Zentranslate\Routing\BrowserRedirect::COOKIE,
+			sanitize_key( $lang ),
+			time() + ( 30 * DAY_IN_SECONDS ),
+			COOKIEPATH ?: '/',
+			COOKIE_DOMAIN ?: ''
+		);
+	}
+
+	private function clear_frontend_cookie() {
+		if ( headers_sent() ) {
+			return;
+		}
+		setcookie(
+			\Zentranslate\Routing\BrowserRedirect::COOKIE,
+			'',
+			time() - 3600,
+			COOKIEPATH ?: '/',
+			COOKIE_DOMAIN ?: ''
+		);
 	}
 
 	/**

@@ -5502,23 +5502,29 @@ function LanguagePicker() {
     // Reload so the new locale activates immediately.
     window.location.reload();
   };
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("label", {
-    className: "ztrans-block ztrans-rounded-md ztrans-bg-ztrans-bg ztrans-px-3 ztrans-py-2",
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("span", {
-      className: "ztrans-block ztrans-text-xs ztrans-font-medium ztrans-text-ztrans-muted",
-      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Admin language', 'zentranslate')
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("select", {
-      value: current,
-      onChange: onChange,
-      disabled: setMine.isPending,
-      className: "ztrans-mt-1 ztrans-w-full ztrans-rounded ztrans-border ztrans-border-ztrans-border ztrans-bg-white ztrans-px-2 ztrans-py-1 ztrans-text-sm",
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("option", {
-        value: "",
-        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Site default', 'zentranslate')
-      }), langs.map(lang => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("option", {
-        value: lang.code,
-        children: [lang.name, " (", lang.code, ")"]
-      }, lang.code))]
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
+    className: "ztrans-rounded-md ztrans-bg-ztrans-bg ztrans-px-3 ztrans-py-2",
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("label", {
+      className: "ztrans-block",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("span", {
+        className: "ztrans-block ztrans-text-xs ztrans-font-medium ztrans-text-ztrans-muted",
+        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Admin UI language', 'zentranslate')
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("select", {
+        value: current,
+        onChange: onChange,
+        disabled: setMine.isPending,
+        className: "ztrans-mt-1 ztrans-w-full ztrans-rounded ztrans-border ztrans-border-ztrans-border ztrans-bg-white ztrans-px-2 ztrans-py-1 ztrans-text-sm",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("option", {
+          value: "",
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Site default', 'zentranslate')
+        }), langs.map(lang => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("option", {
+          value: lang.code,
+          children: [lang.name, " (", lang.code, ")"]
+        }, lang.code))]
+      })]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("p", {
+      className: "ztrans-mt-1 ztrans-mb-0 ztrans-text-[11px] ztrans-leading-snug ztrans-text-ztrans-muted",
+      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Changes the admin interface only. Frontend visitors pick their own language via the switcher.', 'zentranslate')
     })]
   });
 }

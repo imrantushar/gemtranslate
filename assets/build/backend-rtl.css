@@ -833,6 +833,9 @@ input:where([type='file']):focus {
 #zentranslate-admin-root .ztrans-leading-relaxed {
 	line-height: 1.625;
 }
+#zentranslate-admin-root .ztrans-leading-snug {
+	line-height: 1.375;
+}
 #zentranslate-admin-root .ztrans-tracking-wide {
 	letter-spacing: 0.025em;
 }

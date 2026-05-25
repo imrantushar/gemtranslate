@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Zentranslate\Language\Context;
+use Zentranslate\Translation\EditorContext;
 
 /**
  * Swaps post fields (title, content, excerpt) for the current language via
@@ -34,7 +35,7 @@ class PostTranslator {
 	}
 
 	public function filter_title( $title, $post_id_or_post = null ) {
-		if ( Context::is_default() ) {
+		if ( Context::is_default() || EditorContext::is_render_target() ) {
 			return $title;
 		}
 		$post_id = $this->resolve_post_id( $post_id_or_post );
@@ -55,7 +56,7 @@ class PostTranslator {
 	}
 
 	public function filter_content( $content ) {
-		if ( Context::is_default() ) {
+		if ( Context::is_default() || EditorContext::is_render_target() ) {
 			return $content;
 		}
 		global $post;
@@ -76,7 +77,7 @@ class PostTranslator {
 	}
 
 	public function filter_excerpt( $excerpt, $post = null ) {
-		if ( Context::is_default() ) {
+		if ( Context::is_default() || EditorContext::is_render_target() ) {
 			return $excerpt;
 		}
 		$post_id = $this->resolve_post_id( $post );
