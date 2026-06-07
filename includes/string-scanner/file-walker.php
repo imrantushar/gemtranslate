@@ -45,7 +45,11 @@ class FileWalker {
 				continue;
 			}
 			$file_count++;
-			$calls = CallExtractor::extract( $code );
+			$is_js = substr( $path, -4 ) === '.jsx'
+				|| substr( $path, -3 ) === '.js';
+			$calls = $is_js
+				? CallExtractor::extract_js( $code )
+				: CallExtractor::extract( $code );
 			foreach ( $calls as $call ) {
 				if ( '' === $call['text'] ) {
 					continue;
@@ -63,13 +67,17 @@ class FileWalker {
 		if ( ! is_dir( $dir ) ) {
 			return [];
 		}
+
+		// Directories that never contain translatable source strings.
+		$skip_dirs = [ 'node_modules', '.git', '.svn', 'build', 'dist' ];
+
 		$iterator = new \RecursiveIteratorIterator(
 			new \RecursiveCallbackFilterIterator(
 				new \RecursiveDirectoryIterator( $dir, \FilesystemIterator::SKIP_DOTS ),
-				function ( $current ) use ( $skip_vendor ) {
+				function ( $current ) use ( $skip_vendor, $skip_dirs ) {
 					$name = $current->getFilename();
 					if ( $current->isDir() ) {
-						if ( in_array( $name, [ 'node_modules', '.git', '.svn' ], true ) ) {
+						if ( in_array( $name, $skip_dirs, true ) ) {
 							return false;
 						}
 						if ( $skip_vendor && in_array( $name, [ 'vendor', 'libraries' ], true ) ) {
@@ -77,7 +85,18 @@ class FileWalker {
 						}
 						return true;
 					}
-					return self::ends_with( $name, '.php' );
+					// PHP source files.
+					if ( self::ends_with( $name, '.php' ) ) {
+						return true;
+					}
+					// JS/JSX source files — skip compiled/minified variants.
+					if ( self::ends_with( $name, '.jsx' ) ) {
+						return true;
+					}
+					if ( self::ends_with( $name, '.js' ) && ! self::ends_with( $name, '.min.js' ) ) {
+						return true;
+					}
+					return false;
 				}
 			)
 		);

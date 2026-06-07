@@ -298,11 +298,8 @@ class StringTranslator {
 			if ( ! isset( $out[ $code ] ) ) {
 				$out[ $code ] = [ 'total' => $total, 'translated' => 0, 'wp_org' => 0, 'draft' => 0, 'missing' => $total ];
 			}
-			$bucket = match ( (string) $row['status'] ) {
-				'wp_org' => 'wp_org',
-				'draft'  => 'draft',
-				default  => 'translated',
-			};
+			$status_map = [ 'wp_org' => 'wp_org', 'draft' => 'draft' ];
+			$bucket     = $status_map[ (string) $row['status'] ] ?? 'translated';
 			$out[ $code ][ $bucket ] += (int) $row['n'];
 		}
 		foreach ( $out as $code => $stats ) {

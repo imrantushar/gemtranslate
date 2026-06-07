@@ -98,6 +98,22 @@ class TokenExtractor {
 			$core
 		);
 
+		// If any HTML tags remain after inline tokenization (e.g. ABlocks composite
+		// blocks like info-box whose innerHTML contains structural divs, headings,
+		// etc. that the outer-wrapper peeling could not strip), tokenize them too.
+		// This guarantees the translator always sees plain text + {N} tokens only.
+		if ( false !== strpos( $text, '<' ) ) {
+			$text = preg_replace_callback(
+				'/<[^>]+>/s',
+				function( $match ) use ( &$tokens, &$counter ) {
+					$counter++;
+					$tokens[ $counter ] = $match[0];
+					return '{' . $counter . '}';
+				},
+				$text
+			);
+		}
+
 		return [
 			'template' => $template,
 			'tokens'   => $tokens,

@@ -129,6 +129,94 @@ class CallExtractor {
 		return $args;
 	}
 
+	/**
+	 * Extract @wordpress/i18n calls from a JS or JSX file using regex.
+	 *
+	 * Handles:
+	 *   __( 'text', 'domain' )
+	 *   _e  esc_html__  esc_attr__  esc_html_e  esc_attr_e
+	 *   _x( 'text', 'context', 'domain' )
+	 *   _ex  esc_html_x  esc_attr_x
+	 *   _n( 'singular', 'plural', count, 'domain' )
+	 *
+	 * @param string $code File contents.
+	 * @return array<array{text:string,domain:string,context:string,line:int}>
+	 */
+	public static function extract_js( $code ) {
+		$code = (string) $code;
+		$out  = [];
+
+		// A single- or double-quoted JS string (handles basic backslash escapes).
+		$s = "(?:'(?:[^'\\\\\\n]|\\\\.)*'|\"(?:[^\"\\\\\\n]|\\\\.)*\")";
+
+		// 1. __( 'text', 'domain' ) — and esc_html__ / esc_attr__ variants.
+		$simple_re = '/\b(?:__|_e|esc_html__|esc_html_e|esc_attr__|esc_attr_e)\s*\(\s*(' . $s . ')\s*,\s*(' . $s . ')\s*[,)]/u';
+		if ( preg_match_all( $simple_re, $code, $m, PREG_OFFSET_CAPTURE ) ) {
+			foreach ( $m[0] as $i => $hit ) {
+				$text = self::dequote_js( $m[1][ $i ][0] );
+				if ( '' === $text ) {
+					continue;
+				}
+				$out[] = [
+					'text'    => $text,
+					'context' => '',
+					'domain'  => self::dequote_js( $m[2][ $i ][0] ),
+					'line'    => substr_count( substr( $code, 0, $hit[1] ), "\n" ) + 1,
+				];
+			}
+		}
+
+		// 2. _x( 'text', 'context', 'domain' ) — and esc_html_x / esc_attr_x.
+		$ctx_re = '/\b(?:_x|_ex|esc_html_x|esc_attr_x)\s*\(\s*(' . $s . ')\s*,\s*(' . $s . ')\s*,\s*(' . $s . ')\s*[,)]/u';
+		if ( preg_match_all( $ctx_re, $code, $m, PREG_OFFSET_CAPTURE ) ) {
+			foreach ( $m[0] as $i => $hit ) {
+				$text = self::dequote_js( $m[1][ $i ][0] );
+				if ( '' === $text ) {
+					continue;
+				}
+				$out[] = [
+					'text'    => $text,
+					'context' => self::dequote_js( $m[2][ $i ][0] ),
+					'domain'  => self::dequote_js( $m[3][ $i ][0] ),
+					'line'    => substr_count( substr( $code, 0, $hit[1] ), "\n" ) + 1,
+				];
+			}
+		}
+
+		// 3. _n( 'singular', 'plural', count, 'domain' ).
+		// count is a non-string expression — match loosely with [^,)]+.
+		$plural_re = '/\b_n\s*\(\s*(' . $s . ')\s*,\s*' . $s . '\s*,\s*[^,)]+,\s*(' . $s . ')\s*[,)]/u';
+		if ( preg_match_all( $plural_re, $code, $m, PREG_OFFSET_CAPTURE ) ) {
+			foreach ( $m[0] as $i => $hit ) {
+				$text = self::dequote_js( $m[1][ $i ][0] );
+				if ( '' === $text ) {
+					continue;
+				}
+				$out[] = [
+					'text'    => $text,
+					'context' => '',
+					'domain'  => self::dequote_js( $m[2][ $i ][0] ),
+					'line'    => substr_count( substr( $code, 0, $hit[1] ), "\n" ) + 1,
+				];
+			}
+		}
+
+		return $out;
+	}
+
+	private static function dequote_js( $s ) {
+		$s = (string) $s;
+		if ( strlen( $s ) < 2 ) {
+			return $s;
+		}
+		$quote = $s[0];
+		$inner = substr( $s, 1, -1 );
+		if ( "'" === $quote ) {
+			return strtr( $inner, [ "\\'" => "'", '\\\\' => '\\' ] );
+		}
+		return strtr( $inner, [ '\\"' => '"', '\\\\' => '\\', '\\n' => "\n", '\\t' => "\t" ] );
+	}
+
 	private static function dequote( $literal ) {
 		if ( strlen( $literal ) < 2 ) {
 			return $literal;
