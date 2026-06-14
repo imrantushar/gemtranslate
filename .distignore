@@ -1,0 +1,66 @@
+.babelrc
+.editorconfig
+.gitignore
+.gitattributes
+.distignore
+
+.claude/
+.agents/
+.codex/
+.vscode/
+.idea/
+.github/
+
+# Build tooling & dependencies
+node_modules/
+package-lock.json
+package.json
+pnpm-lock.yaml
+yarn.lock
+composer.json
+composer.lock
+vendor/
+webpack.config.js
+postcss.config.js
+tailwind.config.js
+.npmrc
+.nvmrc
+
+# Source (compiled into assets/build/)
+dev_zentranslate/
+
+# Linters / formatters
+.eslintignore
+.eslintrc.js
+.prettierignore
+.prettierrc.json
+.prettierrc.js
+jsconfig.json
+tsconfig.json
+phpcs.xml
+phpcs.xml.dist
+.phpcs.xml.dist
+phpstan.neon
+phpstan.neon.dist
+
+# Tests
+tests/
+phpunit.xml.dist
+.phpunit.result.cache
+
+# Docs / project files
+docs/
+CLAUDE.md
+AGENTS.md
+README.md
+plan.md
+
+# VCS & misc
+.git/
+.DS_Store
+*.map
+*.xml
+*.zip
+*.tar
+*.tar.gz
+*.log
