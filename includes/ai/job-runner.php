@@ -150,10 +150,21 @@ class JobRunner {
 			throw new \RuntimeException( 'No AI translator configured.' );
 		}
 
-		$source_lang = (string) ( get_post_meta( $post_id, '_ztrans_source_lang', true ) ?: \Zentranslate\Language\Context::default_code() );
-		$batch       = [ (string) $post->post_title, (string) $post->post_excerpt, (string) $post->post_content ];
+		$source_lang  = (string) ( get_post_meta( $post_id, '_ztrans_source_lang', true ) ?: \Zentranslate\Language\Context::default_code() );
+		$content_str  = (string) $post->post_content;
+		$is_block     = \Zentranslate\Translation\BlockParser::is_block_content( $content_str );
 
-		// Translation memory pass.
+		// For block content the content field is translated separately via
+		// block-aware extraction, so exclude it from the simple batch.
+		$batch = [
+			0 => (string) $post->post_title,
+			1 => (string) $post->post_excerpt,
+		];
+		if ( ! $is_block ) {
+			$batch[2] = $content_str;
+		}
+
+		// Translation memory pass for the simple batch.
 		$translations = array_fill( 0, 3, null );
 		$to_fetch     = [];
 		if ( ! empty( $opts['use_memory'] ) ) {
@@ -166,31 +177,47 @@ class JobRunner {
 				}
 			}
 		} else {
-			foreach ( $batch as $i => $text ) {
-				$to_fetch[ $i ] = $text;
-			}
+			$to_fetch = $batch;
 		}
 
+		$glossary_pairs = [];
 		if ( ! empty( $to_fetch ) ) {
-			$glossary = Glossary::build_context( $source_lang, $target_lang );
-			$result   = $translator->translate(
+			$glossary       = Glossary::build_context( $source_lang, $target_lang );
+			$glossary_pairs = $glossary['pairs'];
+			$result         = $translator->translate(
 				array_values( $to_fetch ),
 				$source_lang,
 				$target_lang,
-				[ 'preserve_html' => ! empty( $opts['preserve_html'] ), 'glossary' => $glossary['pairs'] ]
+				[ 'preserve_html' => ! empty( $opts['preserve_html'] ), 'glossary' => $glossary_pairs ]
 			);
 			if ( is_wp_error( $result ) ) {
 				throw new \RuntimeException( $result->get_error_message() );
 			}
 			$j = 0;
 			foreach ( array_keys( $to_fetch ) as $orig_index ) {
-				$value = $result['translations'][ $j ] ?? '';
+				$value                       = $result['translations'][ $j ] ?? '';
 				$translations[ $orig_index ] = $value;
 				if ( ! empty( $opts['use_memory'] ) && '' !== $value ) {
 					TranslationMemory::set( $to_fetch[ $orig_index ], $value, $source_lang, $target_lang, $result['provider'] );
 				}
 				$j++;
 			}
+		}
+
+		// Block-aware content translation: walks each block's text fields
+		// individually, protecting HTML wrappers from AI corruption.
+		if ( $is_block ) {
+			if ( empty( $glossary_pairs ) ) {
+				$glossary_pairs = Glossary::build_context( $source_lang, $target_lang )['pairs'];
+			}
+			$translations[2] = self::translate_block_content(
+				$content_str,
+				$source_lang,
+				$target_lang,
+				$opts,
+				$translator,
+				$glossary_pairs
+			);
 		}
 
 		TranslationLoader::save_translation(
@@ -204,6 +231,69 @@ class JobRunner {
 				'status'  => (string) ( $opts['status'] ?? 'publish' ),
 			]
 		);
+	}
+
+	/**
+	 * Translate Gutenberg block content field-by-field using BlockParser so
+	 * that block comment attributes (including third-party block styling JSON
+	 * like ABlocks' inline styles and CSS classes) are never sent to the AI.
+	 *
+	 * For innerHTML fields, HTML tags are replaced with {ZTN} placeholders
+	 * before translation and restored afterwards, preventing the AI from
+	 * modifying class names, inline styles, or data attributes.
+	 */
+	private static function translate_block_content(
+		string $content,
+		string $source_lang,
+		string $target_lang,
+		array $opts,
+		TranslatorInterface $translator,
+		array $glossary_pairs
+	): string {
+		$fields = \Zentranslate\Translation\BlockParser::extract( $content );
+		if ( empty( $fields ) ) {
+			return $content;
+		}
+
+		// Protect HTML tags in innerHTML fields so the AI only sees text.
+		$tag_maps = [];
+		$texts    = [];
+		foreach ( $fields as $i => $field ) {
+			if ( 'innerHTML' === $field['kind'] ) {
+				[ $protected, $tags ] = \Zentranslate\Translation\BlockParser::protect_html( $field['value'] );
+				$tag_maps[ $i ] = $tags;
+				$texts[ $i ]    = $protected;
+			} else {
+				$tag_maps[ $i ] = [];
+				$texts[ $i ]    = $field['value'];
+			}
+		}
+
+		$result = $translator->translate(
+			array_values( $texts ),
+			$source_lang,
+			$target_lang,
+			// HTML is already stripped via placeholders; preserve_html not needed.
+			[ 'preserve_html' => false, 'glossary' => $glossary_pairs ]
+		);
+
+		if ( is_wp_error( $result ) ) {
+			// On AI failure fall back to original content rather than corrupt it.
+			return $content;
+		}
+
+		$raw = array_values( $result['translations'] );
+		$map = [];
+		foreach ( $fields as $i => $field ) {
+			$translated = $raw[ $i ] ?? '';
+			if ( '' !== $translated && 'innerHTML' === $field['kind'] && ! empty( $tag_maps[ $i ] ) ) {
+				$translated = \Zentranslate\Translation\BlockParser::restore_html( $translated, $tag_maps[ $i ] );
+			}
+			// Keep original value when the AI returns nothing.
+			$map[ $field['path'] ] = '' !== $translated ? $translated : $field['value'];
+		}
+
+		return \Zentranslate\Translation\BlockParser::apply( $content, $map );
 	}
 
 	public static function get_job( $job_id ) {

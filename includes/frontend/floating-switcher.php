@@ -28,17 +28,16 @@ class FloatingSwitcher {
 			return;
 		}
 
-		$g       = $GLOBALS['ztrans_settings'] ?? null;
-		$enabled = isset( $g->float_switcher_enabled ) ? (bool) $g->float_switcher_enabled : false;
-		if ( ! $enabled ) {
+		$g            = $GLOBALS['ztrans_settings'] ?? null;
+		$enabled      = isset( $g->float_switcher_enabled ) ? (bool) $g->float_switcher_enabled : false;
+		$is_admin_cap = current_user_can( 'manage_options' );
+
+		// Nothing to render if the switcher is off and the user has no admin actions.
+		if ( ! $enabled && ! $is_admin_cap ) {
 			return;
 		}
 
-		$languages = Context::active_languages();
-		if ( count( $languages ) <= 1 ) {
-			return;
-		}
-
+		$languages   = Context::active_languages();
 		$position    = sanitize_key( (string) ( $g->float_switcher_position ?? 'bottom-right' ) );
 		$show_flag   = isset( $g->switcher_show_flag ) ? (bool) $g->switcher_show_flag : true;
 		$show_name   = isset( $g->switcher_show_name ) ? (bool) $g->switcher_show_name : true;
@@ -47,25 +46,50 @@ class FloatingSwitcher {
 		$current  = Context::current();
 		$rewriter = new UrlRewriter();
 
-		// Build current language label for the trigger button.
-		$current_lang = $languages[ $current ] ?? reset( $languages );
-		$trigger_label = $this->build_label( $current_lang, $show_flag, $show_name, $show_native );
+		// Build language list items — only when the switcher is enabled and there
+		// are at least two active languages.
+		$items_html    = '';
+		$trigger_label = '';
+		if ( $enabled && count( $languages ) > 1 ) {
+			$current_lang  = $languages[ $current ] ?? reset( $languages );
+			$trigger_label = $this->build_label( $current_lang, $show_flag, $show_name, $show_native );
+			foreach ( $languages as $row ) {
+				$is_current  = ( $row['code'] === $current );
+				$url         = $rewriter->current_url_for_language( $row['code'] );
+				$label       = $this->build_label( $row, $show_flag, $show_name, $show_native );
+				$items_html .= sprintf(
+					'<li class="%s"><a href="%s" hreflang="%s" lang="%s"%s>%s</a></li>',
+					$is_current ? 'ztrans-float__item is-current' : 'ztrans-float__item',
+					esc_url( $url ),
+					esc_attr( $row['code'] ),
+					esc_attr( str_replace( '_', '-', $row['locale'] ) ),
+					$is_current ? ' aria-current="true"' : '',
+					$label
+				);
+			}
+		}
 
-		// Build list items.
-		$items_html = '';
-		foreach ( $languages as $row ) {
-			$is_current = ( $row['code'] === $current );
-			$url        = $rewriter->current_url_for_language( $row['code'] );
-			$label      = $this->build_label( $row, $show_flag, $show_name, $show_native );
-			$items_html .= sprintf(
-				'<li class="%s"><a href="%s" hreflang="%s" lang="%s"%s>%s</a></li>',
-				$is_current ? 'ztrans-float__item is-current' : 'ztrans-float__item',
-				esc_url( $url ),
-				esc_attr( $row['code'] ),
-				esc_attr( str_replace( '_', '-', $row['locale'] ) ),
-				$is_current ? ' aria-current="true"' : '',
-				$label
+		// Admin-only "Add new language" link — always shown to admins.
+		$admin_item_html = '';
+		if ( $is_admin_cap ) {
+			$add_url = admin_url( 'admin.php?page=zentranslate' ) . '#/languages';
+			if ( '' !== $items_html ) {
+				$admin_item_html .= '<li class="ztrans-float__divider" role="separator"></li>';
+			}
+			$admin_item_html .= sprintf(
+				'<li class="ztrans-float__item ztrans-float__item--admin"><a href="%s" target="_blank" rel="noopener noreferrer">%s</a></li>',
+				esc_url( $add_url ),
+				'<span class="ztrans-float__flag" aria-hidden="true">+</span> ' . esc_html__( 'Add new language', 'zentranslate' )
 			);
+		}
+
+		if ( '' === $items_html && '' === $admin_item_html ) {
+			return;
+		}
+
+		// Globe icon fallback for admin-only view (switcher disabled).
+		if ( '' === $trigger_label ) {
+			$trigger_label = '<span class="ztrans-float__name" aria-hidden="true">🌐</span>';
 		}
 
 		$pos_class = 'ztrans-float ztrans-float--' . esc_attr( $position );
@@ -81,6 +105,7 @@ class FloatingSwitcher {
 			><?php echo $trigger_label; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></button>
 			<ul class="ztrans-float__menu" role="listbox" aria-label="<?php esc_attr_e( 'Languages', 'zentranslate' ); ?>">
 				<?php echo $items_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php echo $admin_item_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			</ul>
 		</div>
 		<?php
@@ -144,6 +169,9 @@ class FloatingSwitcher {
 .ztrans-float__item a{display:flex;align-items:center;gap:8px;padding:8px 14px;color:#1d2327;text-decoration:none;white-space:nowrap}
 .ztrans-float__item a:hover{background:#f0f0f1}
 .ztrans-float__item.is-current a{font-weight:700;color:#135e96}
+.ztrans-float__divider{height:1px;background:#dcdcde;margin:4px 0}
+.ztrans-float__item--admin a{color:#135e96;font-size:13px}
+.ztrans-float__item--admin a:hover{background:#f0f0f1}
 </style>
 CSS;
 	}
