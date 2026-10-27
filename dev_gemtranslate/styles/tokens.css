@@ -1,0 +1,35 @@
+/**
+ * Design tokens — color, type and shadow values copied 1:1 from GemCRM's
+ * palette (gemcrm/assets/scss/Common/_global.scss) so both admin UIs read as
+ * one product family. Keep this file as the single source of truth for
+ * color/shadow values; components should reference the Tailwind tokens in
+ * tailwind.config.js (which read these vars), not raw hex codes.
+ */
+#gemtranslate-admin-root {
+	--gtrans-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+	--gtrans-primary-color: #006bff;
+	--gtrans-primary-light: #e3e7ff;
+	--gtrans-border-color: #dfe1e5;
+	--gtrans-body-background: #f6f7f8;
+	--gtrans-background: #ffffff;
+	--gtrans-font-color: #131d2b;
+	--gtrans-secondary-color: #f6f7f8;
+	--gtrans-warn-muted: #575e6c;
+	--gtrans-error: #e2483d;
+	--gtrans-error-light: #fde8e7;
+	--gtrans-placeholder: #a2adb9;
+	--gtrans-shadow: none;
+	--gtrans-success: #00ad6b;
+	--gtrans-success-light: rgba(0, 173, 107, 0.1);
+	--gtrans-warning: #fdb022;
+	--gtrans-warning-light: rgba(253, 176, 34, 0.12);
+
+	/* Typography palette */
+	--gtrans-heading-color: #131d2b;
+	--gtrans-label-color: #374151;
+	--gtrans-description-color: #575e6c;
+	--gtrans-accent: var(--gtrans-primary-color);
+	--gtrans-border: var(--gtrans-border-color);
+	--gtrans-divider: #f3f4f6;
+	--gtrans-nav-active-bg: var(--gtrans-primary-light);
+}

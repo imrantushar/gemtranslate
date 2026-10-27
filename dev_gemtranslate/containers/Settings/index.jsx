@@ -5,7 +5,8 @@ import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
-import { Checkbox, Field, Select, TextInput } from '../../components/Input';
+import { Checkbox, Field, TextInput } from '../../components/Input';
+import { Select } from '../../components/ui/Select';
 import { LoadingBlock } from '../../components/Spinner';
 import { useSettings, useSaveSettings } from '../../hooks/useSettings';
 import { useLanguages } from '../../hooks/useLanguages';
@@ -59,7 +60,7 @@ function SwitcherPreview({ values, languages }) {
 	const langs = (languages || []).filter((l) => l.active);
 	if (langs.length === 0) {
 		return (
-			<p className="gtrans-text-xs gtrans-text-gtrans-muted gtrans-italic">
+			<p className="gtrans-text-xs gtrans-text-muted gtrans-italic">
 				{__('Add at least one active language to see the preview.', 'gemtranslate')}
 			</p>
 		);
@@ -79,17 +80,17 @@ function SwitcherPreview({ values, languages }) {
 
 	if (values.switcher_display === 'dropdown') {
 		return (
-			<div className="gtrans-inline-block gtrans-rounded-md gtrans-border gtrans-border-gtrans-border gtrans-bg-white gtrans-text-sm">
+			<div className="gtrans-inline-block gtrans-rounded-md gtrans-border gtrans-border-line gtrans-bg-surface gtrans-text-sm">
 				<div className="gtrans-flex gtrans-cursor-pointer gtrans-items-center gtrans-gap-1 gtrans-px-3 gtrans-py-2 gtrans-font-medium">
 					{items.find((i) => i.isDefault)?.label || items[0]?.label}
-					<span className="gtrans-text-xs gtrans-text-gtrans-muted">▾</span>
+					<span className="gtrans-text-xs gtrans-text-muted">▾</span>
 				</div>
-				<ul className="gtrans-m-0 gtrans-list-none gtrans-border-t gtrans-border-gtrans-border gtrans-p-0">
+				<ul className="gtrans-m-0 gtrans-list-none gtrans-border-t gtrans-border-line gtrans-p-0">
 					{items.map((item, i) => (
 						<li
 							key={i}
 							className={`gtrans-px-3 gtrans-py-1.5 gtrans-text-sm ${
-								item.isDefault ? 'gtrans-font-semibold' : 'gtrans-text-gray-700'
+								item.isDefault ? 'gtrans-font-semibold' : 'gtrans-text-label'
 							}`}
 						>
 							{item.label}
@@ -107,8 +108,8 @@ function SwitcherPreview({ values, languages }) {
 					key={i}
 					className={`gtrans-text-sm ${
 						item.isDefault
-							? 'gtrans-font-semibold gtrans-text-gtrans-primary'
-							: 'gtrans-text-gray-700'
+							? 'gtrans-font-semibold gtrans-text-primary'
+							: 'gtrans-text-label'
 					}`}
 				>
 					{item.label}
@@ -226,7 +227,7 @@ export default function SettingsPage() {
 							checked={!!values.auto_translate}
 							onChange={(e) => set('auto_translate', e.target.checked)}
 						/>
-						<p className="gtrans-mt-1 gtrans-mb-0 gtrans-text-xs gtrans-text-gtrans-muted">
+						<p className="gtrans-mt-1 gtrans-mb-0 gtrans-text-xs gtrans-text-muted">
 							{__(
 								'Uses your configured AI provider. Only source-language content is translated; existing translations are never overwritten unless you enable re-translation below.',
 								'gemtranslate'
@@ -250,7 +251,7 @@ export default function SettingsPage() {
 								</Field>
 
 								<div>
-									<div className="gtrans-mb-1.5 gtrans-text-sm gtrans-font-medium gtrans-text-gray-700">
+									<div className="gtrans-mb-1.5 gtrans-text-sm gtrans-font-medium gtrans-text-label">
 										{__('Post types to translate', 'gemtranslate')}
 									</div>
 									<div className="gtrans-flex gtrans-flex-wrap gtrans-gap-3">
@@ -272,11 +273,11 @@ export default function SettingsPage() {
 								</div>
 
 								<div>
-									<div className="gtrans-mb-1.5 gtrans-text-sm gtrans-font-medium gtrans-text-gray-700">
+									<div className="gtrans-mb-1.5 gtrans-text-sm gtrans-font-medium gtrans-text-label">
 										{__('Target languages', 'gemtranslate')}
 									</div>
 									{activeTargets.length === 0 ? (
-										<p className="gtrans-m-0 gtrans-text-xs gtrans-text-gtrans-muted">
+										<p className="gtrans-m-0 gtrans-text-xs gtrans-text-muted">
 											{__('Add at least one active non-default language first.', 'gemtranslate')}
 										</p>
 									) : (
@@ -294,7 +295,7 @@ export default function SettingsPage() {
 													/>
 												))}
 											</div>
-											<p className="gtrans-mt-1 gtrans-mb-0 gtrans-text-xs gtrans-text-gtrans-muted">
+											<p className="gtrans-mt-1 gtrans-mb-0 gtrans-text-xs gtrans-text-muted">
 												{__(
 													'Leave all checked to translate into every active language.',
 													'gemtranslate'
@@ -313,13 +314,13 @@ export default function SettingsPage() {
 									onChange={(e) => set('auto_retranslate_on_update', e.target.checked)}
 								/>
 
-								<div className="gtrans-rounded-md gtrans-border gtrans-border-gtrans-border gtrans-bg-gtrans-bg gtrans-p-3">
+								<div className="gtrans-rounded-md gtrans-border gtrans-border-line gtrans-bg-body gtrans-p-3">
 									<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-justify-between gtrans-gap-3">
 										<div>
-											<div className="gtrans-text-sm gtrans-font-medium gtrans-text-gray-800">
+											<div className="gtrans-text-sm gtrans-font-medium gtrans-text-ink">
 												{__('Translate existing content now', 'gemtranslate')}
 											</div>
-											<div className="gtrans-text-xs gtrans-text-gtrans-muted">
+											<div className="gtrans-text-xs gtrans-text-muted">
 												{__(
 													'Queues jobs for all already-published content using the settings above.',
 													'gemtranslate'
@@ -336,7 +337,7 @@ export default function SettingsPage() {
 										</Button>
 									</div>
 									{backfill && (backfill.running || backfill.queued > 0) && (
-										<div className="gtrans-mt-2 gtrans-text-xs gtrans-text-gray-600">
+										<div className="gtrans-mt-2 gtrans-text-xs gtrans-text-muted">
 											{sprintf(
 												/* translators: %d: jobs queued so far. */
 												__('%d jobs queued so far…', 'gemtranslate'),
@@ -358,7 +359,7 @@ export default function SettingsPage() {
 						checked={!!values.auto_redirect_browser_lang}
 						onChange={(e) => set('auto_redirect_browser_lang', e.target.checked)}
 					/>
-					<p className="gtrans-mt-1 gtrans-mb-3 gtrans-text-xs gtrans-text-gtrans-muted">
+					<p className="gtrans-mt-1 gtrans-mb-3 gtrans-text-xs gtrans-text-muted">
 						{__(
 							'Matches Accept-Language against active languages; 302s once and remembers the choice in a cookie.',
 							'gemtranslate'
@@ -369,7 +370,7 @@ export default function SettingsPage() {
 						checked={!!values.translate_emails}
 						onChange={(e) => set('translate_emails', e.target.checked)}
 					/>
-					<p className="gtrans-mt-1 gtrans-mb-0 gtrans-text-xs gtrans-text-gtrans-muted">
+					<p className="gtrans-mt-1 gtrans-mb-0 gtrans-text-xs gtrans-text-muted">
 						{__(
 							"Switches WP locale for the duration of each wp_mail() call to match the recipient's GemTranslate preferred language.",
 							'gemtranslate'
@@ -389,7 +390,7 @@ export default function SettingsPage() {
 							</option>
 						</Select>
 					</Field>
-					<p className="gtrans-mt-3 gtrans-mb-0 gtrans-text-xs gtrans-text-gtrans-muted">
+					<p className="gtrans-mt-3 gtrans-mb-0 gtrans-text-xs gtrans-text-muted">
 						{__(
 							'Subdirectory URLs cache cleanly with page-cache plugins. Subdomain and per-domain modes are planned for v2.',
 							'gemtranslate'
@@ -424,7 +425,7 @@ export default function SettingsPage() {
 						checked={!!values.remove_data_on_uninstall}
 						onChange={(e) => set('remove_data_on_uninstall', e.target.checked)}
 					/>
-					<p className="gtrans-mt-2 gtrans-mb-0 gtrans-text-xs gtrans-text-gtrans-muted">
+					<p className="gtrans-mt-2 gtrans-mb-0 gtrans-text-xs gtrans-text-muted">
 						{__(
 							'When enabled, removing the plugin from WP admin drops all wp_gtrans_* tables and clears GemTranslate options.',
 							'gemtranslate'
@@ -478,7 +479,7 @@ export default function SettingsPage() {
 							onChange={(e) => set('switcher_show_if_single', e.target.checked)}
 						/>
 
-						<p className="gtrans-mt-1 gtrans-mb-0 gtrans-text-xs gtrans-text-gtrans-muted">
+						<p className="gtrans-mt-1 gtrans-mb-0 gtrans-text-xs gtrans-text-muted">
 							{__(
 								'These are the defaults for the shortcode, widget, and block. Each instance can override them via its own settings.',
 								'gemtranslate'
@@ -488,24 +489,24 @@ export default function SettingsPage() {
 				</Card>
 
 				<Card title={__('Live preview', 'gemtranslate')}>
-					<p className="gtrans-mb-3 gtrans-text-xs gtrans-text-gtrans-muted">
+					<p className="gtrans-mb-3 gtrans-text-xs gtrans-text-muted">
 						{__(
 							'Shows how the switcher looks with the current settings. The bold item is the default language.',
 							'gemtranslate'
 						)}
 					</p>
-					<div className="gtrans-rounded-md gtrans-border gtrans-border-gtrans-border gtrans-bg-gtrans-bg gtrans-p-4">
+					<div className="gtrans-rounded-md gtrans-border gtrans-border-line gtrans-bg-body gtrans-p-4">
 						<SwitcherPreview values={values} languages={languages.data} />
 					</div>
 
 					<div className="gtrans-mt-5">
-						<p className="gtrans-mb-1 gtrans-text-xs gtrans-font-semibold gtrans-text-gray-700">
+						<p className="gtrans-mb-1 gtrans-text-xs gtrans-font-semibold gtrans-text-label">
 							{__('Shortcode', 'gemtranslate')}
 						</p>
-						<code className="gtrans-block gtrans-rounded gtrans-bg-gray-100 gtrans-px-3 gtrans-py-2 gtrans-text-xs gtrans-text-gray-800 gtrans-select-all">
+						<code className="gtrans-block gtrans-rounded gtrans-bg-body gtrans-px-3 gtrans-py-2 gtrans-text-xs gtrans-text-ink gtrans-select-all">
 							{'[gemtranslate_language_switcher]'}
 						</code>
-						<p className="gtrans-mt-2 gtrans-mb-0 gtrans-text-xs gtrans-text-gtrans-muted">
+						<p className="gtrans-mt-2 gtrans-mb-0 gtrans-text-xs gtrans-text-muted">
 							{__(
 								'Paste anywhere in a post, page, or text widget. Accepts display, show_flag, show_name, show_native, show_code, hide_current attributes to override the defaults above.',
 								'gemtranslate'
@@ -524,7 +525,7 @@ export default function SettingsPage() {
 							checked={!!values.geo_enabled}
 							onChange={(e) => set('geo_enabled', e.target.checked)}
 						/>
-						<p className="gtrans-mt-1 gtrans-mb-0 gtrans-text-xs gtrans-text-gtrans-muted">
+						<p className="gtrans-mt-1 gtrans-mb-0 gtrans-text-xs gtrans-text-muted">
 							{__(
 								"When enabled, the visitor's country is detected once per session and used to pick country-specific page variants and (optionally) the default language.",
 								'gemtranslate'
@@ -616,7 +617,7 @@ export default function SettingsPage() {
 							checked={!!values.float_switcher_enabled}
 							onChange={(e) => set('float_switcher_enabled', e.target.checked)}
 						/>
-						<p className="gtrans-mt-1 gtrans-mb-0 gtrans-text-xs gtrans-text-gtrans-muted">
+						<p className="gtrans-mt-1 gtrans-mb-0 gtrans-text-xs gtrans-text-muted">
 							{__(
 								'Injects a fixed-position language button on every frontend page — no shortcode or theme edits needed. Visible to all visitors including logged-out users.',
 								'gemtranslate'

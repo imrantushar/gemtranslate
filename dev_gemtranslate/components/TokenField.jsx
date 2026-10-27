@@ -216,7 +216,7 @@ export default function TokenField({
 			onKeyDown={onKeyDown}
 			onPaste={onPaste}
 			onFocus={onFocus}
-			className={`gtrans-tokenfield gtrans-w-full gtrans-rounded-md gtrans-border gtrans-border-gtrans-border gtrans-bg-white gtrans-px-3 gtrans-py-2 gtrans-text-sm gtrans-leading-relaxed gtrans-text-gray-900 focus:gtrans-border-gtrans-primary focus:gtrans-outline-none ${
+			className={`gtrans-tokenfield gtrans-w-full gtrans-rounded-md gtrans-border gtrans-border-line gtrans-bg-surface gtrans-px-3 gtrans-py-2 gtrans-text-sm gtrans-leading-relaxed gtrans-text-ink focus:gtrans-border-primary focus:gtrans-outline-none ${
 				singleLine
 					? 'gtrans-whitespace-nowrap gtrans-overflow-x-auto'
 					: 'gtrans-min-h-[2.5rem] gtrans-whitespace-pre-wrap'

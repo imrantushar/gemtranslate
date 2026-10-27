@@ -24,11 +24,11 @@ export function UpsellCard({ title, description }) {
 				<span className="gtrans-rounded-full gtrans-bg-amber-100 gtrans-px-3 gtrans-py-1 gtrans-text-xs gtrans-font-semibold gtrans-uppercase gtrans-text-amber-700">
 					{__('GemTranslate Pro', 'gemtranslate')}
 				</span>
-				<h3 className="gtrans-m-0 gtrans-text-lg gtrans-font-semibold gtrans-text-gray-900">
+				<h3 className="gtrans-m-0 gtrans-text-lg gtrans-font-semibold gtrans-text-ink">
 					{title || __('This is a Pro feature', 'gemtranslate')}
 				</h3>
 				{description && (
-					<p className="gtrans-m-0 gtrans-max-w-lg gtrans-text-sm gtrans-text-gtrans-muted">
+					<p className="gtrans-m-0 gtrans-max-w-lg gtrans-text-sm gtrans-text-muted">
 						{description}
 					</p>
 				)}
@@ -36,7 +36,7 @@ export function UpsellCard({ title, description }) {
 					href="https://gemtranslate.com/pro"
 					target="_blank"
 					rel="noopener noreferrer"
-					className="gtrans-mt-1 gtrans-inline-flex gtrans-items-center gtrans-gap-2 gtrans-rounded-md gtrans-bg-gtrans-primary gtrans-px-4 gtrans-py-2 gtrans-text-sm gtrans-font-medium gtrans-text-white gtrans-no-underline hover:gtrans-bg-gtrans-primary-hover"
+					className="gtrans-mt-1 gtrans-inline-flex gtrans-items-center gtrans-gap-2 gtrans-rounded-md gtrans-bg-primary gtrans-px-4 gtrans-py-2 gtrans-text-sm gtrans-font-medium gtrans-text-white gtrans-no-underline hover:gtrans-bg-primary-hover"
 				>
 					{__('Upgrade to Pro →', 'gemtranslate')}
 				</a>

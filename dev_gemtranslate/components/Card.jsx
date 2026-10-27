@@ -2,10 +2,10 @@ import clsx from 'clsx';
 
 export default function Card({ title, action, children, className, padded = true }) {
 	return (
-		<section className={clsx('gtrans-rounded-lg gtrans-bg-white gtrans-shadow-card', className)}>
+		<section className={clsx('gtrans-rounded-lg gtrans-border gtrans-border-edge gtrans-bg-surface gtrans-shadow-gtrans', className)}>
 			{(title || action) && (
-				<header className="gtrans-flex gtrans-items-center gtrans-justify-between gtrans-border-b gtrans-border-gtrans-border gtrans-px-5 gtrans-py-3">
-					{title && <h2 className="gtrans-m-0 gtrans-text-sm gtrans-font-semibold gtrans-text-gray-800">{title}</h2>}
+				<header className="gtrans-flex gtrans-items-center gtrans-justify-between gtrans-border-b gtrans-border-divider gtrans-px-5 gtrans-py-3">
+					{title && <h2 className="gtrans-section-title">{title}</h2>}
 					{action}
 				</header>
 			)}

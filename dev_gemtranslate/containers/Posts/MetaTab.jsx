@@ -29,7 +29,7 @@ export default function MetaTab({ postId, sourceLang, targetLang }) {
 	if (!data.data || data.data.length === 0) {
 		return (
 			<Card>
-				<p className="gtrans-m-0 gtrans-text-sm gtrans-text-gtrans-muted">
+				<p className="gtrans-m-0 gtrans-text-sm gtrans-text-muted">
 					{__('This post has no translatable custom fields. ACF fields and any non-internal postmeta appear here automatically.', 'gemtranslate')}
 				</p>
 			</Card>

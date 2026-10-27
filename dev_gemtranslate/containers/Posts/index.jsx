@@ -5,7 +5,9 @@ import { __, sprintf } from '@wordpress/i18n';
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import StatusPill from '../../components/StatusPill';
-import { Field, Select, TextInput, Checkbox } from '../../components/Input';
+import { Field, TextInput, Checkbox } from '../../components/Input';
+import { RawSelect as ReactSelect } from '../../components/ui/Select';
+import { Table } from '../../components/ui/Table';
 import { LoadingBlock } from '../../components/Spinner';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
@@ -34,6 +36,13 @@ export default function PostsPage() {
 	const langs = languages.data || [];
 	const nonDefault = langs.filter((l) => !l.is_default && l.active);
 	const types = postTypes.data || [];
+	const typeOptions = (types.length === 0
+		? [
+				{ value: 'post', label: __('Posts', 'gemtranslate') },
+				{ value: 'page', label: __('Pages', 'gemtranslate') },
+			]
+		: types.map((t) => ({ value: t.name, label: t.label }))
+	);
 
 	const [selectedIds, setSelectedIds] = useState([]);
 	const [selectedLangs, setSelectedLangs] = useState([]);
@@ -105,27 +114,16 @@ export default function PostsPage() {
 			<Card padded={false}>
 				<form
 					onSubmit={runSearch}
-					className="gtrans-flex gtrans-flex-wrap gtrans-items-end gtrans-gap-3 gtrans-border-b gtrans-border-gtrans-border gtrans-px-4 gtrans-py-3"
+					className="gtrans-flex gtrans-flex-wrap gtrans-items-end gtrans-gap-3 gtrans-border-b gtrans-border-line gtrans-px-4 gtrans-py-3"
 				>
-					<div className="gtrans-min-w-[160px]">
+					<div className="gtrans-min-w-[180px]">
 						<Field label={__('Post type', 'gemtranslate')}>
-							<Select
-								value={filters.post_type}
-								onChange={(e) => setFilters((f) => ({ ...f, post_type: e.target.value, page: 1 }))}
-							>
-								{types.length === 0 ? (
-									<>
-										<option value="post">{__('Posts', 'gemtranslate')}</option>
-										<option value="page">{__('Pages', 'gemtranslate')}</option>
-									</>
-								) : (
-									types.map((t) => (
-										<option key={t.name} value={t.name}>
-											{t.label}
-										</option>
-									))
-								)}
-							</Select>
+							<ReactSelect
+								value={typeOptions.find((o) => o.value === filters.post_type) || null}
+								onChange={(opt) => setFilters((f) => ({ ...f, post_type: opt?.value || 'post', page: 1 }))}
+								options={typeOptions}
+								isSearchable={false}
+							/>
 						</Field>
 					</div>
 					<div className="gtrans-min-w-[200px] gtrans-flex-1">
@@ -143,7 +141,7 @@ export default function PostsPage() {
 				</form>
 
 				{selectedIds.length > 0 && hasFeature('ai_bulk') && (
-					<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-justify-between gtrans-gap-3 gtrans-border-b gtrans-border-gtrans-border gtrans-bg-blue-50 gtrans-px-4 gtrans-py-3 gtrans-text-sm">
+					<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-justify-between gtrans-gap-3 gtrans-border-b gtrans-border-line gtrans-bg-primary-light gtrans-px-4 gtrans-py-3 gtrans-text-sm">
 						<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-3">
 							<strong>
 								{sprintf(
@@ -187,82 +185,79 @@ export default function PostsPage() {
 				{posts.isLoading ? (
 					<LoadingBlock>{__('Loading posts…', 'gemtranslate')}</LoadingBlock>
 				) : posts.data?.rows.length === 0 ? (
-					<p className="gtrans-px-5 gtrans-py-8 gtrans-text-center gtrans-text-sm gtrans-text-gtrans-muted">
+					<p className="gtrans-px-5 gtrans-py-8 gtrans-text-center gtrans-text-sm gtrans-text-muted">
 						{__('No posts found.', 'gemtranslate')}
 					</p>
 				) : (
-					<table className="gtrans-w-full gtrans-text-sm">
-						<thead className="gtrans-bg-gtrans-bg gtrans-text-left gtrans-text-xs gtrans-uppercase gtrans-text-gtrans-muted">
-							<tr>
-								<th className="gtrans-px-4 gtrans-py-3 gtrans-w-10">
-									<input
-										type="checkbox"
-										checked={allVisibleSelected}
-										onChange={toggleSelectAll}
-										aria-label={__('Select all visible', 'gemtranslate')}
-									/>
-								</th>
-								<th className="gtrans-px-4 gtrans-py-3">{__('Title', 'gemtranslate')}</th>
-								<th className="gtrans-px-4 gtrans-py-3">{__('Status', 'gemtranslate')}</th>
-								{nonDefault.map((l) => (
-									<th key={l.code} className="gtrans-px-4 gtrans-py-3">
-										{l.code.toUpperCase()}
-									</th>
-								))}
-								<th className="gtrans-px-4 gtrans-py-3" />
-							</tr>
-						</thead>
-						<tbody>
-							{(posts.data?.rows || []).map((row) => (
-								<tr key={row.id} className="gtrans-border-t gtrans-border-gtrans-border">
-									<td className="gtrans-px-4 gtrans-py-3">
+					<Table.ScrollArea>
+						<Table.Root>
+							<Table.Header>
+								<Table.Row>
+									<Table.ColumnHeader className="gtrans-w-10">
 										<input
 											type="checkbox"
-											checked={selectedIds.includes(row.id)}
-											onChange={() => toggleOne(row.id)}
-											aria-label={`Select post ${row.id}`}
+											checked={allVisibleSelected}
+											onChange={toggleSelectAll}
+											aria-label={__('Select all visible', 'gemtranslate')}
 										/>
-									</td>
-									<td className="gtrans-px-4 gtrans-py-3 gtrans-max-w-[360px]">
-										<div className="gtrans-font-medium gtrans-text-gray-900">
-											{truncate(row.title, 60)}
-										</div>
-										<div className="gtrans-text-xs gtrans-text-gtrans-muted">/{row.slug}</div>
-									</td>
-									<td className="gtrans-px-4 gtrans-py-3">
-										<StatusPill tone={STATUS_TONE[row.status] || 'none'}>{row.status}</StatusPill>
-									</td>
-									{nonDefault.map((l) => {
-										const status = row.translations_status?.[l.code];
-										return (
-											<td key={l.code} className="gtrans-px-4 gtrans-py-3">
-												{status ? (
-													<StatusPill tone={STATUS_TONE[status] || 'pending'}>
-														{status === 'stale' ? __('stale', 'gemtranslate') : status}
-													</StatusPill>
-												) : (
-													<StatusPill tone="none">—</StatusPill>
-												)}
-											</td>
-										);
-									})}
-									<td className="gtrans-px-4 gtrans-py-3 gtrans-text-right">
-										<Link
-											to={`/posts/${row.id}`}
-											className="gtrans-rounded-md gtrans-bg-gtrans-primary gtrans-px-3 gtrans-py-1.5 gtrans-text-xs gtrans-text-white gtrans-no-underline"
-										>
-											{__('Translate', 'gemtranslate')}
-										</Link>
-									</td>
-								</tr>
-							))}
-						</tbody>
-					</table>
+									</Table.ColumnHeader>
+									<Table.ColumnHeader>{__('Title', 'gemtranslate')}</Table.ColumnHeader>
+									<Table.ColumnHeader>{__('Status', 'gemtranslate')}</Table.ColumnHeader>
+									{nonDefault.map((l) => (
+										<Table.ColumnHeader key={l.code}>{l.code.toUpperCase()}</Table.ColumnHeader>
+									))}
+									<Table.ColumnHeader />
+								</Table.Row>
+							</Table.Header>
+							<Table.Body>
+								{(posts.data?.rows || []).map((row) => (
+									<Table.Row key={row.id}>
+										<Table.Cell>
+											<input
+												type="checkbox"
+												checked={selectedIds.includes(row.id)}
+												onChange={() => toggleOne(row.id)}
+												aria-label={`Select post ${row.id}`}
+											/>
+										</Table.Cell>
+										<Table.Cell className="gtrans-max-w-[360px]">
+											<div className="gtrans-font-medium gtrans-text-ink">
+												{truncate(row.title, 60)}
+											</div>
+											<div className="gtrans-text-xs gtrans-text-muted">/{row.slug}</div>
+										</Table.Cell>
+										<Table.Cell>
+											<StatusPill tone={STATUS_TONE[row.status] || 'none'}>{row.status}</StatusPill>
+										</Table.Cell>
+										{nonDefault.map((l) => {
+											const status = row.translations_status?.[l.code];
+											return (
+												<Table.Cell key={l.code}>
+													{status ? (
+														<StatusPill tone={STATUS_TONE[status] || 'pending'}>
+															{status === 'stale' ? __('stale', 'gemtranslate') : status}
+														</StatusPill>
+													) : (
+														<StatusPill tone="none">—</StatusPill>
+													)}
+												</Table.Cell>
+											);
+										})}
+										<Table.Cell className="gtrans-text-right">
+											<Button as={Link} to={`/posts/${row.id}`} variant="primary" size="sm">
+												{__('Translate', 'gemtranslate')}
+											</Button>
+										</Table.Cell>
+									</Table.Row>
+								))}
+							</Table.Body>
+						</Table.Root>
+					</Table.ScrollArea>
 				)}
 
 				{posts.data?.meta?.total_pages > 1 && (
-					<div className="gtrans-flex gtrans-justify-between gtrans-border-t gtrans-border-gtrans-border gtrans-px-4 gtrans-py-3 gtrans-text-sm">
-						<span className="gtrans-text-gtrans-muted">
+					<div className="gtrans-flex gtrans-justify-between gtrans-border-t gtrans-border-line gtrans-px-4 gtrans-py-3 gtrans-text-sm">
+						<span className="gtrans-text-muted">
 							{sprintf(
 								/* translators: 1: current page, 2: total pages. */
 								__('Page %1$d of %2$d', 'gemtranslate'),

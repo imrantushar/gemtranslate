@@ -131,7 +131,7 @@ export default function AdvancedEditor({ postId, sourceLang, targetLang, country
 	if (fields.length === 0) {
 		return (
 			<Card>
-				<p className="gtrans-m-0 gtrans-text-sm gtrans-text-gtrans-muted">
+				<p className="gtrans-m-0 gtrans-text-sm gtrans-text-muted">
 					{__('This post has no translatable text.', 'gemtranslate')}
 				</p>
 			</Card>
@@ -256,9 +256,9 @@ export default function AdvancedEditor({ postId, sourceLang, targetLang, country
 	return (
 		<>
 			{/* ---- Sticky progress + actions ---- */}
-			<div className="gtrans-sticky gtrans-top-0 gtrans-z-10 gtrans-mb-4 gtrans-rounded-lg gtrans-border gtrans-border-gtrans-border gtrans-bg-white gtrans-p-4 gtrans-shadow-sm">
+			<div className="gtrans-sticky gtrans-top-0 gtrans-z-10 gtrans-mb-4 gtrans-rounded-lg gtrans-border gtrans-border-line gtrans-bg-surface gtrans-p-4 gtrans-shadow-sm">
 				<div className="gtrans-mb-2 gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-justify-between gtrans-gap-3">
-					<div className="gtrans-text-sm gtrans-font-medium gtrans-text-gray-800">
+					<div className="gtrans-text-sm gtrans-font-medium gtrans-text-ink">
 						{sprintf(
 							/* translators: 1: confirmed count, 2: total, 3: percent. */
 							__('%1$d of %2$d segments complete (%3$d%%)', 'gemtranslate'),
@@ -266,7 +266,7 @@ export default function AdvancedEditor({ postId, sourceLang, targetLang, country
 							totalSegs,
 							pct
 						)}
-						<span className="gtrans-ml-2 gtrans-text-xs gtrans-font-normal gtrans-text-gtrans-muted">
+						<span className="gtrans-ml-2 gtrans-text-xs gtrans-font-normal gtrans-text-muted">
 							{sprintf(
 								/* translators: %d: translated segment count. */
 								__('· %d translated', 'gemtranslate'),
@@ -285,7 +285,7 @@ export default function AdvancedEditor({ postId, sourceLang, targetLang, country
 						</Button>
 					</div>
 				</div>
-				<div className="gtrans-h-2 gtrans-w-full gtrans-overflow-hidden gtrans-rounded-full gtrans-bg-gray-100">
+				<div className="gtrans-h-2 gtrans-w-full gtrans-overflow-hidden gtrans-rounded-full gtrans-bg-body">
 					<div
 						className="gtrans-h-full gtrans-rounded-full gtrans-bg-green-500 gtrans-transition-all"
 						style={{ width: `${pct}%` }}
@@ -294,7 +294,7 @@ export default function AdvancedEditor({ postId, sourceLang, targetLang, country
 			</div>
 
 			{glossaryPairs.length > 0 && (
-				<p className="gtrans-mb-3 gtrans-text-xs gtrans-text-gtrans-muted">
+				<p className="gtrans-mb-3 gtrans-text-xs gtrans-text-muted">
 					<span className="gtrans-gloss gtrans-mr-1">{__('highlighted', 'gemtranslate')}</span>
 					{__('words are glossary terms — hover to see the preferred translation.', 'gemtranslate')}
 				</p>
@@ -349,11 +349,11 @@ function FieldGroup({
 }) {
 	const toolbar = useMemo(() => buildToolbar(field.tokens || {}), [field.tokens]);
 	return (
-		<div className="gtrans-rounded-lg gtrans-border gtrans-border-gtrans-border gtrans-bg-white">
-			<div className="gtrans-border-b gtrans-border-gtrans-border gtrans-px-4 gtrans-py-2 gtrans-text-xs gtrans-font-semibold gtrans-uppercase gtrans-tracking-wide gtrans-text-gtrans-muted">
+		<div className="gtrans-rounded-lg gtrans-border gtrans-border-line gtrans-bg-surface">
+			<div className="gtrans-border-b gtrans-border-line gtrans-px-4 gtrans-py-2 gtrans-text-xs gtrans-font-semibold gtrans-uppercase gtrans-tracking-wide gtrans-text-muted">
 				{labelFor(field)}
 				{field.collapsed && (
-					<span className="gtrans-ml-2 gtrans-rounded gtrans-bg-gray-100 gtrans-px-1.5 gtrans-py-0.5 gtrans-normal-case gtrans-text-[10px] gtrans-text-gray-500">
+					<span className="gtrans-ml-2 gtrans-rounded gtrans-bg-body gtrans-px-1.5 gtrans-py-0.5 gtrans-normal-case gtrans-text-[10px] gtrans-text-muted">
 						{__('whole field', 'gemtranslate')}
 					</span>
 				)}
@@ -408,7 +408,7 @@ function SegmentRow({
 	return (
 		<div className="gtrans-grid gtrans-grid-cols-1 lg:gtrans-grid-cols-[1fr_1fr_auto] gtrans-gap-3 gtrans-p-4">
 			{/* Source */}
-			<div className="gtrans-rounded-md gtrans-bg-gtrans-bg gtrans-p-2.5 gtrans-text-sm gtrans-leading-relaxed gtrans-text-gray-700">
+			<div className="gtrans-rounded-md gtrans-bg-body gtrans-p-2.5 gtrans-text-sm gtrans-leading-relaxed gtrans-text-label">
 				{renderSource(seg.core, tokens, glossaryPairs)}
 			</div>
 
@@ -421,17 +421,17 @@ function SegmentRow({
 							type="button"
 							title={a.label}
 							onClick={() => insertRef.current && insertRef.current(a)}
-							className="gtrans-bare gtrans-rounded gtrans-border gtrans-border-gtrans-border gtrans-bg-white gtrans-px-1.5 gtrans-py-0.5 gtrans-text-[11px] gtrans-font-semibold gtrans-text-gray-600 hover:gtrans-bg-gray-50"
+							className="gtrans-bare gtrans-rounded gtrans-border gtrans-border-line gtrans-bg-surface gtrans-px-1.5 gtrans-py-0.5 gtrans-text-[11px] gtrans-font-semibold gtrans-text-muted hover:gtrans-bg-body"
 						>
 							{a.glyph}
 						</button>
 					))}
-					<span className="gtrans-mx-1 gtrans-h-4 gtrans-w-px gtrans-bg-gtrans-border" />
+					<span className="gtrans-mx-1 gtrans-h-4 gtrans-w-px gtrans-bg-line" />
 					<button
 						type="button"
 						title={__('Copy source', 'gemtranslate')}
 						onClick={() => onChange(seg.core)}
-						className="gtrans-bare gtrans-rounded gtrans-border gtrans-border-gtrans-border gtrans-bg-white gtrans-px-1.5 gtrans-py-0.5 gtrans-text-[11px] gtrans-text-gray-600 hover:gtrans-bg-gray-50"
+						className="gtrans-bare gtrans-rounded gtrans-border gtrans-border-line gtrans-bg-surface gtrans-px-1.5 gtrans-py-0.5 gtrans-text-[11px] gtrans-text-muted hover:gtrans-bg-body"
 					>
 						⧉
 					</button>
@@ -440,7 +440,7 @@ function SegmentRow({
 						title={__('Translate with AI', 'gemtranslate')}
 						onClick={onAI}
 						disabled={aiBusy}
-						className="gtrans-bare gtrans-rounded gtrans-border gtrans-border-gtrans-border gtrans-bg-white gtrans-px-1.5 gtrans-py-0.5 gtrans-text-[11px] gtrans-text-indigo-600 hover:gtrans-bg-indigo-50 disabled:gtrans-opacity-50"
+						className="gtrans-bare gtrans-rounded gtrans-border gtrans-border-line gtrans-bg-surface gtrans-px-1.5 gtrans-py-0.5 gtrans-text-[11px] gtrans-text-indigo-600 hover:gtrans-bg-indigo-50 disabled:gtrans-opacity-50"
 					>
 						{__('AI', 'gemtranslate')}
 					</button>
@@ -496,7 +496,7 @@ function SegmentRow({
 										onChange(s.target);
 										setShowSug(false);
 									}}
-									className="gtrans-bare gtrans-flex gtrans-items-center gtrans-gap-2 gtrans-rounded gtrans-bg-white gtrans-px-2 gtrans-py-1 gtrans-text-left gtrans-text-xs gtrans-text-gray-700 hover:gtrans-bg-amber-100"
+									className="gtrans-bare gtrans-flex gtrans-items-center gtrans-gap-2 gtrans-rounded gtrans-bg-surface gtrans-px-2 gtrans-py-1 gtrans-text-left gtrans-text-xs gtrans-text-label hover:gtrans-bg-amber-100"
 								>
 									<span
 										className={`gtrans-shrink-0 gtrans-rounded gtrans-px-1 gtrans-text-[10px] gtrans-font-semibold ${
@@ -524,7 +524,7 @@ function SegmentRow({
 							: __('Mark complete', 'gemtranslate')
 					}
 					className={`gtrans-inline-flex gtrans-cursor-pointer gtrans-items-center gtrans-gap-1 gtrans-rounded gtrans-px-2 gtrans-py-1 gtrans-text-xs ${
-						confirmed ? 'gtrans-bg-green-50 gtrans-text-green-700' : 'gtrans-text-gray-500'
+						confirmed ? 'gtrans-bg-green-50 gtrans-text-green-700' : 'gtrans-text-muted'
 					} ${empty ? 'gtrans-cursor-not-allowed gtrans-opacity-50' : ''}`}
 				>
 					<input

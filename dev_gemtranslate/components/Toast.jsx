@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import clsx from 'clsx';
 
 const TONE = {
-	success: 'gtrans-bg-green-50 gtrans-text-green-800 gtrans-border-green-200',
-	error: 'gtrans-bg-red-50 gtrans-text-red-800 gtrans-border-red-200',
-	info: 'gtrans-bg-blue-50 gtrans-text-blue-800 gtrans-border-blue-200',
+	success: 'gtrans-bg-success-light gtrans-text-success gtrans-border-success',
+	error: 'gtrans-bg-danger-light gtrans-text-danger gtrans-border-danger',
+	info: 'gtrans-bg-primary-light gtrans-text-primary gtrans-border-primary',
 };
 
 export default function Toast({ message, tone = 'info', onClear, duration = 4000 }) {
@@ -24,7 +24,7 @@ export default function Toast({ message, tone = 'info', onClear, duration = 4000
 
 	return (
 		<div className={clsx('gtrans-pointer-events-none gtrans-fixed gtrans-bottom-6 gtrans-right-6 gtrans-z-50 gtrans-flex gtrans-flex-col gtrans-gap-2')}>
-			<div className={clsx('gtrans-pointer-events-auto gtrans-flex gtrans-items-center gtrans-rounded-md gtrans-border gtrans-px-3 gtrans-py-2 gtrans-text-sm gtrans-shadow-card', TONE[tone] || TONE.info)}>
+			<div className={clsx('gtrans-pointer-events-auto gtrans-flex gtrans-items-center gtrans-rounded gtrans-border gtrans-px-3 gtrans-py-2 gtrans-text-sm gtrans-shadow-gtrans', TONE[tone] || TONE.info)}>
 				{message}
 			</div>
 		</div>

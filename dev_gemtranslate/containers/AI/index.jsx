@@ -5,7 +5,8 @@ import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
-import { Field, Select, TextInput, Checkbox } from '../../components/Input';
+import { Field, TextInput, Checkbox } from '../../components/Input';
+import { Select } from '../../components/ui/Select';
 import { LoadingBlock } from '../../components/Spinner';
 import {
 	useAIProviders,
@@ -137,7 +138,7 @@ export default function AIPage() {
 					const cfg = state.providers[p.key] || {};
 					return (
 						<Card key={p.key} title={p.label}>
-							<p className="gtrans-mb-3 gtrans-text-xs gtrans-text-gtrans-muted">{p.hint()}</p>
+							<p className="gtrans-mb-3 gtrans-text-xs gtrans-text-muted">{p.hint()}</p>
 							<div className="gtrans-flex gtrans-flex-col gtrans-gap-3">
 								<Field
 									label={__('API key', 'gemtranslate')}
@@ -206,7 +207,7 @@ export default function AIPage() {
 					) : (
 						<div className="gtrans-grid gtrans-grid-cols-2 gtrans-gap-4 gtrans-text-sm">
 							<div>
-								<div className="gtrans-text-xs gtrans-uppercase gtrans-text-gtrans-muted">
+								<div className="gtrans-text-xs gtrans-uppercase gtrans-text-muted">
 									{__('Cached entries', 'gemtranslate')}
 								</div>
 								<div className="gtrans-mt-1 gtrans-text-xl gtrans-font-semibold">
@@ -214,7 +215,7 @@ export default function AIPage() {
 								</div>
 							</div>
 							<div>
-								<div className="gtrans-text-xs gtrans-uppercase gtrans-text-gtrans-muted">
+								<div className="gtrans-text-xs gtrans-uppercase gtrans-text-muted">
 									{__('Reuse hits', 'gemtranslate')}
 								</div>
 								<div className="gtrans-mt-1 gtrans-text-xl gtrans-font-semibold">

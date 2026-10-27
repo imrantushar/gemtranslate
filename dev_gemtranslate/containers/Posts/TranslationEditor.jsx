@@ -76,7 +76,7 @@ export default function TranslationEditor() {
 				actions={
 					<Link
 						to="/posts"
-						className="gtrans-text-sm gtrans-text-gtrans-primary gtrans-no-underline"
+						className="gtrans-text-sm gtrans-text-primary gtrans-no-underline"
 					>
 						{__('← Back to posts', 'gemtranslate')}
 					</Link>
@@ -85,7 +85,7 @@ export default function TranslationEditor() {
 
 			{targetLangs.length === 0 ? (
 				<Card>
-					<p className="gtrans-m-0 gtrans-text-sm gtrans-text-gtrans-muted">
+					<p className="gtrans-m-0 gtrans-text-sm gtrans-text-muted">
 						{__(
 							'Add at least one non-default language to start translating posts.',
 							'gemtranslate'
@@ -104,8 +104,8 @@ export default function TranslationEditor() {
 								}}
 								className={`gtrans-bare gtrans-rounded-md gtrans-px-3 gtrans-py-1.5 gtrans-text-sm ${
 									selectedLang === t.language.code
-										? 'gtrans-bg-gtrans-primary gtrans-text-white'
-										: 'gtrans-bg-white gtrans-border gtrans-border-gtrans-border gtrans-text-gray-700'
+										? 'gtrans-bg-primary gtrans-text-white'
+										: 'gtrans-bg-surface gtrans-border gtrans-border-line gtrans-text-label'
 								}`}
 							>
 								{t.language.name}
@@ -120,7 +120,7 @@ export default function TranslationEditor() {
 
 					{/* ---- Country variant strip (tightened) ---- */}
 					<div className="gtrans-mb-4 gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-2">
-						<span className="gtrans-text-xs gtrans-font-medium gtrans-text-gray-600 gtrans-mr-1">
+						<span className="gtrans-text-xs gtrans-font-medium gtrans-text-muted gtrans-mr-1">
 							{__('Country variant:', 'gemtranslate')}
 						</span>
 						<VariantPill active={country === ''} onClick={() => setCountry('')}>
@@ -208,7 +208,7 @@ export default function TranslationEditor() {
 					/>
 
 					{/* ---- Tabs ---- */}
-					<div className="gtrans-mb-4 gtrans-flex gtrans-border-b gtrans-border-gtrans-border">
+					<div className="gtrans-mb-4 gtrans-flex gtrans-border-b gtrans-border-line">
 						{[
 							{ key: 'content', label: __('Content', 'gemtranslate') },
 							{ key: 'meta', label: __('Custom fields', 'gemtranslate'), pro: 'custom_fields' },
@@ -223,8 +223,8 @@ export default function TranslationEditor() {
 									onClick={() => setTab(t.key)}
 									className={`gtrans-bare gtrans-px-4 gtrans-py-2 gtrans-text-sm gtrans-border-b-2 ${
 										tab === t.key
-											? 'gtrans-border-gtrans-primary gtrans-text-gtrans-primary gtrans-font-semibold'
-											: 'gtrans-border-transparent gtrans-text-gray-600 hover:gtrans-text-gray-900'
+											? 'gtrans-border-primary gtrans-text-primary gtrans-font-semibold'
+											: 'gtrans-border-transparent gtrans-text-muted hover:gtrans-text-ink'
 									}`}
 								>
 									{t.label}
@@ -247,16 +247,16 @@ export default function TranslationEditor() {
 					) : mode === 'string_only' ? (
 						<>
 							<div className="gtrans-mb-3 gtrans-flex gtrans-items-center gtrans-justify-end gtrans-gap-1 gtrans-text-xs">
-								<span className="gtrans-mr-1 gtrans-text-gtrans-muted">
+								<span className="gtrans-mr-1 gtrans-text-muted">
 									{__('Editor:', 'gemtranslate')}
 								</span>
 								<button
 									type="button"
 									onClick={() => setContentMode('advanced')}
-									className={`gtrans-bare gtrans-rounded-l-md gtrans-border gtrans-border-gtrans-border gtrans-px-3 gtrans-py-1 ${
+									className={`gtrans-bare gtrans-rounded-l-md gtrans-border gtrans-border-line gtrans-px-3 gtrans-py-1 ${
 										contentMode === 'advanced'
-											? 'gtrans-bg-gtrans-primary gtrans-text-white'
-											: 'gtrans-bg-white gtrans-text-gray-700'
+											? 'gtrans-bg-primary gtrans-text-white'
+											: 'gtrans-bg-surface gtrans-text-label'
 									}`}
 								>
 									{__('Advanced', 'gemtranslate')}
@@ -264,10 +264,10 @@ export default function TranslationEditor() {
 								<button
 									type="button"
 									onClick={() => setContentMode('simple')}
-									className={`gtrans-bare -gtrans-ml-px gtrans-rounded-r-md gtrans-border gtrans-border-gtrans-border gtrans-px-3 gtrans-py-1 ${
+									className={`gtrans-bare -gtrans-ml-px gtrans-rounded-r-md gtrans-border gtrans-border-line gtrans-px-3 gtrans-py-1 ${
 										contentMode === 'simple'
-											? 'gtrans-bg-gtrans-primary gtrans-text-white'
-											: 'gtrans-bg-white gtrans-text-gray-700'
+											? 'gtrans-bg-primary gtrans-text-white'
+											: 'gtrans-bg-surface gtrans-text-label'
 									}`}
 								>
 									{__('Simple', 'gemtranslate')}
@@ -310,8 +310,8 @@ function VariantPill({ active, onClick, children }) {
 			onClick={onClick}
 			className={`gtrans-bare gtrans-rounded-full gtrans-px-3 gtrans-py-1 gtrans-text-xs ${
 				active
-					? 'gtrans-bg-gtrans-primary gtrans-text-white'
-					: 'gtrans-bg-white gtrans-border gtrans-border-gtrans-border gtrans-text-gray-700'
+					? 'gtrans-bg-primary gtrans-text-white'
+					: 'gtrans-bg-surface gtrans-border gtrans-border-line gtrans-text-label'
 			}`}
 		>
 			{children}
@@ -323,7 +323,7 @@ function CustomLayoutPanel({ variantRow, updatedAt }) {
 	if (!variantRow?.shadow_edit_url) {
 		return (
 			<Card>
-				<p className="gtrans-m-0 gtrans-text-sm gtrans-text-gtrans-muted">
+				<p className="gtrans-m-0 gtrans-text-sm gtrans-text-muted">
 					{__('Setting up the custom layout… this should only take a moment.', 'gemtranslate')}
 				</p>
 			</Card>
@@ -331,7 +331,7 @@ function CustomLayoutPanel({ variantRow, updatedAt }) {
 	}
 	return (
 		<Card title={__('Edit in WordPress', 'gemtranslate')}>
-			<p className="gtrans-mb-3 gtrans-text-sm gtrans-text-gray-700">
+			<p className="gtrans-mb-3 gtrans-text-sm gtrans-text-label">
 				{__(
 					'This translation is a real WordPress post — edit it in Gutenberg, Elementor, Beaver, Divi, Bricks, or any builder you have installed.',
 					'gemtranslate'
@@ -342,23 +342,23 @@ function CustomLayoutPanel({ variantRow, updatedAt }) {
 					href={variantRow.shadow_edit_url}
 					target="_blank"
 					rel="noopener noreferrer"
-					className="gtrans-inline-flex gtrans-items-center gtrans-gap-2 gtrans-rounded-md gtrans-bg-gtrans-primary gtrans-px-4 gtrans-py-2 gtrans-text-sm gtrans-font-medium gtrans-text-white gtrans-no-underline hover:gtrans-bg-gtrans-primary-hover"
+					className="gtrans-inline-flex gtrans-items-center gtrans-gap-2 gtrans-rounded-md gtrans-bg-primary gtrans-px-4 gtrans-py-2 gtrans-text-sm gtrans-font-medium gtrans-text-white gtrans-no-underline hover:gtrans-bg-primary-hover"
 				>
 					{__('Open in editor →', 'gemtranslate')}
 				</a>
 				{updatedAt && (
-					<span className="gtrans-text-xs gtrans-text-gtrans-muted">
+					<span className="gtrans-text-xs gtrans-text-muted">
 						{sprintf(
 							/* translators: %s: ISO timestamp. */ __('Last edited %s', 'gemtranslate'),
 							updatedAt
 						)}
 					</span>
 				)}
-				<span className="gtrans-ml-auto gtrans-text-xs gtrans-text-gtrans-muted">
+				<span className="gtrans-ml-auto gtrans-text-xs gtrans-text-muted">
 					{__('Shadow post ID', 'gemtranslate')}: <code>{variantRow.shadow_post_id}</code>
 				</span>
 			</div>
-			<p className="gtrans-mt-4 gtrans-mb-0 gtrans-text-xs gtrans-text-gtrans-muted">
+			<p className="gtrans-mt-4 gtrans-mb-0 gtrans-text-xs gtrans-text-muted">
 				{__(
 					'Use "Revert to strings" in the mode switcher above to discard this layout and switch back to text-only translation.',
 					'gemtranslate'

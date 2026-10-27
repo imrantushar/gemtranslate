@@ -4,6 +4,7 @@ import { __, sprintf } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
+import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
 import { TextArea, TextInput } from '../../components/Input';
@@ -97,9 +98,9 @@ export default function PackageEditor() {
 			<>
 				<PageHeader title={__('Strings', 'gemtranslate')} />
 				<Card>
-					<p className="gtrans-m-0 gtrans-text-sm gtrans-text-gtrans-muted">
+					<p className="gtrans-m-0 gtrans-text-sm gtrans-text-muted">
 						{__('Package not found. It may have been uninstalled.', 'gemtranslate')}{' '}
-						<Link to="/strings" className="gtrans-text-gtrans-primary">
+						<Link to="/strings" className="gtrans-text-primary">
 							{__('← Back to plugins & themes', 'gemtranslate')}
 						</Link>
 					</p>
@@ -259,7 +260,7 @@ export default function PackageEditor() {
 				actions={
 					<Link
 						to="/strings"
-						className="gtrans-text-sm gtrans-text-gtrans-primary gtrans-no-underline"
+						className="gtrans-text-sm gtrans-text-primary gtrans-no-underline"
 					>
 						{__('← Back to plugins', 'gemtranslate')}
 					</Link>
@@ -268,13 +269,13 @@ export default function PackageEditor() {
 
 			<Card padded={false}>
 				{/* ---- Toolbar ---- */}
-				<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-2 gtrans-border-b gtrans-border-gtrans-border gtrans-px-4 gtrans-py-3">
+				<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-2 gtrans-border-b gtrans-border-line gtrans-px-4 gtrans-py-3">
 					<div className="gtrans-flex gtrans-items-center gtrans-gap-1 gtrans-text-xs">
-						<span className="gtrans-mr-1 gtrans-text-gtrans-muted">{__('Language:', 'gemtranslate')}</span>
+						<span className="gtrans-mr-1 gtrans-text-muted">{__('Language:', 'gemtranslate')}</span>
 						<select
 							value={lang}
 							onChange={(e) => navigate(`/strings/${slug}/${e.target.value}`)}
-							className="gtrans-rounded-md gtrans-border gtrans-border-gtrans-border gtrans-bg-white gtrans-px-2 gtrans-py-1 gtrans-text-xs"
+							className="gtrans-rounded-md gtrans-border gtrans-border-line gtrans-bg-surface gtrans-px-2 gtrans-py-1 gtrans-text-xs"
 						>
 							{targetLangs.map((l) => (
 								<option key={l.code} value={l.code}>
@@ -299,8 +300,8 @@ export default function PackageEditor() {
 								}}
 								className={`gtrans-bare gtrans-rounded-full gtrans-px-3 gtrans-py-1 gtrans-text-xs ${
 									statusFilter === f.key
-										? 'gtrans-bg-gtrans-primary gtrans-text-white'
-										: 'gtrans-bg-white gtrans-border gtrans-border-gtrans-border gtrans-text-gray-700'
+										? 'gtrans-bg-primary gtrans-text-white'
+										: 'gtrans-bg-surface gtrans-border gtrans-border-line gtrans-text-label'
 								}`}
 							>
 								{f.label}
@@ -355,21 +356,21 @@ export default function PackageEditor() {
 
 				{/* ---- Rows ---- */}
 				{rows.length === 0 ? (
-					<p className="gtrans-px-5 gtrans-py-10 gtrans-text-center gtrans-text-sm gtrans-text-gtrans-muted">
+					<p className="gtrans-px-5 gtrans-py-10 gtrans-text-center gtrans-text-sm gtrans-text-muted">
 						{statusFilter === 'untranslated'
 							? __('Nothing untranslated. Nice work.', 'gemtranslate')
 							: __('No strings match.', 'gemtranslate')}
 					</p>
 				) : (
-					<table className="gtrans-w-full gtrans-text-sm">
-						<thead className="gtrans-bg-gtrans-bg gtrans-text-left gtrans-text-xs gtrans-uppercase gtrans-text-gtrans-muted">
-							<tr>
-								<th className="gtrans-px-4 gtrans-py-3 gtrans-w-1/2">{__('Source', 'gemtranslate')}</th>
-								<th className="gtrans-px-4 gtrans-py-3">{__('Translation', 'gemtranslate')}</th>
-								<th className="gtrans-px-4 gtrans-py-3 gtrans-w-24" />
-							</tr>
-						</thead>
-						<tbody>
+					<Table.Root>
+						<Table.Header>
+							<Table.Row>
+								<Table.ColumnHeader className="gtrans-w-1/2">{__('Source', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader>{__('Translation', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader className="gtrans-w-24" />
+							</Table.Row>
+						</Table.Header>
+						<Table.Body>
 							{rows.map((row) => (
 								<StringRow
 									key={row.string_id}
@@ -383,14 +384,14 @@ export default function PackageEditor() {
 									aiBusy={ai.isPending}
 								/>
 							))}
-						</tbody>
-					</table>
+						</Table.Body>
+					</Table.Root>
 				)}
 
 				{/* ---- Pagination ---- */}
 				{total > PAGE_SIZE && (
-					<div className="gtrans-flex gtrans-items-center gtrans-justify-between gtrans-border-t gtrans-border-gtrans-border gtrans-px-4 gtrans-py-3 gtrans-text-sm">
-						<span className="gtrans-text-gtrans-muted">
+					<div className="gtrans-flex gtrans-items-center gtrans-justify-between gtrans-border-t gtrans-border-line gtrans-px-4 gtrans-py-3 gtrans-text-sm">
+						<span className="gtrans-text-muted">
 							{sprintf(
 								/* translators: 1: current page, 2: total pages, 3: total rows. */
 								__('Page %1$d of %2$d · %3$d total', 'gemtranslate'),
@@ -424,25 +425,23 @@ function StringRow({ row, draft, suggestion, wpOrgProjectUrl, onChange, onAi, on
 	const hasSuggestion = !value && suggestion;
 
 	return (
-		<tr
-			className={`gtrans-border-t gtrans-border-gtrans-border gtrans-align-top ${
-				dirty ? 'gtrans-bg-amber-50' : ''
-			}`}
+		<Table.Row
+			className={`gtrans-align-top ${dirty ? 'gtrans-bg-warning-light' : ''}`}
 		>
-			<td className="gtrans-px-4 gtrans-py-3">
-				<div className="gtrans-text-gray-900">{row.source}</div>
+			<Table.Cell>
+				<div className="gtrans-text-ink">{row.source}</div>
 				{row.file_ref && (
-					<div className="gtrans-mt-1 gtrans-text-xs gtrans-text-gtrans-muted">
+					<div className="gtrans-mt-1 gtrans-text-xs gtrans-text-muted">
 						<code>{row.file_ref}</code>
 					</div>
 				)}
 				{row.context && (
-					<div className="gtrans-mt-1 gtrans-text-xs gtrans-text-gtrans-muted">
+					<div className="gtrans-mt-1 gtrans-text-xs gtrans-text-muted">
 						{__('Context', 'gemtranslate')}: <code>{row.context}</code>
 					</div>
 				)}
-			</td>
-			<td className="gtrans-px-4 gtrans-py-3">
+			</Table.Cell>
+			<Table.Cell>
 				<TextArea
 					rows={Math.min(6, Math.max(2, Math.ceil((row.source?.length || 0) / 80)))}
 					value={value}
@@ -460,7 +459,7 @@ function StringRow({ row, draft, suggestion, wpOrgProjectUrl, onChange, onAi, on
 						</span>
 					)}
 					{status === 'draft' && (
-						<span className="gtrans-rounded gtrans-bg-gray-100 gtrans-px-1.5 gtrans-py-0.5 gtrans-text-gray-700">
+						<span className="gtrans-rounded gtrans-bg-body gtrans-px-1.5 gtrans-py-0.5 gtrans-text-label">
 							{__('Draft', 'gemtranslate')}
 						</span>
 					)}
@@ -486,19 +485,19 @@ function StringRow({ row, draft, suggestion, wpOrgProjectUrl, onChange, onAi, on
 							href={`${wpOrgProjectUrl}?filters[term]=${encodeURIComponent(row.source)}`}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="gtrans-text-[11px] gtrans-text-gtrans-muted gtrans-no-underline hover:gtrans-text-gtrans-primary"
+							className="gtrans-text-[11px] gtrans-text-muted gtrans-no-underline hover:gtrans-text-primary"
 						>
 							{__('Suggest on WP.org →', 'gemtranslate')}
 						</a>
 					)}
 				</div>
-			</td>
-			<td className="gtrans-px-4 gtrans-py-3 gtrans-text-right">
+			</Table.Cell>
+			<Table.Cell className="gtrans-text-right">
 				<Button size="sm" variant="ghost" loading={aiBusy} onClick={() => onAi(row)}>
 					{__('AI', 'gemtranslate')}
 				</Button>
-			</td>
-		</tr>
+			</Table.Cell>
+		</Table.Row>
 	);
 }
 
@@ -513,16 +512,16 @@ function ExportMenu({ onExport, loading, pkg, lang, wpOrgProjectUrl }) {
 			</Button>
 			{open && (
 				<div
-					className="gtrans-absolute gtrans-right-0 gtrans-z-10 gtrans-mt-1 gtrans-w-72 gtrans-rounded-md gtrans-border gtrans-border-gtrans-border gtrans-bg-white gtrans-shadow-card"
+					className="gtrans-absolute gtrans-right-0 gtrans-z-10 gtrans-mt-1 gtrans-w-72 gtrans-rounded-md gtrans-border gtrans-border-line gtrans-bg-surface gtrans-shadow-card"
 					onMouseLeave={close}
 				>
 					<button
 						type="button"
 						onClick={() => { close(); onExport({ exclude_status: '' }); }}
-						className="gtrans-bare gtrans-block gtrans-w-full gtrans-px-3 gtrans-py-2 gtrans-text-left gtrans-text-sm hover:gtrans-bg-gray-50"
+						className="gtrans-bare gtrans-block gtrans-w-full gtrans-px-3 gtrans-py-2 gtrans-text-left gtrans-text-sm hover:gtrans-bg-body"
 					>
 						<div className="gtrans-font-medium">{__('Generate PO/MO', 'gemtranslate')}</div>
-						<div className="gtrans-text-xs gtrans-text-gtrans-muted">
+						<div className="gtrans-text-xs gtrans-text-muted">
 							{sprintf(
 								/* translators: %s: file path. */
 								__('Writes to wp-content/languages/plugins/%s-{locale}.mo', 'gemtranslate'),
@@ -535,10 +534,10 @@ function ExportMenu({ onExport, loading, pkg, lang, wpOrgProjectUrl }) {
 							<button
 								type="button"
 								onClick={() => { close(); onExport({ exclude_status: 'wp_org' }); }}
-								className="gtrans-bare gtrans-block gtrans-w-full gtrans-border-t gtrans-border-gtrans-border gtrans-px-3 gtrans-py-2 gtrans-text-left gtrans-text-sm hover:gtrans-bg-gray-50"
+								className="gtrans-bare gtrans-block gtrans-w-full gtrans-border-t gtrans-border-line gtrans-px-3 gtrans-py-2 gtrans-text-left gtrans-text-sm hover:gtrans-bg-body"
 							>
 								<div className="gtrans-font-medium">{__('Export PO for WordPress.org', 'gemtranslate')}</div>
-								<div className="gtrans-text-xs gtrans-text-gtrans-muted">
+								<div className="gtrans-text-xs gtrans-text-muted">
 									{__('PO file with only your edits (skips community translations). Upload to translate.wordpress.org.', 'gemtranslate')}
 								</div>
 							</button>
@@ -547,12 +546,12 @@ function ExportMenu({ onExport, loading, pkg, lang, wpOrgProjectUrl }) {
 									href={wpOrgProjectUrl}
 									target="_blank"
 									rel="noopener noreferrer"
-									className="gtrans-block gtrans-border-t gtrans-border-gtrans-border gtrans-px-3 gtrans-py-2 gtrans-text-sm gtrans-no-underline hover:gtrans-bg-gray-50"
+									className="gtrans-block gtrans-border-t gtrans-border-line gtrans-px-3 gtrans-py-2 gtrans-text-sm gtrans-no-underline hover:gtrans-bg-body"
 								>
-									<div className="gtrans-font-medium gtrans-text-gtrans-primary">
+									<div className="gtrans-font-medium gtrans-text-primary">
 										{__('Contribute on translate.wordpress.org →', 'gemtranslate')}
 									</div>
-									<div className="gtrans-text-xs gtrans-text-gtrans-muted">
+									<div className="gtrans-text-xs gtrans-text-muted">
 										{__('Opens the GlotPress project page in a new tab.', 'gemtranslate')}
 									</div>
 								</a>

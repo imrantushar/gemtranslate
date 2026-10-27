@@ -3,11 +3,13 @@ import { __, sprintf } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
+import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
 import StatusPill from '../../components/StatusPill';
 import { LoadingBlock } from '../../components/Spinner';
-import { Field, Select } from '../../components/Input';
+import { Field } from '../../components/Input';
+import { Select } from '../../components/ui/Select';
 import { useJobs, useJobCounts, useRetryJob, useDeleteJob } from '../../hooks/useJobs';
 import { formatErrorMessage } from '../../lib/format';
 
@@ -68,7 +70,7 @@ export default function JobsPage() {
 			</div>
 
 			<Card padded={false}>
-				<div className="gtrans-flex gtrans-flex-wrap gtrans-items-end gtrans-gap-3 gtrans-border-b gtrans-border-gtrans-border gtrans-px-4 gtrans-py-3">
+				<div className="gtrans-flex gtrans-flex-wrap gtrans-items-end gtrans-gap-3 gtrans-border-b gtrans-border-line gtrans-px-4 gtrans-py-3">
 					<div className="gtrans-min-w-[160px]">
 						<Field label={__('Status', 'gemtranslate')}>
 							<Select value={status} onChange={(e) => setStatus(e.target.value)}>
@@ -84,29 +86,29 @@ export default function JobsPage() {
 				{jobs.isLoading ? (
 					<LoadingBlock>{__('Loading jobs…', 'gemtranslate')}</LoadingBlock>
 				) : (jobs.data?.rows || []).length === 0 ? (
-					<p className="gtrans-px-5 gtrans-py-8 gtrans-text-center gtrans-text-sm gtrans-text-gtrans-muted">
+					<p className="gtrans-px-5 gtrans-py-8 gtrans-text-center gtrans-text-sm gtrans-text-muted">
 						{__('No jobs in this view.', 'gemtranslate')}
 					</p>
 				) : (
-					<table className="gtrans-w-full gtrans-text-sm">
-						<thead className="gtrans-bg-gtrans-bg gtrans-text-left gtrans-text-xs gtrans-uppercase gtrans-text-gtrans-muted">
-							<tr>
-								<th className="gtrans-px-4 gtrans-py-3">#</th>
-								<th className="gtrans-px-4 gtrans-py-3">{__('Type', 'gemtranslate')}</th>
-								<th className="gtrans-px-4 gtrans-py-3">{__('Status', 'gemtranslate')}</th>
-								<th className="gtrans-px-4 gtrans-py-3">{__('Payload', 'gemtranslate')}</th>
-								<th className="gtrans-px-4 gtrans-py-3">{__('Attempts', 'gemtranslate')}</th>
-								<th className="gtrans-px-4 gtrans-py-3">{__('Updated', 'gemtranslate')}</th>
-								<th className="gtrans-px-4 gtrans-py-3" />
-							</tr>
-						</thead>
-						<tbody>
+					<Table.Root>
+						<Table.Header>
+							<Table.Row>
+								<Table.ColumnHeader>#</Table.ColumnHeader>
+								<Table.ColumnHeader>{__('Type', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader>{__('Status', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader>{__('Payload', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader>{__('Attempts', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader>{__('Updated', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader />
+							</Table.Row>
+						</Table.Header>
+						<Table.Body>
 							{(jobs.data?.rows || []).map((j) => (
-								<tr key={j.job_id} className="gtrans-border-t gtrans-border-gtrans-border gtrans-align-top">
-									<td className="gtrans-px-4 gtrans-py-3 gtrans-text-gtrans-muted">{j.job_id}</td>
-									<td className="gtrans-px-4 gtrans-py-3">{j.type}</td>
-									<td className="gtrans-px-4 gtrans-py-3"><StatusPill tone={TONE[j.status] || 'none'}>{j.status}</StatusPill></td>
-									<td className="gtrans-px-4 gtrans-py-3 gtrans-text-xs gtrans-text-gtrans-muted">
+								<Table.Row key={j.job_id} className="gtrans-align-top">
+									<Table.Cell className="gtrans-text-muted">{j.job_id}</Table.Cell>
+									<Table.Cell>{j.type}</Table.Cell>
+									<Table.Cell><StatusPill tone={TONE[j.status] || 'none'}>{j.status}</StatusPill></Table.Cell>
+									<Table.Cell className="gtrans-text-xs gtrans-text-muted">
 										{j.payload?.kind === 'post_translate'
 											? sprintf(
 												/* translators: 1: post ID, 2: target language. */
@@ -117,12 +119,12 @@ export default function JobsPage() {
 											: <code>{JSON.stringify(j.payload)}</code>
 										}
 										{j.error && (
-											<div className="gtrans-mt-1 gtrans-text-gtrans-danger">{j.error}</div>
+											<div className="gtrans-mt-1 gtrans-text-danger">{j.error}</div>
 										)}
-									</td>
-									<td className="gtrans-px-4 gtrans-py-3">{j.attempts}</td>
-									<td className="gtrans-px-4 gtrans-py-3 gtrans-text-xs gtrans-text-gtrans-muted">{j.updated_at}</td>
-									<td className="gtrans-px-4 gtrans-py-3 gtrans-text-right">
+									</Table.Cell>
+									<Table.Cell>{j.attempts}</Table.Cell>
+									<Table.Cell className="gtrans-text-xs gtrans-text-muted">{j.updated_at}</Table.Cell>
+									<Table.Cell className="gtrans-text-right">
 										<div className="gtrans-flex gtrans-justify-end gtrans-gap-1">
 											{(j.status === 'failed' || j.status === 'pending') && (
 												<Button size="sm" variant="ghost" onClick={() => onRetry(j.job_id)}>
@@ -133,11 +135,11 @@ export default function JobsPage() {
 												{__('Delete', 'gemtranslate')}
 											</Button>
 										</div>
-									</td>
-								</tr>
+									</Table.Cell>
+								</Table.Row>
 							))}
-						</tbody>
-					</table>
+						</Table.Body>
+					</Table.Root>
 				)}
 			</Card>
 

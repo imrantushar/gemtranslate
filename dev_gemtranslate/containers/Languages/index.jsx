@@ -8,6 +8,7 @@ import Modal from '../../components/Modal';
 import Toast from '../../components/Toast';
 import StatusPill from '../../components/StatusPill';
 import { LoadingBlock } from '../../components/Spinner';
+import { Table } from '../../components/ui/Table';
 import {
 	useLanguages,
 	useCreateLanguage,
@@ -98,54 +99,56 @@ export default function LanguagesPage() {
 			/>
 
 			<Card padded={false}>
-				<table className="gtrans-w-full gtrans-text-sm">
-					<thead className="gtrans-bg-gtrans-bg gtrans-text-left gtrans-text-xs gtrans-uppercase gtrans-text-gtrans-muted">
-						<tr>
-							<th className="gtrans-px-4 gtrans-py-3">{__('Language', 'gemtranslate')}</th>
-							<th className="gtrans-px-4 gtrans-py-3">{__('Code', 'gemtranslate')}</th>
-							<th className="gtrans-px-4 gtrans-py-3">{__('Locale', 'gemtranslate')}</th>
-							<th className="gtrans-px-4 gtrans-py-3">{__('Status', 'gemtranslate')}</th>
-							<th className="gtrans-px-4 gtrans-py-3 gtrans-text-right">{__('Actions', 'gemtranslate')}</th>
-						</tr>
-					</thead>
-					<tbody>
-						{(languages.data || []).map((lang) => (
-							<tr key={lang.code} className="gtrans-border-t gtrans-border-gtrans-border">
-								<td className="gtrans-px-4 gtrans-py-3">
-									<div className="gtrans-flex gtrans-items-center gtrans-gap-2">
-										<strong>{lang.name}</strong>
-										<span className="gtrans-text-xs gtrans-text-gtrans-muted">{lang.native_name}</span>
-									</div>
-								</td>
-								<td className="gtrans-px-4 gtrans-py-3"><code>{lang.code}</code></td>
-								<td className="gtrans-px-4 gtrans-py-3 gtrans-text-gtrans-muted">{lang.locale}</td>
-								<td className="gtrans-px-4 gtrans-py-3">
-									{lang.is_default && <StatusPill tone="publish">{__('Default', 'gemtranslate')}</StatusPill>}
-									{!lang.is_default && lang.active && <StatusPill tone="pending">{__('Active', 'gemtranslate')}</StatusPill>}
-									{!lang.active && <StatusPill tone="draft">{__('Inactive', 'gemtranslate')}</StatusPill>}
-									{lang.is_rtl && <StatusPill>{__('RTL', 'gemtranslate')}</StatusPill>}
-								</td>
-								<td className="gtrans-px-4 gtrans-py-3 gtrans-text-right">
-									<div className="gtrans-flex gtrans-justify-end gtrans-gap-2">
-										{!lang.is_default && (
-											<Button variant="ghost" size="sm" onClick={() => onMakeDefault(lang)}>
-												{__('Make default', 'gemtranslate')}
+				<Table.ScrollArea>
+					<Table.Root>
+						<Table.Header>
+							<Table.Row>
+								<Table.ColumnHeader>{__('Language', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader>{__('Code', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader>{__('Locale', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader>{__('Status', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader className="gtrans-text-right">{__('Actions', 'gemtranslate')}</Table.ColumnHeader>
+							</Table.Row>
+						</Table.Header>
+						<Table.Body>
+							{(languages.data || []).map((lang) => (
+								<Table.Row key={lang.code}>
+									<Table.Cell>
+										<div className="gtrans-flex gtrans-items-center gtrans-gap-2">
+											<strong>{lang.name}</strong>
+											<span className="gtrans-text-xs gtrans-text-muted">{lang.native_name}</span>
+										</div>
+									</Table.Cell>
+									<Table.Cell><code>{lang.code}</code></Table.Cell>
+									<Table.Cell className="gtrans-text-muted">{lang.locale}</Table.Cell>
+									<Table.Cell>
+										{lang.is_default && <StatusPill tone="publish">{__('Default', 'gemtranslate')}</StatusPill>}
+										{!lang.is_default && lang.active && <StatusPill tone="pending">{__('Active', 'gemtranslate')}</StatusPill>}
+										{!lang.active && <StatusPill tone="draft">{__('Inactive', 'gemtranslate')}</StatusPill>}
+										{lang.is_rtl && <StatusPill>{__('RTL', 'gemtranslate')}</StatusPill>}
+									</Table.Cell>
+									<Table.Cell className="gtrans-text-right">
+										<div className="gtrans-flex gtrans-justify-end gtrans-gap-2">
+											{!lang.is_default && (
+												<Button variant="ghost" size="sm" onClick={() => onMakeDefault(lang)}>
+													{__('Make default', 'gemtranslate')}
+												</Button>
+											)}
+											<Button variant="secondary" size="sm" onClick={() => openEdit(lang)}>
+												{__('Edit', 'gemtranslate')}
 											</Button>
-										)}
-										<Button variant="secondary" size="sm" onClick={() => openEdit(lang)}>
-											{__('Edit', 'gemtranslate')}
-										</Button>
-										{!lang.is_default && (
-											<Button variant="ghost" size="sm" onClick={() => onDelete(lang)}>
-												{__('Delete', 'gemtranslate')}
-											</Button>
-										)}
-									</div>
-								</td>
-							</tr>
-						))}
-					</tbody>
-				</table>
+											{!lang.is_default && (
+												<Button variant="ghost" size="sm" onClick={() => onDelete(lang)}>
+													{__('Delete', 'gemtranslate')}
+												</Button>
+											)}
+										</div>
+									</Table.Cell>
+								</Table.Row>
+							))}
+						</Table.Body>
+					</Table.Root>
+				</Table.ScrollArea>
 			</Card>
 
 			<Modal

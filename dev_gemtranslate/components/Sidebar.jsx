@@ -65,12 +65,12 @@ export default function Sidebar() {
 	const openAssignments = assignmentCounts.data?.open ?? 0;
 
 	return (
-		<aside className="gtrans-w-60 gtrans-flex-shrink-0 gtrans-border-r gtrans-border-gtrans-border gtrans-bg-white gtrans-px-4 gtrans-py-6">
+		<aside className="gtrans-w-60 gtrans-flex-shrink-0 gtrans-border-r gtrans-border-edge gtrans-bg-surface gtrans-px-4 gtrans-py-6">
 			<div className="gtrans-mb-6 gtrans-px-2">
-				<div className="gtrans-text-lg gtrans-font-semibold gtrans-text-gtrans-primary">
+				<div className="gtrans-text-lg gtrans-font-semibold gtrans-text-primary">
 					GemTranslate
 				</div>
-				<div className="gtrans-text-xs gtrans-text-gtrans-muted">
+				<div className="gtrans-text-xs gtrans-text-muted">
 					v{window.gtrans?.version || '1.0.0'}
 				</div>
 			</div>
@@ -84,10 +84,10 @@ export default function Sidebar() {
 						to={item.to}
 						className={({ isActive }) =>
 							clsx(
-								'gtrans-flex gtrans-items-center gtrans-gap-3 gtrans-rounded-md gtrans-px-3 gtrans-py-2 gtrans-text-sm gtrans-no-underline gtrans-transition',
+								'gtrans-flex gtrans-items-center gtrans-gap-3 gtrans-rounded gtrans-px-3 gtrans-py-2 gtrans-text-sm gtrans-no-underline gtrans-transition-colors',
 								isActive
-									? 'gtrans-bg-gtrans-primary gtrans-text-white'
-									: 'gtrans-text-gray-700 hover:gtrans-bg-gray-100'
+									? 'gtrans-bg-navactive gtrans-text-primary gtrans-font-medium'
+									: 'gtrans-text-label hover:gtrans-bg-body'
 							)
 						}
 					>
@@ -96,17 +96,17 @@ export default function Sidebar() {
 						</span>
 						<span className="gtrans-flex-1">{item.label()}</span>
 						{item.badge === 'jobs' && liveJobs > 0 && (
-							<span className="gtrans-rounded-full gtrans-bg-blue-100 gtrans-px-2 gtrans-py-0.5 gtrans-text-xs gtrans-text-blue-800">
+							<span className="gtrans-rounded-full gtrans-bg-primary-light gtrans-px-2 gtrans-py-0.5 gtrans-text-11 gtrans-font-medium gtrans-text-primary">
 								{liveJobs}
 							</span>
 						)}
 						{item.badge === 'review' && pendingReview > 0 && (
-							<span className="gtrans-rounded-full gtrans-bg-amber-100 gtrans-px-2 gtrans-py-0.5 gtrans-text-xs gtrans-text-amber-800">
+							<span className="gtrans-rounded-full gtrans-bg-warning-light gtrans-px-2 gtrans-py-0.5 gtrans-text-11 gtrans-font-medium gtrans-text-warning">
 								{pendingReview}
 							</span>
 						)}
 						{item.badge === 'assignments' && openAssignments > 0 && (
-							<span className="gtrans-rounded-full gtrans-bg-blue-100 gtrans-px-2 gtrans-py-0.5 gtrans-text-xs gtrans-text-blue-800">
+							<span className="gtrans-rounded-full gtrans-bg-primary-light gtrans-px-2 gtrans-py-0.5 gtrans-text-11 gtrans-font-medium gtrans-text-primary">
 								{openAssignments}
 							</span>
 						)}

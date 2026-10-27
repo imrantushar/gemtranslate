@@ -3,16 +3,17 @@ import { __ } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
+import Button from '../../components/Button';
 import { LoadingBlock } from '../../components/Spinner';
 import { useStats } from '../../hooks/useSettings';
 import { useLanguages } from '../../hooks/useLanguages';
 
 function Stat({ label, value, hint }) {
 	return (
-		<div className="gtrans-rounded-lg gtrans-bg-white gtrans-p-5 gtrans-shadow-card">
-			<div className="gtrans-text-xs gtrans-uppercase gtrans-tracking-wide gtrans-text-gtrans-muted">{label}</div>
-			<div className="gtrans-mt-1 gtrans-text-2xl gtrans-font-semibold gtrans-text-gray-900">{value}</div>
-			{hint && <div className="gtrans-mt-1 gtrans-text-xs gtrans-text-gtrans-muted">{hint}</div>}
+		<div className="gtrans-flex gtrans-flex-col gtrans-gap-3 gtrans-rounded-lg gtrans-border gtrans-border-edge gtrans-bg-surface gtrans-p-5 gtrans-shadow-gtrans">
+			<div className="gtrans-text-sm gtrans-font-medium gtrans-text-ink">{label}</div>
+			<div className="gtrans-text-3xl gtrans-font-semibold gtrans-leading-none gtrans-text-ink">{value}</div>
+			{hint && <div className="gtrans-text-xs gtrans-text-muted">{hint}</div>}
 		</div>
 	);
 }
@@ -34,8 +35,8 @@ export default function Dashboard() {
 				title={__('Dashboard', 'gemtranslate')}
 				description={__('Quick overview of your multilingual setup.', 'gemtranslate')}
 				actions={
-					<Link to="/languages" className="gtrans-inline-flex gtrans-rounded-md gtrans-bg-gtrans-primary gtrans-px-4 gtrans-py-2 gtrans-text-sm gtrans-text-white gtrans-no-underline">
-						{__('Manage languages', 'gemtranslate')}
+					<Link to="/languages" className="gtrans-no-underline">
+						<Button variant="primary">{__('Manage languages', 'gemtranslate')}</Button>
 					</Link>
 				}
 			/>
@@ -54,18 +55,18 @@ export default function Dashboard() {
 			<div className="gtrans-mt-8 gtrans-grid gtrans-gap-6 md:gtrans-grid-cols-2">
 				<Card title={__('Languages', 'gemtranslate')}>
 					{langs.length === 0 ? (
-						<p className="gtrans-m-0 gtrans-text-sm gtrans-text-gtrans-muted">
+						<p className="gtrans-m-0 gtrans-text-sm gtrans-text-muted">
 							{__('No languages yet. Add one to get started.', 'gemtranslate')}
 						</p>
 					) : (
 						<ul className="gtrans-m-0 gtrans-flex gtrans-flex-col gtrans-gap-2 gtrans-p-0 gtrans-list-none">
 							{langs.map((lang) => (
-								<li key={lang.code} className="gtrans-flex gtrans-items-center gtrans-justify-between gtrans-rounded-md gtrans-bg-gtrans-bg gtrans-px-3 gtrans-py-2">
-									<span className="gtrans-text-sm">
+								<li key={lang.code} className="gtrans-flex gtrans-items-center gtrans-justify-between gtrans-rounded gtrans-bg-body gtrans-px-3 gtrans-py-2">
+									<span className="gtrans-text-sm gtrans-text-ink">
 										<strong>{lang.name}</strong>
-										<span className="gtrans-ml-2 gtrans-text-xs gtrans-text-gtrans-muted">{lang.code}</span>
+										<span className="gtrans-ml-2 gtrans-text-xs gtrans-text-muted">{lang.code}</span>
 									</span>
-									<span className="gtrans-text-xs gtrans-text-gtrans-muted">
+									<span className="gtrans-text-xs gtrans-text-muted">
 										{lang.is_default
 											? __('Default', 'gemtranslate')
 											: lang.active
@@ -80,17 +81,17 @@ export default function Dashboard() {
 
 				<Card title={__('Per-language post coverage', 'gemtranslate')}>
 					{!data.per_language || Object.keys(data.per_language).length === 0 ? (
-						<p className="gtrans-m-0 gtrans-text-sm gtrans-text-gtrans-muted">
+						<p className="gtrans-m-0 gtrans-text-sm gtrans-text-muted">
 							{__('Add a non-default language and translate posts to see coverage.', 'gemtranslate')}
 						</p>
 					) : (
 						<ul className="gtrans-m-0 gtrans-flex gtrans-flex-col gtrans-gap-2 gtrans-p-0 gtrans-list-none">
 							{Object.entries(data.per_language).map(([code, info]) => (
-								<li key={code} className="gtrans-flex gtrans-items-center gtrans-justify-between gtrans-rounded-md gtrans-bg-gtrans-bg gtrans-px-3 gtrans-py-2">
-									<span className="gtrans-text-sm">
+								<li key={code} className="gtrans-flex gtrans-items-center gtrans-justify-between gtrans-rounded gtrans-bg-body gtrans-px-3 gtrans-py-2">
+									<span className="gtrans-text-sm gtrans-text-ink">
 										<strong>{info.language?.name || code}</strong>
 									</span>
-									<span className="gtrans-text-xs gtrans-text-gtrans-muted">
+									<span className="gtrans-text-xs gtrans-text-muted">
 										{`${info.translated_posts} ${__('posts', 'gemtranslate')}`}
 									</span>
 								</li>

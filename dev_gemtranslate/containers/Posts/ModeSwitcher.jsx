@@ -72,7 +72,7 @@ export default function ModeSwitcher({
 								href={variantRow.shadow_edit_url}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="gtrans-inline-flex gtrans-items-center gtrans-gap-1 gtrans-rounded-md gtrans-bg-gtrans-primary gtrans-px-3 gtrans-py-1.5 gtrans-text-xs gtrans-font-medium gtrans-text-white gtrans-no-underline hover:gtrans-bg-gtrans-primary-hover"
+								className="gtrans-inline-flex gtrans-items-center gtrans-gap-1 gtrans-rounded-md gtrans-bg-primary gtrans-px-3 gtrans-py-1.5 gtrans-text-xs gtrans-font-medium gtrans-text-white gtrans-no-underline hover:gtrans-bg-primary-hover"
 							>
 								{__('Open in editor →', 'gemtranslate')}
 							</a>
@@ -108,14 +108,14 @@ function ModeCard({ active, icon, title, summary, details, switchButton }) {
 			className={clsx(
 				'gtrans-rounded-lg gtrans-border gtrans-p-4 gtrans-transition-colors',
 				active
-					? 'gtrans-border-gtrans-primary gtrans-bg-gtrans-primary/5 gtrans-shadow-sm'
-					: 'gtrans-border-gtrans-border gtrans-bg-white'
+					? 'gtrans-border-primary gtrans-bg-primary/5 gtrans-shadow-sm'
+					: 'gtrans-border-line gtrans-bg-surface'
 			)}
 		>
 			<div className="gtrans-flex gtrans-items-start gtrans-justify-between gtrans-gap-2">
 				<div className="gtrans-flex gtrans-items-center gtrans-gap-2">
 					<span className="gtrans-text-lg" aria-hidden="true">{icon}</span>
-					<h3 className="gtrans-m-0 gtrans-text-sm gtrans-font-semibold gtrans-text-gray-900">
+					<h3 className="gtrans-m-0 gtrans-text-sm gtrans-font-semibold gtrans-text-ink">
 						{title}
 					</h3>
 				</div>
@@ -125,10 +125,10 @@ function ModeCard({ active, icon, title, summary, details, switchButton }) {
 					</span>
 				)}
 			</div>
-			<p className="gtrans-mt-2 gtrans-mb-1 gtrans-text-xs gtrans-leading-relaxed gtrans-text-gray-700">
+			<p className="gtrans-mt-2 gtrans-mb-1 gtrans-text-xs gtrans-leading-relaxed gtrans-text-label">
 				{summary}
 			</p>
-			<p className="gtrans-mb-3 gtrans-text-xs gtrans-text-gtrans-muted">
+			<p className="gtrans-mb-3 gtrans-text-xs gtrans-text-muted">
 				{details}
 			</p>
 			{switchButton && (

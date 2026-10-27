@@ -3,10 +3,12 @@ import { __, sprintf } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
+import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
 import StatusPill from '../../components/StatusPill';
-import { Field, Select, TextInput, TextArea } from '../../components/Input';
+import { Field, TextInput, TextArea } from '../../components/Input';
+import { Select } from '../../components/ui/Select';
 import { LoadingBlock } from '../../components/Spinner';
 import { useTerms, useTermTranslations, useSaveTermTranslation } from '../../hooks/useTerms';
 import { useLanguages } from '../../hooks/useLanguages';
@@ -107,7 +109,7 @@ export default function TermsPage() {
 			/>
 
 			<Card padded={false} className="gtrans-mb-6">
-				<form onSubmit={runSearch} className="gtrans-flex gtrans-flex-wrap gtrans-items-end gtrans-gap-3 gtrans-border-b gtrans-border-gtrans-border gtrans-px-4 gtrans-py-3">
+				<form onSubmit={runSearch} className="gtrans-flex gtrans-flex-wrap gtrans-items-end gtrans-gap-3 gtrans-border-b gtrans-border-line gtrans-px-4 gtrans-py-3">
 					<Field label={__('Taxonomy', 'gemtranslate')}>
 						<Select value={taxonomy} onChange={(e) => setTaxonomy(e.target.value)}>
 							<option value="category">{__('Categories', 'gemtranslate')}</option>
@@ -127,46 +129,46 @@ export default function TermsPage() {
 				{terms.isLoading ? (
 					<LoadingBlock>{__('Loading terms…', 'gemtranslate')}</LoadingBlock>
 				) : (terms.data?.rows || []).length === 0 ? (
-					<p className="gtrans-px-5 gtrans-py-8 gtrans-text-center gtrans-text-sm gtrans-text-gtrans-muted">
+					<p className="gtrans-px-5 gtrans-py-8 gtrans-text-center gtrans-text-sm gtrans-text-muted">
 						{__('No terms found.', 'gemtranslate')}
 					</p>
 				) : (
-					<table className="gtrans-w-full gtrans-text-sm">
-						<thead className="gtrans-bg-gtrans-bg gtrans-text-left gtrans-text-xs gtrans-uppercase gtrans-text-gtrans-muted">
-							<tr>
-								<th className="gtrans-px-4 gtrans-py-3">{__('Name', 'gemtranslate')}</th>
-								<th className="gtrans-px-4 gtrans-py-3">{__('Slug', 'gemtranslate')}</th>
-								<th className="gtrans-px-4 gtrans-py-3">{__('Count', 'gemtranslate')}</th>
+					<Table.Root>
+						<Table.Header>
+							<Table.Row>
+								<Table.ColumnHeader>{__('Name', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader>{__('Slug', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader>{__('Count', 'gemtranslate')}</Table.ColumnHeader>
 								{nonDefault.map((l) => (
-									<th key={l.code} className="gtrans-px-4 gtrans-py-3">{l.code.toUpperCase()}</th>
+									<Table.ColumnHeader key={l.code}>{l.code.toUpperCase()}</Table.ColumnHeader>
 								))}
-								<th className="gtrans-px-4 gtrans-py-3" />
-							</tr>
-						</thead>
-						<tbody>
+								<Table.ColumnHeader />
+							</Table.Row>
+						</Table.Header>
+						<Table.Body>
 							{(terms.data?.rows || []).map((row) => (
-								<tr key={row.id} className="gtrans-border-t gtrans-border-gtrans-border">
-									<td className="gtrans-px-4 gtrans-py-3 gtrans-font-medium">{row.name}</td>
-									<td className="gtrans-px-4 gtrans-py-3 gtrans-text-gtrans-muted"><code>{row.slug}</code></td>
-									<td className="gtrans-px-4 gtrans-py-3 gtrans-text-gtrans-muted">{row.count}</td>
+								<Table.Row key={row.id}>
+									<Table.Cell className="gtrans-font-medium">{row.name}</Table.Cell>
+									<Table.Cell className="gtrans-text-muted"><code>{row.slug}</code></Table.Cell>
+									<Table.Cell className="gtrans-text-muted">{row.count}</Table.Cell>
 									{nonDefault.map((l) => (
-										<td key={l.code} className="gtrans-px-4 gtrans-py-3">
+										<Table.Cell key={l.code}>
 											{row.translations_status?.[l.code] ? (
 												<StatusPill tone="translated">✓</StatusPill>
 											) : (
 												<StatusPill tone="none">—</StatusPill>
 											)}
-										</td>
+										</Table.Cell>
 									))}
-									<td className="gtrans-px-4 gtrans-py-3 gtrans-text-right">
+									<Table.Cell className="gtrans-text-right">
 										<Button size="sm" onClick={() => setSelectedTerm(row.id)}>
 											{__('Translate', 'gemtranslate')}
 										</Button>
-									</td>
-								</tr>
+									</Table.Cell>
+								</Table.Row>
 							))}
-						</tbody>
-					</table>
+						</Table.Body>
+					</Table.Root>
 				)}
 			</Card>
 

@@ -67,7 +67,7 @@ export default function LanguageForm({ initial, onSubmit, onCancel, busy }) {
 		<form onSubmit={submit} className="gtrans-flex gtrans-flex-col gtrans-gap-4">
 			{!initial && (
 				<div>
-					<div className="gtrans-mb-2 gtrans-text-xs gtrans-font-medium gtrans-text-gray-700">
+					<div className="gtrans-mb-2 gtrans-text-xs gtrans-font-medium gtrans-text-label">
 						{__('Pick a preset (optional)', 'gemtranslate')}
 					</div>
 					<div className="gtrans-flex gtrans-flex-wrap gtrans-gap-2">
@@ -76,7 +76,7 @@ export default function LanguageForm({ initial, onSubmit, onCancel, busy }) {
 								key={p.code}
 								type="button"
 								onClick={() => applyPreset(p)}
-								className="gtrans-bare gtrans-rounded-full gtrans-border gtrans-border-gtrans-border gtrans-bg-white gtrans-px-3 gtrans-py-1 gtrans-text-xs gtrans-text-gray-700 hover:gtrans-bg-gray-50"
+								className="gtrans-bare gtrans-rounded-full gtrans-border gtrans-border-line gtrans-bg-surface gtrans-px-3 gtrans-py-1 gtrans-text-xs gtrans-text-label hover:gtrans-bg-body"
 							>
 								{p.name}
 							</button>
@@ -119,13 +119,13 @@ export default function LanguageForm({ initial, onSubmit, onCancel, busy }) {
 					{values.country_codes.map((c) => (
 						<span
 							key={c}
-							className="gtrans-inline-flex gtrans-items-center gtrans-gap-1 gtrans-rounded-full gtrans-bg-gray-100 gtrans-px-2 gtrans-py-0.5 gtrans-text-xs gtrans-text-gray-700"
+							className="gtrans-inline-flex gtrans-items-center gtrans-gap-1 gtrans-rounded-full gtrans-bg-body gtrans-px-2 gtrans-py-0.5 gtrans-text-xs gtrans-text-label"
 						>
 							{c}
 							<button
 								type="button"
 								onClick={() => removeCountry(c)}
-								className="gtrans-bare gtrans-text-gray-500 hover:gtrans-text-red-600"
+								className="gtrans-bare gtrans-text-muted hover:gtrans-text-red-600"
 								aria-label={__('Remove', 'gemtranslate')}
 							>
 								×

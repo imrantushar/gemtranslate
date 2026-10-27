@@ -1,11 +1,11 @@
 import clsx from 'clsx';
 
 const TONE = {
-	none: 'gtrans-bg-gray-100 gtrans-text-gray-600',
-	draft: 'gtrans-bg-amber-100 gtrans-text-amber-700',
-	publish: 'gtrans-bg-green-100 gtrans-text-green-700',
-	translated: 'gtrans-bg-green-100 gtrans-text-green-700',
-	pending: 'gtrans-bg-blue-100 gtrans-text-blue-700',
+	none: 'gtrans-bg-body gtrans-text-muted',
+	draft: 'gtrans-bg-warning-light gtrans-text-warning',
+	publish: 'gtrans-bg-success-light gtrans-text-success',
+	translated: 'gtrans-bg-success-light gtrans-text-success',
+	pending: 'gtrans-bg-primary-light gtrans-text-primary',
 };
 
 export default function StatusPill({ tone = 'none', children }) {

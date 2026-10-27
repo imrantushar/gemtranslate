@@ -11,7 +11,7 @@ export default function SeoPage() {
 				description={__('Hreflang tags, sitemap entries, and Yoast/RankMath meta are translated automatically.', 'gemtranslate')}
 			/>
 			<Card>
-				<ul className="gtrans-list-disc gtrans-pl-5 gtrans-text-sm gtrans-text-gray-800">
+				<ul className="gtrans-list-disc gtrans-pl-5 gtrans-text-sm gtrans-text-ink">
 					<li>{__('Hreflang tags emitted in <head> for every active language plus x-default.', 'gemtranslate')}</li>
 					<li>{__('Core WP sitemaps include alternate URLs.', 'gemtranslate')}</li>
 					<li>{__('Yoast SEO and Rank Math bridges swap meta title / description per language when those plugins are active.', 'gemtranslate')}</li>

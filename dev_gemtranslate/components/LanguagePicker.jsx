@@ -43,16 +43,16 @@ export default function LanguagePicker() {
 	};
 
 	return (
-		<div className="gtrans-rounded-md gtrans-bg-gtrans-bg gtrans-px-3 gtrans-py-2">
+		<div className="gtrans-rounded-md gtrans-bg-body gtrans-px-3 gtrans-py-2">
 			<label className="gtrans-block">
-				<span className="gtrans-block gtrans-text-xs gtrans-font-medium gtrans-text-gtrans-muted">
+				<span className="gtrans-block gtrans-text-xs gtrans-font-medium gtrans-text-muted">
 					{__('Admin UI language', 'gemtranslate')}
 				</span>
 				<select
 					value={current}
 					onChange={onChange}
 					disabled={setMine.isPending}
-					className="gtrans-mt-1 gtrans-w-full gtrans-rounded gtrans-border gtrans-border-gtrans-border gtrans-bg-white gtrans-px-2 gtrans-py-1 gtrans-text-sm"
+					className="gtrans-mt-1 gtrans-w-full gtrans-rounded gtrans-border gtrans-border-line gtrans-bg-surface gtrans-px-2 gtrans-py-1 gtrans-text-sm"
 				>
 					<option value="">{__('Site default', 'gemtranslate')}</option>
 					{langs.map((lang) => (
@@ -62,7 +62,7 @@ export default function LanguagePicker() {
 					))}
 				</select>
 			</label>
-			<p className="gtrans-mt-1 gtrans-mb-0 gtrans-text-[11px] gtrans-leading-snug gtrans-text-gtrans-muted">
+			<p className="gtrans-mt-1 gtrans-mb-0 gtrans-text-[11px] gtrans-leading-snug gtrans-text-muted">
 				{__('Changes the admin interface only. Frontend visitors pick their own language via the switcher.', 'gemtranslate')}
 			</p>
 		</div>

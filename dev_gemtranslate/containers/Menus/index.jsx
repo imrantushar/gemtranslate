@@ -3,9 +3,11 @@ import { __, sprintf } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
+import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
-import { Field, Select, TextInput } from '../../components/Input';
+import { Field, TextInput } from '../../components/Input';
+import { Select } from '../../components/ui/Select';
 import { LoadingBlock } from '../../components/Spinner';
 import { api, unwrap } from '../../lib/api';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -102,53 +104,53 @@ export default function MenusPage() {
 				{items.isLoading ? (
 					<LoadingBlock>{__('Loading items…', 'gemtranslate')}</LoadingBlock>
 				) : (items.data || []).length === 0 ? (
-					<p className="gtrans-px-5 gtrans-py-8 gtrans-text-center gtrans-text-sm gtrans-text-gtrans-muted">
+					<p className="gtrans-px-5 gtrans-py-8 gtrans-text-center gtrans-text-sm gtrans-text-muted">
 						{__('No menu items.', 'gemtranslate')}
 					</p>
 				) : (
-					<table className="gtrans-w-full gtrans-text-sm">
-						<thead className="gtrans-bg-gtrans-bg gtrans-text-left gtrans-text-xs gtrans-uppercase gtrans-text-gtrans-muted">
-							<tr>
-								<th className="gtrans-px-4 gtrans-py-3">{__('Original', 'gemtranslate')}</th>
-								<th className="gtrans-px-4 gtrans-py-3">
+					<Table.Root>
+						<Table.Header>
+							<Table.Row>
+								<Table.ColumnHeader>{__('Original', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader>
 									{sprintf(/* translators: %s: language code. */ __('Translation (%s)', 'gemtranslate'), selectedLang)}
-								</th>
-								<th className="gtrans-px-4 gtrans-py-3">{__('URL override', 'gemtranslate')}</th>
-								<th className="gtrans-px-4 gtrans-py-3 gtrans-w-24" />
-							</tr>
-						</thead>
-						<tbody>
+								</Table.ColumnHeader>
+								<Table.ColumnHeader>{__('URL override', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader className="gtrans-w-24" />
+							</Table.Row>
+						</Table.Header>
+						<Table.Body>
 							{(items.data || []).map((item) => {
 								const tr = item.translations?.[selectedLang] || {};
 								const draft = drafts[item.id] || {};
 								return (
-									<tr key={item.id} className="gtrans-border-t gtrans-border-gtrans-border">
-										<td className="gtrans-px-4 gtrans-py-3">
+									<Table.Row key={item.id}>
+										<Table.Cell>
 											<div className="gtrans-font-medium">{item.title}</div>
-											<div className="gtrans-text-xs gtrans-text-gtrans-muted">{item.url}</div>
-										</td>
-										<td className="gtrans-px-4 gtrans-py-3">
+											<div className="gtrans-text-xs gtrans-text-muted">{item.url}</div>
+										</Table.Cell>
+										<Table.Cell>
 											<TextInput
 												value={draft.title ?? tr.title ?? ''}
 												onChange={(e) => setDrafts((d) => ({ ...d, [item.id]: { ...(d[item.id] || {}), title: e.target.value } }))}
 											/>
-										</td>
-										<td className="gtrans-px-4 gtrans-py-3">
+										</Table.Cell>
+										<Table.Cell>
 											<TextInput
 												value={draft.url_override ?? tr.url_override ?? ''}
 												onChange={(e) => setDrafts((d) => ({ ...d, [item.id]: { ...(d[item.id] || {}), url_override: e.target.value } }))}
 											/>
-										</td>
-										<td className="gtrans-px-4 gtrans-py-3 gtrans-text-right">
+										</Table.Cell>
+										<Table.Cell className="gtrans-text-right">
 											<Button size="sm" onClick={() => onSave(item)} loading={save.isPending}>
 												{__('Save', 'gemtranslate')}
 											</Button>
-										</td>
-									</tr>
+										</Table.Cell>
+									</Table.Row>
 								);
 							})}
-						</tbody>
-					</table>
+						</Table.Body>
+					</Table.Root>
 				)}
 			</Card>
 

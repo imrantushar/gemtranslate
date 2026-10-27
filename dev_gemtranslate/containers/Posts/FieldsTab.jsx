@@ -107,7 +107,7 @@ export default function FieldsTab({ postId, sourceLang, targetLang, country = ''
 					</Button>
 				}
 			>
-				<p className="gtrans-mb-3 gtrans-text-xs gtrans-text-gtrans-muted">
+				<p className="gtrans-mb-3 gtrans-text-xs gtrans-text-muted">
 					{__(
 						'Translate text only — block wrappers and inline tags are protected. Use {1} {2} placeholders for bold/links/etc; the legend under each field shows what each token means.',
 						'gemtranslate'
@@ -146,8 +146,8 @@ function FieldRow({ field, label, draft, onChange, onAI, aiBusy }) {
 	const mismatch = draft && draftTokenCount !== sourceTokenCount;
 
 	return (
-		<div className="gtrans-rounded-md gtrans-border gtrans-border-gtrans-border gtrans-p-3">
-			<div className="gtrans-mb-2 gtrans-flex gtrans-items-center gtrans-justify-between gtrans-text-xs gtrans-text-gtrans-muted">
+		<div className="gtrans-rounded-md gtrans-border gtrans-border-line gtrans-p-3">
+			<div className="gtrans-mb-2 gtrans-flex gtrans-items-center gtrans-justify-between gtrans-text-xs gtrans-text-muted">
 				<code>{label}</code>
 				<Button variant="ghost" size="sm" onClick={onAI} loading={aiBusy}>
 					{__('AI', 'gemtranslate')}
@@ -170,7 +170,7 @@ function FieldRow({ field, label, draft, onChange, onAI, aiBusy }) {
 				</Field>
 			</div>
 			{tokenNumbers.length > 0 && (
-				<div className="gtrans-mt-2 gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-1 gtrans-text-xs gtrans-text-gtrans-muted">
+				<div className="gtrans-mt-2 gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-1 gtrans-text-xs gtrans-text-muted">
 					<span className="gtrans-mr-1">{__('Tokens:', 'gemtranslate')}</span>
 					{tokenNumbers.map((n) => (
 						<TokenChip key={n} number={n} html={tokens[n]} />
@@ -196,7 +196,7 @@ function TokenChip({ number, html }) {
 	return (
 		<span
 			title={html}
-			className="gtrans-inline-flex gtrans-items-center gtrans-gap-1 gtrans-rounded gtrans-bg-gray-100 gtrans-px-1.5 gtrans-py-0.5 gtrans-text-gray-700"
+			className="gtrans-inline-flex gtrans-items-center gtrans-gap-1 gtrans-rounded gtrans-bg-body gtrans-px-1.5 gtrans-py-0.5 gtrans-text-label"
 		>
 			<code className="gtrans-text-[11px]">{`{${number}}`}</code>
 			<span className="gtrans-text-[11px]">= {label}</span>

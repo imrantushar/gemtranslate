@@ -3,6 +3,7 @@ import { __ } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
+import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
 import StatusPill from '../../components/StatusPill';
@@ -53,32 +54,32 @@ export default function TranslatorsPage() {
 
 			<Card padded={false}>
 				{list.data.length === 0 ? (
-					<p className="gtrans-px-5 gtrans-py-8 gtrans-text-center gtrans-text-sm gtrans-text-gtrans-muted">
+					<p className="gtrans-px-5 gtrans-py-8 gtrans-text-center gtrans-text-sm gtrans-text-muted">
 						{__('No users with translator access. Edit users and assign them the Translator role or grant the gtrans_translate_content capability.', 'gemtranslate')}
 					</p>
 				) : (
-					<table className="gtrans-w-full gtrans-text-sm">
-						<thead className="gtrans-bg-gtrans-bg gtrans-text-left gtrans-text-xs gtrans-uppercase gtrans-text-gtrans-muted">
-							<tr>
-								<th className="gtrans-px-4 gtrans-py-3">{__('User', 'gemtranslate')}</th>
-								<th className="gtrans-px-4 gtrans-py-3">{__('Roles', 'gemtranslate')}</th>
-								<th className="gtrans-px-4 gtrans-py-3">{__('Languages', 'gemtranslate')}</th>
-								<th className="gtrans-px-4 gtrans-py-3" />
-							</tr>
-						</thead>
-						<tbody>
+					<Table.Root>
+						<Table.Header>
+							<Table.Row>
+								<Table.ColumnHeader>{__('User', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader>{__('Roles', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader>{__('Languages', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader />
+							</Table.Row>
+						</Table.Header>
+						<Table.Body>
 							{list.data.map((u) => {
 								const picked = drafts[u.id] || [];
 								return (
-									<tr key={u.id} className="gtrans-border-t gtrans-border-gtrans-border gtrans-align-top">
-										<td className="gtrans-px-4 gtrans-py-3">
+									<Table.Row key={u.id} className="gtrans-align-top">
+										<Table.Cell>
 											<div className="gtrans-font-medium">{u.name}</div>
-											<div className="gtrans-text-xs gtrans-text-gtrans-muted">{u.email}</div>
-										</td>
-										<td className="gtrans-px-4 gtrans-py-3 gtrans-text-xs gtrans-text-gtrans-muted">
+											<div className="gtrans-text-xs gtrans-text-muted">{u.email}</div>
+										</Table.Cell>
+										<Table.Cell className="gtrans-text-xs gtrans-text-muted">
 											{u.roles.join(', ')}
-										</td>
-										<td className="gtrans-px-4 gtrans-py-3">
+										</Table.Cell>
+										<Table.Cell>
 											<div className="gtrans-flex gtrans-flex-wrap gtrans-gap-2">
 												{nonDefault.map((l) => (
 													<Checkbox
@@ -92,17 +93,17 @@ export default function TranslatorsPage() {
 											{picked.length === 0 && (
 												<div className="gtrans-mt-2"><StatusPill>{__('Unrestricted', 'gemtranslate')}</StatusPill></div>
 											)}
-										</td>
-										<td className="gtrans-px-4 gtrans-py-3 gtrans-text-right">
+										</Table.Cell>
+										<Table.Cell className="gtrans-text-right">
 											<Button size="sm" onClick={() => onSave(u.id)} loading={save.isPending}>
 												{__('Save', 'gemtranslate')}
 											</Button>
-										</td>
-									</tr>
+										</Table.Cell>
+									</Table.Row>
 								);
 							})}
-						</tbody>
-					</table>
+						</Table.Body>
+					</Table.Root>
 				)}
 			</Card>
 

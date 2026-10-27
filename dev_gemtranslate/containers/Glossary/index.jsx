@@ -3,10 +3,12 @@ import { __ } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
+import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
 import StatusPill from '../../components/StatusPill';
-import { Field, Select, TextInput, Checkbox } from '../../components/Input';
+import { Field, TextInput, Checkbox } from '../../components/Input';
+import { Select } from '../../components/ui/Select';
 import { LoadingBlock } from '../../components/Spinner';
 import { useGlossary, useAddGlossaryTerm, useDeleteGlossaryTerm } from '../../hooks/useAI';
 import { useLanguages } from '../../hooks/useLanguages';
@@ -110,41 +112,41 @@ export default function GlossaryPage() {
 
 			<Card padded={false} title={__('Existing terms', 'gemtranslate')}>
 				{(list.data || []).length === 0 ? (
-					<p className="gtrans-px-5 gtrans-py-8 gtrans-text-center gtrans-text-sm gtrans-text-gtrans-muted">
+					<p className="gtrans-px-5 gtrans-py-8 gtrans-text-center gtrans-text-sm gtrans-text-muted">
 						{__('No glossary entries yet.', 'gemtranslate')}
 					</p>
 				) : (
-					<table className="gtrans-w-full gtrans-text-sm">
-						<thead className="gtrans-bg-gtrans-bg gtrans-text-left gtrans-text-xs gtrans-uppercase gtrans-text-gtrans-muted">
-							<tr>
-								<th className="gtrans-px-4 gtrans-py-3">{__('Source', 'gemtranslate')}</th>
-								<th className="gtrans-px-4 gtrans-py-3">{__('Target', 'gemtranslate')}</th>
-								<th className="gtrans-px-4 gtrans-py-3">{__('Pair', 'gemtranslate')}</th>
-								<th className="gtrans-px-4 gtrans-py-3">{__('Flags', 'gemtranslate')}</th>
-								<th className="gtrans-px-4 gtrans-py-3" />
-							</tr>
-						</thead>
-						<tbody>
+					<Table.Root>
+						<Table.Header>
+							<Table.Row>
+								<Table.ColumnHeader>{__('Source', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader>{__('Target', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader>{__('Pair', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader>{__('Flags', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader />
+							</Table.Row>
+						</Table.Header>
+						<Table.Body>
 							{(list.data || []).map((row) => (
-								<tr key={row.term_id} className="gtrans-border-t gtrans-border-gtrans-border">
-									<td className="gtrans-px-4 gtrans-py-3 gtrans-font-medium">{row.source_term}</td>
-									<td className="gtrans-px-4 gtrans-py-3">{row.target_term || <em className="gtrans-text-gtrans-muted">{__('(do not translate)', 'gemtranslate')}</em>}</td>
-									<td className="gtrans-px-4 gtrans-py-3 gtrans-text-gtrans-muted">
+								<Table.Row key={row.term_id}>
+									<Table.Cell className="gtrans-font-medium">{row.source_term}</Table.Cell>
+									<Table.Cell>{row.target_term || <em className="gtrans-text-muted">{__('(do not translate)', 'gemtranslate')}</em>}</Table.Cell>
+									<Table.Cell className="gtrans-text-muted">
 										<code>{row.source_lang}</code> → <code>{row.target_lang}</code>
-									</td>
-									<td className="gtrans-px-4 gtrans-py-3">
+									</Table.Cell>
+									<Table.Cell>
 										{Number(row.case_sensitive) === 1 && <StatusPill>{__('Aa', 'gemtranslate')}</StatusPill>}
 										{Number(row.do_not_translate) === 1 && <StatusPill tone="draft">{__('DNT', 'gemtranslate')}</StatusPill>}
-									</td>
-									<td className="gtrans-px-4 gtrans-py-3 gtrans-text-right">
+									</Table.Cell>
+									<Table.Cell className="gtrans-text-right">
 										<Button variant="ghost" size="sm" onClick={() => onDelete(row.term_id)}>
 											{__('Delete', 'gemtranslate')}
 										</Button>
-									</td>
-								</tr>
+									</Table.Cell>
+								</Table.Row>
 							))}
-						</tbody>
-					</table>
+						</Table.Body>
+					</Table.Root>
 				)}
 			</Card>
 

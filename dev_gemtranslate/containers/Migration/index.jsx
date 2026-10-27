@@ -56,7 +56,7 @@ export default function MigrationPage() {
 					const result = results[s.key];
 					return (
 						<Card key={s.key} title={s.label}>
-							<p className="gtrans-mb-3 gtrans-text-xs gtrans-text-gtrans-muted">{s.hint()}</p>
+							<p className="gtrans-mb-3 gtrans-text-xs gtrans-text-muted">{s.hint()}</p>
 							<div className="gtrans-mb-4">
 								{detected ? (
 									<StatusPill tone="translated">{__('Detected', 'gemtranslate')}</StatusPill>
@@ -68,13 +68,13 @@ export default function MigrationPage() {
 								{__('Run import', 'gemtranslate')}
 							</Button>
 							{result && (
-								<div className="gtrans-mt-3 gtrans-rounded gtrans-bg-gtrans-bg gtrans-p-2 gtrans-text-xs gtrans-text-gray-700">
+								<div className="gtrans-mt-3 gtrans-rounded gtrans-bg-body gtrans-p-2 gtrans-text-xs gtrans-text-label">
 									<div>{__('Languages:', 'gemtranslate')} <strong>{result.languages}</strong></div>
 									<div>{__('Posts:', 'gemtranslate')} <strong>{result.posts}</strong></div>
 									<div>{__('Strings:', 'gemtranslate')} <strong>{result.strings}</strong></div>
 									<div>{__('Skipped:', 'gemtranslate')} <strong>{result.skipped}</strong></div>
 									{result.errors?.length > 0 && (
-										<div className="gtrans-mt-2 gtrans-text-gtrans-danger">{result.errors[0]}</div>
+										<div className="gtrans-mt-2 gtrans-text-danger">{result.errors[0]}</div>
 									)}
 								</div>
 							)}

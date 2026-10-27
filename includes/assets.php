@@ -67,6 +67,14 @@ class Assets {
 			return;
 		}
 
+		// Full-bleed app shell like GemCRM's: suppress WP's own admin notices
+		// (plugin review nudges, "just reset your DB" banners, …) on our screen
+		// instead of letting them stack above the React app.
+		remove_all_actions( 'admin_notices' );
+		remove_all_actions( 'all_admin_notices' );
+		remove_all_actions( 'user_admin_notices' );
+		remove_all_actions( 'network_admin_notices' );
+
 		$build_dir  = GTRANS_ASSETS_DIR_PATH . 'build/';
 		$asset_file = $build_dir . 'backend.' . GTRANS_VERSION . '.asset.php';
 		$bundle_js  = $build_dir . 'backend.' . GTRANS_VERSION . '.js';

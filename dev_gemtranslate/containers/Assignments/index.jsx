@@ -4,10 +4,12 @@ import { __, sprintf } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
+import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
 import StatusPill from '../../components/StatusPill';
-import { Field, Select, TextInput, TextArea } from '../../components/Input';
+import { Field, TextInput, TextArea } from '../../components/Input';
+import { Select } from '../../components/ui/Select';
 import { LoadingBlock } from '../../components/Spinner';
 import {
 	useAssignments,
@@ -78,7 +80,7 @@ export default function AssignmentsPage() {
 			{canManage && <NewAssignment onToast={setToast} />}
 
 			<Card padded={false}>
-				<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-3 gtrans-border-b gtrans-border-gtrans-border gtrans-px-4 gtrans-py-3 gtrans-text-sm">
+				<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-3 gtrans-border-b gtrans-border-line gtrans-px-4 gtrans-py-3 gtrans-text-sm">
 					{canManage && (
 						<div className="gtrans-flex gtrans-gap-1">
 							{['all', 'mine'].map((s) => (
@@ -88,8 +90,8 @@ export default function AssignmentsPage() {
 									onClick={() => setScope(s)}
 									className={`gtrans-bare gtrans-rounded-md gtrans-px-3 gtrans-py-1 gtrans-text-xs ${
 										scope === s
-											? 'gtrans-bg-gtrans-primary gtrans-text-white'
-											: 'gtrans-bg-white gtrans-border gtrans-border-gtrans-border gtrans-text-gray-700'
+											? 'gtrans-bg-primary gtrans-text-white'
+											: 'gtrans-bg-surface gtrans-border gtrans-border-line gtrans-text-label'
 									}`}
 								>
 									{s === 'all'
@@ -114,50 +116,50 @@ export default function AssignmentsPage() {
 				{list.isLoading ? (
 					<LoadingBlock>{__('Loading assignments…', 'gemtranslate')}</LoadingBlock>
 				) : rows.length === 0 ? (
-					<p className="gtrans-px-5 gtrans-py-10 gtrans-text-center gtrans-text-sm gtrans-text-gtrans-muted">
+					<p className="gtrans-px-5 gtrans-py-10 gtrans-text-center gtrans-text-sm gtrans-text-muted">
 						{__('No assignments yet.', 'gemtranslate')}
 					</p>
 				) : (
-					<table className="gtrans-w-full gtrans-text-sm">
-						<thead className="gtrans-bg-gtrans-bg gtrans-text-left gtrans-text-xs gtrans-uppercase gtrans-text-gtrans-muted">
-							<tr>
-								<th className="gtrans-px-4 gtrans-py-3">{__('Content', 'gemtranslate')}</th>
-								<th className="gtrans-px-4 gtrans-py-3">{__('Language', 'gemtranslate')}</th>
+					<Table.Root>
+						<Table.Header>
+							<Table.Row>
+								<Table.ColumnHeader>{__('Content', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader>{__('Language', 'gemtranslate')}</Table.ColumnHeader>
 								{canManage && (
-									<th className="gtrans-px-4 gtrans-py-3">{__('Translator', 'gemtranslate')}</th>
+									<Table.ColumnHeader>{__('Translator', 'gemtranslate')}</Table.ColumnHeader>
 								)}
-								<th className="gtrans-px-4 gtrans-py-3">{__('Status', 'gemtranslate')}</th>
-								<th className="gtrans-px-4 gtrans-py-3 gtrans-text-right">
+								<Table.ColumnHeader>{__('Status', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader className="gtrans-text-right">
 									{__('Actions', 'gemtranslate')}
-								</th>
-							</tr>
-						</thead>
-						<tbody>
+								</Table.ColumnHeader>
+							</Table.Row>
+						</Table.Header>
+						<Table.Body>
 							{rows.map((r) => (
-								<tr key={r.id} className="gtrans-border-t gtrans-border-gtrans-border">
-									<td className="gtrans-px-4 gtrans-py-3 gtrans-max-w-[280px]">
-										<div className="gtrans-font-medium gtrans-text-gray-900">
+								<Table.Row key={r.id}>
+									<Table.Cell className="gtrans-max-w-[280px]">
+										<div className="gtrans-font-medium gtrans-text-ink">
 											{truncate(r.post_title, 60)}
 										</div>
 										{r.note && (
-											<div className="gtrans-text-xs gtrans-text-gtrans-muted">
+											<div className="gtrans-text-xs gtrans-text-muted">
 												{truncate(r.note, 80)}
 											</div>
 										)}
-									</td>
-									<td className="gtrans-px-4 gtrans-py-3">
+									</Table.Cell>
+									<Table.Cell>
 										{r.language_name}
 										{r.country_code ? ` · ${r.country_code}` : ''}
-									</td>
-									{canManage && <td className="gtrans-px-4 gtrans-py-3">{r.translator_name}</td>}
-									<td className="gtrans-px-4 gtrans-py-3">
+									</Table.Cell>
+									{canManage && <Table.Cell>{r.translator_name}</Table.Cell>}
+									<Table.Cell>
 										<StatusPill tone={STATUS_TONE[r.status]}>{statusLabel(r.status)}</StatusPill>
-									</td>
-									<td className="gtrans-px-4 gtrans-py-3">
+									</Table.Cell>
+									<Table.Cell>
 										<div className="gtrans-flex gtrans-items-center gtrans-justify-end gtrans-gap-2">
 											<Link
 												to={`/posts/${r.post_id}`}
-												className="gtrans-rounded-md gtrans-border gtrans-border-gtrans-border gtrans-bg-white gtrans-px-3 gtrans-py-1.5 gtrans-text-xs gtrans-text-gray-700 gtrans-no-underline hover:gtrans-bg-gray-50"
+												className="gtrans-rounded-md gtrans-border gtrans-border-line gtrans-bg-surface gtrans-px-3 gtrans-py-1.5 gtrans-text-xs gtrans-text-label gtrans-no-underline hover:gtrans-bg-body"
 											>
 												{__('Open', 'gemtranslate')}
 											</Link>
@@ -206,11 +208,11 @@ export default function AssignmentsPage() {
 												</Button>
 											)}
 										</div>
-									</td>
-								</tr>
+									</Table.Cell>
+								</Table.Row>
 							))}
-						</tbody>
-					</table>
+						</Table.Body>
+					</Table.Root>
 				)}
 			</Card>
 

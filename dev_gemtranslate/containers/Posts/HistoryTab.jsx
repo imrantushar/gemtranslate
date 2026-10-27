@@ -21,7 +21,7 @@ export default function HistoryTab({ postId, targetLang }) {
 	if (!list.data || list.data.length === 0) {
 		return (
 			<Card>
-				<p className="gtrans-m-0 gtrans-text-sm gtrans-text-gtrans-muted">
+				<p className="gtrans-m-0 gtrans-text-sm gtrans-text-muted">
 					{__('No revisions yet. Each save creates a new history entry (up to 20 per translation).', 'gemtranslate')}
 				</p>
 			</Card>
@@ -48,15 +48,15 @@ export default function HistoryTab({ postId, targetLang }) {
 							<li
 								key={rev.revision_id}
 								onClick={() => setSelected(rev.revision_id)}
-								className={`gtrans-cursor-pointer gtrans-border-b gtrans-border-gtrans-border gtrans-px-4 gtrans-py-3 gtrans-text-sm ${
-									selected === rev.revision_id ? 'gtrans-bg-blue-50' : 'hover:gtrans-bg-gtrans-bg'
+								className={`gtrans-cursor-pointer gtrans-border-b gtrans-border-line gtrans-px-4 gtrans-py-3 gtrans-text-sm ${
+									selected === rev.revision_id ? 'gtrans-bg-blue-50' : 'hover:gtrans-bg-body'
 								}`}
 							>
 								<div className="gtrans-flex gtrans-items-center gtrans-justify-between">
-									<strong className="gtrans-text-gray-900">#{rev.revision_id}</strong>
+									<strong className="gtrans-text-ink">#{rev.revision_id}</strong>
 									<StatusPill tone={rev.status === 'publish' ? 'translated' : 'pending'}>{rev.status}</StatusPill>
 								</div>
-								<div className="gtrans-mt-1 gtrans-text-xs gtrans-text-gtrans-muted">
+								<div className="gtrans-mt-1 gtrans-text-xs gtrans-text-muted">
 									{rev.created_at}
 									{rev.author?.name && (
 										<>
@@ -65,7 +65,7 @@ export default function HistoryTab({ postId, targetLang }) {
 									)}
 								</div>
 								<div className="gtrans-mt-1 gtrans-text-xs">{truncate(rev.title_preview || __('(no title)', 'gemtranslate'), 80)}</div>
-								<div className="gtrans-mt-1 gtrans-text-xs gtrans-text-gtrans-muted">
+								<div className="gtrans-mt-1 gtrans-text-xs gtrans-text-muted">
 									{sprintf(/* translators: %d: byte length. */ __('%d chars', 'gemtranslate'), rev.content_size)}
 								</div>
 							</li>
@@ -75,26 +75,26 @@ export default function HistoryTab({ postId, targetLang }) {
 
 				<Card title={selected ? sprintf(/* translators: %d: revision id. */ __('Revision #%d', 'gemtranslate'), selected) : __('Pick a revision', 'gemtranslate')}>
 					{!selected ? (
-						<p className="gtrans-m-0 gtrans-text-sm gtrans-text-gtrans-muted">
+						<p className="gtrans-m-0 gtrans-text-sm gtrans-text-muted">
 							{__('Select a revision from the list to view its contents.', 'gemtranslate')}
 						</p>
 					) : detail.isLoading ? (
 						<LoadingBlock>{__('Loading revision…', 'gemtranslate')}</LoadingBlock>
 					) : !detail.data ? (
-						<p className="gtrans-text-gtrans-danger">{__('Revision not available.', 'gemtranslate')}</p>
+						<p className="gtrans-text-danger">{__('Revision not available.', 'gemtranslate')}</p>
 					) : (
 						<div className="gtrans-flex gtrans-flex-col gtrans-gap-3 gtrans-text-sm">
 							<div>
-								<div className="gtrans-text-xs gtrans-text-gtrans-muted gtrans-mb-1">{__('Title', 'gemtranslate')}</div>
-								<div className="gtrans-rounded gtrans-bg-gtrans-bg gtrans-px-3 gtrans-py-2">{detail.data.title || '—'}</div>
+								<div className="gtrans-text-xs gtrans-text-muted gtrans-mb-1">{__('Title', 'gemtranslate')}</div>
+								<div className="gtrans-rounded gtrans-bg-body gtrans-px-3 gtrans-py-2">{detail.data.title || '—'}</div>
 							</div>
 							<div>
-								<div className="gtrans-text-xs gtrans-text-gtrans-muted gtrans-mb-1">{__('Excerpt', 'gemtranslate')}</div>
-								<div className="gtrans-rounded gtrans-bg-gtrans-bg gtrans-px-3 gtrans-py-2 gtrans-whitespace-pre-wrap">{detail.data.excerpt || '—'}</div>
+								<div className="gtrans-text-xs gtrans-text-muted gtrans-mb-1">{__('Excerpt', 'gemtranslate')}</div>
+								<div className="gtrans-rounded gtrans-bg-body gtrans-px-3 gtrans-py-2 gtrans-whitespace-pre-wrap">{detail.data.excerpt || '—'}</div>
 							</div>
 							<div>
-								<div className="gtrans-text-xs gtrans-text-gtrans-muted gtrans-mb-1">{__('Content', 'gemtranslate')}</div>
-								<pre className="gtrans-max-h-72 gtrans-overflow-auto gtrans-rounded gtrans-bg-gtrans-bg gtrans-p-3 gtrans-text-xs gtrans-whitespace-pre-wrap">{detail.data.content || '—'}</pre>
+								<div className="gtrans-text-xs gtrans-text-muted gtrans-mb-1">{__('Content', 'gemtranslate')}</div>
+								<pre className="gtrans-max-h-72 gtrans-overflow-auto gtrans-rounded gtrans-bg-body gtrans-p-3 gtrans-text-xs gtrans-whitespace-pre-wrap">{detail.data.content || '—'}</pre>
 							</div>
 							<div className="gtrans-flex gtrans-justify-end">
 								<Button onClick={onRevert} loading={revert.isPending}>

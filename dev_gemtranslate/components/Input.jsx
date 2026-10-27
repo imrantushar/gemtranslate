@@ -3,10 +3,10 @@ import clsx from 'clsx';
 export function Field({ label, hint, error, children }) {
 	return (
 		<label className="gtrans-block">
-			{label && <span className="gtrans-mb-1 gtrans-block gtrans-text-xs gtrans-font-medium gtrans-text-gray-700">{label}</span>}
+			{label && <span className="gtrans-mb-1 gtrans-block gtrans-text-xs gtrans-font-medium gtrans-text-label">{label}</span>}
 			{children}
-			{hint && !error && <span className="gtrans-mt-1 gtrans-block gtrans-text-xs gtrans-text-gtrans-muted">{hint}</span>}
-			{error && <span className="gtrans-mt-1 gtrans-block gtrans-text-xs gtrans-text-gtrans-danger">{error}</span>}
+			{hint && !error && <span className="gtrans-mt-1 gtrans-block gtrans-text-xs gtrans-text-muted">{hint}</span>}
+			{error && <span className="gtrans-mt-1 gtrans-block gtrans-text-xs gtrans-text-danger">{error}</span>}
 		</label>
 	);
 }
@@ -29,7 +29,7 @@ export function Select({ className, children, ...props }) {
 
 export function Checkbox({ label, ...props }) {
 	return (
-		<label className="gtrans-inline-flex gtrans-items-center gtrans-gap-2 gtrans-text-sm gtrans-text-gray-800">
+		<label className="gtrans-inline-flex gtrans-items-center gtrans-gap-2 gtrans-text-sm gtrans-text-ink">
 			<input type="checkbox" {...props} />
 			{label}
 		</label>

@@ -4,6 +4,7 @@ import { __, sprintf } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
+import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
 import StatusPill from '../../components/StatusPill';
@@ -92,52 +93,52 @@ export default function ReviewPage() {
 				{queue.isLoading ? (
 					<LoadingBlock>{__('Loading review queue…', 'gemtranslate')}</LoadingBlock>
 				) : rows.length === 0 ? (
-					<p className="gtrans-px-5 gtrans-py-10 gtrans-text-center gtrans-text-sm gtrans-text-gtrans-muted">
+					<p className="gtrans-px-5 gtrans-py-10 gtrans-text-center gtrans-text-sm gtrans-text-muted">
 						{__(
 							'Nothing waiting for review. New automatic translations will appear here when "Hold for review" is on.',
 							'gemtranslate'
 						)}
 					</p>
 				) : (
-					<table className="gtrans-w-full gtrans-text-sm">
-						<thead className="gtrans-bg-gtrans-bg gtrans-text-left gtrans-text-xs gtrans-uppercase gtrans-text-gtrans-muted">
-							<tr>
-								<th className="gtrans-px-4 gtrans-py-3">{__('Content', 'gemtranslate')}</th>
-								<th className="gtrans-px-4 gtrans-py-3">{__('Language', 'gemtranslate')}</th>
-								<th className="gtrans-px-4 gtrans-py-3">{__('Preview', 'gemtranslate')}</th>
-								<th className="gtrans-px-4 gtrans-py-3 gtrans-text-right">
+					<Table.Root>
+						<Table.Header>
+							<Table.Row>
+								<Table.ColumnHeader>{__('Content', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader>{__('Language', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader>{__('Preview', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader className="gtrans-text-right">
 									{__('Actions', 'gemtranslate')}
-								</th>
-							</tr>
-						</thead>
-						<tbody>
+								</Table.ColumnHeader>
+							</Table.Row>
+						</Table.Header>
+						<Table.Body>
 							{rows.map((r) => {
 								const busy = busyKey === rowKey(r);
 								return (
-									<tr
+									<Table.Row
 										key={rowKey(r)}
-										className="gtrans-border-t gtrans-border-gtrans-border gtrans-align-top"
+										className="gtrans-align-top"
 									>
-										<td className="gtrans-px-4 gtrans-py-3 gtrans-max-w-[280px]">
-											<div className="gtrans-font-medium gtrans-text-gray-900">
+										<Table.Cell className="gtrans-max-w-[280px]">
+											<div className="gtrans-font-medium gtrans-text-ink">
 												{truncate(r.source_title || `#${r.post_id}`, 60)}
 											</div>
-											<div className="gtrans-text-xs gtrans-text-gtrans-muted">{r.post_type}</div>
-										</td>
-										<td className="gtrans-px-4 gtrans-py-3">
+											<div className="gtrans-text-xs gtrans-text-muted">{r.post_type}</div>
+										</Table.Cell>
+										<Table.Cell>
 											<StatusPill tone="pending">
 												{langName(r.language_code)}
 												{r.country_code ? ` · ${r.country_code}` : ''}
 											</StatusPill>
-										</td>
-										<td className="gtrans-px-4 gtrans-py-3 gtrans-max-w-[360px] gtrans-text-gray-700">
-											{r.snippet || <span className="gtrans-text-gtrans-muted">—</span>}
-										</td>
-										<td className="gtrans-px-4 gtrans-py-3">
+										</Table.Cell>
+										<Table.Cell className="gtrans-max-w-[360px] gtrans-text-label">
+											{r.snippet || <span className="gtrans-text-muted">—</span>}
+										</Table.Cell>
+										<Table.Cell>
 											<div className="gtrans-flex gtrans-items-center gtrans-justify-end gtrans-gap-2">
 												<Link
 													to={`/posts/${r.post_id}`}
-													className="gtrans-rounded-md gtrans-border gtrans-border-gtrans-border gtrans-bg-white gtrans-px-3 gtrans-py-1.5 gtrans-text-xs gtrans-text-gray-700 gtrans-no-underline hover:gtrans-bg-gray-50"
+													className="gtrans-rounded-md gtrans-border gtrans-border-line gtrans-bg-surface gtrans-px-3 gtrans-py-1.5 gtrans-text-xs gtrans-text-label gtrans-no-underline hover:gtrans-bg-body"
 												>
 													{__('Edit', 'gemtranslate')}
 												</Link>
@@ -153,17 +154,17 @@ export default function ReviewPage() {
 													{__('Approve', 'gemtranslate')}
 												</Button>
 											</div>
-										</td>
-									</tr>
+										</Table.Cell>
+									</Table.Row>
 								);
 							})}
-						</tbody>
-					</table>
+						</Table.Body>
+					</Table.Root>
 				)}
 
 				{meta?.total_pages > 1 && (
-					<div className="gtrans-flex gtrans-justify-between gtrans-border-t gtrans-border-gtrans-border gtrans-px-4 gtrans-py-3 gtrans-text-sm">
-						<span className="gtrans-text-gtrans-muted">
+					<div className="gtrans-flex gtrans-justify-between gtrans-border-t gtrans-border-line gtrans-px-4 gtrans-py-3 gtrans-text-sm">
+						<span className="gtrans-text-muted">
 							{sprintf(
 								/* translators: 1: current page, 2: total pages. */
 								__('Page %1$d of %2$d', 'gemtranslate'),

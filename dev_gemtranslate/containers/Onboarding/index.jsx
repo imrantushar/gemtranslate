@@ -6,7 +6,8 @@ import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
-import { Checkbox, Field, TextInput, Select } from '../../components/Input';
+import { Checkbox, Field, TextInput } from '../../components/Input';
+import { Select } from '../../components/ui/Select';
 import { LoadingBlock } from '../../components/Spinner';
 import { useLanguages, useCreateLanguage } from '../../hooks/useLanguages';
 import { useAIProviders, useSaveAIProviders, useTestAIProvider } from '../../hooks/useAI';
@@ -143,21 +144,21 @@ export default function Onboarding() {
 						<span
 							className={`gtrans-flex gtrans-h-6 gtrans-w-6 gtrans-items-center gtrans-justify-center gtrans-rounded-full gtrans-text-xs ${
 								STEPS.findIndex((x) => x.key === step) >= i
-									? 'gtrans-bg-gtrans-primary gtrans-text-white'
-									: 'gtrans-bg-gtrans-border gtrans-text-gray-600'
+									? 'gtrans-bg-primary gtrans-text-white'
+									: 'gtrans-bg-line gtrans-text-muted'
 							}`}
 						>
 							{i + 1}
 						</span>
-						<span className="gtrans-text-sm gtrans-text-gray-700">{s.label()}</span>
-						{i < STEPS.length - 1 && <span className="gtrans-text-gtrans-muted">→</span>}
+						<span className="gtrans-text-sm gtrans-text-label">{s.label()}</span>
+						{i < STEPS.length - 1 && <span className="gtrans-text-muted">→</span>}
 					</div>
 				))}
 			</div>
 
 			{step === 'welcome' && (
 				<Card>
-					<p className="gtrans-text-sm gtrans-text-gray-700">
+					<p className="gtrans-text-sm gtrans-text-label">
 						{__('GemTranslate makes your WordPress site multilingual without slowing it down. We\'ll set up your languages, optionally connect an AI translator, and you\'ll be ready to translate.', 'gemtranslate')}
 					</p>
 					<div className="gtrans-mt-4 gtrans-flex gtrans-justify-end">
@@ -180,10 +181,10 @@ export default function Onboarding() {
 									onClick={() => togglePick(l.code)}
 									className={`gtrans-bare gtrans-rounded-md gtrans-border gtrans-px-3 gtrans-py-2 gtrans-text-left gtrans-text-sm ${
 										already
-											? 'gtrans-border-gtrans-border gtrans-bg-gtrans-bg gtrans-text-gtrans-muted gtrans-cursor-not-allowed'
+											? 'gtrans-border-line gtrans-bg-body gtrans-text-muted gtrans-cursor-not-allowed'
 											: isPicked
-												? 'gtrans-border-gtrans-primary gtrans-bg-blue-50 gtrans-text-gtrans-primary'
-												: 'gtrans-border-gtrans-border gtrans-bg-white gtrans-text-gray-700 hover:gtrans-bg-gray-50'
+												? 'gtrans-border-primary gtrans-bg-blue-50 gtrans-text-primary'
+												: 'gtrans-border-line gtrans-bg-surface gtrans-text-label hover:gtrans-bg-body'
 									}`}
 								>
 									<div className="gtrans-font-medium">{l.name}</div>
@@ -207,7 +208,7 @@ export default function Onboarding() {
 
 			{step === 'ai' && (
 				<Card title={__('Optional: connect an AI translator', 'gemtranslate')}>
-					<p className="gtrans-mb-4 gtrans-text-xs gtrans-text-gtrans-muted">
+					<p className="gtrans-mb-4 gtrans-text-xs gtrans-text-muted">
 						{__('Bring your own API key. Skip to set up later from AI Translation.', 'gemtranslate')}
 					</p>
 					<div className="gtrans-grid gtrans-grid-cols-1 md:gtrans-grid-cols-3 gtrans-gap-4">
@@ -239,7 +240,7 @@ export default function Onboarding() {
 
 			{step === 'done' && (
 				<Card>
-					<p className="gtrans-text-sm gtrans-text-gray-700">
+					<p className="gtrans-text-sm gtrans-text-label">
 						{__('All set! Head to Posts to translate your first article, or Strings to translate theme/plugin labels.', 'gemtranslate')}
 					</p>
 					<div className="gtrans-mt-4 gtrans-flex gtrans-justify-end">

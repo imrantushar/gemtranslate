@@ -3,11 +3,13 @@ import { __, sprintf } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
+import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
 import StatusPill from '../../components/StatusPill';
 import { LoadingBlock } from '../../components/Spinner';
-import { Field, Select, TextInput, TextArea } from '../../components/Input';
+import { Field, TextInput, TextArea } from '../../components/Input';
+import { Select } from '../../components/ui/Select';
 import { useScanStrings, useSaveStringTranslation, useStringDomains, useStrings } from '../../hooks/useStrings';
 import { useLanguages } from '../../hooks/useLanguages';
 import { useTranslateWithAI } from '../../hooks/useAI';
@@ -104,7 +106,7 @@ export default function StringsLegacy() {
 			/>
 
 			<Card padded={false}>
-				<form onSubmit={runSearch} className="gtrans-flex gtrans-flex-wrap gtrans-items-end gtrans-gap-3 gtrans-border-b gtrans-border-gtrans-border gtrans-px-4 gtrans-py-3">
+				<form onSubmit={runSearch} className="gtrans-flex gtrans-flex-wrap gtrans-items-end gtrans-gap-3 gtrans-border-b gtrans-border-line gtrans-px-4 gtrans-py-3">
 					<div className="gtrans-min-w-[160px]">
 						<Field label={__('Target language', 'gemtranslate')}>
 							<Select value={filters.lang} onChange={(e) => setFilters((f) => ({ ...f, lang: e.target.value, page: 1 }))}>
@@ -139,37 +141,37 @@ export default function StringsLegacy() {
 				{strings.isLoading ? (
 					<LoadingBlock>{__('Loading strings…', 'gemtranslate')}</LoadingBlock>
 				) : (strings.data?.rows || []).length === 0 ? (
-					<p className="gtrans-px-5 gtrans-py-8 gtrans-text-center gtrans-text-sm gtrans-text-gtrans-muted">
+					<p className="gtrans-px-5 gtrans-py-8 gtrans-text-center gtrans-text-sm gtrans-text-muted">
 						{__('No strings yet. Scan a theme or plugin to populate this list.', 'gemtranslate')}
 					</p>
 				) : (
-					<table className="gtrans-w-full gtrans-text-sm">
-						<thead className="gtrans-bg-gtrans-bg gtrans-text-left gtrans-text-xs gtrans-uppercase gtrans-text-gtrans-muted">
-							<tr>
-								<th className="gtrans-px-4 gtrans-py-3 gtrans-w-1/3">{__('Source', 'gemtranslate')}</th>
-								<th className="gtrans-px-4 gtrans-py-3">
+					<Table.Root>
+						<Table.Header>
+							<Table.Row>
+								<Table.ColumnHeader className="gtrans-w-1/3">{__('Source', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader>
 									{sprintf(
 										/* translators: %s: language code. */
 										__('Translation (%s)', 'gemtranslate'),
 										filters.lang
 									)}
-								</th>
-								<th className="gtrans-px-4 gtrans-py-3 gtrans-w-32">{__('Domain', 'gemtranslate')}</th>
-								<th className="gtrans-px-4 gtrans-py-3 gtrans-w-32" />
-							</tr>
-						</thead>
-						<tbody>
+								</Table.ColumnHeader>
+								<Table.ColumnHeader className="gtrans-w-32">{__('Domain', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader className="gtrans-w-32" />
+							</Table.Row>
+						</Table.Header>
+						<Table.Body>
 							{(strings.data?.rows || []).map((row) => {
 								const draft = drafts[row.string_id] ?? row.translation ?? '';
 								return (
-									<tr key={row.string_id} className="gtrans-border-t gtrans-border-gtrans-border gtrans-align-top">
-										<td className="gtrans-px-4 gtrans-py-3">
-											<div className="gtrans-text-gray-900">{truncate(row.source, 240)}</div>
+									<Table.Row key={row.string_id} className="gtrans-align-top">
+										<Table.Cell>
+											<div className="gtrans-text-ink">{truncate(row.source, 240)}</div>
 											{row.file_ref && (
-												<div className="gtrans-mt-1 gtrans-text-xs gtrans-text-gtrans-muted"><code>{row.file_ref}</code></div>
+												<div className="gtrans-mt-1 gtrans-text-xs gtrans-text-muted"><code>{row.file_ref}</code></div>
 											)}
-										</td>
-										<td className="gtrans-px-4 gtrans-py-3">
+										</Table.Cell>
+										<Table.Cell>
 											<TextArea
 												rows={Math.min(6, Math.max(2, Math.ceil(row.source.length / 80)))}
 												value={draft}
@@ -180,9 +182,9 @@ export default function StringsLegacy() {
 													<StatusPill tone="translated">{row.translation_status}</StatusPill>
 												</div>
 											)}
-										</td>
-										<td className="gtrans-px-4 gtrans-py-3 gtrans-text-xs gtrans-text-gtrans-muted">{row.domain || '—'}</td>
-										<td className="gtrans-px-4 gtrans-py-3 gtrans-text-right">
+										</Table.Cell>
+										<Table.Cell className="gtrans-text-xs gtrans-text-muted">{row.domain || '—'}</Table.Cell>
+										<Table.Cell className="gtrans-text-right">
 											<div className="gtrans-flex gtrans-flex-col gtrans-gap-1">
 												<Button size="sm" onClick={() => onSave(row.string_id)}>
 													{__('Save', 'gemtranslate')}
@@ -191,17 +193,17 @@ export default function StringsLegacy() {
 													{__('AI', 'gemtranslate')}
 												</Button>
 											</div>
-										</td>
-									</tr>
+										</Table.Cell>
+									</Table.Row>
 								);
 							})}
-						</tbody>
-					</table>
+						</Table.Body>
+					</Table.Root>
 				)}
 
 				{strings.data?.meta?.total > strings.data?.meta?.per_page && (
-					<div className="gtrans-flex gtrans-justify-between gtrans-border-t gtrans-border-gtrans-border gtrans-px-4 gtrans-py-3 gtrans-text-sm">
-						<span className="gtrans-text-gtrans-muted">
+					<div className="gtrans-flex gtrans-justify-between gtrans-border-t gtrans-border-line gtrans-px-4 gtrans-py-3 gtrans-text-sm">
+						<span className="gtrans-text-muted">
 							{sprintf(
 								/* translators: %d: total count. */
 								__('%d total', 'gemtranslate'),
