@@ -17,6 +17,7 @@ class API {
 		API\Settings::init();
 		API\Stats::init();
 		API\Geo::init();
+		API\VisualEditor::init();
 		// Pro API controllers (SEO meta, Jobs, Translators, Revisions, Import/Export)
 		// are registered by gemtranslate-pro on `gtrans_init`.
 	}
