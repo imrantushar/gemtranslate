@@ -385,19 +385,24 @@ class TranslationLoader {
 			? (int) $fields['shadow_post_id']
 			: (int) ( $existing['shadow_post_id'] ?? 0 );
 
+		// Partial updates: when a caller passes only a subset of fields
+		// (e.g. just {title, slug}), keep the existing row's other columns
+		// instead of overwriting them with empty strings. On a fresh insert
+		// the existing-row map is empty and defaults apply.
+		$base = $existing ?: [];
 		$data = [
 			'group_id'         => $group_id,
 			'language_code'    => $language,
 			'country_code'     => $country,
 			'post_id'          => $post_id,
 			'shadow_post_id'   => $shadow_post_id,
-			'title'            => (string) ( $fields['title'] ?? '' ),
-			'content'          => (string) ( $fields['content'] ?? '' ),
-			'excerpt'          => (string) ( $fields['excerpt'] ?? '' ),
-			'slug'             => $slug,
-			'status'           => (string) ( $fields['status'] ?? 'publish' ),
+			'title'            => array_key_exists( 'title', $fields )   ? (string) $fields['title']   : (string) ( $base['title']   ?? '' ),
+			'content'          => array_key_exists( 'content', $fields ) ? (string) $fields['content'] : (string) ( $base['content'] ?? '' ),
+			'excerpt'          => array_key_exists( 'excerpt', $fields ) ? (string) $fields['excerpt'] : (string) ( $base['excerpt'] ?? '' ),
+			'slug'             => array_key_exists( 'slug', $fields )    ? $slug                       : (string) ( $base['slug']    ?? '' ),
+			'status'           => (string) ( $fields['status'] ?? $base['status'] ?? 'publish' ),
 			'translation_mode' => $mode,
-			'source_hash'      => (string) ( $fields['source_hash'] ?? $source_hash ),
+			'source_hash'      => (string) ( $fields['source_hash'] ?? $base['source_hash'] ?? $source_hash ),
 			'updated_at'       => Helper::get_time(),
 		];
 

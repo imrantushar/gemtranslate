@@ -65,7 +65,46 @@ class UrlRewriter {
 		if ( Context::is_default() ) {
 			return $url;
 		}
-		return $this->prepend_language( $url, Context::current() );
+		$lang = Context::current();
+		$url  = $this->swap_translated_slug( $url, $post, $lang );
+		return $this->prepend_language( $url, $lang );
+	}
+
+	/**
+	 * If the queried post has a translated slug for the current language,
+	 * swap the source slug in the URL for the translated one. Keeps
+	 * outgoing links (menus, archives, next/prev) consistent with the
+	 * incoming slug resolver in RequestParser.
+	 */
+	private function swap_translated_slug( $url, $post, $lang ) {
+		$post = $post instanceof \WP_Post ? $post : get_post( $post );
+		if ( ! $post ) {
+			return $url;
+		}
+		$source_slug = (string) $post->post_name;
+		if ( '' === $source_slug ) {
+			return $url;
+		}
+		global $wpdb;
+		$table = \GemTranslate\Helper::table( 'post_translations' );
+		$translated = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT slug FROM $table WHERE post_id = %d AND language_code = %s LIMIT 1",
+				$post->ID,
+				$lang
+			)
+		);
+		if ( ! $translated || $translated === $source_slug ) {
+			return $url;
+		}
+		// Replace only the slug segment to avoid clobbering identical
+		// substrings elsewhere in the URL.
+		return preg_replace(
+			'#/' . preg_quote( $source_slug, '#' ) . '(/|$)#',
+			'/' . $translated . '$1',
+			$url,
+			1
+		);
 	}
 
 	public function filter_term_link( $url, $term = null, $taxonomy = null ) {

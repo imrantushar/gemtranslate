@@ -107,6 +107,14 @@ class RequestParser {
 				$relative
 			);
 
+			// Translated slug lookup: if the first path segment after /{lang}/
+			// matches a translated slug for the current language, swap it for
+			// the source post's slug so WP::parse_request() can resolve it.
+			// This is how per-language URLs work: /{lang}/{translated-slug}/
+			// → routes to the source post, with translated content served via
+			// TranslationLoader at render time.
+			$stripped_relative = $this->resolve_translated_slug( $stripped_relative, $first );
+
 			// Rebuild the full path and rewrite REQUEST_URI BEFORE
 			// WordPress reads it at WP::parse_request() line 174.
 			$new_path = $home_path_trimmed . $stripped_relative;
@@ -170,5 +178,47 @@ class RequestParser {
 		}
 		$parts = explode( '/', $request, 2 );
 		return strtolower( $parts[0] );
+	}
+
+	/**
+	 * Swap a translated slug for the source slug so WP's native resolver
+	 * finds the correct post. The lookup only touches the FIRST path
+	 * segment — nested paths (CPT archive/term/children) still work because
+	 * only the leaf slug differs between languages.
+	 *
+	 * The query is a single indexed read against (language_code, slug);
+	 * it short-circuits on empty paths and when nothing matches.
+	 */
+	private function resolve_translated_slug( $relative, $lang ) {
+		$trimmed = ltrim( $relative, '/' );
+		if ( '' === $trimmed ) {
+			return $relative;
+		}
+		$segments = explode( '/', $trimmed, 2 );
+		$leaf     = $segments[0];
+		// Drop any trailing slash the explode left behind.
+		$leaf = rtrim( $leaf, '/' );
+		if ( '' === $leaf ) {
+			return $relative;
+		}
+		global $wpdb;
+		$table = \GemTranslate\Helper::table( 'post_translations' );
+		$row   = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT post_id FROM $table WHERE language_code = %s AND slug = %s LIMIT 1",
+				$lang,
+				$leaf
+			),
+			ARRAY_A
+		);
+		if ( ! $row || empty( $row['post_id'] ) ) {
+			return $relative;
+		}
+		$source_slug = (string) get_post_field( 'post_name', (int) $row['post_id'] );
+		if ( '' === $source_slug || $source_slug === $leaf ) {
+			return $relative;
+		}
+		$rest = isset( $segments[1] ) ? '/' . $segments[1] : '/';
+		return '/' . $source_slug . $rest;
 	}
 }
