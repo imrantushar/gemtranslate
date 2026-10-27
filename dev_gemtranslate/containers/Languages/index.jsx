@@ -4,10 +4,13 @@ import { __, sprintf } from '@wordpress/i18n';
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
+import SearchBox from '../../components/SearchBox';
+import StatusTabs from '../../components/StatusTabs';
+
 import Modal from '../../components/Modal';
 import Toast from '../../components/Toast';
 import StatusPill from '../../components/StatusPill';
-import { LoadingBlock } from '../../components/Spinner';
+import { PageSkeleton } from '../../components/Skeleton';
 import { Table } from '../../components/ui/Table';
 import {
 	useLanguages,
@@ -26,6 +29,8 @@ export default function LanguagesPage() {
 	const remove = useDeleteLanguage();
 	const setDefault = useSetDefaultLanguage();
 
+	const [tab, setTab] = useState('all');
+	const [query, setQuery] = useState('');
 	const [modalOpen, setModalOpen] = useState(false);
 	const [editing, setEditing] = useState(null);
 	const [toast, setToast] = useState(null);
@@ -86,8 +91,16 @@ export default function LanguagesPage() {
 		}
 	};
 
+	const all = languages.data || [];
+	const needle = query.trim().toLowerCase();
+	const visible = all.filter((l) => {
+		if (tab === 'active' && !l.active) return false;
+		if (tab === 'inactive' && l.active) return false;
+		return !needle || [l.name, l.native_name, l.code, l.locale].some((v) => String(v || '').toLowerCase().includes(needle));
+	});
+
 	if (languages.isLoading) {
-		return <LoadingBlock>{__('Loading languages…', 'gemtranslate')}</LoadingBlock>;
+		return <PageSkeleton />;
 	}
 
 	return (
@@ -98,7 +111,19 @@ export default function LanguagesPage() {
 				actions={<Button onClick={openCreate}>{__('Add language', 'gemtranslate')}</Button>}
 			/>
 
-			<Card padded={false}>
+			<Card table>
+				<Table.Toolbar variant="tabs">
+					<StatusTabs
+						value={tab}
+						onChange={setTab}
+						tabs={[
+							{ value: 'all', label: __('All', 'gemtranslate'), count: all.length },
+							{ value: 'active', label: __('Active', 'gemtranslate'), count: all.filter((l) => l.active).length },
+							{ value: 'inactive', label: __('Inactive', 'gemtranslate'), count: all.filter((l) => !l.active).length },
+						]}
+					/>
+					<SearchBox value={query} placeholder={__('Search languages…', 'gemtranslate')} onSearch={setQuery} />
+				</Table.Toolbar>
 				<Table.ScrollArea>
 					<Table.Root>
 						<Table.Header>
@@ -111,7 +136,7 @@ export default function LanguagesPage() {
 							</Table.Row>
 						</Table.Header>
 						<Table.Body>
-							{(languages.data || []).map((lang) => (
+							{visible.map((lang) => (
 								<Table.Row key={lang.code}>
 									<Table.Cell>
 										<div className="gtrans-flex gtrans-items-center gtrans-gap-2">

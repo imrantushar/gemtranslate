@@ -6,9 +6,12 @@ import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
+import { Select } from '../../components/ui/Select';
+import SearchBox from '../../components/SearchBox';
+import StatusTabs from '../../components/StatusTabs';
 import Toast from '../../components/Toast';
 import { TextArea, TextInput } from '../../components/Input';
-import { LoadingBlock } from '../../components/Spinner';
+import { PageSkeleton } from '../../components/Skeleton';
 import { useStrings } from '../../hooks/useStrings';
 import {
 	useBulkSaveStrings,
@@ -38,7 +41,6 @@ export default function PackageEditor() {
 
 	const [page, setPage] = useState(1);
 	const [search, setSearch] = useState('');
-	const [searchDraft, setSearchDraft] = useState('');
 	const [statusFilter, setStatusFilter] = useState('all'); // all | untranslated | translated
 	const [drafts, setDrafts] = useState({}); // string_id -> {value, dirty}
 	const [memoryHits, setMemoryHits] = useState({}); // string_id -> suggested value
@@ -91,7 +93,7 @@ export default function PackageEditor() {
 	}, [strings.data, slug, lang]);
 
 	if (packages.isLoading || strings.isLoading || languages.isLoading) {
-		return <LoadingBlock>{__('Loading…', 'gemtranslate')}</LoadingBlock>;
+		return <PageSkeleton />;
 	}
 	if (!pkg) {
 		return (
@@ -141,12 +143,6 @@ export default function PackageEditor() {
 
 	const onUseSuggestion = (id, value) => {
 		onChange(id, value);
-	};
-
-	const runSearch = (e) => {
-		e.preventDefault();
-		setPage(1);
-		setSearch(searchDraft);
 	};
 
 	const onSaveAll = async () => {
@@ -267,58 +263,48 @@ export default function PackageEditor() {
 				}
 			/>
 
-			<Card padded={false}>
+			<Card table>
 				{/* ---- Toolbar ---- */}
-				<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-2 gtrans-border-b gtrans-border-line gtrans-px-4 gtrans-py-3">
+				<Table.Toolbar variant="tabs">
+					<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-3">
 					<div className="gtrans-flex gtrans-items-center gtrans-gap-1 gtrans-text-xs">
 						<span className="gtrans-mr-1 gtrans-text-muted">{__('Language:', 'gemtranslate')}</span>
-						<select
+						<Select
+							className="gtrans-min-w-[200px]"
 							value={lang}
 							onChange={(e) => navigate(`/strings/${slug}/${e.target.value}`)}
-							className="gtrans-rounded-md gtrans-border gtrans-border-line gtrans-bg-surface gtrans-px-2 gtrans-py-1 gtrans-text-xs"
 						>
 							{targetLangs.map((l) => (
 								<option key={l.code} value={l.code}>
 									{l.name} ({l.code})
 								</option>
 							))}
-						</select>
+						</Select>
 					</div>
 
-					<div className="gtrans-flex gtrans-items-center gtrans-gap-1 gtrans-ml-2">
-						{[
-							{ key: 'all', label: __('All', 'gemtranslate') },
-							{ key: 'untranslated', label: __('Untranslated', 'gemtranslate') },
-							{ key: 'translated', label: __('Translated', 'gemtranslate') },
-						].map((f) => (
-							<button
-								key={f.key}
-								type="button"
-								onClick={() => {
-									setStatusFilter(f.key);
-									setPage(1);
-								}}
-								className={`gtrans-bare gtrans-rounded-full gtrans-px-3 gtrans-py-1 gtrans-text-xs ${
-									statusFilter === f.key
-										? 'gtrans-bg-primary gtrans-text-white'
-										: 'gtrans-bg-surface gtrans-border gtrans-border-line gtrans-text-label'
-								}`}
-							>
-								{f.label}
-							</button>
-						))}
-					</div>
-
-					<form onSubmit={runSearch} className="gtrans-flex gtrans-items-center gtrans-gap-1">
-						<TextInput
-							value={searchDraft}
-							onChange={(e) => setSearchDraft(e.target.value)}
-							placeholder={__('Search…', 'gemtranslate')}
+						<StatusTabs
+							value={statusFilter}
+							onChange={(key) => {
+								setStatusFilter(key);
+								setPage(1);
+							}}
+							tabs={[
+								{ value: 'all', label: __('All', 'gemtranslate') },
+								{ value: 'untranslated', label: __('Untranslated', 'gemtranslate') },
+								{ value: 'translated', label: __('Translated', 'gemtranslate') },
+							]}
 						/>
-						<Button type="submit" variant="ghost" size="sm">{__('Filter', 'gemtranslate')}</Button>
-					</form>
-
-					<span className="gtrans-ml-auto gtrans-flex gtrans-items-center gtrans-gap-2">
+					</div>
+					<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-3 gtrans-py-2">
+						<SearchBox
+							value={search}
+							placeholder={__('Search…', 'gemtranslate')}
+							onSearch={(keyword) => {
+								setPage(1);
+								setSearch(keyword);
+							}}
+						/>
+					<span className="gtrans-flex gtrans-items-center gtrans-gap-2">
 						<Button
 							size="sm"
 							variant="secondary"
@@ -352,15 +338,16 @@ export default function PackageEditor() {
 								: __('Save all', 'gemtranslate')}
 						</Button>
 					</span>
-				</div>
+					</div>
+				</Table.Toolbar>
 
 				{/* ---- Rows ---- */}
 				{rows.length === 0 ? (
-					<p className="gtrans-px-5 gtrans-py-10 gtrans-text-center gtrans-text-sm gtrans-text-muted">
+					<Table.Empty>
 						{statusFilter === 'untranslated'
 							? __('Nothing untranslated. Nice work.', 'gemtranslate')
 							: __('No strings match.', 'gemtranslate')}
-					</p>
+					</Table.Empty>
 				) : (
 					<Table.Root>
 						<Table.Header>
@@ -390,7 +377,7 @@ export default function PackageEditor() {
 
 				{/* ---- Pagination ---- */}
 				{total > PAGE_SIZE && (
-					<div className="gtrans-flex gtrans-items-center gtrans-justify-between gtrans-border-t gtrans-border-line gtrans-px-4 gtrans-py-3 gtrans-text-sm">
+					<div className="gtrans-flex gtrans-items-center gtrans-justify-between gtrans-mt-3 gtrans-text-sm">
 						<span className="gtrans-text-muted">
 							{sprintf(
 								/* translators: 1: current page, 2: total pages, 3: total rows. */

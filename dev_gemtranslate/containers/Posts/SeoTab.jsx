@@ -4,7 +4,7 @@ import { __ } from '@wordpress/i18n';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import { Field, TextInput, TextArea } from '../../components/Input';
-import { LoadingBlock } from '../../components/Spinner';
+import { FormSkeleton } from '../../components/Skeleton';
 import { usePostSeo, useSavePostSeo } from '../../hooks/useSeo';
 import { useTranslateWithAI } from '../../hooks/useAI';
 import { formatErrorMessage } from '../../lib/format';
@@ -64,7 +64,7 @@ export default function SeoTab({ postId, sourceLang, targetLang, onToast }) {
 		}
 	};
 
-	if (seo.isLoading) return <LoadingBlock>{__('Loading SEO meta…', 'gemtranslate')}</LoadingBlock>;
+	if (seo.isLoading) return <FormSkeleton />;
 
 	return (
 		<Card title={__('SEO meta for this translation', 'gemtranslate')}>

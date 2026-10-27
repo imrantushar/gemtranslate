@@ -19,13 +19,8 @@ export function TextArea({ className, rows = 4, ...props }) {
 	return <textarea rows={rows} className={clsx('gtrans-w-full gtrans-font-mono gtrans-text-sm', className)} {...props} />;
 }
 
-export function Select({ className, children, ...props }) {
-	return (
-		<select className={clsx('gtrans-w-full', className)} {...props}>
-			{children}
-		</select>
-	);
-}
+// One select everywhere: the react-select wrapper (native <select> can't be themed).
+export { Select } from './ui/Select';
 
 export function Checkbox({ label, ...props }) {
 	return (

@@ -5,11 +5,14 @@ import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
+import SearchBox from '../../components/SearchBox';
+import StatusTabs from '../../components/StatusTabs';
+
 import Toast from '../../components/Toast';
 import StatusPill from '../../components/StatusPill';
 import { Field, TextInput, Checkbox } from '../../components/Input';
 import { Select } from '../../components/ui/Select';
-import { LoadingBlock } from '../../components/Spinner';
+import { PageSkeleton } from '../../components/Skeleton';
 import { useGlossary, useAddGlossaryTerm, useDeleteGlossaryTerm } from '../../hooks/useAI';
 import { useLanguages } from '../../hooks/useLanguages';
 import { formatErrorMessage } from '../../lib/format';
@@ -31,6 +34,7 @@ export default function GlossaryPage() {
 		do_not_translate: false,
 	});
 	const [toast, setToast] = useState(null);
+	const [query, setQuery] = useState('');
 
 	const submit = async (e) => {
 		e.preventDefault();
@@ -57,13 +61,16 @@ export default function GlossaryPage() {
 		}
 	};
 
-	if (list.isLoading || langs.isLoading) return <LoadingBlock>{__('Loading glossary…', 'gemtranslate')}</LoadingBlock>;
+	if (list.isLoading || langs.isLoading) return <PageSkeleton />;
 
 	return (
 		<>
 			<PageHeader
 				title={__('Glossary', 'gemtranslate')}
 				description={__('Define brand terms and protected phrases so AI translations stay consistent.', 'gemtranslate')}
+				actions={
+					<SearchBox value={query} placeholder={__('Search terms…', 'gemtranslate')} onSearch={setQuery} />
+				}
 			/>
 
 			<Card title={__('Add a term', 'gemtranslate')} className="gtrans-mb-6">
@@ -110,11 +117,11 @@ export default function GlossaryPage() {
 				</form>
 			</Card>
 
-			<Card padded={false} title={__('Existing terms', 'gemtranslate')}>
+			<Card table title={__('Existing terms', 'gemtranslate')}>
 				{(list.data || []).length === 0 ? (
-					<p className="gtrans-px-5 gtrans-py-8 gtrans-text-center gtrans-text-sm gtrans-text-muted">
+					<Table.Empty>
 						{__('No glossary entries yet.', 'gemtranslate')}
-					</p>
+					</Table.Empty>
 				) : (
 					<Table.Root>
 						<Table.Header>
@@ -127,7 +134,7 @@ export default function GlossaryPage() {
 							</Table.Row>
 						</Table.Header>
 						<Table.Body>
-							{(list.data || []).map((row) => (
+							{(list.data || []).filter((row) => !query || `${row.source_term} ${row.target_term || ''}`.toLowerCase().includes(query.toLowerCase())).map((row) => (
 								<Table.Row key={row.term_id}>
 									<Table.Cell className="gtrans-font-medium">{row.source_term}</Table.Cell>
 									<Table.Cell>{row.target_term || <em className="gtrans-text-muted">{__('(do not translate)', 'gemtranslate')}</em>}</Table.Cell>

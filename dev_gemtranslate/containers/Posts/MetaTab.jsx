@@ -5,7 +5,7 @@ import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
 import { Field, TextInput, TextArea } from '../../components/Input';
-import { LoadingBlock } from '../../components/Spinner';
+import { FormSkeleton } from '../../components/Skeleton';
 import { usePostMetaFields, useSavePostMeta } from '../../hooks/usePostMeta';
 import { useTranslateWithAI } from '../../hooks/useAI';
 import { formatErrorMessage } from '../../lib/format';
@@ -24,7 +24,7 @@ export default function MetaTab({ postId, sourceLang, targetLang }) {
 		setDrafts(init);
 	}, [data.data, targetLang]);
 
-	if (data.isLoading) return <LoadingBlock>{__('Loading meta fields…', 'gemtranslate')}</LoadingBlock>;
+	if (data.isLoading) return <FormSkeleton />;
 
 	if (!data.data || data.data.length === 0) {
 		return (

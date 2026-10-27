@@ -6,7 +6,7 @@ import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
-import { LoadingBlock } from '../../components/Spinner';
+import { PageSkeleton } from '../../components/Skeleton';
 import { usePostTranslations } from '../../hooks/usePosts';
 import {
 	usePostVariants,
@@ -49,7 +49,7 @@ export default function TranslationEditor() {
 	}, [data.data]);
 
 	if (data.isLoading)
-		return <LoadingBlock>{__('Loading translation editor…', 'gemtranslate')}</LoadingBlock>;
+		return <PageSkeleton />;
 	if (data.error) return <p className="gtrans-text-red-600">{formatErrorMessage(data.error)}</p>;
 	if (!data.data) return null;
 

@@ -5,6 +5,8 @@
  * color/shadow values; components should reference the Tailwind tokens in
  * tailwind.config.js (which read these vars), not raw hex codes.
  */
+/* Also on :root so body-portaled UI (react-select menus, modals) resolves tokens. */
+:root,
 #gemtranslate-admin-root {
 	--gtrans-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
 	--gtrans-primary-color: #006bff;
@@ -32,4 +34,60 @@
 	--gtrans-border: var(--gtrans-border-color);
 	--gtrans-divider: #f3f4f6;
 	--gtrans-nav-active-bg: var(--gtrans-primary-light);
+}
+
+/* Dark mode — toggled by lib/theme.js via html[data-gtrans-theme="dark"]. */
+html[data-gtrans-theme='dark'],
+html[data-gtrans-theme='dark'] #gemtranslate-admin-root {
+	--gtrans-primary-color: #3b8cff;
+	--gtrans-primary-light: rgba(59, 140, 255, 0.16);
+	--gtrans-border-color: #2b3441;
+	--gtrans-body-background: #0f141b;
+	--gtrans-background: #171d26;
+	--gtrans-font-color: #e6e9ee;
+	--gtrans-secondary-color: #0f141b;
+	--gtrans-warn-muted: #8b97a6;
+	--gtrans-error: #f87171;
+	--gtrans-error-light: rgba(248, 113, 113, 0.16);
+	--gtrans-placeholder: #66717f;
+	--gtrans-success: #34d399;
+	--gtrans-success-light: rgba(52, 211, 153, 0.16);
+	--gtrans-warning: #fbbf24;
+	--gtrans-warning-light: rgba(251, 191, 36, 0.16);
+	--gtrans-heading-color: #f1f3f6;
+	--gtrans-label-color: #c4cbd5;
+	--gtrans-description-color: #8b97a6;
+	--gtrans-divider: #222b37;
+}
+
+/* Tint wp-admin chrome so no bright gutter shows around the app. */
+html[data-gtrans-theme='dark'] body.toplevel_page_gemtranslate,
+html[data-gtrans-theme='dark'] body.toplevel_page_gemtranslate #wpwrap,
+html[data-gtrans-theme='dark'] body.toplevel_page_gemtranslate #wpcontent,
+html[data-gtrans-theme='dark'] body.toplevel_page_gemtranslate #wpbody {
+	background: #0f141b;
+}
+
+/* Hard-coded Tailwind palette colours used by a few screens. */
+html[data-gtrans-theme='dark'] #gemtranslate-admin-root :is(.gtrans-bg-amber-50, .gtrans-bg-amber-100, .gtrans-bg-blue-50, .gtrans-bg-blue-100, .gtrans-bg-green-50, .gtrans-bg-green-100, .gtrans-bg-gray-100) {
+	background-color: rgba(255, 255, 255, 0.06);
+}
+html[data-gtrans-theme='dark'] #gemtranslate-admin-root :is(.gtrans-text-amber-700, .gtrans-text-amber-800) {
+	color: #fbbf24;
+}
+html[data-gtrans-theme='dark'] #gemtranslate-admin-root :is(.gtrans-text-blue-800, .gtrans-text-gray-700) {
+	color: #93c5fd;
+}
+html[data-gtrans-theme='dark'] #gemtranslate-admin-root .gtrans-text-green-700 {
+	color: #34d399;
+}
+html[data-gtrans-theme='dark'] #gemtranslate-admin-root .gtrans-text-red-600 {
+	color: #f87171;
+}
+html[data-gtrans-theme='dark'] #gemtranslate-admin-root .gtrans-border-amber-200 {
+	border-color: rgba(251, 191, 36, 0.3);
+}
+
+html[data-gtrans-theme='dark'] #gemtranslate-admin-root {
+	color-scheme: dark;
 }

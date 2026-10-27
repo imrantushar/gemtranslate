@@ -5,9 +5,12 @@ import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
+import SearchBox from '../../components/SearchBox';
+import StatusTabs from '../../components/StatusTabs';
+
 import Toast from '../../components/Toast';
 import StatusPill from '../../components/StatusPill';
-import { LoadingBlock } from '../../components/Spinner';
+import { PageSkeleton } from '../../components/Skeleton';
 import { Checkbox } from '../../components/Input';
 import { useTranslators, useSaveTranslatorLanguages } from '../../hooks/useTranslators';
 import { useLanguages } from '../../hooks/useLanguages';
@@ -19,6 +22,7 @@ export default function TranslatorsPage() {
 	const save = useSaveTranslatorLanguages();
 	const [drafts, setDrafts] = useState({});
 	const [toast, setToast] = useState(null);
+	const [query, setQuery] = useState('');
 	const nonDefault = (langs.data || []).filter((l) => !l.is_default);
 
 	useEffect(() => {
@@ -28,7 +32,7 @@ export default function TranslatorsPage() {
 		setDrafts(init);
 	}, [list.data]);
 
-	if (list.isLoading || langs.isLoading) return <LoadingBlock>{__('Loading translators…', 'gemtranslate')}</LoadingBlock>;
+	if (list.isLoading || langs.isLoading) return <PageSkeleton />;
 
 	const toggle = (userId, code) =>
 		setDrafts((d) => {
@@ -50,13 +54,16 @@ export default function TranslatorsPage() {
 			<PageHeader
 				title={__('Translators', 'gemtranslate')}
 				description={__('Users with the translate capability. Assign each user to specific languages, or leave empty for unrestricted access.', 'gemtranslate')}
+				actions={
+					<SearchBox value={query} placeholder={__('Search users…', 'gemtranslate')} onSearch={setQuery} />
+				}
 			/>
 
-			<Card padded={false}>
+			<Card table>
 				{list.data.length === 0 ? (
-					<p className="gtrans-px-5 gtrans-py-8 gtrans-text-center gtrans-text-sm gtrans-text-muted">
+					<Table.Empty>
 						{__('No users with translator access. Edit users and assign them the Translator role or grant the gtrans_translate_content capability.', 'gemtranslate')}
-					</p>
+					</Table.Empty>
 				) : (
 					<Table.Root>
 						<Table.Header>
@@ -68,7 +75,7 @@ export default function TranslatorsPage() {
 							</Table.Row>
 						</Table.Header>
 						<Table.Body>
-							{list.data.map((u) => {
+							{list.data.filter((u) => !query || `${u.name} ${u.email}`.toLowerCase().includes(query.toLowerCase())).map((u) => {
 								const picked = drafts[u.id] || [];
 								return (
 									<Table.Row key={u.id} className="gtrans-align-top">

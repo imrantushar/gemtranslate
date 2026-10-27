@@ -72,14 +72,15 @@ export default function LanguageForm({ initial, onSubmit, onCancel, busy }) {
 					</div>
 					<div className="gtrans-flex gtrans-flex-wrap gtrans-gap-2">
 						{PRESETS.map((p) => (
-							<button
+							<Button
 								key={p.code}
-								type="button"
+								size="sm"
+								variant="secondary"
 								onClick={() => applyPreset(p)}
-								className="gtrans-bare gtrans-rounded-full gtrans-border gtrans-border-line gtrans-bg-surface gtrans-px-3 gtrans-py-1 gtrans-text-xs gtrans-text-label hover:gtrans-bg-body"
+								className="gtrans-rounded-full"
 							>
 								{p.name}
-							</button>
+							</Button>
 						))}
 					</div>
 				</div>

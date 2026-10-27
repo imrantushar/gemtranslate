@@ -1,20 +1,20 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { __, sprintf } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import StatusPill from '../../components/StatusPill';
-import { Field, TextInput, Checkbox } from '../../components/Input';
-import { RawSelect as ReactSelect } from '../../components/ui/Select';
+import { Checkbox } from '../../components/Input';
+import SearchBox from '../../components/SearchBox';
+import StatusTabs from '../../components/StatusTabs';
 import { Table } from '../../components/ui/Table';
-import { LoadingBlock } from '../../components/Spinner';
+import { TableSkeleton } from '../../components/Skeleton';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
 import { hasFeature } from '../../hooks/useFeatures';
 import { usePosts } from '../../hooks/usePosts';
 import { useLanguages } from '../../hooks/useLanguages';
-import { usePostTypes } from '../../hooks/usePostTypes';
 import { useBulkTranslate } from '../../hooks/useJobs';
 import { formatErrorMessage, truncate } from '../../lib/format';
 
@@ -27,27 +27,27 @@ const STATUS_TONE = {
 };
 
 export default function PostsPage() {
-	const [filters, setFilters] = useState({ post_type: 'post', page: 1, per_page: 20, search: '' });
-	const [search, setSearch] = useState('');
-	const posts = usePosts(filters);
+	const [filters, setFilters] = useState({ page: 1, per_page: 20, search: '', status: 'any' });
+	// Post type is chosen from the sidebar submenu (?type=page).
+	const [params] = useSearchParams();
+	const postType = params.get('type') || 'post';
+	const query = useMemo(() => ({ ...filters, post_type: postType }), [filters, postType]);
+	const posts = usePosts(query);
 	const languages = useLanguages();
-	const postTypes = usePostTypes();
 	const bulk = useBulkTranslate();
 	const langs = languages.data || [];
 	const nonDefault = langs.filter((l) => !l.is_default && l.active);
-	const types = postTypes.data || [];
-	const typeOptions = (types.length === 0
-		? [
-				{ value: 'post', label: __('Posts', 'gemtranslate') },
-				{ value: 'page', label: __('Pages', 'gemtranslate') },
-			]
-		: types.map((t) => ({ value: t.name, label: t.label }))
-	);
 
 	const [selectedIds, setSelectedIds] = useState([]);
 	const [selectedLangs, setSelectedLangs] = useState([]);
 	const [overwrite, setOverwrite] = useState(false);
 	const [toast, setToast] = useState(null);
+
+	// Switching post type starts a fresh list.
+	useEffect(() => {
+		setFilters((f) => ({ ...f, page: 1 }));
+		setSelectedIds([]);
+	}, [postType]);
 
 	// Default selected langs to all non-default whenever language list changes.
 	useEffect(() => {
@@ -73,11 +73,6 @@ export default function PostsPage() {
 
 	const toggleLang = (code) =>
 		setSelectedLangs((s) => (s.includes(code) ? s.filter((x) => x !== code) : [...s, code]));
-
-	const runSearch = (e) => {
-		e.preventDefault();
-		setFilters((f) => ({ ...f, search, page: 1 }));
-	};
 
 	const runBulk = async () => {
 		if (selectedIds.length === 0 || selectedLangs.length === 0) return;
@@ -111,37 +106,28 @@ export default function PostsPage() {
 				)}
 			/>
 
-			<Card padded={false}>
-				<form
-					onSubmit={runSearch}
-					className="gtrans-flex gtrans-flex-wrap gtrans-items-end gtrans-gap-3 gtrans-border-b gtrans-border-line gtrans-px-4 gtrans-py-3"
-				>
-					<div className="gtrans-min-w-[180px]">
-						<Field label={__('Post type', 'gemtranslate')}>
-							<ReactSelect
-								value={typeOptions.find((o) => o.value === filters.post_type) || null}
-								onChange={(opt) => setFilters((f) => ({ ...f, post_type: opt?.value || 'post', page: 1 }))}
-								options={typeOptions}
-								isSearchable={false}
-							/>
-						</Field>
-					</div>
-					<div className="gtrans-min-w-[200px] gtrans-flex-1">
-						<Field label={__('Search', 'gemtranslate')}>
-							<TextInput
-								value={search}
-								onChange={(e) => setSearch(e.target.value)}
-								placeholder={__('Search by title…', 'gemtranslate')}
-							/>
-						</Field>
-					</div>
-					<Button type="submit" variant="secondary">
-						{__('Filter', 'gemtranslate')}
-					</Button>
-				</form>
+			<Card table>
+				<Table.Toolbar variant="tabs">
+					<StatusTabs
+						value={filters.status}
+						onChange={(status) => setFilters((f) => ({ ...f, status, page: 1 }))}
+						tabs={[
+							{ value: 'any', label: __('All', 'gemtranslate') },
+							{ value: 'publish', label: __('Published', 'gemtranslate') },
+							{ value: 'draft', label: __('Draft', 'gemtranslate') },
+							{ value: 'pending', label: __('Pending', 'gemtranslate') },
+							{ value: 'private', label: __('Private', 'gemtranslate') },
+						]}
+					/>
+					<SearchBox
+						value={filters.search}
+						placeholder={__('Search by title…', 'gemtranslate')}
+						onSearch={(search) => setFilters((f) => ({ ...f, search, page: 1 }))}
+					/>
+				</Table.Toolbar>
 
 				{selectedIds.length > 0 && hasFeature('ai_bulk') && (
-					<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-justify-between gtrans-gap-3 gtrans-border-b gtrans-border-line gtrans-bg-primary-light gtrans-px-4 gtrans-py-3 gtrans-text-sm">
+					<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-justify-between gtrans-gap-3 gtrans-mb-4 gtrans-rounded gtrans-bg-primary-light gtrans-px-4 gtrans-py-3 gtrans-text-sm">
 						<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-3">
 							<strong>
 								{sprintf(
@@ -183,11 +169,11 @@ export default function PostsPage() {
 				)}
 
 				{posts.isLoading ? (
-					<LoadingBlock>{__('Loading posts…', 'gemtranslate')}</LoadingBlock>
+					<TableSkeleton />
 				) : posts.data?.rows.length === 0 ? (
-					<p className="gtrans-px-5 gtrans-py-8 gtrans-text-center gtrans-text-sm gtrans-text-muted">
+					<Table.Empty>
 						{__('No posts found.', 'gemtranslate')}
-					</p>
+					</Table.Empty>
 				) : (
 					<Table.ScrollArea>
 						<Table.Root>
@@ -255,35 +241,45 @@ export default function PostsPage() {
 					</Table.ScrollArea>
 				)}
 
-				{posts.data?.meta?.total_pages > 1 && (
-					<div className="gtrans-flex gtrans-justify-between gtrans-border-t gtrans-border-line gtrans-px-4 gtrans-py-3 gtrans-text-sm">
+				{!posts.isLoading && (posts.data?.rows || []).length > 0 && (
+					<Table.Footer>
 						<span className="gtrans-text-muted">
 							{sprintf(
-								/* translators: 1: current page, 2: total pages. */
-								__('Page %1$d of %2$d', 'gemtranslate'),
-								filters.page,
-								posts.data.meta.total_pages
+								/* translators: 1: rows shown, 2: total rows. */
+								__('Showing result %1$d out of %2$d', 'gemtranslate'),
+								posts.data.rows.length,
+								posts.data.meta?.total ?? posts.data.rows.length
 							)}
 						</span>
-						<div className="gtrans-flex gtrans-gap-2">
-							<Button
-								variant="ghost"
-								size="sm"
-								disabled={filters.page <= 1}
-								onClick={() => setFilters((f) => ({ ...f, page: f.page - 1 }))}
-							>
-								{__('Previous', 'gemtranslate')}
-							</Button>
-							<Button
-								variant="ghost"
-								size="sm"
-								disabled={filters.page >= posts.data.meta.total_pages}
-								onClick={() => setFilters((f) => ({ ...f, page: f.page + 1 }))}
-							>
-								{__('Next', 'gemtranslate')}
-							</Button>
-						</div>
-					</div>
+						{posts.data.meta?.total_pages > 1 && (
+							<div className="gtrans-flex gtrans-items-center gtrans-gap-3">
+								<span className="gtrans-text-muted">
+									{sprintf(
+										/* translators: 1: current page, 2: total pages. */
+										__('Page %1$d of %2$d', 'gemtranslate'),
+										filters.page,
+										posts.data.meta.total_pages
+									)}
+								</span>
+								<Button
+									variant="secondary"
+									size="sm"
+									disabled={filters.page <= 1}
+									onClick={() => setFilters((f) => ({ ...f, page: f.page - 1 }))}
+								>
+									{__('Previous', 'gemtranslate')}
+								</Button>
+								<Button
+									variant="secondary"
+									size="sm"
+									disabled={filters.page >= posts.data.meta.total_pages}
+									onClick={() => setFilters((f) => ({ ...f, page: f.page + 1 }))}
+								>
+									{__('Next', 'gemtranslate')}
+								</Button>
+							</div>
+						)}
+					</Table.Footer>
 				)}
 			</Card>
 

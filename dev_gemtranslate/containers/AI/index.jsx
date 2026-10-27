@@ -7,7 +7,7 @@ import Button from '../../components/Button';
 import Toast from '../../components/Toast';
 import { Field, TextInput, Checkbox } from '../../components/Input';
 import { Select } from '../../components/ui/Select';
-import { LoadingBlock } from '../../components/Spinner';
+import { PageSkeleton, TableSkeleton } from '../../components/Skeleton';
 import {
 	useAIProviders,
 	useSaveAIProviders,
@@ -57,7 +57,7 @@ export default function AIPage() {
 	}, [providers.data, state]);
 
 	if (providers.isLoading || !state)
-		return <LoadingBlock>{__('Loading AI providers…', 'gemtranslate')}</LoadingBlock>;
+		return <PageSkeleton />;
 
 	const update = (name, key, value) =>
 		setState((s) => ({
@@ -203,7 +203,7 @@ export default function AIPage() {
 			{hasFeature('translation_memory') ? (
 				<Card title={__('Translation memory', 'gemtranslate')} className="gtrans-mt-6">
 					{memory.isLoading ? (
-						<LoadingBlock>{__('Loading memory stats…', 'gemtranslate')}</LoadingBlock>
+						<TableSkeleton />
 					) : (
 						<div className="gtrans-grid gtrans-grid-cols-2 gtrans-gap-4 gtrans-text-sm">
 							<div>

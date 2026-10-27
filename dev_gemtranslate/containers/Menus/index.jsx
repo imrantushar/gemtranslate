@@ -8,7 +8,7 @@ import Button from '../../components/Button';
 import Toast from '../../components/Toast';
 import { Field, TextInput } from '../../components/Input';
 import { Select } from '../../components/ui/Select';
-import { LoadingBlock } from '../../components/Spinner';
+import { PageSkeleton, TableSkeleton } from '../../components/Skeleton';
 import { api, unwrap } from '../../lib/api';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLanguages } from '../../hooks/useLanguages';
@@ -55,7 +55,7 @@ export default function MenusPage() {
 		if (!selectedLang && nonDefault.length) setSelectedLang(nonDefault[0].code);
 	}, [menus.data, nonDefault, selectedMenu, selectedLang]);
 
-	if (menus.isLoading || langs.isLoading) return <LoadingBlock>{__('Loading menus…', 'gemtranslate')}</LoadingBlock>;
+	if (menus.isLoading || langs.isLoading) return <PageSkeleton />;
 
 	const onSave = async (item) => {
 		const draft = drafts[item.id] || {};
@@ -100,13 +100,13 @@ export default function MenusPage() {
 				</Field>
 			</div>
 
-			<Card padded={false}>
+			<Card table>
 				{items.isLoading ? (
-					<LoadingBlock>{__('Loading items…', 'gemtranslate')}</LoadingBlock>
+					<TableSkeleton />
 				) : (items.data || []).length === 0 ? (
-					<p className="gtrans-px-5 gtrans-py-8 gtrans-text-center gtrans-text-sm gtrans-text-muted">
+					<Table.Empty>
 						{__('No menu items.', 'gemtranslate')}
-					</p>
+					</Table.Empty>
 				) : (
 					<Table.Root>
 						<Table.Header>

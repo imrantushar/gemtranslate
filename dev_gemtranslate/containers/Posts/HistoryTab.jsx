@@ -5,7 +5,7 @@ import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
 import StatusPill from '../../components/StatusPill';
-import { LoadingBlock } from '../../components/Spinner';
+import { FormSkeleton, TableSkeleton } from '../../components/Skeleton';
 import { useRevision, useRevisions, useRevertRevision } from '../../hooks/useRevisions';
 import { formatErrorMessage, truncate } from '../../lib/format';
 
@@ -16,7 +16,7 @@ export default function HistoryTab({ postId, targetLang }) {
 	const revert = useRevertRevision();
 	const [toast, setToast] = useState(null);
 
-	if (list.isLoading) return <LoadingBlock>{__('Loading history…', 'gemtranslate')}</LoadingBlock>;
+	if (list.isLoading) return <FormSkeleton />;
 
 	if (!list.data || list.data.length === 0) {
 		return (
@@ -79,7 +79,7 @@ export default function HistoryTab({ postId, targetLang }) {
 							{__('Select a revision from the list to view its contents.', 'gemtranslate')}
 						</p>
 					) : detail.isLoading ? (
-						<LoadingBlock>{__('Loading revision…', 'gemtranslate')}</LoadingBlock>
+						<TableSkeleton />
 					) : !detail.data ? (
 						<p className="gtrans-text-danger">{__('Revision not available.', 'gemtranslate')}</p>
 					) : (

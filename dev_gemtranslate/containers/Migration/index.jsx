@@ -6,7 +6,7 @@ import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
 import StatusPill from '../../components/StatusPill';
-import { LoadingBlock } from '../../components/Spinner';
+import { PageSkeleton } from '../../components/Skeleton';
 import { useMigrationDetect, useRunMigration } from '../../hooks/useMigration';
 import { formatErrorMessage } from '../../lib/format';
 
@@ -22,7 +22,7 @@ export default function MigrationPage() {
 	const [results, setResults] = useState({});
 	const [toast, setToast] = useState(null);
 
-	if (detect.isLoading) return <LoadingBlock>{__('Detecting other multilingual plugins…', 'gemtranslate')}</LoadingBlock>;
+	if (detect.isLoading) return <PageSkeleton />;
 
 	const onRun = async (source) => {
 		if (!window.confirm(__('Run import? Existing translations may be overwritten.', 'gemtranslate'))) return;

@@ -17,7 +17,7 @@ import ReactSelect from 'react-select';
 export const RawSelect = React.forwardRef(({ className = '', ...rest }, ref) => (
 	<ReactSelect
 		ref={ref}
-		className={className}
+		className={`gtrans-select ${className}`.trim()}
 		classNamePrefix="gtrans-select"
 		menuPortalTarget={document.body}
 		styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}

@@ -7,7 +7,7 @@ import Button from '../../components/Button';
 import Toast from '../../components/Toast';
 import { Checkbox, Field, TextInput } from '../../components/Input';
 import { Select } from '../../components/ui/Select';
-import { LoadingBlock } from '../../components/Spinner';
+import { PageSkeleton } from '../../components/Skeleton';
 import { useSettings, useSaveSettings } from '../../hooks/useSettings';
 import { useLanguages } from '../../hooks/useLanguages';
 import { usePostTypes } from '../../hooks/usePostTypes';
@@ -134,7 +134,7 @@ export default function SettingsPage() {
 	}, [settings.data, values]);
 
 	if (settings.isLoading || !values)
-		return <LoadingBlock>{__('Loading settings…', 'gemtranslate')}</LoadingBlock>;
+		return <PageSkeleton />;
 
 	const set = (key, value) => setValues((v) => ({ ...v, [key]: value }));
 

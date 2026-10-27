@@ -6,9 +6,10 @@ import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
+import Stepper from '../../components/Stepper';
 import { Checkbox, Field, TextInput } from '../../components/Input';
 import { Select } from '../../components/ui/Select';
-import { LoadingBlock } from '../../components/Spinner';
+import { PageSkeleton } from '../../components/Skeleton';
 import { useLanguages, useCreateLanguage } from '../../hooks/useLanguages';
 import { useAIProviders, useSaveAIProviders, useTestAIProvider } from '../../hooks/useAI';
 import { useSaveSettings } from '../../hooks/useSettings';
@@ -54,7 +55,7 @@ export default function Onboarding() {
 	const [toast, setToast] = useState(null);
 	const [working, setWorking] = useState(false);
 
-	if (languages.isLoading || providers.isLoading) return <LoadingBlock>{__('Loading…', 'gemtranslate')}</LoadingBlock>;
+	if (languages.isLoading || providers.isLoading) return <PageSkeleton />;
 
 	const existingCodes = new Set((languages.data || []).map((l) => l.code));
 	const togglePick = (code) =>
@@ -138,22 +139,12 @@ export default function Onboarding() {
 				description={__('Quick setup — pick languages, add an AI key (optional), done.', 'gemtranslate')}
 			/>
 
-			<div className="gtrans-mb-6 gtrans-flex gtrans-items-center gtrans-gap-2">
-				{STEPS.map((s, i) => (
-					<div key={s.key} className="gtrans-flex gtrans-items-center gtrans-gap-2">
-						<span
-							className={`gtrans-flex gtrans-h-6 gtrans-w-6 gtrans-items-center gtrans-justify-center gtrans-rounded-full gtrans-text-xs ${
-								STEPS.findIndex((x) => x.key === step) >= i
-									? 'gtrans-bg-primary gtrans-text-white'
-									: 'gtrans-bg-line gtrans-text-muted'
-							}`}
-						>
-							{i + 1}
-						</span>
-						<span className="gtrans-text-sm gtrans-text-label">{s.label()}</span>
-						{i < STEPS.length - 1 && <span className="gtrans-text-muted">→</span>}
-					</div>
-				))}
+			<div className="gtrans-mb-6 gtrans-rounded-lg gtrans-border gtrans-border-edge gtrans-bg-surface gtrans-px-6 gtrans-py-4">
+				<Stepper
+					steps={STEPS}
+					currentStepIndex={STEPS.findIndex((s) => s.key === step)}
+					onStepClick={(i) => setStep(STEPS[i].key)}
+				/>
 			</div>
 
 			{step === 'welcome' && (

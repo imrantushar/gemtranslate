@@ -6,11 +6,13 @@ import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
+import StatusTabs from '../../components/StatusTabs';
+
 import Toast from '../../components/Toast';
 import StatusPill from '../../components/StatusPill';
 import { Field, TextInput, TextArea } from '../../components/Input';
 import { Select } from '../../components/ui/Select';
-import { LoadingBlock } from '../../components/Spinner';
+import { TableSkeleton } from '../../components/Skeleton';
 import {
 	useAssignments,
 	useCreateAssignment,
@@ -79,46 +81,42 @@ export default function AssignmentsPage() {
 
 			{canManage && <NewAssignment onToast={setToast} />}
 
-			<Card padded={false}>
-				<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-3 gtrans-border-b gtrans-border-line gtrans-px-4 gtrans-py-3 gtrans-text-sm">
+			<Card table>
+				<Table.Toolbar variant="tabs">
+					<StatusTabs
+						value={status}
+						onChange={setStatus}
+						tabs={[
+							{ value: '', label: __('All', 'gemtranslate') },
+							{ value: 'open', label: __('Open', 'gemtranslate') },
+							{ value: 'assigned', label: __('Assigned', 'gemtranslate') },
+							{ value: 'in_progress', label: __('In progress', 'gemtranslate') },
+							{ value: 'completed', label: __('Completed', 'gemtranslate') },
+							{ value: 'cancelled', label: __('Cancelled', 'gemtranslate') },
+						]}
+					/>
 					{canManage && (
-						<div className="gtrans-flex gtrans-gap-1">
-							{['all', 'mine'].map((s) => (
-								<button
-									key={s}
-									type="button"
-									onClick={() => setScope(s)}
-									className={`gtrans-bare gtrans-rounded-md gtrans-px-3 gtrans-py-1 gtrans-text-xs ${
-										scope === s
-											? 'gtrans-bg-primary gtrans-text-white'
-											: 'gtrans-bg-surface gtrans-border gtrans-border-line gtrans-text-label'
-									}`}
+						<div className="gtrans-flex gtrans-gap-2 gtrans-py-2">
+							{['all', 'mine'].map((sc) => (
+								<Button
+									key={sc}
+									size="sm"
+									variant={scope === sc ? 'light' : 'secondary'}
+									onClick={() => setScope(sc)}
 								>
-									{s === 'all'
-										? __('Everyone', 'gemtranslate')
-										: __('Assigned by me', 'gemtranslate')}
-								</button>
+									{sc === 'all' ? __('Everyone', 'gemtranslate') : __('Assigned by me', 'gemtranslate')}
+								</Button>
 							))}
 						</div>
 					)}
-					<div className="gtrans-min-w-[160px]">
-						<Select value={status} onChange={(e) => setStatus(e.target.value)}>
-							<option value="">{__('All statuses', 'gemtranslate')}</option>
-							<option value="open">{__('Open', 'gemtranslate')}</option>
-							<option value="assigned">{__('Assigned', 'gemtranslate')}</option>
-							<option value="in_progress">{__('In progress', 'gemtranslate')}</option>
-							<option value="completed">{__('Completed', 'gemtranslate')}</option>
-							<option value="cancelled">{__('Cancelled', 'gemtranslate')}</option>
-						</Select>
-					</div>
-				</div>
+				</Table.Toolbar>
 
 				{list.isLoading ? (
-					<LoadingBlock>{__('Loading assignments…', 'gemtranslate')}</LoadingBlock>
+					<TableSkeleton />
 				) : rows.length === 0 ? (
-					<p className="gtrans-px-5 gtrans-py-10 gtrans-text-center gtrans-text-sm gtrans-text-muted">
+					<Table.Empty>
 						{__('No assignments yet.', 'gemtranslate')}
-					</p>
+					</Table.Empty>
 				) : (
 					<Table.Root>
 						<Table.Header>

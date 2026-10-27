@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { __, sprintf } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
+import SearchBox from '../../components/SearchBox';
 import Toast from '../../components/Toast';
 import StatusPill from '../../components/StatusPill';
 import { Field, TextInput, TextArea } from '../../components/Input';
 import { Select } from '../../components/ui/Select';
-import { LoadingBlock } from '../../components/Spinner';
+import { PageSkeleton, TableSkeleton } from '../../components/Skeleton';
 import { useTerms, useTermTranslations, useSaveTermTranslation } from '../../hooks/useTerms';
 import { useLanguages } from '../../hooks/useLanguages';
 import { useTranslateWithAI } from '../../hooks/useAI';
@@ -20,18 +22,23 @@ export default function TermsPage() {
 	const nonDefault = (langs.data || []).filter((l) => !l.is_default);
 	const defaultLang = (langs.data || []).find((l) => l.is_default);
 
-	const [taxonomy, setTaxonomy] = useState('category');
-	const [search, setSearch] = useState('');
-	const [filters, setFilters] = useState({ taxonomy: 'category', search: '', per_page: 100 });
+	// Taxonomy is chosen from the sidebar submenu (?tax=post_tag).
+	const [params] = useSearchParams();
+	const taxonomy = params.get('tax') || 'category';
+	const [filters, setFilters] = useState({ search: '', per_page: 100 });
 	const [selectedTerm, setSelectedTerm] = useState(null);
 	const [selectedLang, setSelectedLang] = useState('');
 	const [form, setForm] = useState({ name: '', description: '', slug: '' });
 	const [toast, setToast] = useState(null);
 
-	const terms = useTerms(filters);
+	const terms = useTerms({ ...filters, taxonomy });
 	const detail = useTermTranslations(selectedTerm);
 	const save = useSaveTermTranslation();
 	const ai = useTranslateWithAI();
+
+	useEffect(() => {
+		setSelectedTerm(null);
+	}, [taxonomy]);
 
 	useEffect(() => {
 		if (!nonDefault.length || selectedLang) return;
@@ -94,45 +101,32 @@ export default function TermsPage() {
 		}
 	};
 
-	const runSearch = (e) => {
-		e.preventDefault();
-		setFilters({ taxonomy, search, per_page: 100 });
-	};
-
-	if (langs.isLoading) return <LoadingBlock>{__('Loading…', 'gemtranslate')}</LoadingBlock>;
+	if (langs.isLoading) return <PageSkeleton />;
 
 	return (
 		<>
 			<PageHeader
 				title={__('Taxonomies', 'gemtranslate')}
 				description={__('Translate categories, tags, and other taxonomy terms.', 'gemtranslate')}
+				actions={
+					<SearchBox
+						value={filters.search}
+						placeholder={__('Search terms…', 'gemtranslate')}
+						onSearch={(search) => setFilters((f) => ({ ...f, search }))}
+					/>
+				}
 			/>
 
-			<Card padded={false} className="gtrans-mb-6">
-				<form onSubmit={runSearch} className="gtrans-flex gtrans-flex-wrap gtrans-items-end gtrans-gap-3 gtrans-border-b gtrans-border-line gtrans-px-4 gtrans-py-3">
-					<Field label={__('Taxonomy', 'gemtranslate')}>
-						<Select value={taxonomy} onChange={(e) => setTaxonomy(e.target.value)}>
-							<option value="category">{__('Categories', 'gemtranslate')}</option>
-							<option value="post_tag">{__('Tags', 'gemtranslate')}</option>
-							<option value="product_cat">{__('Product categories', 'gemtranslate')}</option>
-							<option value="product_tag">{__('Product tags', 'gemtranslate')}</option>
-						</Select>
-					</Field>
-					<div className="gtrans-min-w-[200px] gtrans-flex-1">
-						<Field label={__('Search', 'gemtranslate')}>
-							<TextInput value={search} onChange={(e) => setSearch(e.target.value)} placeholder={__('Search…', 'gemtranslate')} />
-						</Field>
-					</div>
-					<Button type="submit" variant="secondary">{__('Filter', 'gemtranslate')}</Button>
-				</form>
+			<Card table className="gtrans-mb-6">
 
 				{terms.isLoading ? (
-					<LoadingBlock>{__('Loading terms…', 'gemtranslate')}</LoadingBlock>
+					<TableSkeleton />
 				) : (terms.data?.rows || []).length === 0 ? (
-					<p className="gtrans-px-5 gtrans-py-8 gtrans-text-center gtrans-text-sm gtrans-text-muted">
+					<Table.Empty>
 						{__('No terms found.', 'gemtranslate')}
-					</p>
+					</Table.Empty>
 				) : (
+					<>
 					<Table.Root>
 						<Table.Header>
 							<Table.Row>
@@ -169,6 +163,12 @@ export default function TermsPage() {
 							))}
 						</Table.Body>
 					</Table.Root>
+					<Table.Footer>
+						<span className="gtrans-text-muted">
+							{sprintf(__('Showing result %1$d out of %2$d', 'gemtranslate'), terms.data.rows.length, terms.data.rows.length)}
+						</span>
+					</Table.Footer>
+					</>
 				)}
 			</Card>
 

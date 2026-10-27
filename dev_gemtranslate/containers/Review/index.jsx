@@ -8,7 +8,7 @@ import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
 import StatusPill from '../../components/StatusPill';
-import { LoadingBlock } from '../../components/Spinner';
+import { TableSkeleton } from '../../components/Skeleton';
 import { useReviewQueue, useApproveTranslation, useRejectTranslation } from '../../hooks/useReview';
 import { useLanguages } from '../../hooks/useLanguages';
 import { formatErrorMessage, truncate } from '../../lib/format';
@@ -89,16 +89,16 @@ export default function ReviewPage() {
 				)}
 			/>
 
-			<Card padded={false}>
+			<Card table>
 				{queue.isLoading ? (
-					<LoadingBlock>{__('Loading review queue…', 'gemtranslate')}</LoadingBlock>
+					<TableSkeleton />
 				) : rows.length === 0 ? (
-					<p className="gtrans-px-5 gtrans-py-10 gtrans-text-center gtrans-text-sm gtrans-text-muted">
+					<Table.Empty>
 						{__(
 							'Nothing waiting for review. New automatic translations will appear here when "Hold for review" is on.',
 							'gemtranslate'
 						)}
-					</p>
+					</Table.Empty>
 				) : (
 					<Table.Root>
 						<Table.Header>
@@ -163,7 +163,7 @@ export default function ReviewPage() {
 				)}
 
 				{meta?.total_pages > 1 && (
-					<div className="gtrans-flex gtrans-justify-between gtrans-border-t gtrans-border-line gtrans-px-4 gtrans-py-3 gtrans-text-sm">
+					<div className="gtrans-flex gtrans-justify-between gtrans-mt-3 gtrans-text-sm">
 						<span className="gtrans-text-muted">
 							{sprintf(
 								/* translators: 1: current page, 2: total pages. */

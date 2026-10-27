@@ -6,9 +6,11 @@ import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
+import SearchBox from '../../components/SearchBox';
+import StatusTabs from '../../components/StatusTabs';
 import Toast from '../../components/Toast';
 import { TextInput } from '../../components/Input';
-import { LoadingBlock } from '../../components/Spinner';
+import { PageSkeleton } from '../../components/Skeleton';
 import { usePackages, useScanPackage } from '../../hooks/usePackages';
 import { useLanguages } from '../../hooks/useLanguages';
 import { formatErrorMessage } from '../../lib/format';
@@ -27,7 +29,7 @@ export default function PackageList() {
 	const [toast, setToast] = useState(null);
 	const [scanningSlug, setScanningSlug] = useState('');
 
-	if (packages.isLoading) return <LoadingBlock>{__('Loading plugins & themes…', 'gemtranslate')}</LoadingBlock>;
+	if (packages.isLoading) return <PageSkeleton />;
 	if (packages.error) return <p className="gtrans-text-red-600">{formatErrorMessage(packages.error)}</p>;
 
 	const langCodes = packages.data?.meta?.languages || [];
@@ -99,43 +101,23 @@ export default function PackageList() {
 				}
 			/>
 
-			<Card padded={false}>
-				<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-3 gtrans-border-b gtrans-border-line gtrans-px-4 gtrans-py-3">
-					<div className="gtrans-flex gtrans-items-center gtrans-gap-1 gtrans-text-xs">
-						{['all', 'plugin', 'theme'].map((t) => (
-							<button
-								key={t}
-								type="button"
-								onClick={() => setTypeFilter(t)}
-								className={`gtrans-bare gtrans-rounded-full gtrans-px-3 gtrans-py-1 ${
-									typeFilter === t
-										? 'gtrans-bg-primary gtrans-text-white'
-										: 'gtrans-bg-surface gtrans-border gtrans-border-line gtrans-text-label'
-								}`}
-							>
-								{t === 'all'
-									? __('All', 'gemtranslate')
-									: t === 'plugin'
-										? __('Plugins', 'gemtranslate')
-										: __('Themes', 'gemtranslate')}
-							</button>
-						))}
-					</div>
-					<div className="gtrans-flex-1 gtrans-min-w-[200px]">
-						<TextInput
-							value={filter}
-							onChange={(e) => setFilter(e.target.value)}
-							placeholder={__('Search plugins & themes…', 'gemtranslate')}
-						/>
-					</div>
-					<span className="gtrans-text-xs gtrans-text-muted">
-						{sprintf(
-							/* translators: %d: count. */
-							__('%d installed', 'gemtranslate'),
-							packages.data?.rows?.length || 0
-						)}
-					</span>
-				</div>
+			<Card table>
+				<Table.Toolbar variant="tabs">
+					<StatusTabs
+						value={typeFilter}
+						onChange={setTypeFilter}
+						tabs={[
+							{ value: 'all', label: __('All', 'gemtranslate'), count: packages.data?.rows?.length || 0 },
+							{ value: 'plugin', label: __('Plugins', 'gemtranslate') },
+							{ value: 'theme', label: __('Themes', 'gemtranslate') },
+						]}
+					/>
+					<SearchBox
+						value={filter}
+						placeholder={__('Search plugins & themes…', 'gemtranslate')}
+						onSearch={setFilter}
+					/>
+				</Table.Toolbar>
 
 				<Table.Root>
 					<Table.Header>
@@ -162,8 +144,8 @@ export default function PackageList() {
 						))}
 						{rows.length === 0 && (
 							<Table.Row>
-								<Table.Cell colSpan={5} className="gtrans-py-8 gtrans-text-center gtrans-text-sm gtrans-text-muted">
-									{__('No matches.', 'gemtranslate')}
+								<Table.Cell colSpan={5}>
+									<Table.Empty>{__('No matches.', 'gemtranslate')}</Table.Empty>
 								</Table.Cell>
 							</Table.Row>
 						)}

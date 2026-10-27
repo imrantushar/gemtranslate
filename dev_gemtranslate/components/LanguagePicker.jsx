@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { api, unwrap } from '../lib/api';
 import { useLanguages } from '../hooks/useLanguages';
+import { Select } from './ui/Select';
 
 function useMyLanguage() {
 	return useQuery({
@@ -48,11 +49,11 @@ export default function LanguagePicker() {
 				<span className="gtrans-block gtrans-text-xs gtrans-font-medium gtrans-text-muted">
 					{__('Admin UI language', 'gemtranslate')}
 				</span>
-				<select
+				<Select
 					value={current}
 					onChange={onChange}
 					disabled={setMine.isPending}
-					className="gtrans-mt-1 gtrans-w-full gtrans-rounded gtrans-border gtrans-border-line gtrans-bg-surface gtrans-px-2 gtrans-py-1 gtrans-text-sm"
+					className="gtrans-mt-1 gtrans-w-full"
 				>
 					<option value="">{__('Site default', 'gemtranslate')}</option>
 					{langs.map((lang) => (
@@ -60,7 +61,7 @@ export default function LanguagePicker() {
 							{lang.name} ({lang.code})
 						</option>
 					))}
-				</select>
+				</Select>
 			</label>
 			<p className="gtrans-mt-1 gtrans-mb-0 gtrans-text-[11px] gtrans-leading-snug gtrans-text-muted">
 				{__('Changes the admin interface only. Frontend visitors pick their own language via the switcher.', 'gemtranslate')}

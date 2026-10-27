@@ -5,9 +5,10 @@ import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
+import SearchBox from '../../components/SearchBox';
 import Toast from '../../components/Toast';
 import StatusPill from '../../components/StatusPill';
-import { LoadingBlock } from '../../components/Spinner';
+import { TableSkeleton } from '../../components/Skeleton';
 import { Field, TextInput, TextArea } from '../../components/Input';
 import { Select } from '../../components/ui/Select';
 import { useScanStrings, useSaveStringTranslation, useStringDomains, useStrings } from '../../hooks/useStrings';
@@ -28,7 +29,6 @@ export default function StringsLegacy() {
 		domain: '',
 		lang: nonDefault[0]?.code || '',
 	});
-	const [search, setSearch] = useState('');
 	const strings = useStrings(filters);
 	const domains = useStringDomains();
 	const save = useSaveStringTranslation();
@@ -40,11 +40,6 @@ export default function StringsLegacy() {
 	if (filters.lang === '' && nonDefault[0]) {
 		setFilters((f) => ({ ...f, lang: nonDefault[0].code }));
 	}
-
-	const runSearch = (e) => {
-		e.preventDefault();
-		setFilters((f) => ({ ...f, search, page: 1 }));
-	};
 
 	const onSave = async (id) => {
 		const value = drafts[id] ?? '';
@@ -105,8 +100,9 @@ export default function StringsLegacy() {
 				}
 			/>
 
-			<Card padded={false}>
-				<form onSubmit={runSearch} className="gtrans-flex gtrans-flex-wrap gtrans-items-end gtrans-gap-3 gtrans-border-b gtrans-border-line gtrans-px-4 gtrans-py-3">
+			<Card table>
+				<Table.Toolbar>
+					<div className="gtrans-flex gtrans-flex-wrap gtrans-items-end gtrans-gap-3">
 					<div className="gtrans-min-w-[160px]">
 						<Field label={__('Target language', 'gemtranslate')}>
 							<Select value={filters.lang} onChange={(e) => setFilters((f) => ({ ...f, lang: e.target.value, page: 1 }))}>
@@ -130,20 +126,20 @@ export default function StringsLegacy() {
 							</Select>
 						</Field>
 					</div>
-					<div className="gtrans-min-w-[200px] gtrans-flex-1">
-						<Field label={__('Search source', 'gemtranslate')}>
-							<TextInput value={search} onChange={(e) => setSearch(e.target.value)} placeholder={__('Search…', 'gemtranslate')} />
-						</Field>
 					</div>
-					<Button type="submit" variant="secondary">{__('Filter', 'gemtranslate')}</Button>
-				</form>
+					<SearchBox
+						value={filters.search}
+						placeholder={__('Search source…', 'gemtranslate')}
+						onSearch={(search) => setFilters((f) => ({ ...f, search, page: 1 }))}
+					/>
+				</Table.Toolbar>
 
 				{strings.isLoading ? (
-					<LoadingBlock>{__('Loading strings…', 'gemtranslate')}</LoadingBlock>
+					<TableSkeleton />
 				) : (strings.data?.rows || []).length === 0 ? (
-					<p className="gtrans-px-5 gtrans-py-8 gtrans-text-center gtrans-text-sm gtrans-text-muted">
+					<Table.Empty>
 						{__('No strings yet. Scan a theme or plugin to populate this list.', 'gemtranslate')}
-					</p>
+					</Table.Empty>
 				) : (
 					<Table.Root>
 						<Table.Header>
@@ -202,7 +198,7 @@ export default function StringsLegacy() {
 				)}
 
 				{strings.data?.meta?.total > strings.data?.meta?.per_page && (
-					<div className="gtrans-flex gtrans-justify-between gtrans-border-t gtrans-border-line gtrans-px-4 gtrans-py-3 gtrans-text-sm">
+					<div className="gtrans-flex gtrans-justify-between gtrans-mt-3 gtrans-text-sm">
 						<span className="gtrans-text-muted">
 							{sprintf(
 								/* translators: %d: total count. */

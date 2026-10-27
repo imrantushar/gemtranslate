@@ -5,9 +5,11 @@ import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
+import StatusTabs from '../../components/StatusTabs';
+
 import Toast from '../../components/Toast';
 import StatusPill from '../../components/StatusPill';
-import { LoadingBlock } from '../../components/Spinner';
+import { TableSkeleton } from '../../components/Skeleton';
 import { Field } from '../../components/Input';
 import { Select } from '../../components/ui/Select';
 import { useJobs, useJobCounts, useRetryJob, useDeleteJob } from '../../hooks/useJobs';
@@ -69,26 +71,26 @@ export default function JobsPage() {
 				</Card>
 			</div>
 
-			<Card padded={false}>
-				<div className="gtrans-flex gtrans-flex-wrap gtrans-items-end gtrans-gap-3 gtrans-border-b gtrans-border-line gtrans-px-4 gtrans-py-3">
-					<div className="gtrans-min-w-[160px]">
-						<Field label={__('Status', 'gemtranslate')}>
-							<Select value={status} onChange={(e) => setStatus(e.target.value)}>
-								<option value="">{__('All', 'gemtranslate')}</option>
-								<option value="pending">{__('Pending', 'gemtranslate')}</option>
-								<option value="running">{__('Running', 'gemtranslate')}</option>
-								<option value="success">{__('Success', 'gemtranslate')}</option>
-								<option value="failed">{__('Failed', 'gemtranslate')}</option>
-							</Select>
-						</Field>
-					</div>
-				</div>
+			<Card table>
+				<Table.Toolbar variant="tabs">
+					<StatusTabs
+						value={status}
+						onChange={setStatus}
+						tabs={[
+							{ value: '', label: __('All', 'gemtranslate') },
+							{ value: 'pending', label: __('Pending', 'gemtranslate'), count: counts.data?.pending ?? 0 },
+							{ value: 'running', label: __('Running', 'gemtranslate'), count: counts.data?.running ?? 0 },
+							{ value: 'success', label: __('Success', 'gemtranslate'), count: counts.data?.success ?? 0 },
+							{ value: 'failed', label: __('Failed', 'gemtranslate'), count: counts.data?.failed ?? 0 },
+						]}
+					/>
+				</Table.Toolbar>
 				{jobs.isLoading ? (
-					<LoadingBlock>{__('Loading jobs…', 'gemtranslate')}</LoadingBlock>
+					<TableSkeleton />
 				) : (jobs.data?.rows || []).length === 0 ? (
-					<p className="gtrans-px-5 gtrans-py-8 gtrans-text-center gtrans-text-sm gtrans-text-muted">
+					<Table.Empty>
 						{__('No jobs in this view.', 'gemtranslate')}
-					</p>
+					</Table.Empty>
 				) : (
 					<Table.Root>
 						<Table.Header>

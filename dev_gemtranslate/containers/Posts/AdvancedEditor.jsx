@@ -4,7 +4,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
-import { LoadingBlock } from '../../components/Spinner';
+import { FormSkeleton } from '../../components/Skeleton';
 import TokenField from '../../components/TokenField';
 import {
 	usePostFields,
@@ -126,7 +126,7 @@ export default function AdvancedEditor({ postId, sourceLang, targetLang, country
 		};
 	}, [fields, drafts, confirmedSet]);
 
-	if (data.isLoading) return <LoadingBlock>{__('Loading editor…', 'gemtranslate')}</LoadingBlock>;
+	if (data.isLoading) return <FormSkeleton />;
 	if (!data.data) return null;
 	if (fields.length === 0) {
 		return (

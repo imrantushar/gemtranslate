@@ -26,13 +26,8 @@ export const Textarea = React.forwardRef(({ className = '', rows = 4, ...rest },
 ));
 Textarea.displayName = 'Textarea';
 
-/** Native <select> styled to match Input; browser supplies the chevron. */
-export const Select = React.forwardRef(({ className = '', children, ...rest }, ref) => (
-	<select ref={ref} className={cx(fieldBase, 'gtrans-h-10 gtrans-px-3 gtrans-pr-8 gtrans-cursor-pointer', className)} {...rest}>
-		{children}
-	</select>
-));
-Select.displayName = 'Select';
+/** Selects are react-select everywhere; see ./Select. */
+export { Select } from './Select';
 
 export const Checkbox = React.forwardRef(({ label, className = '', ...rest }, ref) => (
 	<label className="gtrans-inline-flex gtrans-items-center gtrans-gap-2 gtrans-cursor-pointer gtrans-select-none gtrans-text-sm gtrans-text-ink gtrans-font-sans">

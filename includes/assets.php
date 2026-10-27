@@ -54,7 +54,7 @@ class Assets {
 				'gemtranslate-editor',
 				GTRANS_ASSETS_URI . 'build/editor.css',
 				[],
-				$ver
+				filemtime( $build_dir . $css_handle ) ?: $ver
 			);
 		}
 	}

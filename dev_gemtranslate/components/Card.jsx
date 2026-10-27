@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 
-export default function Card({ title, action, children, className, padded = true }) {
+export default function Card({ title, action, children, className, padded = true, table = false }) {
 	return (
 		<section className={clsx('gtrans-rounded-lg gtrans-border gtrans-border-edge gtrans-bg-surface gtrans-shadow-gtrans', className)}>
 			{(title || action) && (
@@ -9,7 +9,7 @@ export default function Card({ title, action, children, className, padded = true
 					{action}
 				</header>
 			)}
-			<div className={clsx(padded && 'gtrans-p-5')}>{children}</div>
+			<div className={clsx(padded && 'gtrans-p-5', table && 'gtrans-p-6')}>{children}</div>
 		</section>
 	);
 }

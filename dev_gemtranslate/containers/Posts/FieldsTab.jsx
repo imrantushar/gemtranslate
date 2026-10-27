@@ -5,7 +5,7 @@ import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
 import { Field, TextArea, TextInput } from '../../components/Input';
-import { LoadingBlock } from '../../components/Spinner';
+import { FormSkeleton } from '../../components/Skeleton';
 import { usePostFields, useSavePostFields } from '../../hooks/usePostFields';
 import { useTranslateWithAI } from '../../hooks/useAI';
 import { formatErrorMessage } from '../../lib/format';
@@ -35,7 +35,7 @@ export default function FieldsTab({ postId, sourceLang, targetLang, country = ''
 		setDrafts(init);
 	}, [data.data, targetLang, country]);
 
-	if (data.isLoading) return <LoadingBlock>{__('Loading fields…', 'gemtranslate')}</LoadingBlock>;
+	if (data.isLoading) return <FormSkeleton />;
 	if (!data.data) return null;
 
 	const set = (path, value) => setDrafts((d) => ({ ...d, [path]: value }));
