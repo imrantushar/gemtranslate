@@ -1,11 +1,11 @@
 <?php
-namespace Zentranslate\Routing;
+namespace GemTranslate\Routing;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Language\Context;
+use GemTranslate\Language\Context;
 
 /**
  * Detects the requested language from the URL prefix and rewrites the
@@ -146,7 +146,7 @@ class RequestParser {
 	 */
 	private function detect_admin_language() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$override = isset( $_GET['ztrans_lang'] ) ? sanitize_key( wp_unslash( $_GET['ztrans_lang'] ) ) : '';
+		$override = isset( $_GET['gtrans_lang'] ) ? sanitize_key( wp_unslash( $_GET['gtrans_lang'] ) ) : '';
 		if ( $override && Context::is_active( $override ) ) {
 			Context::set( $override );
 			return;
@@ -154,7 +154,7 @@ class RequestParser {
 
 		$user_id = get_current_user_id();
 		if ( $user_id ) {
-			$pref = (string) get_user_meta( $user_id, 'ztrans_preferred_language', true );
+			$pref = (string) get_user_meta( $user_id, 'gtrans_preferred_language', true );
 			if ( $pref && Context::is_active( $pref ) ) {
 				Context::set( $pref );
 				return;

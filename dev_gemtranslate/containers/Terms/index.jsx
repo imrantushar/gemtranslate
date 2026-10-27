@@ -1,0 +1,239 @@
+import { useEffect, useState } from 'react';
+import { __, sprintf } from '@wordpress/i18n';
+
+import PageHeader from '../../components/PageHeader';
+import Card from '../../components/Card';
+import Button from '../../components/Button';
+import Toast from '../../components/Toast';
+import StatusPill from '../../components/StatusPill';
+import { Field, Select, TextInput, TextArea } from '../../components/Input';
+import { LoadingBlock } from '../../components/Spinner';
+import { useTerms, useTermTranslations, useSaveTermTranslation } from '../../hooks/useTerms';
+import { useLanguages } from '../../hooks/useLanguages';
+import { useTranslateWithAI } from '../../hooks/useAI';
+import { formatErrorMessage } from '../../lib/format';
+
+export default function TermsPage() {
+	const langs = useLanguages();
+	const nonDefault = (langs.data || []).filter((l) => !l.is_default);
+	const defaultLang = (langs.data || []).find((l) => l.is_default);
+
+	const [taxonomy, setTaxonomy] = useState('category');
+	const [search, setSearch] = useState('');
+	const [filters, setFilters] = useState({ taxonomy: 'category', search: '', per_page: 100 });
+	const [selectedTerm, setSelectedTerm] = useState(null);
+	const [selectedLang, setSelectedLang] = useState('');
+	const [form, setForm] = useState({ name: '', description: '', slug: '' });
+	const [toast, setToast] = useState(null);
+
+	const terms = useTerms(filters);
+	const detail = useTermTranslations(selectedTerm);
+	const save = useSaveTermTranslation();
+	const ai = useTranslateWithAI();
+
+	useEffect(() => {
+		if (!nonDefault.length || selectedLang) return;
+		setSelectedLang(nonDefault[0].code);
+	}, [nonDefault, selectedLang]);
+
+	useEffect(() => {
+		if (!detail.data) return;
+		const row = (detail.data.translations || []).find((t) => t.language.code === selectedLang);
+		setForm({
+			name: row?.translation?.name ?? '',
+			description: row?.translation?.description ?? '',
+			slug: row?.translation?.slug ?? '',
+		});
+	}, [detail.data, selectedLang]);
+
+	const submit = async (e) => {
+		e.preventDefault();
+		try {
+			await save.mutateAsync({ termId: selectedTerm, lang: selectedLang, payload: form });
+			setToast({ tone: 'success', message: __('Term translation saved.', 'gemtranslate') });
+		} catch (err) {
+			setToast({ tone: 'error', message: formatErrorMessage(err) });
+		}
+	};
+
+	const aiFill = async (field, sourceText) => {
+		try {
+			const res = await ai.mutateAsync({
+				text: sourceText,
+				source_lang: defaultLang?.code || 'en',
+				target_lang: selectedLang,
+				preserve_html: field === 'description',
+				use_memory: true,
+			});
+			setForm((f) => ({ ...f, [field]: res.translations }));
+		} catch (err) {
+			setToast({ tone: 'error', message: formatErrorMessage(err) });
+		}
+	};
+
+	const aiFillAll = async () => {
+		if (!detail.data?.term) return;
+		const t = detail.data.term;
+		try {
+			const res = await ai.mutateAsync({
+				text: [t.name, t.description || ''],
+				source_lang: defaultLang?.code || 'en',
+				target_lang: selectedLang,
+				preserve_html: true,
+				use_memory: true,
+			});
+			setForm((f) => ({
+				...f,
+				name: res.translations[0] || f.name,
+				description: res.translations[1] || f.description,
+			}));
+		} catch (err) {
+			setToast({ tone: 'error', message: formatErrorMessage(err) });
+		}
+	};
+
+	const runSearch = (e) => {
+		e.preventDefault();
+		setFilters({ taxonomy, search, per_page: 100 });
+	};
+
+	if (langs.isLoading) return <LoadingBlock>{__('Loading…', 'gemtranslate')}</LoadingBlock>;
+
+	return (
+		<>
+			<PageHeader
+				title={__('Taxonomies', 'gemtranslate')}
+				description={__('Translate categories, tags, and other taxonomy terms.', 'gemtranslate')}
+			/>
+
+			<Card padded={false} className="gtrans-mb-6">
+				<form onSubmit={runSearch} className="gtrans-flex gtrans-flex-wrap gtrans-items-end gtrans-gap-3 gtrans-border-b gtrans-border-gtrans-border gtrans-px-4 gtrans-py-3">
+					<Field label={__('Taxonomy', 'gemtranslate')}>
+						<Select value={taxonomy} onChange={(e) => setTaxonomy(e.target.value)}>
+							<option value="category">{__('Categories', 'gemtranslate')}</option>
+							<option value="post_tag">{__('Tags', 'gemtranslate')}</option>
+							<option value="product_cat">{__('Product categories', 'gemtranslate')}</option>
+							<option value="product_tag">{__('Product tags', 'gemtranslate')}</option>
+						</Select>
+					</Field>
+					<div className="gtrans-min-w-[200px] gtrans-flex-1">
+						<Field label={__('Search', 'gemtranslate')}>
+							<TextInput value={search} onChange={(e) => setSearch(e.target.value)} placeholder={__('Search…', 'gemtranslate')} />
+						</Field>
+					</div>
+					<Button type="submit" variant="secondary">{__('Filter', 'gemtranslate')}</Button>
+				</form>
+
+				{terms.isLoading ? (
+					<LoadingBlock>{__('Loading terms…', 'gemtranslate')}</LoadingBlock>
+				) : (terms.data?.rows || []).length === 0 ? (
+					<p className="gtrans-px-5 gtrans-py-8 gtrans-text-center gtrans-text-sm gtrans-text-gtrans-muted">
+						{__('No terms found.', 'gemtranslate')}
+					</p>
+				) : (
+					<table className="gtrans-w-full gtrans-text-sm">
+						<thead className="gtrans-bg-gtrans-bg gtrans-text-left gtrans-text-xs gtrans-uppercase gtrans-text-gtrans-muted">
+							<tr>
+								<th className="gtrans-px-4 gtrans-py-3">{__('Name', 'gemtranslate')}</th>
+								<th className="gtrans-px-4 gtrans-py-3">{__('Slug', 'gemtranslate')}</th>
+								<th className="gtrans-px-4 gtrans-py-3">{__('Count', 'gemtranslate')}</th>
+								{nonDefault.map((l) => (
+									<th key={l.code} className="gtrans-px-4 gtrans-py-3">{l.code.toUpperCase()}</th>
+								))}
+								<th className="gtrans-px-4 gtrans-py-3" />
+							</tr>
+						</thead>
+						<tbody>
+							{(terms.data?.rows || []).map((row) => (
+								<tr key={row.id} className="gtrans-border-t gtrans-border-gtrans-border">
+									<td className="gtrans-px-4 gtrans-py-3 gtrans-font-medium">{row.name}</td>
+									<td className="gtrans-px-4 gtrans-py-3 gtrans-text-gtrans-muted"><code>{row.slug}</code></td>
+									<td className="gtrans-px-4 gtrans-py-3 gtrans-text-gtrans-muted">{row.count}</td>
+									{nonDefault.map((l) => (
+										<td key={l.code} className="gtrans-px-4 gtrans-py-3">
+											{row.translations_status?.[l.code] ? (
+												<StatusPill tone="translated">✓</StatusPill>
+											) : (
+												<StatusPill tone="none">—</StatusPill>
+											)}
+										</td>
+									))}
+									<td className="gtrans-px-4 gtrans-py-3 gtrans-text-right">
+										<Button size="sm" onClick={() => setSelectedTerm(row.id)}>
+											{__('Translate', 'gemtranslate')}
+										</Button>
+									</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				)}
+			</Card>
+
+			{selectedTerm && detail.data && (
+				<div className="gtrans-grid gtrans-grid-cols-1 lg:gtrans-grid-cols-2 gtrans-gap-6">
+					<Card title={sprintf(/* translators: %s: lang code. */ __('Source — %s', 'gemtranslate'), defaultLang?.code || '')}>
+						<div className="gtrans-flex gtrans-flex-col gtrans-gap-3">
+							<Field label={__('Name', 'gemtranslate')}>
+								<TextInput value={detail.data.term.name} readOnly />
+							</Field>
+							<Field label={__('Slug', 'gemtranslate')}>
+								<TextInput value={detail.data.term.slug} readOnly />
+							</Field>
+							<Field label={__('Description', 'gemtranslate')}>
+								<TextArea rows={5} value={detail.data.term.description || ''} readOnly />
+							</Field>
+						</div>
+					</Card>
+
+					<Card
+						title={sprintf(/* translators: %s: lang code. */ __('Translation — %s', 'gemtranslate'), selectedLang)}
+						action={
+							<Select value={selectedLang} onChange={(e) => setSelectedLang(e.target.value)}>
+								{nonDefault.map((l) => (
+									<option key={l.code} value={l.code}>{l.name}</option>
+								))}
+							</Select>
+						}
+					>
+						<form onSubmit={submit} className="gtrans-flex gtrans-flex-col gtrans-gap-3">
+							<div className="gtrans-flex gtrans-items-end gtrans-gap-2">
+								<div className="gtrans-flex-1">
+									<Field label={__('Name', 'gemtranslate')}>
+										<TextInput value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
+									</Field>
+								</div>
+								<Button variant="ghost" size="sm" onClick={() => aiFill('name', detail.data.term.name)}>
+									{__('AI', 'gemtranslate')}
+								</Button>
+							</div>
+							<Field label={__('Slug', 'gemtranslate')}>
+								<TextInput value={form.slug} onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))} />
+							</Field>
+							<div className="gtrans-flex gtrans-items-end gtrans-gap-2">
+								<div className="gtrans-flex-1">
+									<Field label={__('Description', 'gemtranslate')}>
+										<TextArea rows={5} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
+									</Field>
+								</div>
+								<Button variant="ghost" size="sm" onClick={() => aiFill('description', detail.data.term.description || '')}>
+									{__('AI', 'gemtranslate')}
+								</Button>
+							</div>
+							<div className="gtrans-mt-2 gtrans-flex gtrans-justify-between">
+								<Button variant="secondary" size="sm" onClick={aiFillAll} loading={ai.isPending}>
+									{__('Translate all with AI', 'gemtranslate')}
+								</Button>
+								<Button type="submit" loading={save.isPending}>
+									{__('Save translation', 'gemtranslate')}
+								</Button>
+							</div>
+						</form>
+					</Card>
+				</div>
+			)}
+
+			<Toast message={toast?.message} tone={toast?.tone} onClear={() => setToast(null)} />
+		</>
+	);
+}

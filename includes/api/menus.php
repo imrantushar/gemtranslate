@@ -1,12 +1,12 @@
 <?php
-namespace Zentranslate\API;
+namespace GemTranslate\API;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Language\Context;
-use Zentranslate\Translation\MenuTranslator;
+use GemTranslate\Language\Context;
+use GemTranslate\Translation\MenuTranslator;
 
 class Menus extends Controller {
 
@@ -67,7 +67,7 @@ class Menus extends Controller {
 		$menu_id = (int) $request['id'];
 		$items   = wp_get_nav_menu_items( $menu_id );
 		if ( false === $items ) {
-			return $this->fail( 'ztrans_not_found', __( 'Menu not found.', 'zentranslate' ), 404 );
+			return $this->fail( 'gtrans_not_found', __( 'Menu not found.', 'gemtranslate' ), 404 );
 		}
 
 		$default = Context::default_code();
@@ -93,12 +93,12 @@ class Menus extends Controller {
 		$item_id = (int) $request['item_id'];
 		$lang    = strtolower( $request['lang'] );
 		if ( ! Context::is_active( $lang ) ) {
-			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_invalid_lang', __( 'Language is not active.', 'gemtranslate' ), 422 );
 		}
 		$body = $request->get_json_params() ?: $request->get_params();
 		$ok   = MenuTranslator::save( $item_id, $lang, $body );
 		if ( ! $ok ) {
-			return $this->fail( 'ztrans_save_failed', __( 'Could not save translation.', 'zentranslate' ), 500 );
+			return $this->fail( 'gtrans_save_failed', __( 'Could not save translation.', 'gemtranslate' ), 500 );
 		}
 		return $this->ok( [ 'saved' => true, 'menu_item_id' => $item_id, 'language_code' => $lang ] );
 	}

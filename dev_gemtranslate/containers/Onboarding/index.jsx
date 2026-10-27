@@ -1,0 +1,254 @@
+import { useState } from 'react';
+import { __ } from '@wordpress/i18n';
+import { useNavigate } from 'react-router-dom';
+
+import PageHeader from '../../components/PageHeader';
+import Card from '../../components/Card';
+import Button from '../../components/Button';
+import Toast from '../../components/Toast';
+import { Checkbox, Field, TextInput, Select } from '../../components/Input';
+import { LoadingBlock } from '../../components/Spinner';
+import { useLanguages, useCreateLanguage } from '../../hooks/useLanguages';
+import { useAIProviders, useSaveAIProviders, useTestAIProvider } from '../../hooks/useAI';
+import { useSaveSettings } from '../../hooks/useSettings';
+import { formatErrorMessage } from '../../lib/format';
+
+const QUICK_LANGS = [
+	{ code: 'es', locale: 'es_ES', name: 'Spanish', native_name: 'Español' },
+	{ code: 'fr', locale: 'fr_FR', name: 'French', native_name: 'Français' },
+	{ code: 'de', locale: 'de_DE', name: 'German', native_name: 'Deutsch' },
+	{ code: 'it', locale: 'it_IT', name: 'Italian', native_name: 'Italiano' },
+	{ code: 'pt-br', locale: 'pt_BR', name: 'Portuguese (Brazil)', native_name: 'Português' },
+	{ code: 'ja', locale: 'ja', name: 'Japanese', native_name: '日本語' },
+	{ code: 'zh-cn', locale: 'zh_CN', name: 'Chinese (Simplified)', native_name: '简体中文' },
+	{ code: 'ar', locale: 'ar', name: 'Arabic', native_name: 'العربية', is_rtl: true },
+	{ code: 'hi', locale: 'hi_IN', name: 'Hindi', native_name: 'हिन्दी' },
+	{ code: 'ko', locale: 'ko_KR', name: 'Korean', native_name: '한국어' },
+	{ code: 'tr', locale: 'tr_TR', name: 'Turkish', native_name: 'Türkçe' },
+	{ code: 'nl', locale: 'nl_NL', name: 'Dutch', native_name: 'Nederlands' },
+	{ code: 'pl', locale: 'pl_PL', name: 'Polish', native_name: 'Polski' },
+];
+
+const STEPS = [
+	{ key: 'welcome', label: () => __('Welcome', 'gemtranslate') },
+	{ key: 'languages', label: () => __('Languages', 'gemtranslate') },
+	{ key: 'ai', label: () => __('AI provider', 'gemtranslate') },
+	{ key: 'done', label: () => __('Done', 'gemtranslate') },
+];
+
+export default function Onboarding() {
+	const navigate = useNavigate();
+	const languages = useLanguages();
+	const createLang = useCreateLanguage();
+	const providers = useAIProviders();
+	const saveProviders = useSaveAIProviders();
+	const testProvider = useTestAIProvider();
+	const saveSettings = useSaveSettings();
+
+	const [step, setStep] = useState('welcome');
+	const [picked, setPicked] = useState([]);
+	const [aiProvider, setAiProvider] = useState('openai');
+	const [aiKey, setAiKey] = useState('');
+	const [aiModel, setAiModel] = useState('gpt-4o-mini');
+	const [toast, setToast] = useState(null);
+	const [working, setWorking] = useState(false);
+
+	if (languages.isLoading || providers.isLoading) return <LoadingBlock>{__('Loading…', 'gemtranslate')}</LoadingBlock>;
+
+	const existingCodes = new Set((languages.data || []).map((l) => l.code));
+	const togglePick = (code) =>
+		setPicked((p) => p.includes(code) ? p.filter((x) => x !== code) : [ ...p, code ]);
+
+	const goNext = () => {
+		const i = STEPS.findIndex((s) => s.key === step);
+		if (i < STEPS.length - 1) setStep(STEPS[i + 1].key);
+	};
+	const goBack = () => {
+		const i = STEPS.findIndex((s) => s.key === step);
+		if (i > 0) setStep(STEPS[i - 1].key);
+	};
+
+	const saveLanguages = async () => {
+		setWorking(true);
+		try {
+			for (const code of picked) {
+				if (existingCodes.has(code)) continue;
+				const preset = QUICK_LANGS.find((p) => p.code === code);
+				if (!preset) continue;
+				await createLang.mutateAsync({
+					code: preset.code,
+					locale: preset.locale,
+					name: preset.name,
+					native_name: preset.native_name,
+					flag: preset.code,
+					is_rtl: !!preset.is_rtl,
+					active: true,
+					position: 10,
+				});
+			}
+			setToast({ tone: 'success', message: __('Languages added.', 'gemtranslate') });
+			goNext();
+		} catch (err) {
+			setToast({ tone: 'error', message: formatErrorMessage(err) });
+		} finally {
+			setWorking(false);
+		}
+	};
+
+	const saveAi = async () => {
+		if (!aiKey) {
+			goNext();
+			return;
+		}
+		setWorking(true);
+		try {
+			await testProvider.mutateAsync({ name: aiProvider, api_key: aiKey, model: aiModel });
+			await saveProviders.mutateAsync({
+				default: aiProvider,
+				providers: {
+					[aiProvider]: { api_key: aiKey, ...(aiProvider === 'openai' ? { model: aiModel } : {}) },
+				},
+			});
+			setToast({ tone: 'success', message: __('AI provider configured.', 'gemtranslate') });
+			goNext();
+		} catch (err) {
+			setToast({ tone: 'error', message: formatErrorMessage(err) });
+		} finally {
+			setWorking(false);
+		}
+	};
+
+	const finish = async () => {
+		setWorking(true);
+		try {
+			await saveSettings.mutateAsync({ onboarding_complete: true });
+		} catch (err) {
+			// non-fatal; mark via current settings shape
+		} finally {
+			setWorking(false);
+			navigate('/dashboard');
+		}
+	};
+
+	return (
+		<>
+			<PageHeader
+				title={__('Welcome to GemTranslate', 'gemtranslate')}
+				description={__('Quick setup — pick languages, add an AI key (optional), done.', 'gemtranslate')}
+			/>
+
+			<div className="gtrans-mb-6 gtrans-flex gtrans-items-center gtrans-gap-2">
+				{STEPS.map((s, i) => (
+					<div key={s.key} className="gtrans-flex gtrans-items-center gtrans-gap-2">
+						<span
+							className={`gtrans-flex gtrans-h-6 gtrans-w-6 gtrans-items-center gtrans-justify-center gtrans-rounded-full gtrans-text-xs ${
+								STEPS.findIndex((x) => x.key === step) >= i
+									? 'gtrans-bg-gtrans-primary gtrans-text-white'
+									: 'gtrans-bg-gtrans-border gtrans-text-gray-600'
+							}`}
+						>
+							{i + 1}
+						</span>
+						<span className="gtrans-text-sm gtrans-text-gray-700">{s.label()}</span>
+						{i < STEPS.length - 1 && <span className="gtrans-text-gtrans-muted">→</span>}
+					</div>
+				))}
+			</div>
+
+			{step === 'welcome' && (
+				<Card>
+					<p className="gtrans-text-sm gtrans-text-gray-700">
+						{__('GemTranslate makes your WordPress site multilingual without slowing it down. We\'ll set up your languages, optionally connect an AI translator, and you\'ll be ready to translate.', 'gemtranslate')}
+					</p>
+					<div className="gtrans-mt-4 gtrans-flex gtrans-justify-end">
+						<Button onClick={goNext}>{__('Get started', 'gemtranslate')}</Button>
+					</div>
+				</Card>
+			)}
+
+			{step === 'languages' && (
+				<Card title={__('Pick the languages you want to support', 'gemtranslate')}>
+					<div className="gtrans-grid gtrans-grid-cols-2 md:gtrans-grid-cols-3 gtrans-gap-2">
+						{QUICK_LANGS.map((l) => {
+							const already = existingCodes.has(l.code);
+							const isPicked = picked.includes(l.code);
+							return (
+								<button
+									key={l.code}
+									type="button"
+									disabled={already}
+									onClick={() => togglePick(l.code)}
+									className={`gtrans-bare gtrans-rounded-md gtrans-border gtrans-px-3 gtrans-py-2 gtrans-text-left gtrans-text-sm ${
+										already
+											? 'gtrans-border-gtrans-border gtrans-bg-gtrans-bg gtrans-text-gtrans-muted gtrans-cursor-not-allowed'
+											: isPicked
+												? 'gtrans-border-gtrans-primary gtrans-bg-blue-50 gtrans-text-gtrans-primary'
+												: 'gtrans-border-gtrans-border gtrans-bg-white gtrans-text-gray-700 hover:gtrans-bg-gray-50'
+									}`}
+								>
+									<div className="gtrans-font-medium">{l.name}</div>
+									<div className="gtrans-text-xs">{l.native_name} · {l.code}</div>
+									{already && <div className="gtrans-mt-1 gtrans-text-xs">{__('(already added)', 'gemtranslate')}</div>}
+								</button>
+							);
+						})}
+					</div>
+					<div className="gtrans-mt-4 gtrans-flex gtrans-justify-between">
+						<Button variant="ghost" onClick={goBack}>{__('Back', 'gemtranslate')}</Button>
+						<div className="gtrans-flex gtrans-gap-2">
+							<Button variant="secondary" onClick={goNext}>{__('Skip', 'gemtranslate')}</Button>
+							<Button onClick={saveLanguages} loading={working} disabled={picked.length === 0}>
+								{__('Add and continue', 'gemtranslate')}
+							</Button>
+						</div>
+					</div>
+				</Card>
+			)}
+
+			{step === 'ai' && (
+				<Card title={__('Optional: connect an AI translator', 'gemtranslate')}>
+					<p className="gtrans-mb-4 gtrans-text-xs gtrans-text-gtrans-muted">
+						{__('Bring your own API key. Skip to set up later from AI Translation.', 'gemtranslate')}
+					</p>
+					<div className="gtrans-grid gtrans-grid-cols-1 md:gtrans-grid-cols-3 gtrans-gap-4">
+						<Field label={__('Provider', 'gemtranslate')}>
+							<Select value={aiProvider} onChange={(e) => setAiProvider(e.target.value)}>
+								<option value="openai">OpenAI</option>
+								<option value="deepl">DeepL</option>
+								<option value="google">Google</option>
+							</Select>
+						</Field>
+						<Field label={__('API key', 'gemtranslate')}>
+							<TextInput type="password" value={aiKey} onChange={(e) => setAiKey(e.target.value)} placeholder="sk-…" />
+						</Field>
+						{aiProvider === 'openai' && (
+							<Field label={__('Model', 'gemtranslate')} hint={__('Default: gpt-4o-mini', 'gemtranslate')}>
+								<TextInput value={aiModel} onChange={(e) => setAiModel(e.target.value)} />
+							</Field>
+						)}
+					</div>
+					<div className="gtrans-mt-4 gtrans-flex gtrans-justify-between">
+						<Button variant="ghost" onClick={goBack}>{__('Back', 'gemtranslate')}</Button>
+						<div className="gtrans-flex gtrans-gap-2">
+							<Button variant="secondary" onClick={goNext}>{__('Skip', 'gemtranslate')}</Button>
+							<Button onClick={saveAi} loading={working}>{__('Test & save', 'gemtranslate')}</Button>
+						</div>
+					</div>
+				</Card>
+			)}
+
+			{step === 'done' && (
+				<Card>
+					<p className="gtrans-text-sm gtrans-text-gray-700">
+						{__('All set! Head to Posts to translate your first article, or Strings to translate theme/plugin labels.', 'gemtranslate')}
+					</p>
+					<div className="gtrans-mt-4 gtrans-flex gtrans-justify-end">
+						<Button onClick={finish} loading={working}>{__('Go to dashboard', 'gemtranslate')}</Button>
+					</div>
+				</Card>
+			)}
+
+			<Toast message={toast?.message} tone={toast?.tone} onClear={() => setToast(null)} />
+		</>
+	);
+}

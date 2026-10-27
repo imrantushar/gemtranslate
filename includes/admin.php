@@ -1,5 +1,5 @@
 <?php
-namespace Zentranslate;
+namespace GemTranslate;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

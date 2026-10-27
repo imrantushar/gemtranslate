@@ -1,12 +1,12 @@
 <?php
-namespace Zentranslate\AI;
+namespace GemTranslate\AI;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 /**
- * Zentranslate Cloud client.
+ * GemTranslate Cloud client.
  *
  * Calls an HTTPS endpoint with a license key. The proxy on the other side
  * is responsible for routing to OpenAI / DeepL / Google, metering credits,
@@ -38,7 +38,7 @@ class CloudTranslator implements TranslatorInterface {
 
 	public function translate( $texts, $source_lang, $target_lang, $context = [] ) {
 		if ( empty( $this->license_key ) || empty( $this->endpoint ) ) {
-			return new \WP_Error( 'ztrans_no_cloud', __( 'Zentranslate Cloud is not configured.', 'zentranslate' ) );
+			return new \WP_Error( 'gtrans_no_cloud', __( 'GemTranslate Cloud is not configured.', 'gemtranslate' ) );
 		}
 		$is_array = is_array( $texts );
 		$batch    = $is_array ? array_values( $texts ) : [ (string) $texts ];
@@ -50,7 +50,7 @@ class CloudTranslator implements TranslatorInterface {
 				'headers' => [
 					'Authorization' => 'Bearer ' . $this->license_key,
 					'Content-Type'  => 'application/json',
-					'User-Agent'    => 'Zentranslate/' . ZTRANS_VERSION . ' (' . home_url() . ')',
+					'User-Agent'    => 'GemTranslate/' . GTRANS_VERSION . ' (' . home_url() . ')',
 				],
 				'body'    => wp_json_encode(
 					[
@@ -71,7 +71,7 @@ class CloudTranslator implements TranslatorInterface {
 		if ( $code < 200 || $code >= 300 ) {
 			$decoded = json_decode( $body, true );
 			$msg     = $decoded['error']['message'] ?? ( $body ?: 'Cloud error' );
-			return new \WP_Error( 'ztrans_cloud_http_' . $code, $msg, [ 'status' => $code ] );
+			return new \WP_Error( 'gtrans_cloud_http_' . $code, $msg, [ 'status' => $code ] );
 		}
 		$data         = json_decode( $body, true );
 		$translations = $data['translations'] ?? [];
@@ -87,7 +87,7 @@ class CloudTranslator implements TranslatorInterface {
 
 	public function test_credentials() {
 		if ( empty( $this->license_key ) || empty( $this->endpoint ) ) {
-			return new \WP_Error( 'ztrans_no_cloud', __( 'License key and endpoint are required.', 'zentranslate' ) );
+			return new \WP_Error( 'gtrans_no_cloud', __( 'License key and endpoint are required.', 'gemtranslate' ) );
 		}
 		$response = wp_remote_get(
 			$this->endpoint . '/ping',
@@ -101,7 +101,7 @@ class CloudTranslator implements TranslatorInterface {
 		}
 		$code = (int) wp_remote_retrieve_response_code( $response );
 		if ( $code < 200 || $code >= 300 ) {
-			return new \WP_Error( 'ztrans_cloud_http_' . $code, wp_remote_retrieve_body( $response ) ?: 'Cloud unreachable.' );
+			return new \WP_Error( 'gtrans_cloud_http_' . $code, wp_remote_retrieve_body( $response ) ?: 'Cloud unreachable.' );
 		}
 		return true;
 	}

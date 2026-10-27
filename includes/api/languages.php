@@ -1,11 +1,11 @@
 <?php
-namespace Zentranslate\API;
+namespace GemTranslate\API;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Language\LanguageRegistry;
+use GemTranslate\Language\LanguageRegistry;
 
 class Languages extends Controller {
 
@@ -28,7 +28,7 @@ class Languages extends Controller {
 					'args'                => [
 						'active' => [
 							'type'        => 'boolean',
-							'description' => __( 'If true, only return active languages.', 'zentranslate' ),
+							'description' => __( 'If true, only return active languages.', 'gemtranslate' ),
 						],
 					],
 				],
@@ -86,7 +86,7 @@ class Languages extends Controller {
 		$registry = new LanguageRegistry();
 		$row = $registry->get( $request['code'] );
 		if ( ! $row ) {
-			return $this->fail( 'ztrans_not_found', __( 'Language not found.', 'zentranslate' ), 404 );
+			return $this->fail( 'gtrans_not_found', __( 'Language not found.', 'gemtranslate' ), 404 );
 		}
 		return $this->ok( $this->prepare_row( $row ) );
 	}
@@ -96,15 +96,15 @@ class Languages extends Controller {
 		$params = $request->get_json_params() ?: $request->get_params();
 
 		if ( empty( $params['code'] ) || empty( $params['locale'] ) || empty( $params['name'] ) ) {
-			return $this->fail( 'ztrans_invalid', __( 'code, locale, and name are required.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_invalid', __( 'code, locale, and name are required.', 'gemtranslate' ), 422 );
 		}
 		if ( $registry->get( strtolower( $params['code'] ) ) ) {
-			return $this->fail( 'ztrans_duplicate', __( 'A language with that code already exists.', 'zentranslate' ), 409 );
+			return $this->fail( 'gtrans_duplicate', __( 'A language with that code already exists.', 'gemtranslate' ), 409 );
 		}
 
 		$code = $registry->insert( $params );
 		if ( ! $code ) {
-			return $this->fail( 'ztrans_insert_failed', __( 'Could not save language.', 'zentranslate' ), 500 );
+			return $this->fail( 'gtrans_insert_failed', __( 'Could not save language.', 'gemtranslate' ), 500 );
 		}
 
 		return $this->ok( $this->prepare_row( $registry->get( $code ) ), [], 201 );
@@ -115,13 +115,13 @@ class Languages extends Controller {
 		$code = $request['code'];
 
 		if ( ! $registry->get( $code ) ) {
-			return $this->fail( 'ztrans_not_found', __( 'Language not found.', 'zentranslate' ), 404 );
+			return $this->fail( 'gtrans_not_found', __( 'Language not found.', 'gemtranslate' ), 404 );
 		}
 
 		$params = $request->get_json_params() ?: $request->get_params();
 		$ok = $registry->update( $code, $params );
 		if ( ! $ok ) {
-			return $this->fail( 'ztrans_update_failed', __( 'No changes applied.', 'zentranslate' ), 400 );
+			return $this->fail( 'gtrans_update_failed', __( 'No changes applied.', 'gemtranslate' ), 400 );
 		}
 
 		return $this->ok( $this->prepare_row( $registry->get( $code ) ) );
@@ -132,10 +132,10 @@ class Languages extends Controller {
 		$code = $request['code'];
 		$row = $registry->get( $code );
 		if ( ! $row ) {
-			return $this->fail( 'ztrans_not_found', __( 'Language not found.', 'zentranslate' ), 404 );
+			return $this->fail( 'gtrans_not_found', __( 'Language not found.', 'gemtranslate' ), 404 );
 		}
 		if ( (int) $row['is_default'] === 1 ) {
-			return $this->fail( 'ztrans_default_locked', __( 'Cannot delete the default language.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_default_locked', __( 'Cannot delete the default language.', 'gemtranslate' ), 422 );
 		}
 		$registry->delete( $code );
 		return $this->ok( [ 'deleted' => true, 'code' => $code ] );
@@ -145,7 +145,7 @@ class Languages extends Controller {
 		$registry = new LanguageRegistry();
 		$code = $request['code'];
 		if ( ! $registry->get( $code ) ) {
-			return $this->fail( 'ztrans_not_found', __( 'Language not found.', 'zentranslate' ), 404 );
+			return $this->fail( 'gtrans_not_found', __( 'Language not found.', 'gemtranslate' ), 404 );
 		}
 		$registry->set_default( $code );
 		return $this->ok( $this->prepare_row( $registry->get( $code ) ) );

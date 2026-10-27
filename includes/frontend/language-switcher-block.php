@@ -1,5 +1,5 @@
 <?php
-namespace Zentranslate\Frontend;
+namespace GemTranslate\Frontend;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -8,10 +8,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Server-side rendered Gutenberg block for the language switcher.
  *
- * Block: zentranslate/language-switcher
+ * Block: gemtranslate/language-switcher
  * Attributes: display ('inline'|'dropdown'), show_flag, show_name, show_native.
  *
- * Uses the existing `[zentranslate_language_switcher]` shortcode renderer
+ * Uses the existing `[gemtranslate_language_switcher]` shortcode renderer
  * so block + shortcode + widget all produce identical markup.
  */
 class LanguageSwitcherBlock {
@@ -27,13 +27,13 @@ class LanguageSwitcherBlock {
 		}
 
 		register_block_type(
-			'zentranslate/language-switcher',
+			'gemtranslate/language-switcher',
 			[
 				'api_version'     => 2,
-				'title'           => __( 'Zentranslate language switcher', 'zentranslate' ),
+				'title'           => __( 'GemTranslate language switcher', 'gemtranslate' ),
 				'category'        => 'widgets',
 				'icon'            => 'translation',
-				'description'     => __( 'Show a switcher between all active languages.', 'zentranslate' ),
+				'description'     => __( 'Show a switcher between all active languages.', 'gemtranslate' ),
 				'supports'        => [ 'html' => false ],
 				'attributes'      => [
 					'display'     => [ 'type' => 'string', 'default' => 'inline' ],

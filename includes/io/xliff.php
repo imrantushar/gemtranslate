@@ -1,5 +1,5 @@
 <?php
-namespace Zentranslate\Io;
+namespace GemTranslate\Io;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -30,7 +30,7 @@ class Xliff {
 		$doc->appendChild( $root );
 
 		$file = $doc->createElement( 'file' );
-		$file->setAttribute( 'id', 'zentranslate' );
+		$file->setAttribute( 'id', 'gemtranslate' );
 		$root->appendChild( $file );
 
 		foreach ( $units as $u ) {

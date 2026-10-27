@@ -1,5 +1,5 @@
 <?php
-namespace Zentranslate\API;
+namespace GemTranslate\API;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -92,14 +92,14 @@ class Settings extends Controller {
 		if ( is_user_logged_in() ) {
 			return true;
 		}
-		return new \WP_Error( 'ztrans_unauth', __( 'Login required.', 'zentranslate' ), [ 'status' => 401 ] );
+		return new \WP_Error( 'gtrans_unauth', __( 'Login required.', 'gemtranslate' ), [ 'status' => 401 ] );
 	}
 
 	public function show_my_language() {
 		$user_id = get_current_user_id();
 		return $this->ok(
 			[
-				'language' => (string) get_user_meta( $user_id, \Zentranslate\Admin\ProfileField::META_KEY, true ),
+				'language' => (string) get_user_meta( $user_id, \GemTranslate\Admin\ProfileField::META_KEY, true ),
 			]
 		);
 	}
@@ -110,12 +110,12 @@ class Settings extends Controller {
 		$lang    = isset( $body['language'] ) ? sanitize_key( $body['language'] ) : '';
 
 		if ( '' === $lang ) {
-			delete_user_meta( $user_id, \Zentranslate\Admin\ProfileField::META_KEY );
+			delete_user_meta( $user_id, \GemTranslate\Admin\ProfileField::META_KEY );
 			delete_user_meta( $user_id, 'locale' );
-		} elseif ( \Zentranslate\Language\Context::is_active( $lang ) ) {
-			update_user_meta( $user_id, \Zentranslate\Admin\ProfileField::META_KEY, $lang );
+		} elseif ( \GemTranslate\Language\Context::is_active( $lang ) ) {
+			update_user_meta( $user_id, \GemTranslate\Admin\ProfileField::META_KEY, $lang );
 			// Sync to WP's native user locale so determine_locale() at boot uses it.
-			$languages = \Zentranslate\Language\Context::active_languages();
+			$languages = \GemTranslate\Language\Context::active_languages();
 			$locale    = $languages[ $lang ]['locale'] ?? '';
 			if ( $locale ) {
 				$site_locale = get_option( 'WPLANG', '' ) ?: 'en_US';
@@ -126,7 +126,7 @@ class Settings extends Controller {
 				}
 			}
 		} else {
-			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_invalid_lang', __( 'Language is not active.', 'gemtranslate' ), 422 );
 		}
 
 		return $this->show_my_language();
@@ -144,9 +144,9 @@ class Settings extends Controller {
 				$merged[ $key ] = $body[ $key ];
 			}
 		}
-		update_option( ZTRANS_SETTINGS_NAME, wp_json_encode( $merged ) );
+		update_option( GTRANS_SETTINGS_NAME, wp_json_encode( $merged ) );
 		// Refresh global settings cache for the rest of this request.
-		$GLOBALS['ztrans_settings'] = (object) $merged;
+		$GLOBALS['gtrans_settings'] = (object) $merged;
 		return $this->ok( $merged );
 	}
 
@@ -186,7 +186,7 @@ class Settings extends Controller {
 			'geo_cookie_ttl_days'       => 90,
 			'geo_auto_redirect_country' => false,
 		];
-		$saved = json_decode( get_option( ZTRANS_SETTINGS_NAME, '{}' ), true );
+		$saved = json_decode( get_option( GTRANS_SETTINGS_NAME, '{}' ), true );
 		if ( ! is_array( $saved ) ) {
 			$saved = [];
 		}

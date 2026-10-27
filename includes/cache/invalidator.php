@@ -1,13 +1,13 @@
 <?php
-namespace Zentranslate\Cache;
+namespace GemTranslate\Cache;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Translation\PostFieldTranslator;
-use Zentranslate\Translation\StringTranslator;
-use Zentranslate\Translation\TranslationLoader;
+use GemTranslate\Translation\PostFieldTranslator;
+use GemTranslate\Translation\StringTranslator;
+use GemTranslate\Translation\TranslationLoader;
 
 /**
  * Fires generic invalidation hooks that compat bridges subscribe to.
@@ -37,12 +37,12 @@ class Invalidator {
 		TranslationLoader::invalidate_post( $post_id );
 		PostFieldTranslator::flush_memo();
 		StringTranslator::flush_runtime_cache();
-		do_action( 'ztrans_translation_saved', $post_id );
+		do_action( 'gtrans_translation_saved', $post_id );
 	}
 
 	public static function on_post_deleted( $post_id ) {
 		TranslationLoader::invalidate_post( $post_id );
 		PostFieldTranslator::flush_memo();
-		do_action( 'ztrans_translation_saved', $post_id );
+		do_action( 'gtrans_translation_saved', $post_id );
 	}
 }

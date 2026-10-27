@@ -1,5 +1,5 @@
 <?php
-namespace Zentranslate;
+namespace GemTranslate;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -13,6 +13,6 @@ class Translation {
 		Translation\StringTranslator::init();
 		Translation\ShadowPostSync::init();
 		// MetaTranslator (custom fields/ACF) and AutoTranslate (Translate
-		// Everything) are Pro — registered by zentranslate-pro on `ztrans_init`.
+		// Everything) are Pro — registered by gemtranslate-pro on `gtrans_init`.
 	}
 }

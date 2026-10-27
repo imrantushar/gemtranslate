@@ -1,11 +1,11 @@
 <?php
-namespace Zentranslate\Routing;
+namespace GemTranslate\Routing;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Language\Context;
+use GemTranslate\Language\Context;
 
 /**
  * Prepends /{lang}/ to outgoing site URLs when the current language is

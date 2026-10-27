@@ -1,19 +1,19 @@
 <?php
 /**
- * Zentranslate uninstaller.
+ * GemTranslate uninstaller.
  *
  * Runs only when the user deletes the plugin via WP admin. Drops all
- * Zentranslate tables and options when the "Remove all data on uninstall"
+ * GemTranslate tables and options when the "Remove all data on uninstall"
  * setting is enabled.
  *
- * @package Zentranslate
+ * @package GemTranslate
  */
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
-$settings_json = get_option( 'ztrans_settings', '{}' );
+$settings_json = get_option( 'gtrans_settings', '{}' );
 $settings      = json_decode( $settings_json );
 $remove_data   = isset( $settings->remove_data_on_uninstall ) ? (bool) $settings->remove_data_on_uninstall : false;
 
@@ -22,7 +22,7 @@ if ( ! $remove_data ) {
 }
 
 global $wpdb;
-$prefix = $wpdb->prefix . 'ztrans_';
+$prefix = $wpdb->prefix . 'gtrans_';
 $tables = [
 	'languages',
 	'translation_groups',
@@ -42,11 +42,11 @@ foreach ( $tables as $name ) {
 }
 
 $options = [
-	'ztrans_version',
-	'ztrans_db_version',
-	'ztrans_settings',
-	'ztrans_first_install_time',
-	'ztrans_required_rewrite_flush',
+	'gtrans_version',
+	'gtrans_db_version',
+	'gtrans_settings',
+	'gtrans_first_install_time',
+	'gtrans_required_rewrite_flush',
 ];
 foreach ( $options as $option ) {
 	delete_option( $option );

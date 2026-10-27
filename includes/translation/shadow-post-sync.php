@@ -1,12 +1,12 @@
 <?php
-namespace Zentranslate\Translation;
+namespace GemTranslate\Translation;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Language\Context;
-use Zentranslate\Translation\EditorContext;
+use GemTranslate\Language\Context;
+use GemTranslate\Translation\EditorContext;
 
 /**
  * Glue between custom-layout translations and the real WP post that backs them.
@@ -32,9 +32,9 @@ use Zentranslate\Translation\EditorContext;
  */
 class ShadowPostSync {
 
-	const META_SOURCE   = '_ztrans_translation_of';
-	const META_LANG     = '_ztrans_lang';
-	const META_COUNTRY  = '_ztrans_country';
+	const META_SOURCE   = '_gtrans_translation_of';
+	const META_LANG     = '_gtrans_lang';
+	const META_COUNTRY  = '_gtrans_country';
 
 	public static function init() {
 		add_action( 'save_post', [ __CLASS__, 'on_shadow_saved' ], 30, 3 );
@@ -194,7 +194,7 @@ class ShadowPostSync {
 		}
 		// Case 2: a source is being deleted → trash all of its shadows.
 		global $wpdb;
-		$table = \Zentranslate\Helper::table( 'post_translations' );
+		$table = \GemTranslate\Helper::table( 'post_translations' );
 		$shadows = $wpdb->get_col(
 			$wpdb->prepare( "SELECT shadow_post_id FROM $table WHERE post_id = %d AND shadow_post_id > 0", (int) $post_id )
 		);
@@ -295,6 +295,6 @@ class ShadowPostSync {
 		if ( '' !== $country ) {
 			$tag .= '-' . strtolower( $country );
 		}
-		return sanitize_title( $base . '--ztrans-' . $tag );
+		return sanitize_title( $base . '--gtrans-' . $tag );
 	}
 }

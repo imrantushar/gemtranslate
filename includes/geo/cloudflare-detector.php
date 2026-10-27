@@ -1,5 +1,5 @@
 <?php
-namespace Zentranslate\Geo;
+namespace GemTranslate\Geo;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

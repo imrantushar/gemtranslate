@@ -1,0 +1,1788 @@
+# Copyright (C) 2026 GemTranslate
+# This file is distributed under the GPL-3.0+.
+msgid ""
+msgstr ""
+"Project-Id-Version: GemTranslate 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/gemtranslate\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-05-12T05:59:39+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.10.0\n"
+"X-Domain: gemtranslate\n"
+
+#. Plugin Name of the plugin
+#. Author of the plugin
+#: gemtranslate.php
+#: includes/admin/admin-menu.php:19
+#: includes/admin/admin-menu.php:20
+#: includes/admin/profile-field.php:40
+#: dev_gemtranslate/editor/index.jsx:77
+#: dev_gemtranslate/editor/index.jsx:144
+msgid "GemTranslate"
+msgstr ""
+
+#. Plugin URI of the plugin
+#. Author URI of the plugin
+#: gemtranslate.php
+msgid "https://gemtranslate.com"
+msgstr ""
+
+#. Description of the plugin
+#: gemtranslate.php
+msgid "AI-first multilingual platform for WordPress. Fast, modern, and developer-friendly."
+msgstr ""
+
+#: includes/admin/admin-menu.php:31
+msgid "GemTranslate requires JavaScript to manage translations."
+msgstr ""
+
+#: includes/admin/profile-field.php:43
+#: dev_gemtranslate/components/LanguagePicker.jsx:48
+msgid "Admin language"
+msgstr ""
+
+#: includes/admin/profile-field.php:46
+#: dev_gemtranslate/components/LanguagePicker.jsx:56
+msgid "Site default"
+msgstr ""
+
+#: includes/admin/profile-field.php:54
+msgid "Translates the WordPress admin UI for this user using GemTranslate string translations."
+msgstr ""
+
+#: includes/ai/cloud-translator.php:41
+msgid "GemTranslate Cloud is not configured."
+msgstr ""
+
+#: includes/ai/cloud-translator.php:90
+msgid "License key and endpoint are required."
+msgstr ""
+
+#: includes/ai/deepl-translator.php:30
+msgid "DeepL API key is not configured."
+msgstr ""
+
+#: includes/ai/deepl-translator.php:74
+msgid "DeepL returned no translations."
+msgstr ""
+
+#: includes/ai/google-translator.php:28
+msgid "Google API key is not configured."
+msgstr ""
+
+#: includes/ai/google-translator.php:71
+msgid "Google returned no translations."
+msgstr ""
+
+#: includes/ai/open-ai-translator.php:35
+msgid "OpenAI API key is not configured."
+msgstr ""
+
+#: includes/ai/open-ai-translator.php:103
+msgid "OpenAI returned an empty response."
+msgstr ""
+
+#: includes/api/ai.php:174
+#: includes/api/ai.php:181
+msgid "Unknown provider."
+msgstr ""
+
+#: includes/api/ai.php:198
+msgid "target_lang is required."
+msgstr ""
+
+#: includes/api/ai.php:202
+msgid "No translator is configured."
+msgstr ""
+
+#: includes/api/ai.php:277
+msgid "Could not add glossary term."
+msgstr ""
+
+#: includes/api/controller.php:31
+msgid "You do not have permission to perform this action."
+msgstr ""
+
+#: includes/api/controller.php:49
+msgid "You are not assigned to translate this language."
+msgstr ""
+
+#: includes/api/controller.php:58
+msgid "You do not have permission to translate content."
+msgstr ""
+
+#: includes/api/i18n.php:61
+msgid "target_lang and locale are required."
+msgstr ""
+
+#: includes/api/io.php:162
+#: includes/api/io.php:187
+#: includes/api/menus.php:96
+#: includes/api/post-translations.php:217
+#: includes/api/post-translations.php:298
+#: includes/api/post-translations.php:376
+#: includes/api/revisions.php:85
+#: includes/api/seo.php:63
+#: includes/api/settings.php:93
+#: includes/api/strings.php:107
+#: includes/api/term-translations.php:138
+msgid "Language is not active."
+msgstr ""
+
+#: includes/api/jobs.php:118
+#: includes/api/jobs.php:160
+msgid "Job not found."
+msgstr ""
+
+#: includes/api/jobs.php:129
+msgid "post_id and active target_lang are required."
+msgstr ""
+
+#: includes/api/jobs.php:142
+msgid "post_ids and languages are required."
+msgstr ""
+
+#: includes/api/languages.php:31
+msgid "If true, only return active languages."
+msgstr ""
+
+#: includes/api/languages.php:89
+#: includes/api/languages.php:118
+#: includes/api/languages.php:135
+#: includes/api/languages.php:148
+msgid "Language not found."
+msgstr ""
+
+#: includes/api/languages.php:99
+msgid "code, locale, and name are required."
+msgstr ""
+
+#: includes/api/languages.php:102
+msgid "A language with that code already exists."
+msgstr ""
+
+#: includes/api/languages.php:107
+msgid "Could not save language."
+msgstr ""
+
+#: includes/api/languages.php:124
+msgid "No changes applied."
+msgstr ""
+
+#: includes/api/languages.php:138
+msgid "Cannot delete the default language."
+msgstr ""
+
+#: includes/api/menus.php:70
+msgid "Menu not found."
+msgstr ""
+
+#: includes/api/menus.php:101
+#: includes/api/post-translations.php:232
+#: includes/api/strings.php:114
+#: includes/api/term-translations.php:143
+msgid "Could not save translation."
+msgstr ""
+
+#: includes/api/migration.php:68
+msgid "Unknown migration source."
+msgstr ""
+
+#: includes/api/post-translations.php:172
+#: includes/api/post-translations.php:220
+#: includes/api/post-translations.php:249
+#: includes/api/post-translations.php:302
+#: includes/api/post-translations.php:350
+msgid "Post not found."
+msgstr ""
+
+#: includes/api/post-translations.php:210
+msgid "Translation not found."
+msgstr ""
+
+#: includes/api/post-translations.php:341
+msgid "Could not save block translation."
+msgstr ""
+
+#: includes/api/revisions.php:75
+#: includes/api/revisions.php:89
+msgid "Revision not found."
+msgstr ""
+
+#: includes/api/revisions.php:104
+msgid "Could not revert translation."
+msgstr ""
+
+#: includes/api/revisions.php:112
+msgid "One or both revisions not found."
+msgstr ""
+
+#: includes/api/seo.php:68
+msgid "Could not establish translation group."
+msgstr ""
+
+#: includes/api/seo.php:96
+msgid "Could not save SEO meta."
+msgstr ""
+
+#: includes/api/settings.php:71
+msgid "Login required."
+msgstr ""
+
+#: includes/api/strings.php:150
+msgid "Directory does not exist."
+msgstr ""
+
+#: includes/api/strings.php:154
+msgid "Unknown scan target."
+msgstr ""
+
+#: includes/api/term-translations.php:102
+msgid "Term not found."
+msgstr ""
+
+#: includes/api/translators.php:76
+#: includes/api/translators.php:89
+msgid "User not found."
+msgstr ""
+
+#: includes/frontend/language-switcher-block.php:33
+#: includes/frontend/language-switcher-widget.php:17
+msgid "GemTranslate language switcher"
+msgstr ""
+
+#: includes/frontend/language-switcher-block.php:36
+msgid "Show a switcher between all active languages."
+msgstr ""
+
+#: includes/frontend/language-switcher-widget.php:18
+msgid "Switch between all active languages."
+msgstr ""
+
+#: includes/frontend/language-switcher-widget.php:51
+#: dev_gemtranslate/containers/Posts/HistoryTab.jsx:88
+#: dev_gemtranslate/containers/Posts/index.jsx:168
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:198
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:226
+msgid "Title"
+msgstr ""
+
+#: includes/frontend/language-switcher-widget.php:55
+#: dev_gemtranslate/containers/Settings/index.jsx:75
+msgid "Display"
+msgstr ""
+
+#: includes/frontend/language-switcher-widget.php:57
+msgid "Inline list"
+msgstr ""
+
+#: includes/frontend/language-switcher-widget.php:58
+msgid "Dropdown"
+msgstr ""
+
+#: includes/frontend/language-switcher-widget.php:63
+msgid "Show flag"
+msgstr ""
+
+#: includes/frontend/language-switcher-widget.php:67
+msgid "Show English name"
+msgstr ""
+
+#: includes/frontend/language-switcher-widget.php:71
+msgid "Show native name"
+msgstr ""
+
+#: includes/i18n/pack-generator.php:69
+msgid "languages/gemtranslate.pot is missing. Run `wp i18n make-pot` first."
+msgstr ""
+
+#: includes/i18n/pack-generator.php:74
+msgid "Configure an AI provider before generating packs."
+msgstr ""
+
+#: includes/i18n/pack-generator.php:79
+msgid "POT file has no translatable strings."
+msgstr ""
+
+#: includes/installer.php:35
+msgid "Translator"
+msgstr ""
+
+#: dev_gemtranslate/components/Modal.jsx:29
+msgid "Close"
+msgstr ""
+
+#: dev_gemtranslate/components/Sidebar.jsx:9
+#: dev_gemtranslate/containers/Dashboard/index.jsx:34
+msgid "Dashboard"
+msgstr ""
+
+#: dev_gemtranslate/components/Sidebar.jsx:10
+#: dev_gemtranslate/containers/Dashboard/index.jsx:55
+#: dev_gemtranslate/containers/Languages/index.jsx:95
+#: dev_gemtranslate/containers/Onboarding/index.jsx:29
+#: dev_gemtranslate/containers/Translators/index.jsx:65
+msgid "Languages"
+msgstr ""
+
+#: dev_gemtranslate/components/Sidebar.jsx:11
+#: dev_gemtranslate/containers/Posts/index.jsx:92
+msgid "Posts & Pages"
+msgstr ""
+
+#: dev_gemtranslate/components/Sidebar.jsx:12
+#: dev_gemtranslate/containers/Terms/index.jsx:105
+msgid "Taxonomies"
+msgstr ""
+
+#: dev_gemtranslate/components/Sidebar.jsx:13
+#: dev_gemtranslate/containers/Strings/index.jsx:92
+msgid "Strings"
+msgstr ""
+
+#: dev_gemtranslate/components/Sidebar.jsx:14
+#: dev_gemtranslate/containers/Menus/index.jsx:77
+msgid "Menus"
+msgstr ""
+
+#: dev_gemtranslate/components/Sidebar.jsx:15
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:168
+#: dev_gemtranslate/containers/SEO/index.jsx:10
+msgid "SEO"
+msgstr ""
+
+#: dev_gemtranslate/components/Sidebar.jsx:16
+#: dev_gemtranslate/containers/AI/index.jsx:87
+msgid "AI Translation"
+msgstr ""
+
+#: dev_gemtranslate/components/Sidebar.jsx:17
+#: dev_gemtranslate/containers/Glossary/index.jsx:63
+msgid "Glossary"
+msgstr ""
+
+#: dev_gemtranslate/components/Sidebar.jsx:18
+msgid "Jobs"
+msgstr ""
+
+#: dev_gemtranslate/components/Sidebar.jsx:19
+#: dev_gemtranslate/containers/PluginTranslations/index.jsx:68
+msgid "Plugin translations"
+msgstr ""
+
+#: dev_gemtranslate/components/Sidebar.jsx:20
+#: dev_gemtranslate/containers/Translators/index.jsx:50
+msgid "Translators"
+msgstr ""
+
+#: dev_gemtranslate/components/Sidebar.jsx:21
+#: dev_gemtranslate/containers/Migration/index.jsx:49
+msgid "Migration"
+msgstr ""
+
+#: dev_gemtranslate/components/Sidebar.jsx:22
+msgid "Import & Export"
+msgstr ""
+
+#: dev_gemtranslate/components/Sidebar.jsx:23
+#: dev_gemtranslate/containers/Settings/index.jsx:39
+msgid "Settings"
+msgstr ""
+
+#: dev_gemtranslate/components/Spinner.jsx:7
+msgid "Loading"
+msgstr ""
+
+#: dev_gemtranslate/components/Spinner.jsx:17
+#: dev_gemtranslate/containers/Onboarding/index.jsx:51
+#: dev_gemtranslate/containers/PluginTranslations/index.jsx:26
+#: dev_gemtranslate/containers/Terms/index.jsx:100
+msgid "Loading…"
+msgstr ""
+
+#: dev_gemtranslate/containers/AI/index.jsx:19
+msgid "Uses GPT models. Best quality, BYOK."
+msgstr ""
+
+#: dev_gemtranslate/containers/AI/index.jsx:20
+msgid "Specialized translation API. BYOK."
+msgstr ""
+
+#: dev_gemtranslate/containers/AI/index.jsx:21
+msgid "Cloud Translation v2 (API key auth)."
+msgstr ""
+
+#: dev_gemtranslate/containers/AI/index.jsx:22
+msgid "Hosted proxy with credit packs. Set the endpoint and license key."
+msgstr ""
+
+#: dev_gemtranslate/containers/AI/index.jsx:39
+msgid "Loading AI providers…"
+msgstr ""
+
+#: dev_gemtranslate/containers/AI/index.jsx:53
+msgid "AI providers saved."
+msgstr ""
+
+#. translators: %s: provider name (openai, deepl, google).
+#: dev_gemtranslate/containers/AI/index.jsx:75
+msgid "%s credentials work."
+msgstr ""
+
+#: dev_gemtranslate/containers/AI/index.jsx:88
+msgid "Connect your own AI provider keys. Translations stay on your site."
+msgstr ""
+
+#: dev_gemtranslate/containers/AI/index.jsx:89
+#: dev_gemtranslate/containers/Languages/LanguageForm.jsx:103
+#: dev_gemtranslate/containers/Settings/index.jsx:41
+msgid "Save changes"
+msgstr ""
+
+#: dev_gemtranslate/containers/AI/index.jsx:92
+msgid "Default provider"
+msgstr ""
+
+#: dev_gemtranslate/containers/AI/index.jsx:93
+msgid "Used when 'Translate with AI' is clicked"
+msgstr ""
+
+#: dev_gemtranslate/containers/AI/index.jsx:95
+msgid "— Pick one —"
+msgstr ""
+
+#: dev_gemtranslate/containers/AI/index.jsx:111
+#: dev_gemtranslate/containers/Onboarding/index.jsx:216
+msgid "API key"
+msgstr ""
+
+#: dev_gemtranslate/containers/AI/index.jsx:112
+msgid "Key saved. Enter a new value to replace."
+msgstr ""
+
+#: dev_gemtranslate/containers/AI/index.jsx:112
+msgid "Required."
+msgstr ""
+
+#: dev_gemtranslate/containers/AI/index.jsx:122
+#: dev_gemtranslate/containers/Onboarding/index.jsx:220
+msgid "Model"
+msgstr ""
+
+#: dev_gemtranslate/containers/AI/index.jsx:122
+#: dev_gemtranslate/containers/Onboarding/index.jsx:220
+msgid "Default: gpt-4o-mini"
+msgstr ""
+
+#: dev_gemtranslate/containers/AI/index.jsx:132
+msgid "Use DeepL Pro endpoint"
+msgstr ""
+
+#: dev_gemtranslate/containers/AI/index.jsx:138
+msgid "Cloud endpoint"
+msgstr ""
+
+#: dev_gemtranslate/containers/AI/index.jsx:138
+msgid "https://your-gemtranslate-cloud.example.com"
+msgstr ""
+
+#: dev_gemtranslate/containers/AI/index.jsx:147
+msgid "Test credentials"
+msgstr ""
+
+#: dev_gemtranslate/containers/AI/index.jsx:155
+#: dev_gemtranslate/containers/Dashboard/index.jsx:48
+msgid "Translation memory"
+msgstr ""
+
+#: dev_gemtranslate/containers/AI/index.jsx:157
+msgid "Loading memory stats…"
+msgstr ""
+
+#: dev_gemtranslate/containers/AI/index.jsx:161
+msgid "Cached entries"
+msgstr ""
+
+#: dev_gemtranslate/containers/AI/index.jsx:165
+msgid "Reuse hits"
+msgstr ""
+
+#: dev_gemtranslate/containers/Dashboard/index.jsx:25
+msgid "Loading dashboard…"
+msgstr ""
+
+#: dev_gemtranslate/containers/Dashboard/index.jsx:35
+msgid "Quick overview of your multilingual setup."
+msgstr ""
+
+#: dev_gemtranslate/containers/Dashboard/index.jsx:38
+msgid "Manage languages"
+msgstr ""
+
+#: dev_gemtranslate/containers/Dashboard/index.jsx:44
+msgid "Active languages"
+msgstr ""
+
+#: dev_gemtranslate/containers/Dashboard/index.jsx:45
+msgid "Translated posts"
+msgstr ""
+
+#: dev_gemtranslate/containers/Dashboard/index.jsx:46
+msgid "Translated strings"
+msgstr ""
+
+#: dev_gemtranslate/containers/Dashboard/index.jsx:50
+msgid "cache hits"
+msgstr ""
+
+#: dev_gemtranslate/containers/Dashboard/index.jsx:58
+msgid "No languages yet. Add one to get started."
+msgstr ""
+
+#: dev_gemtranslate/containers/Dashboard/index.jsx:70
+#: dev_gemtranslate/containers/Languages/index.jsx:123
+msgid "Default"
+msgstr ""
+
+#: dev_gemtranslate/containers/Dashboard/index.jsx:72
+#: dev_gemtranslate/containers/Languages/index.jsx:124
+msgid "Active"
+msgstr ""
+
+#: dev_gemtranslate/containers/Dashboard/index.jsx:73
+#: dev_gemtranslate/containers/Languages/index.jsx:125
+msgid "Inactive"
+msgstr ""
+
+#: dev_gemtranslate/containers/Dashboard/index.jsx:81
+msgid "Per-language post coverage"
+msgstr ""
+
+#: dev_gemtranslate/containers/Dashboard/index.jsx:84
+msgid "Add a non-default language and translate posts to see coverage."
+msgstr ""
+
+#: dev_gemtranslate/containers/Dashboard/index.jsx:94
+msgid "posts"
+msgstr ""
+
+#: dev_gemtranslate/containers/Glossary/index.jsx:36
+msgid "Source term is required."
+msgstr ""
+
+#: dev_gemtranslate/containers/Glossary/index.jsx:42
+msgid "Glossary term added."
+msgstr ""
+
+#: dev_gemtranslate/containers/Glossary/index.jsx:49
+msgid "Delete this glossary entry?"
+msgstr ""
+
+#: dev_gemtranslate/containers/Glossary/index.jsx:52
+msgid "Removed."
+msgstr ""
+
+#: dev_gemtranslate/containers/Glossary/index.jsx:58
+msgid "Loading glossary…"
+msgstr ""
+
+#: dev_gemtranslate/containers/Glossary/index.jsx:64
+msgid "Define brand terms and protected phrases so AI translations stay consistent."
+msgstr ""
+
+#: dev_gemtranslate/containers/Glossary/index.jsx:67
+msgid "Add a term"
+msgstr ""
+
+#: dev_gemtranslate/containers/Glossary/index.jsx:69
+msgid "Source language"
+msgstr ""
+
+#: dev_gemtranslate/containers/Glossary/index.jsx:76
+#: dev_gemtranslate/containers/Menus/index.jsx:89
+#: dev_gemtranslate/containers/PluginTranslations/index.jsx:74
+#: dev_gemtranslate/containers/Strings/index.jsx:109
+msgid "Target language"
+msgstr ""
+
+#: dev_gemtranslate/containers/Glossary/index.jsx:83
+msgid "Source term"
+msgstr ""
+
+#: dev_gemtranslate/containers/Glossary/index.jsx:83
+msgid "e.g. Acme Cloud"
+msgstr ""
+
+#: dev_gemtranslate/containers/Glossary/index.jsx:86
+msgid "Target term"
+msgstr ""
+
+#: dev_gemtranslate/containers/Glossary/index.jsx:86
+msgid "Leave empty if do-not-translate."
+msgstr ""
+
+#: dev_gemtranslate/containers/Glossary/index.jsx:95
+msgid "Case sensitive"
+msgstr ""
+
+#: dev_gemtranslate/containers/Glossary/index.jsx:100
+msgid "Do not translate (keep source verbatim)"
+msgstr ""
+
+#: dev_gemtranslate/containers/Glossary/index.jsx:106
+msgid "Add term"
+msgstr ""
+
+#: dev_gemtranslate/containers/Glossary/index.jsx:111
+msgid "Existing terms"
+msgstr ""
+
+#: dev_gemtranslate/containers/Glossary/index.jsx:114
+msgid "No glossary entries yet."
+msgstr ""
+
+#: dev_gemtranslate/containers/Glossary/index.jsx:120
+#: dev_gemtranslate/containers/Posts/BlocksTab.jsx:112
+#: dev_gemtranslate/containers/Strings/index.jsx:149
+msgid "Source"
+msgstr ""
+
+#: dev_gemtranslate/containers/Glossary/index.jsx:121
+msgid "Target"
+msgstr ""
+
+#: dev_gemtranslate/containers/Glossary/index.jsx:122
+msgid "Pair"
+msgstr ""
+
+#: dev_gemtranslate/containers/Glossary/index.jsx:123
+msgid "Flags"
+msgstr ""
+
+#: dev_gemtranslate/containers/Glossary/index.jsx:131
+msgid "(do not translate)"
+msgstr ""
+
+#: dev_gemtranslate/containers/Glossary/index.jsx:136
+msgid "Aa"
+msgstr ""
+
+#: dev_gemtranslate/containers/Glossary/index.jsx:137
+msgid "DNT"
+msgstr ""
+
+#: dev_gemtranslate/containers/Glossary/index.jsx:141
+#: dev_gemtranslate/containers/Jobs/index.jsx:133
+#: dev_gemtranslate/containers/Languages/index.jsx:140
+#: dev_gemtranslate/containers/PluginTranslations/index.jsx:124
+msgid "Delete"
+msgstr ""
+
+#: dev_gemtranslate/containers/ImportExport/index.jsx:59
+msgid "Export downloaded."
+msgstr ""
+
+#: dev_gemtranslate/containers/ImportExport/index.jsx:75
+msgid "Pick a file first."
+msgstr ""
+
+#. translators: 1: saved count, 2: total units.
+#: dev_gemtranslate/containers/ImportExport/index.jsx:89
+msgid "Imported %1$d of %2$d entries."
+msgstr ""
+
+#: dev_gemtranslate/containers/ImportExport/index.jsx:102
+msgid "Import & export"
+msgstr ""
+
+#: dev_gemtranslate/containers/ImportExport/index.jsx:103
+msgid "Round-trip translations through XLIFF 2.1 or CSV for offline translators and translation services."
+msgstr ""
+
+#: dev_gemtranslate/containers/ImportExport/index.jsx:107
+msgid "Export"
+msgstr ""
+
+#: dev_gemtranslate/containers/ImportExport/index.jsx:109
+#: dev_gemtranslate/containers/ImportExport/index.jsx:147
+msgid "What"
+msgstr ""
+
+#: dev_gemtranslate/containers/ImportExport/index.jsx:111
+#: dev_gemtranslate/containers/ImportExport/index.jsx:149
+msgid "UI strings"
+msgstr ""
+
+#: dev_gemtranslate/containers/ImportExport/index.jsx:112
+#: dev_gemtranslate/containers/ImportExport/index.jsx:150
+msgid "Posts / pages"
+msgstr ""
+
+#: dev_gemtranslate/containers/ImportExport/index.jsx:115
+#: dev_gemtranslate/containers/ImportExport/index.jsx:153
+#: dev_gemtranslate/containers/Languages/index.jsx:104
+msgid "Language"
+msgstr ""
+
+#: dev_gemtranslate/containers/ImportExport/index.jsx:122
+#: dev_gemtranslate/containers/ImportExport/index.jsx:160
+msgid "Format"
+msgstr ""
+
+#: dev_gemtranslate/containers/ImportExport/index.jsx:129
+#: dev_gemtranslate/containers/Posts/index.jsx:99
+msgid "Post type"
+msgstr ""
+
+#: dev_gemtranslate/containers/ImportExport/index.jsx:140
+msgid "Download"
+msgstr ""
+
+#: dev_gemtranslate/containers/ImportExport/index.jsx:145
+#: dev_gemtranslate/containers/ImportExport/index.jsx:177
+msgid "Import"
+msgstr ""
+
+#: dev_gemtranslate/containers/ImportExport/index.jsx:166
+msgid "File"
+msgstr ""
+
+#: dev_gemtranslate/containers/Jobs/index.jsx:32
+msgid "Re-queued."
+msgstr ""
+
+#: dev_gemtranslate/containers/Jobs/index.jsx:39
+msgid "Remove this job from the list?"
+msgstr ""
+
+#: dev_gemtranslate/containers/Jobs/index.jsx:42
+msgid "Job removed."
+msgstr ""
+
+#: dev_gemtranslate/containers/Jobs/index.jsx:51
+msgid "Translation jobs"
+msgstr ""
+
+#: dev_gemtranslate/containers/Jobs/index.jsx:52
+msgid "Monitor async AI translation jobs. Pending and running jobs poll for updates."
+msgstr ""
+
+#: dev_gemtranslate/containers/Jobs/index.jsx:56
+#: dev_gemtranslate/containers/Jobs/index.jsx:76
+msgid "Pending"
+msgstr ""
+
+#: dev_gemtranslate/containers/Jobs/index.jsx:59
+#: dev_gemtranslate/containers/Jobs/index.jsx:77
+msgid "Running"
+msgstr ""
+
+#: dev_gemtranslate/containers/Jobs/index.jsx:62
+#: dev_gemtranslate/containers/Jobs/index.jsx:78
+msgid "Success"
+msgstr ""
+
+#: dev_gemtranslate/containers/Jobs/index.jsx:65
+#: dev_gemtranslate/containers/Jobs/index.jsx:79
+msgid "Failed"
+msgstr ""
+
+#: dev_gemtranslate/containers/Jobs/index.jsx:73
+#: dev_gemtranslate/containers/Jobs/index.jsx:96
+#: dev_gemtranslate/containers/Languages/index.jsx:107
+#: dev_gemtranslate/containers/Posts/index.jsx:169
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:257
+msgid "Status"
+msgstr ""
+
+#: dev_gemtranslate/containers/Jobs/index.jsx:75
+msgid "All"
+msgstr ""
+
+#: dev_gemtranslate/containers/Jobs/index.jsx:85
+msgid "Loading jobs…"
+msgstr ""
+
+#: dev_gemtranslate/containers/Jobs/index.jsx:88
+msgid "No jobs in this view."
+msgstr ""
+
+#: dev_gemtranslate/containers/Jobs/index.jsx:95
+msgid "Type"
+msgstr ""
+
+#: dev_gemtranslate/containers/Jobs/index.jsx:97
+msgid "Payload"
+msgstr ""
+
+#: dev_gemtranslate/containers/Jobs/index.jsx:98
+msgid "Attempts"
+msgstr ""
+
+#: dev_gemtranslate/containers/Jobs/index.jsx:99
+msgid "Updated"
+msgstr ""
+
+#. translators: 1: post ID, 2: target language.
+#: dev_gemtranslate/containers/Jobs/index.jsx:113
+msgid "post #%1$d → %2$s"
+msgstr ""
+
+#: dev_gemtranslate/containers/Jobs/index.jsx:129
+msgid "Retry"
+msgstr ""
+
+#: dev_gemtranslate/containers/Languages/index.jsx:46
+msgid "Language updated."
+msgstr ""
+
+#: dev_gemtranslate/containers/Languages/index.jsx:49
+msgid "Language added."
+msgstr ""
+
+#. translators: %s: language name.
+#: dev_gemtranslate/containers/Languages/index.jsx:60
+msgid "Delete %s? This will remove all of its translations."
+msgstr ""
+
+#: dev_gemtranslate/containers/Languages/index.jsx:66
+msgid "Language deleted."
+msgstr ""
+
+#. translators: %s: language name.
+#: dev_gemtranslate/containers/Languages/index.jsx:79
+msgid "%s is now the default."
+msgstr ""
+
+#: dev_gemtranslate/containers/Languages/index.jsx:89
+#: dev_gemtranslate/editor/index.jsx:82
+msgid "Loading languages…"
+msgstr ""
+
+#: dev_gemtranslate/containers/Languages/index.jsx:96
+msgid "Manage the languages your site supports."
+msgstr ""
+
+#: dev_gemtranslate/containers/Languages/index.jsx:97
+#: dev_gemtranslate/containers/Languages/index.jsx:153
+#: dev_gemtranslate/containers/Languages/LanguageForm.jsx:103
+msgid "Add language"
+msgstr ""
+
+#: dev_gemtranslate/containers/Languages/index.jsx:105
+#: dev_gemtranslate/containers/Languages/LanguageForm.jsx:75
+msgid "Code"
+msgstr ""
+
+#: dev_gemtranslate/containers/Languages/index.jsx:106
+#: dev_gemtranslate/containers/Languages/LanguageForm.jsx:78
+#: dev_gemtranslate/containers/PluginTranslations/index.jsx:81
+#: dev_gemtranslate/containers/PluginTranslations/index.jsx:104
+msgid "Locale"
+msgstr ""
+
+#: dev_gemtranslate/containers/Languages/index.jsx:108
+msgid "Actions"
+msgstr ""
+
+#: dev_gemtranslate/containers/Languages/index.jsx:126
+msgid "RTL"
+msgstr ""
+
+#: dev_gemtranslate/containers/Languages/index.jsx:132
+msgid "Make default"
+msgstr ""
+
+#: dev_gemtranslate/containers/Languages/index.jsx:136
+#: dev_gemtranslate/editor/index.jsx:118
+msgid "Edit"
+msgstr ""
+
+#: dev_gemtranslate/containers/Languages/index.jsx:153
+msgid "Edit language"
+msgstr ""
+
+#: dev_gemtranslate/containers/Languages/LanguageForm.jsx:57
+msgid "Pick a preset (optional)"
+msgstr ""
+
+#: dev_gemtranslate/containers/Languages/LanguageForm.jsx:75
+msgid "e.g. en, es, pt-br"
+msgstr ""
+
+#: dev_gemtranslate/containers/Languages/LanguageForm.jsx:78
+msgid "WP locale: en_US, es_ES, pt_BR"
+msgstr ""
+
+#: dev_gemtranslate/containers/Languages/LanguageForm.jsx:81
+msgid "Name (English)"
+msgstr ""
+
+#: dev_gemtranslate/containers/Languages/LanguageForm.jsx:84
+msgid "Native name"
+msgstr ""
+
+#: dev_gemtranslate/containers/Languages/LanguageForm.jsx:87
+msgid "Flag code"
+msgstr ""
+
+#: dev_gemtranslate/containers/Languages/LanguageForm.jsx:87
+msgid "Country code, e.g. ES, FR"
+msgstr ""
+
+#: dev_gemtranslate/containers/Languages/LanguageForm.jsx:90
+msgid "Position"
+msgstr ""
+
+#: dev_gemtranslate/containers/Languages/LanguageForm.jsx:90
+msgid "Sort order in the switcher"
+msgstr ""
+
+#: dev_gemtranslate/containers/Languages/LanguageForm.jsx:96
+msgid "Right-to-left script"
+msgstr ""
+
+#: dev_gemtranslate/containers/Languages/LanguageForm.jsx:97
+msgid "Active (shown in switcher)"
+msgstr ""
+
+#: dev_gemtranslate/containers/Languages/LanguageForm.jsx:101
+msgid "Cancel"
+msgstr ""
+
+#: dev_gemtranslate/containers/Menus/index.jsx:55
+msgid "Loading menus…"
+msgstr ""
+
+#: dev_gemtranslate/containers/Menus/index.jsx:68
+msgid "Menu item saved."
+msgstr ""
+
+#: dev_gemtranslate/containers/Menus/index.jsx:78
+msgid "Translate WordPress nav menu items per language."
+msgstr ""
+
+#: dev_gemtranslate/containers/Menus/index.jsx:82
+msgid "Menu"
+msgstr ""
+
+#: dev_gemtranslate/containers/Menus/index.jsx:100
+msgid "Loading items…"
+msgstr ""
+
+#: dev_gemtranslate/containers/Menus/index.jsx:103
+msgid "No menu items."
+msgstr ""
+
+#: dev_gemtranslate/containers/Menus/index.jsx:109
+msgid "Original"
+msgstr ""
+
+#. translators: %s: language code.
+#: dev_gemtranslate/containers/Menus/index.jsx:111
+#: dev_gemtranslate/containers/Strings/index.jsx:153
+msgid "Translation (%s)"
+msgstr ""
+
+#: dev_gemtranslate/containers/Menus/index.jsx:113
+msgid "URL override"
+msgstr ""
+
+#: dev_gemtranslate/containers/Menus/index.jsx:141
+#: dev_gemtranslate/containers/Strings/index.jsx:188
+#: dev_gemtranslate/containers/Translators/index.jsx:98
+msgid "Save"
+msgstr ""
+
+#: dev_gemtranslate/containers/Migration/index.jsx:14
+msgid "Imports languages and post translations from icl_translations."
+msgstr ""
+
+#: dev_gemtranslate/containers/Migration/index.jsx:15
+msgid "Imports languages and post translations from the language taxonomy."
+msgstr ""
+
+#: dev_gemtranslate/containers/Migration/index.jsx:16
+msgid "Imports translated UI strings from trp_dictionary tables."
+msgstr ""
+
+#: dev_gemtranslate/containers/Migration/index.jsx:25
+msgid "Detecting other multilingual plugins…"
+msgstr ""
+
+#: dev_gemtranslate/containers/Migration/index.jsx:28
+msgid "Run import? Existing translations may be overwritten."
+msgstr ""
+
+#. translators: 1: posts imported, 2: strings imported.
+#: dev_gemtranslate/containers/Migration/index.jsx:36
+msgid "Imported %1$d posts and %2$d strings."
+msgstr ""
+
+#: dev_gemtranslate/containers/Migration/index.jsx:50
+msgid "Import translations from other multilingual plugins."
+msgstr ""
+
+#: dev_gemtranslate/containers/Migration/index.jsx:62
+msgid "Detected"
+msgstr ""
+
+#: dev_gemtranslate/containers/Migration/index.jsx:64
+msgid "Not detected"
+msgstr ""
+
+#: dev_gemtranslate/containers/Migration/index.jsx:68
+msgid "Run import"
+msgstr ""
+
+#: dev_gemtranslate/containers/Migration/index.jsx:72
+msgid "Languages:"
+msgstr ""
+
+#: dev_gemtranslate/containers/Migration/index.jsx:73
+msgid "Posts:"
+msgstr ""
+
+#: dev_gemtranslate/containers/Migration/index.jsx:74
+msgid "Strings:"
+msgstr ""
+
+#: dev_gemtranslate/containers/Migration/index.jsx:75
+msgid "Skipped:"
+msgstr ""
+
+#: dev_gemtranslate/containers/Onboarding/index.jsx:28
+msgid "Welcome"
+msgstr ""
+
+#: dev_gemtranslate/containers/Onboarding/index.jsx:30
+msgid "AI provider"
+msgstr ""
+
+#: dev_gemtranslate/containers/Onboarding/index.jsx:31
+msgid "Done"
+msgstr ""
+
+#: dev_gemtranslate/containers/Onboarding/index.jsx:84
+msgid "Languages added."
+msgstr ""
+
+#: dev_gemtranslate/containers/Onboarding/index.jsx:107
+msgid "AI provider configured."
+msgstr ""
+
+#: dev_gemtranslate/containers/Onboarding/index.jsx:131
+msgid "Welcome to GemTranslate"
+msgstr ""
+
+#: dev_gemtranslate/containers/Onboarding/index.jsx:132
+msgid "Quick setup — pick languages, add an AI key (optional), done."
+msgstr ""
+
+#: dev_gemtranslate/containers/Onboarding/index.jsx:156
+msgid "GemTranslate makes your WordPress site multilingual without slowing it down. We'll set up your languages, optionally connect an AI translator, and you'll be ready to translate."
+msgstr ""
+
+#: dev_gemtranslate/containers/Onboarding/index.jsx:159
+msgid "Get started"
+msgstr ""
+
+#: dev_gemtranslate/containers/Onboarding/index.jsx:165
+msgid "Pick the languages you want to support"
+msgstr ""
+
+#: dev_gemtranslate/containers/Onboarding/index.jsx:186
+msgid "(already added)"
+msgstr ""
+
+#: dev_gemtranslate/containers/Onboarding/index.jsx:192
+#: dev_gemtranslate/containers/Onboarding/index.jsx:226
+msgid "Back"
+msgstr ""
+
+#: dev_gemtranslate/containers/Onboarding/index.jsx:194
+#: dev_gemtranslate/containers/Onboarding/index.jsx:228
+msgid "Skip"
+msgstr ""
+
+#: dev_gemtranslate/containers/Onboarding/index.jsx:196
+msgid "Add and continue"
+msgstr ""
+
+#: dev_gemtranslate/containers/Onboarding/index.jsx:204
+msgid "Optional: connect an AI translator"
+msgstr ""
+
+#: dev_gemtranslate/containers/Onboarding/index.jsx:206
+msgid "Bring your own API key. Skip to set up later from AI Translation."
+msgstr ""
+
+#: dev_gemtranslate/containers/Onboarding/index.jsx:209
+msgid "Provider"
+msgstr ""
+
+#: dev_gemtranslate/containers/Onboarding/index.jsx:229
+msgid "Test & save"
+msgstr ""
+
+#: dev_gemtranslate/containers/Onboarding/index.jsx:238
+msgid "All set! Head to Posts to translate your first article, or Strings to translate theme/plugin labels."
+msgstr ""
+
+#: dev_gemtranslate/containers/Onboarding/index.jsx:241
+msgid "Go to dashboard"
+msgstr ""
+
+#. translators: 1: written, 2: total, 3: locale.
+#: dev_gemtranslate/containers/PluginTranslations/index.jsx:42
+msgid "%1$d of %2$d strings translated into %3$s."
+msgstr ""
+
+#: dev_gemtranslate/containers/PluginTranslations/index.jsx:54
+msgid "Remove this translation pack?"
+msgstr ""
+
+#: dev_gemtranslate/containers/PluginTranslations/index.jsx:57
+msgid "Pack deleted."
+msgstr ""
+
+#: dev_gemtranslate/containers/PluginTranslations/index.jsx:69
+msgid "Auto-generate the GemTranslate admin in any active language using your configured AI provider."
+msgstr ""
+
+#: dev_gemtranslate/containers/PluginTranslations/index.jsx:72
+msgid "Generate a new pack"
+msgstr ""
+
+#: dev_gemtranslate/containers/PluginTranslations/index.jsx:81
+msgid "WP locale like es_ES, fr_FR."
+msgstr ""
+
+#: dev_gemtranslate/containers/PluginTranslations/index.jsx:86
+msgid "Generate with AI"
+msgstr ""
+
+#: dev_gemtranslate/containers/PluginTranslations/index.jsx:91
+msgid "Reads languages/gemtranslate.pot, translates each string in batches through the default AI provider, and writes PO + MO + JSON to languages/."
+msgstr ""
+
+#: dev_gemtranslate/containers/PluginTranslations/index.jsx:95
+msgid "Existing packs"
+msgstr ""
+
+#: dev_gemtranslate/containers/PluginTranslations/index.jsx:98
+msgid "No translation packs yet."
+msgstr ""
+
+#: dev_gemtranslate/containers/PluginTranslations/index.jsx:105
+msgid "PO"
+msgstr ""
+
+#: dev_gemtranslate/containers/PluginTranslations/index.jsx:106
+msgid "MO"
+msgstr ""
+
+#: dev_gemtranslate/containers/PluginTranslations/index.jsx:107
+msgid "JSON files"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/BlocksTab.jsx:27
+msgid "Loading blocks…"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/BlocksTab.jsx:33
+msgid "This post is not block-based. Use the Content tab for classic HTML editing."
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/BlocksTab.jsx:46
+msgid "Block translation saved."
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/BlocksTab.jsx:90
+msgid "Block-by-block translation"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/BlocksTab.jsx:93
+msgid "Translate all blocks with AI"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/BlocksTab.jsx:104
+msgid "attribute"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/BlocksTab.jsx:108
+#: dev_gemtranslate/containers/Posts/MetaTab.jsx:92
+#: dev_gemtranslate/containers/Posts/SeoTab.jsx:84
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:231
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:244
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:254
+#: dev_gemtranslate/containers/Strings/index.jsx:191
+#: dev_gemtranslate/containers/Terms/index.jsx:207
+#: dev_gemtranslate/containers/Terms/index.jsx:220
+#: dev_gemtranslate/editor/index.jsx:111
+msgid "AI"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/BlocksTab.jsx:119
+#: dev_gemtranslate/containers/Posts/MetaTab.jsx:83
+msgid "Translation"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/BlocksTab.jsx:130
+msgid "Save blocks"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/HistoryTab.jsx:19
+msgid "Loading history…"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/HistoryTab.jsx:25
+msgid "No revisions yet. Each save creates a new history entry (up to 20 per translation)."
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/HistoryTab.jsx:33
+msgid "Revert the live translation to this revision? The current version will be saved as a new revision."
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/HistoryTab.jsx:36
+msgid "Reverted."
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/HistoryTab.jsx:45
+msgid "Revisions"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/HistoryTab.jsx:67
+msgid "(no title)"
+msgstr ""
+
+#. translators: %d: byte length.
+#: dev_gemtranslate/containers/Posts/HistoryTab.jsx:69
+msgid "%d chars"
+msgstr ""
+
+#. translators: %d: revision id.
+#: dev_gemtranslate/containers/Posts/HistoryTab.jsx:76
+msgid "Revision #%d"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/HistoryTab.jsx:76
+msgid "Pick a revision"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/HistoryTab.jsx:79
+msgid "Select a revision from the list to view its contents."
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/HistoryTab.jsx:82
+msgid "Loading revision…"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/HistoryTab.jsx:84
+msgid "Revision not available."
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/HistoryTab.jsx:92
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:204
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:239
+msgid "Excerpt"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/HistoryTab.jsx:96
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:165
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:207
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:249
+msgid "Content"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/HistoryTab.jsx:101
+msgid "Revert to this revision"
+msgstr ""
+
+#. translators: %d: number of jobs queued.
+#: dev_gemtranslate/containers/Posts/index.jsx:80
+msgid "%d translation jobs queued. See Jobs page for progress."
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/index.jsx:93
+msgid "Pick a post to translate it into your active languages, or bulk-translate with AI."
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/index.jsx:103
+msgid "Posts"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/index.jsx:104
+msgid "Pages"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/index.jsx:115
+#: dev_gemtranslate/containers/Terms/index.jsx:120
+msgid "Search"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/index.jsx:116
+msgid "Search by title…"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/index.jsx:119
+#: dev_gemtranslate/containers/Strings/index.jsx:136
+#: dev_gemtranslate/containers/Terms/index.jsx:124
+msgid "Filter"
+msgstr ""
+
+#. translators: %d: number of selected posts.
+#: dev_gemtranslate/containers/Posts/index.jsx:128
+msgid "%d selected"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/index.jsx:142
+msgid "Overwrite existing"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/index.jsx:146
+msgid "Clear"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/index.jsx:149
+msgid "Translate selected with AI"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/index.jsx:156
+msgid "Loading posts…"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/index.jsx:159
+msgid "No posts found."
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/index.jsx:166
+msgid "Select all visible"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/index.jsx:195
+msgid "stale"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/index.jsx:205
+#: dev_gemtranslate/containers/Terms/index.jsx:163
+msgid "Translate"
+msgstr ""
+
+#. translators: 1: current page, 2: total pages.
+#: dev_gemtranslate/containers/Posts/index.jsx:219
+msgid "Page %1$d of %2$d"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/index.jsx:226
+#: dev_gemtranslate/containers/Strings/index.jsx:213
+msgid "Previous"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/index.jsx:229
+#: dev_gemtranslate/containers/Strings/index.jsx:216
+msgid "Next"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/MetaTab.jsx:27
+msgid "Loading meta fields…"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/MetaTab.jsx:33
+msgid "This post has no translatable custom fields. ACF fields and any non-internal postmeta appear here automatically."
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/MetaTab.jsx:46
+msgid "Meta fields saved."
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/MetaTab.jsx:70
+msgid "Custom fields & ACF"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/MetaTab.jsx:98
+msgid "Save fields"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/SeoTab.jsx:13
+msgid "Meta title"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/SeoTab.jsx:14
+msgid "Meta description"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/SeoTab.jsx:15
+msgid "OpenGraph title"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/SeoTab.jsx:16
+msgid "OpenGraph description"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/SeoTab.jsx:17
+msgid "Canonical override"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/SeoTab.jsx:43
+msgid "SEO meta saved."
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/SeoTab.jsx:51
+msgid "(no source)"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/SeoTab.jsx:67
+msgid "Loading SEO meta…"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/SeoTab.jsx:70
+msgid "SEO meta for this translation"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/SeoTab.jsx:89
+msgid "Save SEO meta"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:47
+msgid "Loading translation editor…"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:61
+#: dev_gemtranslate/containers/Strings/index.jsx:51
+msgid "Translation saved."
+msgstr ""
+
+#. translators: %s: field name like title, excerpt, content.
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:81
+msgid "AI filled %s."
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:105
+msgid "AI translation applied to all fields."
+msgstr ""
+
+#. translators: %s: post title.
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:116
+msgid "Translate: %s"
+msgstr ""
+
+#. translators: %s: source language code.
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:121
+msgid "Source language: %s. Pick a target language and edit the translation."
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:126
+msgid "← Back to posts"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:134
+msgid "Add at least one non-default language to start translating posts."
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:159
+#: dev_gemtranslate/containers/Terms/index.jsx:225
+msgid "Translate all with AI"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:166
+msgid "Blocks"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:167
+msgid "Fields"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:169
+msgid "History"
+msgstr ""
+
+#. translators: %s: language code.
+#. translators: %s: lang code.
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:196
+#: dev_gemtranslate/containers/Terms/index.jsx:175
+msgid "Source — %s"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:201
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:234
+#: dev_gemtranslate/containers/Terms/index.jsx:138
+#: dev_gemtranslate/containers/Terms/index.jsx:180
+#: dev_gemtranslate/containers/Terms/index.jsx:210
+msgid "Slug"
+msgstr ""
+
+#. translators: %s: language code.
+#. translators: %s: lang code.
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:214
+#: dev_gemtranslate/containers/Terms/index.jsx:190
+msgid "Translation — %s"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:234
+msgid "Used for SEO-friendly URLs."
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:259
+msgid "Draft"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:260
+msgid "Published"
+msgstr ""
+
+#: dev_gemtranslate/containers/Posts/TranslationEditor.jsx:265
+#: dev_gemtranslate/containers/Terms/index.jsx:228
+msgid "Save translation"
+msgstr ""
+
+#: dev_gemtranslate/containers/SEO/index.jsx:11
+msgid "Hreflang tags, sitemap entries, and Yoast/RankMath meta are translated automatically."
+msgstr ""
+
+#: dev_gemtranslate/containers/SEO/index.jsx:15
+msgid "Hreflang tags emitted in <head> for every active language plus x-default."
+msgstr ""
+
+#: dev_gemtranslate/containers/SEO/index.jsx:16
+msgid "Core WP sitemaps include alternate URLs."
+msgstr ""
+
+#: dev_gemtranslate/containers/SEO/index.jsx:17
+msgid "Yoast SEO and Rank Math bridges swap meta title / description per language when those plugins are active."
+msgstr ""
+
+#: dev_gemtranslate/containers/SEO/index.jsx:18
+msgid "Per-post SEO overrides are saved via the post translation editor (coming soon UI)."
+msgstr ""
+
+#: dev_gemtranslate/containers/Settings/index.jsx:23
+msgid "Loading settings…"
+msgstr ""
+
+#: dev_gemtranslate/containers/Settings/index.jsx:30
+msgid "Settings saved."
+msgstr ""
+
+#: dev_gemtranslate/containers/Settings/index.jsx:40
+msgid "Configure how GemTranslate behaves."
+msgstr ""
+
+#: dev_gemtranslate/containers/Settings/index.jsx:45
+msgid "Visitor experience"
+msgstr ""
+
+#: dev_gemtranslate/containers/Settings/index.jsx:47
+msgid "Auto-redirect first visit by browser language"
+msgstr ""
+
+#: dev_gemtranslate/containers/Settings/index.jsx:52
+msgid "Matches Accept-Language against active languages; 302s once and remembers the choice in a cookie."
+msgstr ""
+
+#: dev_gemtranslate/containers/Settings/index.jsx:55
+msgid "Translate transactional emails per recipient"
+msgstr ""
+
+#: dev_gemtranslate/containers/Settings/index.jsx:60
+msgid "Switches WP locale for the duration of each wp_mail() call to match the recipient's GemTranslate preferred language."
+msgstr ""
+
+#: dev_gemtranslate/containers/Settings/index.jsx:64
+msgid "URL strategy"
+msgstr ""
+
+#: dev_gemtranslate/containers/Settings/index.jsx:65
+msgid "Pattern"
+msgstr ""
+
+#: dev_gemtranslate/containers/Settings/index.jsx:67
+msgid "Subdirectory (/es/, /fr/)"
+msgstr ""
+
+#: dev_gemtranslate/containers/Settings/index.jsx:71
+msgid "Subdirectory URLs cache cleanly with page-cache plugins. Subdomain and per-domain modes are planned for v2."
+msgstr ""
+
+#: dev_gemtranslate/containers/Settings/index.jsx:77
+msgid "Show switcher for default language"
+msgstr ""
+
+#: dev_gemtranslate/containers/Settings/index.jsx:83
+msgid "Performance"
+msgstr ""
+
+#: dev_gemtranslate/containers/Settings/index.jsx:85
+msgid "Use object cache (recommended)"
+msgstr ""
+
+#: dev_gemtranslate/containers/Settings/index.jsx:90
+msgid "Enable debug log"
+msgstr ""
+
+#: dev_gemtranslate/containers/Settings/index.jsx:96
+msgid "Danger zone"
+msgstr ""
+
+#: dev_gemtranslate/containers/Settings/index.jsx:98
+msgid "Delete all data on uninstall"
+msgstr ""
+
+#: dev_gemtranslate/containers/Settings/index.jsx:103
+msgid "When enabled, removing the plugin from WP admin drops all wp_gtrans_* tables and clears GemTranslate options."
+msgstr ""
+
+#. translators: 1: file count, 2: string count.
+#: dev_gemtranslate/containers/Strings/index.jsx:79
+msgid "Scanned %1$d files, found %2$d strings."
+msgstr ""
+
+#: dev_gemtranslate/containers/Strings/index.jsx:93
+msgid "Translate hardcoded UI strings from your active theme and plugins."
+msgstr ""
+
+#: dev_gemtranslate/containers/Strings/index.jsx:97
+msgid "Scan active theme"
+msgstr ""
+
+#: dev_gemtranslate/containers/Strings/index.jsx:100
+msgid "Scan all plugins"
+msgstr ""
+
+#: dev_gemtranslate/containers/Strings/index.jsx:120
+#: dev_gemtranslate/containers/Strings/index.jsx:157
+msgid "Domain"
+msgstr ""
+
+#: dev_gemtranslate/containers/Strings/index.jsx:122
+msgid "All domains"
+msgstr ""
+
+#: dev_gemtranslate/containers/Strings/index.jsx:125
+msgid "(empty)"
+msgstr ""
+
+#: dev_gemtranslate/containers/Strings/index.jsx:132
+msgid "Search source"
+msgstr ""
+
+#: dev_gemtranslate/containers/Strings/index.jsx:133
+#: dev_gemtranslate/containers/Terms/index.jsx:121
+msgid "Search…"
+msgstr ""
+
+#: dev_gemtranslate/containers/Strings/index.jsx:140
+msgid "Loading strings…"
+msgstr ""
+
+#: dev_gemtranslate/containers/Strings/index.jsx:143
+msgid "No strings yet. Scan a theme or plugin to populate this list."
+msgstr ""
+
+#. translators: %d: total count.
+#: dev_gemtranslate/containers/Strings/index.jsx:207
+msgid "%d total"
+msgstr ""
+
+#: dev_gemtranslate/containers/Terms/index.jsx:53
+msgid "Term translation saved."
+msgstr ""
+
+#: dev_gemtranslate/containers/Terms/index.jsx:106
+msgid "Translate categories, tags, and other taxonomy terms."
+msgstr ""
+
+#: dev_gemtranslate/containers/Terms/index.jsx:111
+msgid "Taxonomy"
+msgstr ""
+
+#: dev_gemtranslate/containers/Terms/index.jsx:113
+msgid "Categories"
+msgstr ""
+
+#: dev_gemtranslate/containers/Terms/index.jsx:114
+msgid "Tags"
+msgstr ""
+
+#: dev_gemtranslate/containers/Terms/index.jsx:115
+msgid "Product categories"
+msgstr ""
+
+#: dev_gemtranslate/containers/Terms/index.jsx:116
+msgid "Product tags"
+msgstr ""
+
+#: dev_gemtranslate/containers/Terms/index.jsx:128
+msgid "Loading terms…"
+msgstr ""
+
+#: dev_gemtranslate/containers/Terms/index.jsx:131
+msgid "No terms found."
+msgstr ""
+
+#: dev_gemtranslate/containers/Terms/index.jsx:137
+#: dev_gemtranslate/containers/Terms/index.jsx:177
+#: dev_gemtranslate/containers/Terms/index.jsx:202
+msgid "Name"
+msgstr ""
+
+#: dev_gemtranslate/containers/Terms/index.jsx:139
+msgid "Count"
+msgstr ""
+
+#: dev_gemtranslate/containers/Terms/index.jsx:183
+#: dev_gemtranslate/containers/Terms/index.jsx:215
+msgid "Description"
+msgstr ""
+
+#: dev_gemtranslate/containers/Translators/index.jsx:30
+msgid "Loading translators…"
+msgstr ""
+
+#: dev_gemtranslate/containers/Translators/index.jsx:41
+msgid "Assignments saved."
+msgstr ""
+
+#: dev_gemtranslate/containers/Translators/index.jsx:51
+msgid "Users with the translate capability. Assign each user to specific languages, or leave empty for unrestricted access."
+msgstr ""
+
+#: dev_gemtranslate/containers/Translators/index.jsx:57
+msgid "No users with translator access. Edit users and assign them the Translator role or grant the gtrans_translate_content capability."
+msgstr ""
+
+#: dev_gemtranslate/containers/Translators/index.jsx:63
+msgid "User"
+msgstr ""
+
+#: dev_gemtranslate/containers/Translators/index.jsx:64
+msgid "Roles"
+msgstr ""
+
+#: dev_gemtranslate/containers/Translators/index.jsx:93
+msgid "Unrestricted"
+msgstr ""
+
+#: dev_gemtranslate/editor/index.jsx:78
+msgid "Translation status"
+msgstr ""
+
+#: dev_gemtranslate/editor/index.jsx:85
+msgid "Add a non-default language in GemTranslate to start translating."
+msgstr ""
+
+#: dev_gemtranslate/editor/index.jsx:100
+msgid "—"
+msgstr ""
+
+#: dev_gemtranslate/editor/index.jsx:130
+msgid "Refresh"
+msgstr ""
+
+#: dev_gemtranslate/editor/index.jsx:134
+msgid "AI queues a background job. Progress is visible in GemTranslate → Jobs."
+msgstr ""

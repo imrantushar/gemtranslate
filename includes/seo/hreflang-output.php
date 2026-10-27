@@ -1,12 +1,12 @@
 <?php
-namespace Zentranslate\SEO;
+namespace GemTranslate\SEO;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Language\Context;
-use Zentranslate\Routing\UrlRewriter;
+use GemTranslate\Language\Context;
+use GemTranslate\Routing\UrlRewriter;
 
 /**
  * Emits <link rel="alternate" hreflang> tags + x-default in wp_head.

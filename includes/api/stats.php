@@ -1,13 +1,13 @@
 <?php
-namespace Zentranslate\API;
+namespace GemTranslate\API;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\AI\TranslationMemory;
-use Zentranslate\Helper;
-use Zentranslate\Language\Context;
+use GemTranslate\AI\TranslationMemory;
+use GemTranslate\Helper;
+use GemTranslate\Language\Context;
 
 class Stats extends Controller {
 

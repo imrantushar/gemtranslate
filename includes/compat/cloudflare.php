@@ -1,5 +1,5 @@
 <?php
-namespace Zentranslate\Compat;
+namespace GemTranslate\Compat;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

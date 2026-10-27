@@ -1,9 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-	prefix: 'ztrans-',
-	important: '#zentranslate-admin-root',
+	prefix: 'gtrans-',
+	important: '#gemtranslate-admin-root',
 	content: [
-		'./dev_zentranslate/**/*.{js,jsx,ts,tsx}',
+		'./dev_gemtranslate/**/*.{js,jsx,ts,tsx}',
 		'./includes/admin/**/*.php',
 	],
 	corePlugins: {
@@ -12,7 +12,7 @@ module.exports = {
 	theme: {
 		extend: {
 			colors: {
-				ztrans: {
+				gtrans: {
 					primary: '#4338ca',
 					'primary-hover': '#3730a3',
 					accent: '#06b6d4',

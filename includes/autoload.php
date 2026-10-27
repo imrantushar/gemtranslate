@@ -1,14 +1,14 @@
 <?php
-namespace Zentranslate;
+namespace GemTranslate;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 /**
- * Custom autoloader for the Zentranslate namespace.
+ * Custom autoloader for the GemTranslate namespace.
  *
- * Maps `Zentranslate\Foo\BarBaz` -> `includes/foo/bar-baz.php`
+ * Maps `GemTranslate\Foo\BarBaz` -> `includes/foo/bar-baz.php`
  * (CamelCase -> kebab-case, backslash -> directory separator, lowercase).
  *
  * Patterned after Academy LMS's autoloader. No Composer required.
@@ -28,8 +28,8 @@ class Autoload {
 
 	/**
 	 * Register a directory for a namespace. Multiple directories may be added
-	 * for the SAME namespace — this is how zentranslate-pro maps its own
-	 * `Zentranslate\*` classes onto a second directory while keeping the free
+	 * for the SAME namespace — this is how gemtranslate-pro maps its own
+	 * `GemTranslate\*` classes onto a second directory while keeping the free
 	 * plugin's classes resolvable. Directories are searched in registration
 	 * order; the first readable file wins.
 	 */
@@ -63,7 +63,7 @@ class Autoload {
 	}
 
 	public function __construct() {
-		$this->add_namespace_directory( 'Zentranslate', ZTRANS_INCLUDES_DIR_PATH );
+		$this->add_namespace_directory( 'GemTranslate', GTRANS_INCLUDES_DIR_PATH );
 		spl_autoload_register( [ $this, 'autoload' ] );
 	}
 }

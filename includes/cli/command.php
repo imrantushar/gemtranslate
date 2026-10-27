@@ -1,35 +1,35 @@
 <?php
-namespace Zentranslate\Cli;
+namespace GemTranslate\Cli;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\AI\JobRunner;
-use Zentranslate\AI\TranslationMemory;
-use Zentranslate\AI\TranslatorFactory;
-use Zentranslate\I18n\PackGenerator;
-use Zentranslate\Language\Context;
-use Zentranslate\Language\LanguageRegistry;
-use Zentranslate\Migration\PolylangImporter;
-use Zentranslate\Migration\TranslatePressImporter;
-use Zentranslate\Migration\WpmlImporter;
-use Zentranslate\StringScanner\FileWalker;
-use Zentranslate\Translation\TranslationLoader;
+use GemTranslate\AI\JobRunner;
+use GemTranslate\AI\TranslationMemory;
+use GemTranslate\AI\TranslatorFactory;
+use GemTranslate\I18n\PackGenerator;
+use GemTranslate\Language\Context;
+use GemTranslate\Language\LanguageRegistry;
+use GemTranslate\Migration\PolylangImporter;
+use GemTranslate\Migration\TranslatePressImporter;
+use GemTranslate\Migration\WpmlImporter;
+use GemTranslate\StringScanner\FileWalker;
+use GemTranslate\Translation\TranslationLoader;
 
 /**
- * WP-CLI commands for Zentranslate.
+ * WP-CLI commands for GemTranslate.
  *
  * Usage:
- *   wp ztrans languages list
- *   wp ztrans languages add es --locale=es_ES --name=Spanish
- *   wp ztrans languages remove es
- *   wp ztrans pack generate es_ES --target-lang=es
- *   wp ztrans translate-all <lang> [--post-type=post] [--overwrite] [--limit=200]
- *   wp ztrans jobs status
- *   wp ztrans memory stats
- *   wp ztrans strings scan <target> (active_theme|all_plugins|/abs/path)
- *   wp ztrans migrate <source> (wpml|polylang|translatepress)
+ *   wp gtrans languages list
+ *   wp gtrans languages add es --locale=es_ES --name=Spanish
+ *   wp gtrans languages remove es
+ *   wp gtrans pack generate es_ES --target-lang=es
+ *   wp gtrans translate-all <lang> [--post-type=post] [--overwrite] [--limit=200]
+ *   wp gtrans jobs status
+ *   wp gtrans memory stats
+ *   wp gtrans strings scan <target> (active_theme|all_plugins|/abs/path)
+ *   wp gtrans migrate <source> (wpml|polylang|translatepress)
  *
  * Each subcommand prints WP-CLI tables / lines and exits with an error code
  * on failure (so it composes well in shell scripts).
@@ -40,7 +40,7 @@ class Command {
 		if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) {
 			return;
 		}
-		\WP_CLI::add_command( 'ztrans', __CLASS__ );
+		\WP_CLI::add_command( 'gtrans', __CLASS__ );
 	}
 
 	/**
@@ -198,7 +198,7 @@ class Command {
 	 */
 	public function translate_all( $args, $assoc ) {
 		if ( ! class_exists( JobRunner::class ) ) {
-			\WP_CLI::error( 'Bulk AI translation requires Zentranslate Pro.' );
+			\WP_CLI::error( 'Bulk AI translation requires GemTranslate Pro.' );
 		}
 		$lang = strtolower( (string) ( $args[0] ?? '' ) );
 		if ( '' === $lang || ! Context::is_active( $lang ) ) {
@@ -228,7 +228,7 @@ class Command {
 			$progress->tick();
 		}
 		$progress->finish();
-		\WP_CLI::success( "$queued jobs queued. Use 'wp ztrans jobs status' to monitor." );
+		\WP_CLI::success( "$queued jobs queued. Use 'wp gtrans jobs status' to monitor." );
 	}
 
 	/**
@@ -241,7 +241,7 @@ class Command {
 	 */
 	public function jobs( $args ) {
 		if ( ! class_exists( JobRunner::class ) ) {
-			\WP_CLI::error( 'The job queue requires Zentranslate Pro.' );
+			\WP_CLI::error( 'The job queue requires GemTranslate Pro.' );
 		}
 		$sub = $args[0] ?? 'status';
 		if ( 'status' === $sub ) {
@@ -251,7 +251,7 @@ class Command {
 		}
 		if ( 'clear' === $sub ) {
 			global $wpdb;
-			$rows = $wpdb->query( "DELETE FROM " . \Zentranslate\Helper::table( 'jobs' ) . " WHERE status IN ('success','failed')" );
+			$rows = $wpdb->query( "DELETE FROM " . \GemTranslate\Helper::table( 'jobs' ) . " WHERE status IN ('success','failed')" );
 			\WP_CLI::success( "Removed $rows finished jobs." );
 			return;
 		}
@@ -263,7 +263,7 @@ class Command {
 	 */
 	public function memory() {
 		if ( ! class_exists( TranslationMemory::class ) ) {
-			\WP_CLI::error( 'Translation memory requires Zentranslate Pro.' );
+			\WP_CLI::error( 'Translation memory requires GemTranslate Pro.' );
 		}
 		$stats = TranslationMemory::stats();
 		\WP_CLI\Utils\format_items( 'table', [ $stats ], [ 'entries', 'hits' ] );
@@ -280,7 +280,7 @@ class Command {
 	public function strings( $args ) {
 		$sub = $args[0] ?? '';
 		if ( 'scan' !== $sub ) {
-			\WP_CLI::error( "Usage: wp ztrans strings scan <target>" );
+			\WP_CLI::error( "Usage: wp gtrans strings scan <target>" );
 		}
 		$target = $args[1] ?? '';
 		switch ( $target ) {

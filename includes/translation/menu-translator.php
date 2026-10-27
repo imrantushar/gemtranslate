@@ -1,12 +1,12 @@
 <?php
-namespace Zentranslate\Translation;
+namespace GemTranslate\Translation;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Helper;
-use Zentranslate\Language\Context;
+use GemTranslate\Helper;
+use GemTranslate\Language\Context;
 
 /**
  * Translates WP nav menu item titles and optional URL overrides for the

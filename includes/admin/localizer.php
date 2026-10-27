@@ -1,14 +1,14 @@
 <?php
-namespace Zentranslate\Admin;
+namespace GemTranslate\Admin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Language\Context;
+use GemTranslate\Language\Context;
 
 /**
- * Bridges Zentranslate's per-user language preference to WordPress's locale
+ * Bridges GemTranslate's per-user language preference to WordPress's locale
  * system inside the admin. With the locale filter in place:
  *
  * - WP core admin strings load from their `.mo` file for the chosen locale
@@ -16,7 +16,7 @@ use Zentranslate\Language\Context;
  * - Plugin/theme strings using gettext flow through StringTranslator as
  *   usual; the locale filter aligns the underlying domain loading.
  * - `wp_set_script_translations` picks up the user's locale for the
- *   Zentranslate React admin, loading the matching `-{locale}-{handle}.json`.
+ *   GemTranslate React admin, loading the matching `-{locale}-{handle}.json`.
  */
 class Localizer {
 
@@ -36,7 +36,7 @@ class Localizer {
 	}
 
 	/**
-	 * Switch the admin locale to the current user's preferred Zentranslate
+	 * Switch the admin locale to the current user's preferred GemTranslate
 	 * language. Front-end requests are untouched.
 	 */
 	public static function filter_admin_locale( $locale ) {

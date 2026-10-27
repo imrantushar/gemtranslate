@@ -1,12 +1,12 @@
 <?php
-namespace Zentranslate\Translation;
+namespace GemTranslate\Translation;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Language\Context;
-use Zentranslate\Translation\EditorContext;
+use GemTranslate\Language\Context;
+use GemTranslate\Translation\EditorContext;
 
 /**
  * Swaps post fields (title, content, excerpt) for the current language via

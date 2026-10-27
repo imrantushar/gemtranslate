@@ -1,21 +1,21 @@
 <?php
-namespace Zentranslate\Admin;
+namespace GemTranslate\Admin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 /**
- * Per-user language assignment. A user with the `ztrans_translate_content`
- * cap can only operate on languages listed in their `ztrans_assigned_languages`
+ * Per-user language assignment. A user with the `gtrans_translate_content`
+ * cap can only operate on languages listed in their `gtrans_assigned_languages`
  * user meta. Admins (manage_options) bypass the scope entirely.
  *
- * Storage: user meta `ztrans_assigned_languages` is an array of language
+ * Storage: user meta `gtrans_assigned_languages` is an array of language
  * codes. An empty array means "all languages" (unrestricted translator).
  */
 class LanguageScope {
 
-	const META_KEY = 'ztrans_assigned_languages';
+	const META_KEY = 'gtrans_assigned_languages';
 
 	/**
 	 * Return the language codes a user is authorized to translate.
@@ -38,14 +38,14 @@ class LanguageScope {
 	 * Can the current user translate the given language?
 	 *
 	 * - Admins (manage_options) can translate anything.
-	 * - Otherwise, the user must have `ztrans_translate_content` AND either
+	 * - Otherwise, the user must have `gtrans_translate_content` AND either
 	 *   no scope set (unrestricted) or the language in their scope.
 	 */
 	public static function can_translate( $language_code ) {
 		if ( current_user_can( 'manage_options' ) ) {
 			return true;
 		}
-		if ( ! current_user_can( 'ztrans_translate_content' ) ) {
+		if ( ! current_user_can( 'gtrans_translate_content' ) ) {
 			return false;
 		}
 		$scope = self::for_user( get_current_user_id() );

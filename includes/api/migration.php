@@ -1,13 +1,13 @@
 <?php
-namespace Zentranslate\API;
+namespace GemTranslate\API;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Migration\PolylangImporter;
-use Zentranslate\Migration\TranslatePressImporter;
-use Zentranslate\Migration\WpmlImporter;
+use GemTranslate\Migration\PolylangImporter;
+use GemTranslate\Migration\TranslatePressImporter;
+use GemTranslate\Migration\WpmlImporter;
 
 class Migration extends Controller {
 
@@ -65,7 +65,7 @@ class Migration extends Controller {
 				$result = TranslatePressImporter::run();
 				break;
 			default:
-				return $this->fail( 'ztrans_unknown_source', __( 'Unknown migration source.', 'zentranslate' ), 400 );
+				return $this->fail( 'gtrans_unknown_source', __( 'Unknown migration source.', 'gemtranslate' ), 400 );
 		}
 		return $this->ok( $result->to_array() );
 	}

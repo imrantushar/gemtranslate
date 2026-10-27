@@ -1,13 +1,13 @@
 <?php
-namespace Zentranslate\Migration;
+namespace GemTranslate\Migration;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Helper;
-use Zentranslate\Language\LanguageRegistry;
-use Zentranslate\Translation\StringTranslator;
+use GemTranslate\Helper;
+use GemTranslate\Language\LanguageRegistry;
+use GemTranslate\Translation\StringTranslator;
 
 /**
  * TranslatePress importer.

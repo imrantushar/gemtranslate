@@ -1,12 +1,12 @@
 <?php
-namespace Zentranslate\API;
+namespace GemTranslate\API;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Language\Context;
-use Zentranslate\Translation\TermTranslator;
+use GemTranslate\Language\Context;
+use GemTranslate\Translation\TermTranslator;
 
 class TermTranslations extends Controller {
 
@@ -73,7 +73,7 @@ class TermTranslations extends Controller {
 		];
 		$terms = get_terms( $args );
 		if ( is_wp_error( $terms ) ) {
-			return $this->fail( 'ztrans_bad_taxonomy', $terms->get_error_message(), 400 );
+			return $this->fail( 'gtrans_bad_taxonomy', $terms->get_error_message(), 400 );
 		}
 
 		$rows = [];
@@ -99,7 +99,7 @@ class TermTranslations extends Controller {
 		$term_id = (int) $request['id'];
 		$term    = get_term( $term_id );
 		if ( ! $term || is_wp_error( $term ) ) {
-			return $this->fail( 'ztrans_not_found', __( 'Term not found.', 'zentranslate' ), 404 );
+			return $this->fail( 'gtrans_not_found', __( 'Term not found.', 'gemtranslate' ), 404 );
 		}
 
 		$existing = [];
@@ -135,12 +135,12 @@ class TermTranslations extends Controller {
 		$term_id = (int) $request['id'];
 		$lang    = strtolower( $request['lang'] );
 		if ( ! Context::is_active( $lang ) ) {
-			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_invalid_lang', __( 'Language is not active.', 'gemtranslate' ), 422 );
 		}
 		$body = $request->get_json_params() ?: $request->get_params();
 		$ok   = TermTranslator::save( $term_id, $lang, $body );
 		if ( ! $ok ) {
-			return $this->fail( 'ztrans_save_failed', __( 'Could not save translation.', 'zentranslate' ), 500 );
+			return $this->fail( 'gtrans_save_failed', __( 'Could not save translation.', 'gemtranslate' ), 500 );
 		}
 		return $this->get_translations( $request );
 	}

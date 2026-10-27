@@ -1,13 +1,13 @@
 <?php
-namespace Zentranslate\Translation;
+namespace GemTranslate\Translation;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Helper;
-use Zentranslate\Language\Context;
-use Zentranslate\Language\CountryContext;
+use GemTranslate\Helper;
+use GemTranslate\Language\Context;
+use GemTranslate\Language\CountryContext;
 
 /**
  * Looks up translations by post ID, language, and visitor country. Lookups are
@@ -214,14 +214,14 @@ class TranslationLoader {
 		);
 		$new_group = (int) $wpdb->insert_id;
 		if ( $new_group ) {
-			update_post_meta( $post_id, '_ztrans_group_id', $new_group );
-			update_post_meta( $post_id, '_ztrans_source_lang', $source );
+			update_post_meta( $post_id, '_gtrans_group_id', $new_group );
+			update_post_meta( $post_id, '_gtrans_source_lang', $source );
 		}
 		return $new_group;
 	}
 
 	public static function group_id_for_post( $post_id ) {
-		$group = (int) get_post_meta( (int) $post_id, '_ztrans_group_id', true );
+		$group = (int) get_post_meta( (int) $post_id, '_gtrans_group_id', true );
 		return $group > 0 ? $group : 0;
 	}
 
@@ -265,7 +265,7 @@ class TranslationLoader {
 	}
 
 	/**
-	 * Hash of the source content. Stored as `_ztrans_source_hash` post meta on
+	 * Hash of the source content. Stored as `_gtrans_source_hash` post meta on
 	 * the source post; translations record the hash they were derived from in
 	 * the `source_hash` column. Translation is "stale" when those differ.
 	 */
@@ -280,7 +280,7 @@ class TranslationLoader {
 	}
 
 	public static function get_source_hash( $post_id ) {
-		return (string) get_post_meta( (int) $post_id, '_ztrans_source_hash', true );
+		return (string) get_post_meta( (int) $post_id, '_gtrans_source_hash', true );
 	}
 
 	/**
@@ -293,7 +293,7 @@ class TranslationLoader {
 		if ( $fresh === $current ) {
 			return false;
 		}
-		update_post_meta( (int) $post_id, '_ztrans_source_hash', $fresh );
+		update_post_meta( (int) $post_id, '_gtrans_source_hash', $fresh );
 		return true;
 	}
 
@@ -465,7 +465,7 @@ class TranslationLoader {
 		}
 
 		$context   = self::string_context_for_group( $group_id );
-		$string_id = StringTranslator::register_string( $source, 'ztrans:post', $context );
+		$string_id = StringTranslator::register_string( $source, 'gtrans:post', $context );
 		if ( ! $string_id ) {
 			return false;
 		}
@@ -507,7 +507,7 @@ class TranslationLoader {
 				   AND s.context = %s
 				   AND t.language_code = %s
 				   AND t.value <> ''",
-				'ztrans:post',
+				'gtrans:post',
 				self::string_context_for_group( $group_id ),
 				strtolower( $language_code )
 			),

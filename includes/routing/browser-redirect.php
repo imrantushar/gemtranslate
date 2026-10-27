@@ -1,16 +1,16 @@
 <?php
-namespace Zentranslate\Routing;
+namespace GemTranslate\Routing;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Language\Context;
+use GemTranslate\Language\Context;
 
 /**
  * First-visit redirect based on `Accept-Language`.
  *
- * On the very first hit (no `ztrans_user_lang` cookie set) and ONLY on
+ * On the very first hit (no `gtrans_user_lang` cookie set) and ONLY on
  * default-language URLs, we match the visitor's preferred languages
  * against active site languages and 302 to the matched language root.
  *
@@ -19,7 +19,7 @@ use Zentranslate\Language\Context;
  */
 class BrowserRedirect {
 
-	const COOKIE = 'ztrans_user_lang';
+	const COOKIE = 'gtrans_user_lang';
 
 	public static function init() {
 		add_action( 'template_redirect', [ __CLASS__, 'maybe_redirect' ], 1 );
@@ -29,7 +29,7 @@ class BrowserRedirect {
 	}
 
 	public static function enabled() {
-		$raw = get_option( ZTRANS_SETTINGS_NAME, '{}' );
+		$raw = get_option( GTRANS_SETTINGS_NAME, '{}' );
 		$cfg = json_decode( $raw, true ) ?: [];
 		return ! empty( $cfg['auto_redirect_browser_lang'] );
 	}

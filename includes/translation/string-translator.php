@@ -1,12 +1,12 @@
 <?php
-namespace Zentranslate\Translation;
+namespace GemTranslate\Translation;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Helper;
-use Zentranslate\Language\Context;
+use GemTranslate\Helper;
+use GemTranslate\Language\Context;
 
 /**
  * Runtime gettext override. Translates __() / _e() / esc_html__() etc.

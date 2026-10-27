@@ -1,29 +1,29 @@
 <?php
-namespace Zentranslate\I18n;
+namespace GemTranslate\I18n;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\AI\Glossary;
-use Zentranslate\AI\TranslationMemory;
-use Zentranslate\AI\TranslatorFactory;
-use Zentranslate\Language\Context;
-use Zentranslate\Translation\StringTranslator;
+use GemTranslate\AI\Glossary;
+use GemTranslate\AI\TranslationMemory;
+use GemTranslate\AI\TranslatorFactory;
+use GemTranslate\Language\Context;
+use GemTranslate\Translation\StringTranslator;
 
 /**
  * Generates language packs (PO + MO + per-script JSON) using the configured
  * AI translator.
  *
  * Two modes:
- *   - Legacy mode (`$opts['domain']` unset) — reads `languages/zentranslate.pot`,
- *     translates with AI, writes `zentranslate-{locale}.po/mo/json` next to
+ *   - Legacy mode (`$opts['domain']` unset) — reads `languages/gemtranslate.pot`,
+ *     translates with AI, writes `gemtranslate-{locale}.po/mo/json` next to
  *     the .pot. Kept for the WP-CLI / programmatic path that used to back the
  *     "Plugin translations" admin page.
  *
  *   - Per-domain mode (`$opts['domain']` set) — pulls entries from our
- *     `wp_ztrans_strings` table for the given text-domain, uses any existing
- *     translations from `wp_ztrans_string_translations` first, falls back to
+ *     `wp_gtrans_strings` table for the given text-domain, uses any existing
+ *     translations from `wp_gtrans_string_translations` first, falls back to
  *     AI for anything still untranslated, and writes the resulting files into
  *     `wp-content/languages/plugins/{domain}-{locale}.po/mo` — the canonical
  *     location WordPress auto-loads via `load_plugin_textdomain()`.
@@ -37,11 +37,11 @@ class PackGenerator {
 	const BATCH_SIZE = 25;
 
 	public static function languages_dir() {
-		return trailingslashit( ZTRANS_ROOT_DIR_PATH . 'languages' );
+		return trailingslashit( GTRANS_ROOT_DIR_PATH . 'languages' );
 	}
 
 	public static function pot_path() {
-		return self::languages_dir() . 'zentranslate.pot';
+		return self::languages_dir() . 'gemtranslate.pot';
 	}
 
 	/**
@@ -61,11 +61,11 @@ class PackGenerator {
 		if ( ! is_dir( $dir ) ) {
 			return $out;
 		}
-		foreach ( glob( $dir . 'zentranslate-*.po' ) as $po ) {
+		foreach ( glob( $dir . 'gemtranslate-*.po' ) as $po ) {
 			$base   = basename( $po, '.po' );
-			$locale = substr( $base, strlen( 'zentranslate-' ) );
-			$mo     = $dir . 'zentranslate-' . $locale . '.mo';
-			$jsons  = glob( $dir . 'zentranslate-' . $locale . '-*.json' );
+			$locale = substr( $base, strlen( 'gemtranslate-' ) );
+			$mo     = $dir . 'gemtranslate-' . $locale . '.mo';
+			$jsons  = glob( $dir . 'gemtranslate-' . $locale . '-*.json' );
 			$out[ $locale ] = [
 				'locale'    => $locale,
 				'po'        => file_exists( $po ),
@@ -81,8 +81,8 @@ class PackGenerator {
 	/**
 	 * Generate (or refresh) a language pack for the given locale.
 	 *
-	 * In per-domain mode, the entry list comes from `wp_ztrans_strings` and
-	 * any user-supplied translations already in `wp_ztrans_string_translations`
+	 * In per-domain mode, the entry list comes from `wp_gtrans_strings` and
+	 * any user-supplied translations already in `wp_gtrans_string_translations`
 	 * are used verbatim — AI fill is reserved for whatever is still missing
 	 * AND when `$opts['ai_fill']` is true (default true).
 	 *
@@ -97,30 +97,30 @@ class PackGenerator {
 		$exclude_status = (string) ( $opts['exclude_status'] ?? '' );
 
 		if ( '' === $domain ) {
-			return self::generate_legacy_zentranslate_pack( $target_lang, $locale, $ai_fill );
+			return self::generate_legacy_gemtranslate_pack( $target_lang, $locale, $ai_fill );
 		}
 		return self::generate_for_domain( $target_lang, $locale, $domain, $ai_fill, $exclude_status );
 	}
 
 	/**
-	 * Legacy path: read zentranslate.pot, AI-translate, write packs into the
+	 * Legacy path: read gemtranslate.pot, AI-translate, write packs into the
 	 * plugin's own `languages/` folder. One existing caller — the WP-CLI
 	 * commands. The "Plugin translations" admin page is being removed in v1.4.
 	 */
-	private static function generate_legacy_zentranslate_pack( $target_lang, $locale, $ai_fill ) {
+	private static function generate_legacy_gemtranslate_pack( $target_lang, $locale, $ai_fill ) {
 		$pot = self::pot_path();
 		if ( ! file_exists( $pot ) ) {
-			return new \WP_Error( 'ztrans_no_pot', __( 'languages/zentranslate.pot is missing. Run `wp i18n make-pot` first.', 'zentranslate' ) );
+			return new \WP_Error( 'gtrans_no_pot', __( 'languages/gemtranslate.pot is missing. Run `wp i18n make-pot` first.', 'gemtranslate' ) );
 		}
 
 		$translator = $ai_fill ? TranslatorFactory::default_translator() : null;
 		if ( $ai_fill && ! $translator ) {
-			return new \WP_Error( 'ztrans_no_provider', __( 'Configure an AI provider before generating packs.', 'zentranslate' ) );
+			return new \WP_Error( 'gtrans_no_provider', __( 'Configure an AI provider before generating packs.', 'gemtranslate' ) );
 		}
 
 		$entries = PotParser::parse_file( $pot );
 		if ( empty( $entries ) ) {
-			return new \WP_Error( 'ztrans_empty_pot', __( 'POT file has no translatable strings.', 'zentranslate' ) );
+			return new \WP_Error( 'gtrans_empty_pot', __( 'POT file has no translatable strings.', 'gemtranslate' ) );
 		}
 
 		$source_lang = Context::default_code();
@@ -137,8 +137,8 @@ class PackGenerator {
 		}
 
 		$dir     = self::languages_dir();
-		$po_path = $dir . 'zentranslate-' . $locale . '.po';
-		$mo_path = $dir . 'zentranslate-' . $locale . '.mo';
+		$po_path = $dir . 'gemtranslate-' . $locale . '.po';
+		$mo_path = $dir . 'gemtranslate-' . $locale . '.mo';
 
 		self::write_po( $out_entries, $po_path, $locale );
 		MoWriter::write( $out_entries, $mo_path );
@@ -154,7 +154,7 @@ class PackGenerator {
 	}
 
 	/**
-	 * Per-domain path: pull entries from `wp_ztrans_strings` + their
+	 * Per-domain path: pull entries from `wp_gtrans_strings` + their
 	 * translations, optionally AI-fill the gaps, write to
 	 * `wp-content/languages/plugins/{domain}-{locale}.po/mo`. WordPress
 	 * auto-loads these via `load_plugin_textdomain()`.
@@ -169,10 +169,10 @@ class PackGenerator {
 		$rows = $listing['rows'] ?? [];
 		if ( empty( $rows ) ) {
 			return new \WP_Error(
-				'ztrans_empty_domain',
+				'gtrans_empty_domain',
 				sprintf(
 					/* translators: %s: text domain. */
-					__( 'No strings registered for domain "%s". Run a scan first.', 'zentranslate' ),
+					__( 'No strings registered for domain "%s". Run a scan first.', 'gemtranslate' ),
 					$domain
 				)
 			);
@@ -228,7 +228,7 @@ class PackGenerator {
 
 		$dir = self::plugins_languages_dir();
 		if ( ! wp_mkdir_p( $dir ) ) {
-			return new \WP_Error( 'ztrans_mkdir_failed', __( 'Could not create wp-content/languages/plugins/ directory.', 'zentranslate' ) );
+			return new \WP_Error( 'gtrans_mkdir_failed', __( 'Could not create wp-content/languages/plugins/ directory.', 'gemtranslate' ) );
 		}
 		$po_path = $dir . $domain . '-' . $locale . '.po';
 		$mo_path = $dir . $domain . '-' . $locale . '.mo';
@@ -310,7 +310,7 @@ class PackGenerator {
 
 	public static function delete( $locale ) {
 		$dir = self::languages_dir();
-		$pattern = 'zentranslate-' . $locale;
+		$pattern = 'gemtranslate-' . $locale;
 		$removed = 0;
 		foreach ( glob( $dir . $pattern . '*' ) as $path ) {
 			if ( @unlink( $path ) ) {
@@ -326,7 +326,7 @@ class PackGenerator {
 		$lines[] = 'msgstr ""';
 		$lines[] = '"Content-Type: text/plain; charset=UTF-8\\n"';
 		$lines[] = '"Language: ' . PotParser::escape( $locale ) . '\\n"';
-		$lines[] = '"X-Generator: Zentranslate AI Pack Generator\\n"';
+		$lines[] = '"X-Generator: GemTranslate AI Pack Generator\\n"';
 		$lines[] = '';
 
 		foreach ( $entries as $e ) {
@@ -345,11 +345,11 @@ class PackGenerator {
 
 	private static function write_json( array $entries, $dir, $locale ) {
 		// We write a "language-pack-style" JSON-ed messages bag keyed by msgid.
-		// WordPress's runtime looks for `zentranslate-{locale}-{md5(path)}.json`
+		// WordPress's runtime looks for `gemtranslate-{locale}-{md5(path)}.json`
 		// per script. Since we don't know which JS file each string came from,
 		// we write to the canonical handle used by our admin script.
-		$handle    = 'zentranslate-backend'; // matches wp_enqueue_script handle
-		$file_name = sprintf( 'zentranslate-%s-%s.json', $locale, md5( 'assets/build/backend.' . ZTRANS_VERSION . '.js' ) );
+		$handle    = 'gemtranslate-backend'; // matches wp_enqueue_script handle
+		$file_name = sprintf( 'gemtranslate-%s-%s.json', $locale, md5( 'assets/build/backend.' . GTRANS_VERSION . '.js' ) );
 		$messages  = [];
 		foreach ( $entries as $e ) {
 			if ( '' === $e['msgstr'] ) {
@@ -360,7 +360,7 @@ class PackGenerator {
 		}
 		$payload = [
 			'translation-revision-date' => gmdate( 'Y-m-d H:i:s+0000' ),
-			'generator'                  => 'zentranslate',
+			'generator'                  => 'gemtranslate',
 			'domain'                     => 'messages',
 			'locale_data'                => [
 				'messages' => array_merge(

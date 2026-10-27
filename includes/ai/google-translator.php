@@ -1,5 +1,5 @@
 <?php
-namespace Zentranslate\AI;
+namespace GemTranslate\AI;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -25,7 +25,7 @@ class GoogleTranslator implements TranslatorInterface {
 
 	public function translate( $texts, $source_lang, $target_lang, $context = [] ) {
 		if ( empty( $this->api_key ) ) {
-			return new \WP_Error( 'ztrans_no_key', __( 'Google API key is not configured.', 'zentranslate' ) );
+			return new \WP_Error( 'gtrans_no_key', __( 'Google API key is not configured.', 'gemtranslate' ) );
 		}
 		$is_array = is_array( $texts );
 		$batch    = $is_array ? array_values( $texts ) : [ (string) $texts ];
@@ -63,12 +63,12 @@ class GoogleTranslator implements TranslatorInterface {
 		$code = (int) wp_remote_retrieve_response_code( $response );
 		$raw  = wp_remote_retrieve_body( $response );
 		if ( $code < 200 || $code >= 300 ) {
-			return new \WP_Error( 'ztrans_google_http_' . $code, $raw ?: 'Google error', [ 'status' => $code ] );
+			return new \WP_Error( 'gtrans_google_http_' . $code, $raw ?: 'Google error', [ 'status' => $code ] );
 		}
 		$data = json_decode( $raw, true );
 		$rows = $data['data']['translations'] ?? [];
 		if ( empty( $rows ) ) {
-			return new \WP_Error( 'ztrans_google_empty', __( 'Google returned no translations.', 'zentranslate' ) );
+			return new \WP_Error( 'gtrans_google_empty', __( 'Google returned no translations.', 'gemtranslate' ) );
 		}
 		$translations = array_map( fn( $r ) => html_entity_decode( $r['translatedText'] ?? '', ENT_QUOTES, 'UTF-8' ), $rows );
 		if ( ! $is_array ) {

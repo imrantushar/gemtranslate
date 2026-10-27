@@ -1,17 +1,17 @@
 <?php
-namespace Zentranslate\Frontend;
+namespace GemTranslate\Frontend;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Language\Context;
-use Zentranslate\Routing\UrlRewriter;
+use GemTranslate\Language\Context;
+use GemTranslate\Routing\UrlRewriter;
 
 /**
  * Renders a list of active languages as switch links.
  *
- * Shortcode: [zentranslate_language_switcher]
+ * Shortcode: [gemtranslate_language_switcher]
  *   display="dropdown|inline" (default: inline)
  *   show_flag="1|0"           (default: 1)
  *   show_name="1|0"           (default: 1)
@@ -21,7 +21,7 @@ class LanguageSwitcher {
 
 	public static function init() {
 		$self = new self();
-		add_shortcode( 'zentranslate_language_switcher', [ $self, 'render_shortcode' ] );
+		add_shortcode( 'gemtranslate_language_switcher', [ $self, 'render_shortcode' ] );
 	}
 
 	public function render_shortcode( $atts ) {
@@ -37,7 +37,7 @@ class LanguageSwitcher {
 				'hide_current'  => $s['switcher_hide_current'] ? '1' : '0',
 			],
 			$atts,
-			'zentranslate_language_switcher'
+			'gemtranslate_language_switcher'
 		);
 
 		$languages = Context::active_languages();
@@ -66,7 +66,7 @@ class LanguageSwitcher {
 			$label = $this->build_label( $row, $atts );
 
 			$items[] = sprintf(
-				'<li class="ztrans-switcher-item%s"><a href="%s" hreflang="%s" lang="%s"%s>%s</a></li>',
+				'<li class="gtrans-switcher-item%s"><a href="%s" hreflang="%s" lang="%s"%s>%s</a></li>',
 				$is_current ? ' is-current' : '',
 				esc_url( $url ),
 				esc_attr( $row['code'] ),
@@ -80,7 +80,7 @@ class LanguageSwitcher {
 			return '';
 		}
 
-		$class = 'ztrans-switcher ztrans-switcher--' . sanitize_html_class( $atts['display'] );
+		$class = 'gtrans-switcher gtrans-switcher--' . sanitize_html_class( $atts['display'] );
 
 		if ( 'dropdown' === $atts['display'] ) {
 			return $this->render_dropdown( $items, $class );
@@ -89,8 +89,8 @@ class LanguageSwitcher {
 	}
 
 	private function render_dropdown( $items, $class ) {
-		$summary = '<summary class="ztrans-switcher-toggle">' . esc_html__( 'Language', 'zentranslate' ) . '</summary>';
-		return '<details class="' . esc_attr( $class ) . '">' . $summary . '<ul class="ztrans-switcher-dropdown-list">' . implode( '', $items ) . '</ul></details>';
+		$summary = '<summary class="gtrans-switcher-toggle">' . esc_html__( 'Language', 'gemtranslate' ) . '</summary>';
+		return '<details class="' . esc_attr( $class ) . '">' . $summary . '<ul class="gtrans-switcher-dropdown-list">' . implode( '', $items ) . '</ul></details>';
 	}
 
 	/**
@@ -99,7 +99,7 @@ class LanguageSwitcher {
 	 * switcher works even before the settings API is called.
 	 */
 	private function saved_settings() {
-		$g = $GLOBALS['ztrans_settings'] ?? null;
+		$g = $GLOBALS['gtrans_settings'] ?? null;
 		return [
 			'switcher_display'        => isset( $g->switcher_display ) ? (string) $g->switcher_display : 'inline',
 			'switcher_show_flag'      => isset( $g->switcher_show_flag ) ? (bool) $g->switcher_show_flag : true,
@@ -116,20 +116,20 @@ class LanguageSwitcher {
 
 		if ( '1' === (string) $atts['show_flag'] && ! empty( $row['flag'] ) ) {
 			$parts[] = sprintf(
-				'<span class="ztrans-switcher-flag" aria-hidden="true">%s</span>',
+				'<span class="gtrans-switcher-flag" aria-hidden="true">%s</span>',
 				esc_html( $this->flag_emoji( $row['flag'] ) )
 			);
 		}
 		if ( '1' === (string) $atts['show_name'] ) {
-			$parts[] = '<span class="ztrans-switcher-name">' . esc_html( $row['name'] ) . '</span>';
+			$parts[] = '<span class="gtrans-switcher-name">' . esc_html( $row['name'] ) . '</span>';
 		}
 		if ( '1' === (string) $atts['show_native'] && '1' !== (string) $atts['show_name'] ) {
-			$parts[] = '<span class="ztrans-switcher-native">' . esc_html( $row['native_name'] ) . '</span>';
+			$parts[] = '<span class="gtrans-switcher-native">' . esc_html( $row['native_name'] ) . '</span>';
 		} elseif ( '1' === (string) $atts['show_native'] ) {
-			$parts[] = '<span class="ztrans-switcher-native">(' . esc_html( $row['native_name'] ) . ')</span>';
+			$parts[] = '<span class="gtrans-switcher-native">(' . esc_html( $row['native_name'] ) . ')</span>';
 		}
 		if ( '1' === (string) ( $atts['show_code'] ?? '0' ) ) {
-			$parts[] = '<span class="ztrans-switcher-code">(' . esc_html( $row['code'] ) . ')</span>';
+			$parts[] = '<span class="gtrans-switcher-code">(' . esc_html( $row['code'] ) . ')</span>';
 		}
 
 		return implode( ' ', $parts );
