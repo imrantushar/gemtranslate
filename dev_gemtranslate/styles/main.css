@@ -46,6 +46,13 @@ body.toplevel_page_gemtranslate #wpfooter {
 	color: var(--gtrans-warn-muted);
 }
 
+/* Topbar stays pinned under the wp-admin bar while the page scrolls. */
+#gemtranslate-admin-root .gtrans-topbar {
+	position: sticky;
+	top: var(--wp-admin--admin-bar--height, 32px);
+	z-index: 100;
+}
+
 #gemtranslate-admin-root .gtrans-app {
 	@apply gtrans-flex gtrans-flex-col gtrans-min-h-[calc(100vh-32px)];
 }
