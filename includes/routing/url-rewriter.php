@@ -27,6 +27,24 @@ class UrlRewriter {
 		add_filter( 'post_type_link', [ $self, 'filter_post_link' ], 10, 2 );
 		add_filter( 'term_link', [ $self, 'filter_term_link' ], 10, 3 );
 		add_filter( 'attachment_link', [ $self, 'filter_post_link' ], 10, 2 );
+
+		// Prevent redirect_canonical from fighting the language prefix:
+		// WP computes its "canonical" from home_url (which we rewrite) and
+		// then flags the request as non-canonical because the queried-object
+		// permalink isn't aware of /{lang}/, producing a redirect to the SAME
+		// URL (/{lang}/ → /{lang}/) that browsers register as a loop.
+		add_filter( 'redirect_canonical', [ $self, 'short_circuit_canonical' ], 10, 2 );
+	}
+
+	/**
+	 * Return false on any non-default-language request to stop WP from
+	 * emitting a canonical redirect that collides with /{lang}/ routing.
+	 */
+	public function short_circuit_canonical( $redirect_url, $requested_url ) {
+		if ( Context::is_default() ) {
+			return $redirect_url;
+		}
+		return false;
 	}
 
 	/**
