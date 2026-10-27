@@ -61,7 +61,7 @@ export default function TranslatorsPage() {
 
 			<Card table>
 				{list.data.length === 0 ? (
-					<Table.Empty>
+					<Table.Empty columns={[__('User', 'gemtranslate'), __('Roles', 'gemtranslate'), __('Languages', 'gemtranslate'), '']}>
 						{__('No users with translator access. Edit users and assign them the Translator role or grant the gtrans_translate_content capability.', 'gemtranslate')}
 					</Table.Empty>
 				) : (

@@ -104,7 +104,7 @@ export default function MenusPage() {
 				{items.isLoading ? (
 					<TableSkeleton />
 				) : (items.data || []).length === 0 ? (
-					<Table.Empty>
+					<Table.Empty columns={[__('Original', 'gemtranslate'), __('Translation', 'gemtranslate'), __('URL override', 'gemtranslate'), '']}>
 						{__('No menu items.', 'gemtranslate')}
 					</Table.Empty>
 				) : (

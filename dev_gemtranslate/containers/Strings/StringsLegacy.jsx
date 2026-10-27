@@ -137,7 +137,7 @@ export default function StringsLegacy() {
 				{strings.isLoading ? (
 					<TableSkeleton />
 				) : (strings.data?.rows || []).length === 0 ? (
-					<Table.Empty>
+					<Table.Empty columns={[__('Source', 'gemtranslate'), __('Translation', 'gemtranslate'), __('Domain', 'gemtranslate'), '']}>
 						{__('No strings yet. Scan a theme or plugin to populate this list.', 'gemtranslate')}
 					</Table.Empty>
 				) : (

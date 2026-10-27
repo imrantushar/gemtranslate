@@ -122,7 +122,7 @@ export default function TermsPage() {
 				{terms.isLoading ? (
 					<TableSkeleton />
 				) : (terms.data?.rows || []).length === 0 ? (
-					<Table.Empty>
+					<Table.Empty columns={[__('Name', 'gemtranslate'), __('Slug', 'gemtranslate'), __('Count', 'gemtranslate'), '']}>
 						{__('No terms found.', 'gemtranslate')}
 					</Table.Empty>
 				) : (

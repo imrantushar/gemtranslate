@@ -119,7 +119,7 @@ export default function GlossaryPage() {
 
 			<Card table title={__('Existing terms', 'gemtranslate')}>
 				{(list.data || []).length === 0 ? (
-					<Table.Empty>
+					<Table.Empty columns={[__('Source', 'gemtranslate'), __('Target', 'gemtranslate'), __('Pair', 'gemtranslate'), __('Flags', 'gemtranslate'), '']}>
 						{__('No glossary entries yet.', 'gemtranslate')}
 					</Table.Empty>
 				) : (

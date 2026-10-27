@@ -343,7 +343,7 @@ export default function PackageEditor() {
 
 				{/* ---- Rows ---- */}
 				{rows.length === 0 ? (
-					<Table.Empty>
+					<Table.Empty columns={[__('Source', 'gemtranslate'), __('Translation', 'gemtranslate'), '']}>
 						{statusFilter === 'untranslated'
 							? __('Nothing untranslated. Nice work.', 'gemtranslate')
 							: __('No strings match.', 'gemtranslate')}

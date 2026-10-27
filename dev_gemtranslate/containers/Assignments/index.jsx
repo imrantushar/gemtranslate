@@ -114,7 +114,7 @@ export default function AssignmentsPage() {
 				{list.isLoading ? (
 					<TableSkeleton />
 				) : rows.length === 0 ? (
-					<Table.Empty>
+					<Table.Empty columns={[__('Content', 'gemtranslate'), __('Language', 'gemtranslate'), __('Translator', 'gemtranslate'), __('Status', 'gemtranslate'), '']}>
 						{__('No assignments yet.', 'gemtranslate')}
 					</Table.Empty>
 				) : (

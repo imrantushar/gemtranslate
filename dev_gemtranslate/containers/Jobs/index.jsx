@@ -88,7 +88,7 @@ export default function JobsPage() {
 				{jobs.isLoading ? (
 					<TableSkeleton />
 				) : (jobs.data?.rows || []).length === 0 ? (
-					<Table.Empty>
+					<Table.Empty columns={['#', __('Type', 'gemtranslate'), __('Status', 'gemtranslate'), __('Payload', 'gemtranslate'), __('Attempts', 'gemtranslate'), __('Updated', 'gemtranslate'), '']}>
 						{__('No jobs in this view.', 'gemtranslate')}
 					</Table.Empty>
 				) : (

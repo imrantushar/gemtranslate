@@ -93,7 +93,7 @@ export default function ReviewPage() {
 				{queue.isLoading ? (
 					<TableSkeleton />
 				) : rows.length === 0 ? (
-					<Table.Empty>
+					<Table.Empty columns={[__('Content', 'gemtranslate'), __('Language', 'gemtranslate'), __('Preview', 'gemtranslate'), __('Actions', 'gemtranslate')]}>
 						{__(
 							'Nothing waiting for review. New automatic translations will appear here when "Hold for review" is on.',
 							'gemtranslate'

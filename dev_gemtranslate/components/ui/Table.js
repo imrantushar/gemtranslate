@@ -82,14 +82,31 @@ const Toolbar = ({ as: Tag = 'div', variant, className = '', children, ...rest }
 /**
  * Empty state shown in place of a table with no rows — the GemCRM
  * "No Data Available!!!" illustration, heading and a one-line hint (children).
+ * Pass `columns` (header labels) to keep the table's header band above it, as GemCRM does.
  */
-const Empty = ({ title, children, className = '' }) => {
+const Empty = ({ title, columns = [], children, className = '' }) => {
 	const { isDark } = useThemeMode();
 	const file = isDark ? 'dark-NoDataAvailable.svg' : 'NoDataAvailable.svg';
 	const base = window.gtrans?.pluginUrl || '';
 
 	return (
 		<div className={cx('gtrans-text-center', className)}>
+			{columns.length > 0 && (
+				<table className="gtrans-w-full gtrans-border-collapse gtrans-text-left gtrans-text-sm">
+					<thead>
+						<tr>
+							{columns.map((label, i) => (
+								<th
+									key={i}
+									className="gtrans-whitespace-nowrap gtrans-bg-body gtrans-px-3 gtrans-py-3.5 gtrans-text-left gtrans-text-sm gtrans-font-semibold gtrans-text-ink first:gtrans-rounded-l last:gtrans-rounded-r"
+								>
+									{label}
+								</th>
+							))}
+						</tr>
+					</thead>
+				</table>
+			)}
 			<img
 				src={`${base}assets/images/${file}`}
 				alt=""

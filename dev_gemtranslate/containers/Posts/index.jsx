@@ -171,7 +171,7 @@ export default function PostsPage() {
 				{posts.isLoading ? (
 					<TableSkeleton />
 				) : posts.data?.rows.length === 0 ? (
-					<Table.Empty>
+					<Table.Empty columns={['', __('Title', 'gemtranslate'), __('Status', 'gemtranslate'), '']}>
 						{__('No posts found.', 'gemtranslate')}
 					</Table.Empty>
 				) : (
