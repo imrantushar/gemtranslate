@@ -197,27 +197,20 @@ class TranslationLoader {
 	 */
 	public static function ensure_group_for_post( $post_id, $source_language = null ) {
 		$post_id = (int) $post_id;
-		$group   = self::group_id_for_post( $post_id );
+		if ( $post_id <= 0 ) {
+			return 0;
+		}
+		$group = self::group_id_for_post( $post_id );
 		if ( $group ) {
 			return $group;
 		}
-		global $wpdb;
-		$table   = Helper::table( 'translation_groups' );
-		$source  = $source_language ?: Context::default_code();
-		$wpdb->insert(
-			$table,
-			[
-				'object_type'     => 'post',
-				'source_language' => $source,
-				'created_at'      => Helper::get_time(),
-			]
-		);
-		$new_group = (int) $wpdb->insert_id;
-		if ( $new_group ) {
-			update_post_meta( $post_id, '_gtrans_group_id', $new_group );
-			update_post_meta( $post_id, '_gtrans_source_lang', $source );
-		}
-		return $new_group;
+		// group_id == source post_id. Post IDs are globally unique within a site
+		// and already auto-allocated by WP, so no dedicated groups table is
+		// needed. Scope is per table (post_translations rows only).
+		$source = $source_language ?: Context::default_code();
+		update_post_meta( $post_id, '_gtrans_group_id', $post_id );
+		update_post_meta( $post_id, '_gtrans_source_lang', $source );
+		return $post_id;
 	}
 
 	public static function group_id_for_post( $post_id ) {

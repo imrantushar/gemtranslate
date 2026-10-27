@@ -70,8 +70,8 @@ class Multisite {
 		global $wpdb;
 		$prefix = $wpdb->prefix . 'gtrans_';
 		$tables = [
-			'languages', 'translation_groups', 'post_translations', 'term_translations',
-			'menu_translations', 'strings', 'string_translations', 'seo_meta', 'slugs',
+			'languages', 'post_translations', 'term_translations',
+			'menu_translations', 'strings', 'string_translations', 'seo_meta',
 			'jobs', 'translation_memory', 'glossary', 'post_meta_translations',
 		];
 		foreach ( $tables as $t ) {

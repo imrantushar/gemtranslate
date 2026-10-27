@@ -85,6 +85,6 @@ if ( ! function_exists( 'gtrans_flush_rewrite_rules' ) ) {
 	 * Schedule a rewrite-rules flush at the next `init`.
 	 */
 	function gtrans_flush_rewrite_rules() {
-		update_option( 'gtrans_required_rewrite_flush', 'yes' );
+		\GemTranslate\Helper::meta_set( 'required_rewrite_flush', 'yes' );
 	}
 }

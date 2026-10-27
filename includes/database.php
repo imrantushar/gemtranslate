@@ -16,8 +16,8 @@ class Database {
 	}
 
 	public function maybe_flush_rewrite_rules() {
-		if ( 'yes' === get_option( 'gtrans_required_rewrite_flush' ) ) {
-			update_option( 'gtrans_required_rewrite_flush', 'no' );
+		if ( 'yes' === Helper::meta_get( 'required_rewrite_flush' ) ) {
+			Helper::meta_set( 'required_rewrite_flush', 'no' );
 			flush_rewrite_rules();
 		}
 	}

@@ -38,10 +38,10 @@ if ( ! function_exists( 'gtrans_maybe_grant_caps' ) ) {
 	 * with a one-shot option so the role lookup runs only once.
 	 */
 	function gtrans_maybe_grant_caps() {
-		if ( 'yes' === get_option( 'gtrans_caps_granted' ) ) {
+		if ( 'yes' === GemTranslate\Helper::meta_get( 'caps_granted' ) ) {
 			return;
 		}
 		( new GemTranslate\Installer() )->add_capabilities();
-		update_option( 'gtrans_caps_granted', 'yes', false );
+		GemTranslate\Helper::meta_set( 'caps_granted', 'yes' );
 	}
 }

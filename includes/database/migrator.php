@@ -32,15 +32,13 @@ class Migrator {
 		// seo_meta, post_meta_translations, post_translation_revisions) are
 		// created by gemtranslate-pro's own migrator.
 		CreateLanguagesTable::up( $prefix, $charset_collate );
-		CreateTranslationGroupsTable::up( $prefix, $charset_collate );
 		CreatePostTranslationsTable::up( $prefix, $charset_collate );
 		CreateTermTranslationsTable::up( $prefix, $charset_collate );
 		CreateMenuTranslationsTable::up( $prefix, $charset_collate );
 		CreateStringsTable::up( $prefix, $charset_collate );
 		CreateStringTranslationsTable::up( $prefix, $charset_collate );
-		CreateSlugsTable::up( $prefix, $charset_collate );
 
-		update_option( 'gtrans_db_version', GTRANS_DB_VERSION );
+		\GemTranslate\Helper::meta_set( 'db_version', GTRANS_DB_VERSION );
 	}
 
 	private static function ensure_country_code_column( $prefix ) {
@@ -69,7 +67,7 @@ class Migrator {
 	 * Run schema upgrades on `init` if the stored db version is behind.
 	 */
 	public static function maybe_upgrade() {
-		$current = get_option( 'gtrans_db_version' );
+		$current = \GemTranslate\Helper::meta_get( 'db_version' );
 		if ( $current === GTRANS_DB_VERSION ) {
 			return;
 		}

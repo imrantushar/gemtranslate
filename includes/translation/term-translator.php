@@ -131,15 +131,10 @@ class TermTranslator {
 
 		$group_id = (int) get_term_meta( $term_id, '_gtrans_group_id', true );
 		if ( ! $group_id ) {
-			$wpdb->insert(
-				Helper::table( 'translation_groups' ),
-				[
-					'object_type'     => 'term',
-					'source_language' => Context::default_code(),
-					'created_at'      => Helper::get_time(),
-				]
-			);
-			$group_id = (int) $wpdb->insert_id;
+			// group_id == source term_id. Term IDs are globally unique within a
+			// site, so no dedicated groups table is needed — the row scope stays
+			// in term_translations.
+			$group_id = $term_id;
 			update_term_meta( $term_id, '_gtrans_group_id', $group_id );
 		}
 

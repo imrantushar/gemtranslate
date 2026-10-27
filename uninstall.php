@@ -25,15 +25,16 @@ global $wpdb;
 $prefix = $wpdb->prefix . 'gtrans_';
 $tables = [
 	'languages',
-	'translation_groups',
 	'post_translations',
 	'term_translations',
 	'menu_translations',
 	'strings',
 	'string_translations',
 	'seo_meta',
-	'slugs',
+	'post_meta_translations',
+	'post_translation_revisions',
 	'jobs',
+	'assignments',
 	'translation_memory',
 	'glossary',
 ];
@@ -41,13 +42,5 @@ foreach ( $tables as $name ) {
 	$wpdb->query( "DROP TABLE IF EXISTS {$prefix}{$name}" );
 }
 
-$options = [
-	'gtrans_version',
-	'gtrans_db_version',
-	'gtrans_settings',
-	'gtrans_first_install_time',
-	'gtrans_required_rewrite_flush',
-];
-foreach ( $options as $option ) {
-	delete_option( $option );
-}
+// Single options row — all bookkeeping lives under settings._meta now.
+delete_option( 'gtrans_settings' );

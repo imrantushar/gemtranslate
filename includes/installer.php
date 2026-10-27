@@ -73,14 +73,14 @@ class Installer {
 	}
 
 	public function save_option() {
-		if ( ! get_option( 'gtrans_version' ) ) {
-			add_option( 'gtrans_version', GTRANS_VERSION );
+		if ( null === Helper::meta_get( 'version' ) ) {
+			Helper::meta_set( 'version', GTRANS_VERSION );
 		}
-		if ( ! get_option( 'gtrans_db_version' ) ) {
-			add_option( 'gtrans_db_version', GTRANS_DB_VERSION );
+		if ( null === Helper::meta_get( 'db_version' ) ) {
+			Helper::meta_set( 'db_version', GTRANS_DB_VERSION );
 		}
-		if ( ! get_option( 'gtrans_first_install_time' ) ) {
-			add_option( 'gtrans_first_install_time', Helper::get_time() );
+		if ( null === Helper::meta_get( 'first_install_time' ) ) {
+			Helper::meta_set( 'first_install_time', Helper::get_time() );
 		}
 	}
 
