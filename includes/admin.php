@@ -11,6 +11,7 @@ class Admin {
 		Admin\AdminMenu::init();
 		Admin\ProfileField::init();
 		Admin\AdminBar::init();
+		Admin\StaleDashboard::init();
 		// MailLocalizer (transactional email locale switch) is Pro.
 	}
 }
