@@ -1,4 +1,5 @@
 const P = {
+	crown: <path d="M2 20h20M4 17 2 6l6 5 4-7 4 7 6-5-2 11z" />,
 	sun: (
 		<>
 			<circle cx="12" cy="12" r="4" />
