@@ -190,6 +190,9 @@ body.toplevel_page_gemtranslate #wpfooter {
    <body> (outside #gemtranslate-admin-root), so these rules are global. */
 .gtrans-select__control {
 	background-color: var(--gtrans-background) !important;
+	/* react-select's own 1px border loses to the border-width reset above. */
+	border-width: 1px !important;
+	border-style: solid !important;
 	border-color: var(--gtrans-border-color) !important;
 	min-height: 40px !important;
 	border-radius: 4px;
