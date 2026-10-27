@@ -436,6 +436,34 @@ class PostTranslations extends Controller {
 		if ( ! $match ) {
 			return $this->fail( 'gtrans_not_found', __( 'Translation not found.', 'gemtranslate' ), 404 );
 		}
+
+		// Self-heal: a row stuck in custom_layout mode without a shadow post
+		// (e.g. saved by CLI, imported, or interrupted mid-promote) would make
+		// the admin editor spin on "Setting up custom layout…" forever. Create
+		// the shadow on the fly and re-read the row.
+		$needs_shadow = isset( $match['translation_mode'] )
+			&& TranslationLoader::MODE_CUSTOM_LAYOUT === $match['translation_mode']
+			&& (int) ( $match['shadow_post_id'] ?? 0 ) === 0;
+		if ( $needs_shadow ) {
+			ShadowPostSync::ensure_for(
+				$post_id,
+				$lang,
+				(string) ( $match['country_code'] ?? '' ),
+				[
+					'title'   => (string) ( $match['title']   ?? '' ),
+					'content' => (string) ( $match['content'] ?? '' ),
+					'excerpt' => (string) ( $match['excerpt'] ?? '' ),
+					'slug'    => (string) ( $match['slug']    ?? '' ),
+				]
+			);
+			foreach ( TranslationLoader::variants_for_post( $post_id, $lang ) as $row ) {
+				if ( (string) $row['country_code'] === (string) ( $match['country_code'] ?? '' ) ) {
+					$match = $row;
+					break;
+				}
+			}
+		}
+
 		return $this->ok( $this->prepare_translation_row( $match ) );
 	}
 
