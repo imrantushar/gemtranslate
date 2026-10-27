@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { __, sprintf } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
@@ -7,6 +8,7 @@ import Button from '../../components/Button';
 import Toast from '../../components/Toast';
 import { Checkbox, Field, TextInput } from '../../components/Input';
 import { Select } from '../../components/ui/Select';
+import { SettingRow } from '../../components/Switch';
 import { PageSkeleton } from '../../components/Skeleton';
 import { useSettings, useSaveSettings } from '../../hooks/useSettings';
 import { useLanguages } from '../../hooks/useLanguages';
@@ -125,6 +127,9 @@ export default function SettingsPage() {
 	const postTypes = usePostTypes();
 	const backfillAuto = useBackfillAuto();
 	const save = useSaveSettings();
+	// Section is chosen from the sidebar submenu (?tab=switcher).
+	const [params] = useSearchParams();
+	const tab = params.get('tab') || 'general';
 	const [values, setValues] = useState(null);
 	const [toast, setToast] = useState(null);
 	const [backfill, setBackfill] = useState(null);
@@ -205,9 +210,11 @@ export default function SettingsPage() {
 				}
 			/>
 
+			{tab === 'translate' && (
+				<>
 			{/* ---- Translate Everything (automatic translation) ---- */}
 			{!hasFeature('translate_everything') ? (
-				<div className="gtrans-mb-6">
+				<div className="gtrans-mb-4">
 					<UpsellCard
 						title={__('Automatic translation & review queue', 'gemtranslate')}
 						description={__(
@@ -217,22 +224,20 @@ export default function SettingsPage() {
 					/>
 				</div>
 			) : (
-				<div className="gtrans-mb-6">
+				<div className="gtrans-mb-4">
 					<Card title={__('Automatic translation (Translate Everything)', 'gemtranslate')}>
-						<Checkbox
-							label={__(
+						<SettingRow
+	label={__(
 								'Automatically translate content when it is published or updated',
 								'gemtranslate'
 							)}
-							checked={!!values.auto_translate}
-							onChange={(e) => set('auto_translate', e.target.checked)}
-						/>
-						<p className="gtrans-mt-1 gtrans-mb-0 gtrans-text-xs gtrans-text-muted">
-							{__(
+	description={__(
 								'Uses your configured AI provider. Only source-language content is translated; existing translations are never overwritten unless you enable re-translation below.',
 								'gemtranslate'
 							)}
-						</p>
+	checked={!!values.auto_translate}
+	onChange={(v) => set('auto_translate', v)}
+/>
 
 						{!!values.auto_translate && (
 							<div className="gtrans-mt-4 gtrans-flex gtrans-flex-col gtrans-gap-4">
@@ -305,14 +310,14 @@ export default function SettingsPage() {
 									)}
 								</div>
 
-								<Checkbox
-									label={__(
+								<SettingRow
+	label={__(
 										'Re-translate when the source changes (may overwrite AI translations)',
 										'gemtranslate'
 									)}
-									checked={!!values.auto_retranslate_on_update}
-									onChange={(e) => set('auto_retranslate_on_update', e.target.checked)}
-								/>
+	checked={!!values.auto_retranslate_on_update}
+	onChange={(v) => set('auto_retranslate_on_update', v)}
+/>
 
 								<div className="gtrans-rounded-md gtrans-border gtrans-border-line gtrans-bg-body gtrans-p-3">
 									<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-justify-between gtrans-gap-3">
@@ -351,31 +356,30 @@ export default function SettingsPage() {
 					</Card>
 				</div>
 			)}
+				</>
+			)}
 
-			<div className="gtrans-grid gtrans-gap-6 md:gtrans-grid-cols-2">
+			{tab === 'general' && (
+			<div className="gtrans-flex gtrans-flex-col gtrans-gap-4">
 				<Card title={__('Visitor experience', 'gemtranslate')}>
-					<Checkbox
-						label={__('Auto-redirect first visit by browser language', 'gemtranslate')}
-						checked={!!values.auto_redirect_browser_lang}
-						onChange={(e) => set('auto_redirect_browser_lang', e.target.checked)}
-					/>
-					<p className="gtrans-mt-1 gtrans-mb-3 gtrans-text-xs gtrans-text-muted">
-						{__(
+					<SettingRow
+	label={__('Auto-redirect first visit by browser language', 'gemtranslate')}
+	description={__(
 							'Matches Accept-Language against active languages; 302s once and remembers the choice in a cookie.',
 							'gemtranslate'
 						)}
-					</p>
-					<Checkbox
-						label={__('Translate transactional emails per recipient', 'gemtranslate')}
-						checked={!!values.translate_emails}
-						onChange={(e) => set('translate_emails', e.target.checked)}
-					/>
-					<p className="gtrans-mt-1 gtrans-mb-0 gtrans-text-xs gtrans-text-muted">
-						{__(
+	checked={!!values.auto_redirect_browser_lang}
+	onChange={(v) => set('auto_redirect_browser_lang', v)}
+/>
+					<SettingRow
+	label={__('Translate transactional emails per recipient', 'gemtranslate')}
+	description={__(
 							"Switches WP locale for the duration of each wp_mail() call to match the recipient's GemTranslate preferred language.",
 							'gemtranslate'
 						)}
-					</p>
+	checked={!!values.translate_emails}
+	onChange={(v) => set('translate_emails', v)}
+/>
 				</Card>
 
 				<Card title={__('URL strategy', 'gemtranslate')}>
@@ -399,43 +403,47 @@ export default function SettingsPage() {
 				</Card>
 
 				<Card title={__('Display', 'gemtranslate')}>
-					<Checkbox
-						label={__('Show switcher for default language', 'gemtranslate')}
-						checked={!!values.show_switcher_for_default}
-						onChange={(e) => set('show_switcher_for_default', e.target.checked)}
-					/>
+					<SettingRow
+	label={__('Show switcher for default language', 'gemtranslate')}
+	checked={!!values.show_switcher_for_default}
+	onChange={(v) => set('show_switcher_for_default', v)}
+/>
 				</Card>
 
+			</div>
+			)}
+
+			{tab === 'advanced' && (
+			<div className="gtrans-flex gtrans-flex-col gtrans-gap-4">
 				<Card title={__('Performance', 'gemtranslate')}>
-					<Checkbox
-						label={__('Use object cache (recommended)', 'gemtranslate')}
-						checked={!!values.object_cache_enabled}
-						onChange={(e) => set('object_cache_enabled', e.target.checked)}
-					/>
-					<Checkbox
-						label={__('Enable debug log', 'gemtranslate')}
-						checked={!!values.debug_log_enabled}
-						onChange={(e) => set('debug_log_enabled', e.target.checked)}
-					/>
+					<SettingRow
+	label={__('Use object cache (recommended)', 'gemtranslate')}
+	checked={!!values.object_cache_enabled}
+	onChange={(v) => set('object_cache_enabled', v)}
+/>
+					<SettingRow
+	label={__('Enable debug log', 'gemtranslate')}
+	checked={!!values.debug_log_enabled}
+	onChange={(v) => set('debug_log_enabled', v)}
+/>
 				</Card>
 
 				<Card title={__('Danger zone', 'gemtranslate')}>
-					<Checkbox
-						label={__('Delete all data on uninstall', 'gemtranslate')}
-						checked={!!values.remove_data_on_uninstall}
-						onChange={(e) => set('remove_data_on_uninstall', e.target.checked)}
-					/>
-					<p className="gtrans-mt-2 gtrans-mb-0 gtrans-text-xs gtrans-text-muted">
-						{__(
+					<SettingRow
+	label={__('Delete all data on uninstall', 'gemtranslate')}
+	description={__(
 							'When enabled, removing the plugin from WP admin drops all wp_gtrans_* tables and clears GemTranslate options.',
 							'gemtranslate'
 						)}
-					</p>
+	checked={!!values.remove_data_on_uninstall}
+	onChange={(v) => set('remove_data_on_uninstall', v)}
+/>
 				</Card>
 			</div>
+			)}
 
-			{/* ---- Language switcher (full-width below the grid) ---- */}
-			<div className="gtrans-mt-6 gtrans-grid gtrans-gap-6 md:gtrans-grid-cols-2">
+			{tab === 'switcher' && (
+			<div className="gtrans-mt-4 gtrans-grid gtrans-gap-4 md:gtrans-grid-cols-2">
 				<Card title={__('Language switcher appearance', 'gemtranslate')}>
 					<div className="gtrans-flex gtrans-flex-col gtrans-gap-3">
 						<Field label={__('Display style', 'gemtranslate')}>
@@ -448,43 +456,40 @@ export default function SettingsPage() {
 							</Select>
 						</Field>
 
-						<Checkbox
-							label={__('Show flag emoji', 'gemtranslate')}
-							checked={values.switcher_show_flag !== false}
-							onChange={(e) => set('switcher_show_flag', e.target.checked)}
-						/>
-						<Checkbox
-							label={__('Show language name (English)', 'gemtranslate')}
-							checked={values.switcher_show_name !== false}
-							onChange={(e) => set('switcher_show_name', e.target.checked)}
-						/>
-						<Checkbox
-							label={__('Show native name', 'gemtranslate')}
-							checked={!!values.switcher_show_native}
-							onChange={(e) => set('switcher_show_native', e.target.checked)}
-						/>
-						<Checkbox
-							label={__('Show language code (en, fr…)', 'gemtranslate')}
-							checked={!!values.switcher_show_code}
-							onChange={(e) => set('switcher_show_code', e.target.checked)}
-						/>
-						<Checkbox
-							label={__('Hide current language from the list', 'gemtranslate')}
-							checked={!!values.switcher_hide_current}
-							onChange={(e) => set('switcher_hide_current', e.target.checked)}
-						/>
-						<Checkbox
-							label={__('Show switcher even when only one language is active', 'gemtranslate')}
-							checked={!!values.switcher_show_if_single}
-							onChange={(e) => set('switcher_show_if_single', e.target.checked)}
-						/>
-
-						<p className="gtrans-mt-1 gtrans-mb-0 gtrans-text-xs gtrans-text-muted">
-							{__(
+						<SettingRow
+	label={__('Show flag emoji', 'gemtranslate')}
+	checked={values.switcher_show_flag !== false}
+	onChange={(v) => set('switcher_show_flag', v)}
+/>
+						<SettingRow
+	label={__('Show language name (English)', 'gemtranslate')}
+	checked={values.switcher_show_name !== false}
+	onChange={(v) => set('switcher_show_name', v)}
+/>
+						<SettingRow
+	label={__('Show native name', 'gemtranslate')}
+	checked={!!values.switcher_show_native}
+	onChange={(v) => set('switcher_show_native', v)}
+/>
+						<SettingRow
+	label={__('Show language code (en, fr…)', 'gemtranslate')}
+	checked={!!values.switcher_show_code}
+	onChange={(v) => set('switcher_show_code', v)}
+/>
+						<SettingRow
+	label={__('Hide current language from the list', 'gemtranslate')}
+	checked={!!values.switcher_hide_current}
+	onChange={(v) => set('switcher_hide_current', v)}
+/>
+						<SettingRow
+	label={__('Show switcher even when only one language is active', 'gemtranslate')}
+	description={__(
 								'These are the defaults for the shortcode, widget, and block. Each instance can override them via its own settings.',
 								'gemtranslate'
 							)}
-						</p>
+	checked={!!values.switcher_show_if_single}
+	onChange={(v) => set('switcher_show_if_single', v)}
+/>
 					</div>
 				</Card>
 
@@ -515,22 +520,21 @@ export default function SettingsPage() {
 					</div>
 				</Card>
 			</div>
+			)}
 
-			{/* ---- Country detection ---- */}
-			<div className="gtrans-mt-6">
+			{tab === 'geo' && (
+			<div className="gtrans-mt-4">
 				<Card title={__('Country detection', 'gemtranslate')}>
 					<div className="gtrans-flex gtrans-flex-col gtrans-gap-3">
-						<Checkbox
-							label={__('Detect visitor country', 'gemtranslate')}
-							checked={!!values.geo_enabled}
-							onChange={(e) => set('geo_enabled', e.target.checked)}
-						/>
-						<p className="gtrans-mt-1 gtrans-mb-0 gtrans-text-xs gtrans-text-muted">
-							{__(
+						<SettingRow
+	label={__('Detect visitor country', 'gemtranslate')}
+	description={__(
 								"When enabled, the visitor's country is detected once per session and used to pick country-specific page variants and (optionally) the default language.",
 								'gemtranslate'
 							)}
-						</p>
+	checked={!!values.geo_enabled}
+	onChange={(v) => set('geo_enabled', v)}
+/>
 
 						{!!values.geo_enabled && (
 							<>
@@ -572,22 +576,22 @@ export default function SettingsPage() {
 									/>
 								</Field>
 
-								<Checkbox
-									label={__(
+								<SettingRow
+	label={__(
 										"Auto-redirect first visit to country's default language",
 										'gemtranslate'
 									)}
-									checked={!!values.geo_auto_redirect_country}
-									onChange={(e) => set('geo_auto_redirect_country', e.target.checked)}
-								/>
-								<Checkbox
-									label={__(
+	checked={!!values.geo_auto_redirect_country}
+	onChange={(v) => set('geo_auto_redirect_country', v)}
+/>
+								<SettingRow
+	label={__(
 										'Show manual country picker banner when geo source has no match',
 										'gemtranslate'
 									)}
-									checked={!!values.geo_country_picker_banner}
-									onChange={(e) => set('geo_country_picker_banner', e.target.checked)}
-								/>
+	checked={!!values.geo_country_picker_banner}
+	onChange={(v) => set('geo_country_picker_banner', v)}
+/>
 
 								<Field
 									label={__('Country cookie TTL (days)', 'gemtranslate')}
@@ -607,22 +611,21 @@ export default function SettingsPage() {
 					</div>
 				</Card>
 			</div>
+			)}
 
-			{/* ---- Floating language switcher ---- */}
-			<div className="gtrans-mt-6">
+			{tab === 'floating' && (
+			<div className="gtrans-mt-4">
 				<Card title={__('Floating language switcher', 'gemtranslate')}>
 					<div className="gtrans-flex gtrans-flex-col gtrans-gap-3">
-						<Checkbox
-							label={__('Show floating switcher on every page', 'gemtranslate')}
-							checked={!!values.float_switcher_enabled}
-							onChange={(e) => set('float_switcher_enabled', e.target.checked)}
-						/>
-						<p className="gtrans-mt-1 gtrans-mb-0 gtrans-text-xs gtrans-text-muted">
-							{__(
+						<SettingRow
+	label={__('Show floating switcher on every page', 'gemtranslate')}
+	description={__(
 								'Injects a fixed-position language button on every frontend page — no shortcode or theme edits needed. Visible to all visitors including logged-out users.',
 								'gemtranslate'
 							)}
-						</p>
+	checked={!!values.float_switcher_enabled}
+	onChange={(v) => set('float_switcher_enabled', v)}
+/>
 
 						{!!values.float_switcher_enabled && (
 							<Field label={__('Position', 'gemtranslate')}>
@@ -640,6 +643,7 @@ export default function SettingsPage() {
 					</div>
 				</Card>
 			</div>
+			)}
 
 			<Toast message={toast?.message} tone={toast?.tone} onClear={() => setToast(null)} />
 		</>

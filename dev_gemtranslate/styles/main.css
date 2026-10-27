@@ -143,7 +143,7 @@ body.toplevel_page_gemtranslate #wpfooter {
 }
 
 /* Flat, themed checkboxes (wp-admin's default is a white bevelled box). */
-#gemtranslate-admin-root input[type="checkbox"] {
+#gemtranslate-admin-root input[type="checkbox"]:not([role="switch"]) {
 	-webkit-appearance: none;
 	appearance: none;
 	position: relative;
@@ -162,11 +162,11 @@ body.toplevel_page_gemtranslate #wpfooter {
 	background: var(--gtrans-background);
 	box-shadow: none;
 }
-#gemtranslate-admin-root input[type="checkbox"]:checked {
+#gemtranslate-admin-root input[type="checkbox"]:not([role="switch"]):checked {
 	border-color: var(--gtrans-primary-color);
 	background: var(--gtrans-primary-color);
 }
-#gemtranslate-admin-root input[type="checkbox"]:checked::before {
+#gemtranslate-admin-root input[type="checkbox"]:not([role="switch"]):checked::before {
 	content: "";
 	position: absolute;
 	left: 4px;

@@ -56,7 +56,7 @@ export const NAV = [
 		icon: 'upload',
 		pro: 'import_export',
 	},
-	{ to: '/settings', label: () => __('Settings', 'gemtranslate'), icon: 'settings' },
+	{ to: '/settings', label: () => __('Settings', 'gemtranslate'), icon: 'settings', children: 'settings' },
 ];
 
 
@@ -87,7 +87,16 @@ function useSubmenus() {
 			: []),
 	].map((c) => ({ ...c, to: `/terms?tax=${c.key}`, param: 'tax', isDefault: c.key === 'category' }));
 
-	return { postTypes: posts, taxonomies };
+	const settings = [
+		{ key: 'general', label: __('General', 'gemtranslate') },
+		{ key: 'translate', label: __('Automatic translation', 'gemtranslate') },
+		{ key: 'switcher', label: __('Language switcher', 'gemtranslate') },
+		{ key: 'geo', label: __('Country detection', 'gemtranslate') },
+		{ key: 'floating', label: __('Floating switcher', 'gemtranslate') },
+		{ key: 'advanced', label: __('Advanced', 'gemtranslate') },
+	].map((c) => ({ ...c, to: `/settings?tab=${c.key}`, param: 'tab', isDefault: c.key === 'general' }));
+
+	return { postTypes: posts, taxonomies, settings };
 }
 
 function SubMenu({ items }) {
