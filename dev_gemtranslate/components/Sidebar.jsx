@@ -66,13 +66,18 @@ export default function Sidebar() {
 
 	return (
 		<aside className="gtrans-w-60 gtrans-flex-shrink-0 gtrans-border-r gtrans-border-edge gtrans-bg-surface gtrans-px-4 gtrans-py-6">
-			<div className="gtrans-mb-6 gtrans-px-2">
-				<div className="gtrans-text-lg gtrans-font-semibold gtrans-text-primary">
-					GemTranslate
+			<div className="gtrans-mb-6 gtrans-flex gtrans-items-center gtrans-gap-2 gtrans-px-2">
+				<span className="gtrans-flex gtrans-h-8 gtrans-w-8 gtrans-flex-shrink-0 gtrans-items-center gtrans-justify-center gtrans-rounded-lg gtrans-bg-primary gtrans-text-sm gtrans-text-white" aria-hidden="true">
+					🌐
+				</span>
+				<div className="gtrans-min-w-0 gtrans-flex-1">
+					<div className="gtrans-truncate gtrans-text-base gtrans-font-semibold gtrans-text-ink">
+						gem<span className="gtrans-text-primary">Translate</span>
+					</div>
 				</div>
-				<div className="gtrans-text-xs gtrans-text-muted">
+				<span className="gtrans-rounded-full gtrans-border gtrans-border-line gtrans-px-2 gtrans-py-0.5 gtrans-text-2xs gtrans-text-muted">
 					v{window.gtrans?.version || '1.0.0'}
-				</div>
+				</span>
 			</div>
 
 			<LanguagePicker />

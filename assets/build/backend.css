@@ -493,6 +493,9 @@ input:where([type='file']):focus{
 #gemtranslate-admin-root .gtrans-min-h-\[2\.5rem\]{
 	min-height: 2.5rem;
 }
+#gemtranslate-admin-root .gtrans-w-1\.5{
+	width: 0.375rem;
+}
 #gemtranslate-admin-root .gtrans-w-1\/2{
 	width: 50%;
 }
@@ -537,6 +540,9 @@ input:where([type='file']):focus{
 }
 #gemtranslate-admin-root .gtrans-w-px{
 	width: 1px;
+}
+#gemtranslate-admin-root .gtrans-min-w-0{
+	min-width: 0px;
 }
 #gemtranslate-admin-root .gtrans-min-w-\[160px\]{
 	min-width: 160px;
@@ -998,6 +1004,10 @@ input:where([type='file']):focus{
 #gemtranslate-admin-root .gtrans-text-2xl{
 	font-size: 1.5rem;
 	line-height: 2rem;
+}
+#gemtranslate-admin-root .gtrans-text-2xs{
+	font-size: 0.625rem;
+	line-height: 0.875rem;
 }
 #gemtranslate-admin-root .gtrans-text-3xl{
 	font-size: 1.875rem;
