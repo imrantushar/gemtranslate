@@ -146,12 +146,40 @@ class LanguageRegistry {
 		}
 		if ( isset( $out['code'] ) ) {
 			$out['code'] = strtolower( sanitize_key( $out['code'] ) );
+			$out['code'] = self::correct_country_code_mistakes( $out['code'] );
 		}
 		if ( array_key_exists( 'country_codes', $out ) ) {
 			$out['country_codes'] = self::normalize_country_codes( $out['country_codes'] );
 		}
 
 		return $out;
+	}
+
+	/**
+	 * Auto-correct the most common user mistake: entering a country code
+	 * (bd, cn, jp, kr, in, gb, uk) where a language code was expected.
+	 * These are not valid as hreflang / WP locale keys and silently break
+	 * browser language detection and .mo file loading.
+	 *
+	 * Returns the ISO 639-1 language code when a known country code is
+	 * passed; otherwise returns the input unchanged.
+	 */
+	private static function correct_country_code_mistakes( $code ) {
+		$map = [
+			'bd' => 'bn',    // Bangladesh → Bangla
+			'cn' => 'zh',    // China → Chinese
+			'jp' => 'ja',    // Japan → Japanese
+			'kr' => 'ko',    // Korea → Korean
+			'in' => 'hi',    // India → Hindi (most common assumption)
+			'gb' => 'en-gb', // UK → English (UK)
+			'uk' => 'en-gb', // UK → English (UK)
+			'br' => 'pt-br', // Brazil → Portuguese (Brazil)
+			'mx' => 'es-mx', // Mexico → Spanish (Mexico)
+			'ir' => 'fa',    // Iran → Persian
+			'sa' => 'ar',    // Saudi Arabia → Arabic
+			'ae' => 'ar',    // UAE → Arabic
+		];
+		return $map[ $code ] ?? $code;
 	}
 
 	/**

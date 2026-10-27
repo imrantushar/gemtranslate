@@ -11,5 +11,6 @@ class SEO {
 		// Yoast / Rank Math bridges + per-translation SEO meta are Pro.
 		SEO\HreflangOutput::init();
 		SEO\SitemapProvider::init();
+		SEO\DocumentLocale::init();
 	}
 }
