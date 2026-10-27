@@ -12,5 +12,6 @@ class Compat {
 		Compat\W3TC::init();
 		Compat\LiteSpeed::init();
 		Compat\Cloudflare::init();
+		Compat\Elementor::init();
 	}
 }
