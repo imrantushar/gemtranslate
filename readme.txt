@@ -1,5 +1,5 @@
-=== Zentranslate ===
-Contributors: zentranslate
+=== GemTranslate ===
+Contributors: gemtranslate
 Tags: multilingual, translation, ai, i18n, woocommerce
 Requires at least: 6.0
 Tested up to: 6.7
@@ -12,7 +12,7 @@ AI-first multilingual platform for WordPress. Fast, modern, and developer-friend
 
 == Description ==
 
-Zentranslate is a performance-minded multilingual plugin for WordPress with a fully React-based admin, REST-driven architecture, and optional AI translation (OpenAI / DeepL / Google) via BYOK.
+GemTranslate is a performance-minded multilingual plugin for WordPress with a fully React-based admin, REST-driven architecture, and optional AI translation (OpenAI / DeepL / Google) via BYOK.
 
 Designed to never slow down your site:
 * Translations stored in custom tables, not duplicated in wp_posts.
@@ -22,9 +22,9 @@ Designed to never slow down your site:
 
 == Installation ==
 
-1. Upload the `zentranslate` folder to `/wp-content/plugins/`.
+1. Upload the `gemtranslate` folder to `/wp-content/plugins/`.
 2. Activate the plugin through the 'Plugins' menu in WordPress.
-3. Visit Zentranslate in the admin sidebar to configure languages.
+3. Visit GemTranslate in the admin sidebar to configure languages.
 
 == Changelog ==
 

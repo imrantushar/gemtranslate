@@ -55,7 +55,7 @@ wp ztrans pack delete <locale>
 **Examples:**
 
 ```bash
-# Auto-translate the Zentranslate admin into Spanish using your AI provider.
+# Auto-translate the GemTranslate admin into Spanish using your AI provider.
 wp ztrans pack generate es_ES
 wp ztrans pack generate pt_BR --target-lang=pt-br
 wp ztrans pack list

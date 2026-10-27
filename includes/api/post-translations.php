@@ -1,16 +1,16 @@
 <?php
-namespace Zentranslate\API;
+namespace GemTranslate\API;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Language\Context;
-use Zentranslate\Translation\BlockParser;
-use Zentranslate\Translation\MetaTranslator;
-use Zentranslate\Translation\PostFieldTranslator;
-use Zentranslate\Translation\ShadowPostSync;
-use Zentranslate\Translation\TranslationLoader;
+use GemTranslate\Language\Context;
+use GemTranslate\Translation\BlockParser;
+use GemTranslate\Translation\MetaTranslator;
+use GemTranslate\Translation\PostFieldTranslator;
+use GemTranslate\Translation\ShadowPostSync;
+use GemTranslate\Translation\TranslationLoader;
 
 class PostTranslations extends Controller {
 
@@ -377,7 +377,7 @@ class PostTranslations extends Controller {
 		$post_id = (int) $request['id'];
 		$post    = get_post( $post_id ) ?? $this->get_academy_hp_lesson_as_post( $post_id );
 		if ( ! $post ) {
-			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
+			return $this->fail( 'gtrans_not_found', __( 'Post not found.', 'gemtranslate' ), 404 );
 		}
 
 		// Group rows by language; default-country row is the "primary".
@@ -434,7 +434,7 @@ class PostTranslations extends Controller {
 			}
 		}
 		if ( ! $match ) {
-			return $this->fail( 'ztrans_not_found', __( 'Translation not found.', 'zentranslate' ), 404 );
+			return $this->fail( 'gtrans_not_found', __( 'Translation not found.', 'gemtranslate' ), 404 );
 		}
 		return $this->ok( $this->prepare_translation_row( $match ) );
 	}
@@ -443,10 +443,10 @@ class PostTranslations extends Controller {
 		$post_id = (int) $request['id'];
 		$lang    = strtolower( $request['lang'] );
 		if ( ! Context::is_active( $lang ) ) {
-			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_invalid_lang', __( 'Language is not active.', 'gemtranslate' ), 422 );
 		}
 		if ( ! get_post( $post_id ) && ! $this->get_academy_hp_lesson_as_post( $post_id ) ) {
-			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
+			return $this->fail( 'gtrans_not_found', __( 'Post not found.', 'gemtranslate' ), 404 );
 		}
 
 		$body    = $request->get_json_params() ?: $request->get_params();
@@ -461,7 +461,7 @@ class PostTranslations extends Controller {
 			'translation_mode' => $body['translation_mode'] ?? TranslationLoader::MODE_CUSTOM_LAYOUT,
 		] );
 		if ( ! $ok ) {
-			return $this->fail( 'ztrans_save_failed', __( 'Could not save translation.', 'zentranslate' ), 500 );
+			return $this->fail( 'gtrans_save_failed', __( 'Could not save translation.', 'gemtranslate' ), 500 );
 		}
 		return $this->show_translation( $request );
 	}
@@ -486,7 +486,7 @@ class PostTranslations extends Controller {
 		$lang    = strtolower( $request['lang'] );
 		$post    = get_post( $post_id ) ?? $this->get_academy_hp_lesson_as_post( $post_id );
 		if ( ! $post ) {
-			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
+			return $this->fail( 'gtrans_not_found', __( 'Post not found.', 'gemtranslate' ), 404 );
 		}
 		$fields = PostFieldTranslator::enumerate_fields( $post, $lang );
 		return $this->ok( [
@@ -500,11 +500,11 @@ class PostTranslations extends Controller {
 		$post_id = (int) $request['id'];
 		$lang    = strtolower( $request['lang'] );
 		if ( ! Context::is_active( $lang ) ) {
-			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_invalid_lang', __( 'Language is not active.', 'gemtranslate' ), 422 );
 		}
 		$post = get_post( $post_id ) ?? $this->get_academy_hp_lesson_as_post( $post_id );
 		if ( ! $post ) {
-			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
+			return $this->fail( 'gtrans_not_found', __( 'Post not found.', 'gemtranslate' ), 404 );
 		}
 
 		$body    = $request->get_json_params() ?: $request->get_params();
@@ -537,7 +537,7 @@ class PostTranslations extends Controller {
 	 */
 	private function confirmed_meta_key( $lang, $country ) {
 		$suffix = $country ? $lang . '_' . strtolower( $country ) : $lang;
-		return '_ztrans_seg_confirmed_' . $suffix;
+		return '_gtrans_seg_confirmed_' . $suffix;
 	}
 
 	public function get_confirmed_segments( $request ) {
@@ -545,7 +545,7 @@ class PostTranslations extends Controller {
 		$lang    = strtolower( $request['lang'] );
 		$country = $this->country_param( $request );
 		if ( ! get_post( $post_id ) ) {
-			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
+			return $this->fail( 'gtrans_not_found', __( 'Post not found.', 'gemtranslate' ), 404 );
 		}
 		$stored = get_post_meta( $post_id, $this->confirmed_meta_key( $lang, $country ), true );
 		$list   = is_array( $stored ) ? array_values( array_filter( array_map( 'strval', $stored ) ) ) : [];
@@ -557,7 +557,7 @@ class PostTranslations extends Controller {
 		$lang    = strtolower( $request['lang'] );
 		$country = $this->country_param( $request );
 		if ( ! get_post( $post_id ) ) {
-			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
+			return $this->fail( 'gtrans_not_found', __( 'Post not found.', 'gemtranslate' ), 404 );
 		}
 		$body = $request->get_json_params() ?: $request->get_params();
 		$raw  = (array) ( $body['confirmed'] ?? [] );
@@ -588,7 +588,7 @@ class PostTranslations extends Controller {
 		$per_page = max( 1, min( 100, (int) $request->get_param( 'per_page' ) ?: 20 ) );
 		$offset   = ( $page - 1 ) * $per_page;
 
-		$pt    = \Zentranslate\Helper::table( 'post_translations' );
+		$pt    = \GemTranslate\Helper::table( 'post_translations' );
 		$posts = $wpdb->posts;
 
 		$rows = $wpdb->get_results(
@@ -647,7 +647,7 @@ class PostTranslations extends Controller {
 		$country = $this->country_param( $request );
 		$ok      = TranslationLoader::set_translation_status( $post_id, $lang, 'publish', $country );
 		if ( ! $ok ) {
-			return $this->fail( 'ztrans_approve_failed', __( 'Could not approve this translation.', 'zentranslate' ), 500 );
+			return $this->fail( 'gtrans_approve_failed', __( 'Could not approve this translation.', 'gemtranslate' ), 500 );
 		}
 		return $this->ok( [ 'approved' => true, 'status' => 'publish' ] );
 	}
@@ -670,12 +670,12 @@ class PostTranslations extends Controller {
 		$body     = $request->get_json_params() ?: $request->get_params();
 		$limit    = max( 1, min( 500, (int) ( $body['limit'] ?? 200 ) ) );
 		$offset   = max( 0, (int) ( $body['offset'] ?? 0 ) );
-		$targets  = \Zentranslate\Translation\AutoTranslate::target_languages();
+		$targets  = \GemTranslate\Translation\AutoTranslate::target_languages();
 		if ( empty( $targets ) ) {
-			return $this->fail( 'ztrans_no_targets', __( 'No target languages are configured.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_no_targets', __( 'No target languages are configured.', 'gemtranslate' ), 422 );
 		}
 
-		$types = (array) \Zentranslate\Helper::get_settings( 'auto_translate_post_types', [ 'post', 'page' ] );
+		$types = (array) \GemTranslate\Helper::get_settings( 'auto_translate_post_types', [ 'post', 'page' ] );
 		$query = new \WP_Query(
 			[
 				'post_type'      => $types,
@@ -688,7 +688,7 @@ class PostTranslations extends Controller {
 				'no_found_rows'  => false,
 				'meta_query'     => [
 					[
-						'key'     => \Zentranslate\Translation\AutoTranslate::META_SOURCE,
+						'key'     => \GemTranslate\Translation\AutoTranslate::META_SOURCE,
 						'compare' => 'NOT EXISTS',
 					],
 				],
@@ -697,7 +697,7 @@ class PostTranslations extends Controller {
 
 		$queued = 0;
 		foreach ( $query->posts as $pid ) {
-			$queued += \Zentranslate\Translation\AutoTranslate::enqueue_for_post( (int) $pid, $targets, false );
+			$queued += \GemTranslate\Translation\AutoTranslate::enqueue_for_post( (int) $pid, $targets, false );
 		}
 
 		$scanned   = count( $query->posts );
@@ -753,7 +753,7 @@ class PostTranslations extends Controller {
 		$country = $this->country_param( $request );
 		$post    = get_post( $post_id );
 		if ( ! $post ) {
-			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
+			return $this->fail( 'gtrans_not_found', __( 'Post not found.', 'gemtranslate' ), 404 );
 		}
 		// Snapshot current rendered string-only output as the starting custom layout.
 		$rebuilt = PostFieldTranslator::rebuild_content( $post_id, (string) $post->post_content, $lang );
@@ -774,7 +774,7 @@ class PostTranslations extends Controller {
 			]
 		);
 		if ( ! $shadow_id ) {
-			return $this->fail( 'ztrans_save_failed', __( 'Could not create shadow post.', 'zentranslate' ), 500 );
+			return $this->fail( 'gtrans_save_failed', __( 'Could not create shadow post.', 'gemtranslate' ), 500 );
 		}
 		return $this->show_translation( $request );
 	}
@@ -859,7 +859,7 @@ class PostTranslations extends Controller {
 			]
 		);
 		if ( ! $ok ) {
-			return $this->fail( 'ztrans_save_failed', __( 'Could not demote translation.', 'zentranslate' ), 500 );
+			return $this->fail( 'gtrans_save_failed', __( 'Could not demote translation.', 'gemtranslate' ), 500 );
 		}
 		// Trash the shadow post; admin can restore from wp-admin Trash if needed.
 		ShadowPostSync::trash_for( $post_id, $lang, $country );
@@ -888,7 +888,7 @@ class PostTranslations extends Controller {
 		$body    = $request->get_json_params() ?: $request->get_params();
 		$country = strtoupper( (string) ( $body['country_code'] ?? '' ) );
 		if ( ! preg_match( '/^[A-Z]{2}$/', $country ) ) {
-			return $this->fail( 'ztrans_invalid_country', __( 'country_code must be an ISO 3166-1 alpha-2 code.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_invalid_country', __( 'country_code must be an ISO 3166-1 alpha-2 code.', 'gemtranslate' ), 422 );
 		}
 		// Seed from the language-default row if one exists.
 		$seed = null;
@@ -912,7 +912,7 @@ class PostTranslations extends Controller {
 			]
 		);
 		if ( ! $ok ) {
-			return $this->fail( 'ztrans_save_failed', __( 'Could not create country variant.', 'zentranslate' ), 500 );
+			return $this->fail( 'gtrans_save_failed', __( 'Could not create country variant.', 'gemtranslate' ), 500 );
 		}
 		return $this->list_variants( $request );
 	}
@@ -928,7 +928,7 @@ class PostTranslations extends Controller {
 		$post_id = (int) $request['id'];
 		$lang    = strtolower( $request['lang'] );
 		if ( ! get_post( $post_id ) && ! $this->get_academy_hp_lesson_as_post( $post_id ) ) {
-			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
+			return $this->fail( 'gtrans_not_found', __( 'Post not found.', 'gemtranslate' ), 404 );
 		}
 
 		$fields       = MetaTranslator::enumerate_fields( $post_id );
@@ -957,7 +957,7 @@ class PostTranslations extends Controller {
 		$post_id = (int) $request['id'];
 		$lang    = strtolower( $request['lang'] );
 		if ( ! Context::is_active( $lang ) ) {
-			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_invalid_lang', __( 'Language is not active.', 'gemtranslate' ), 422 );
 		}
 		$body = $request->get_json_params() ?: $request->get_params();
 		$rows = (array) ( $body['fields'] ?? [] );

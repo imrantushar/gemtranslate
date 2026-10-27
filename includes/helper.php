@@ -1,5 +1,5 @@
 <?php
-namespace Zentranslate;
+namespace GemTranslate;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -8,15 +8,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Helper {
 
 	public static function table( $name ) {
-		return ztrans_table( $name );
+		return gtrans_table( $name );
 	}
 
 	public static function get_settings( $key, $default = null ) {
-		return ztrans_get_setting( $key, $default );
+		return gtrans_get_setting( $key, $default );
 	}
 
 	public static function flush_rewrite_rules() {
-		ztrans_flush_rewrite_rules();
+		gtrans_flush_rewrite_rules();
 	}
 
 	public static function get_time() {

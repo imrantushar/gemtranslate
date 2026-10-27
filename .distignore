@@ -27,7 +27,7 @@ tailwind.config.js
 .nvmrc
 
 # Source (compiled into assets/build/)
-dev_zentranslate/
+dev_gemtranslate/
 
 # Linters / formatters
 .eslintignore

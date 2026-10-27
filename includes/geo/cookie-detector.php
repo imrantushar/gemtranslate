@@ -1,12 +1,12 @@
 <?php
-namespace Zentranslate\Geo;
+namespace GemTranslate\Geo;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 /**
- * Reads the `ztrans_user_country` cookie. Acts as both a fallback (when no
+ * Reads the `gtrans_user_country` cookie. Acts as both a fallback (when no
  * server-side detector is available) and a manual override — the visitor's
  * choice in the country picker banner is written to this cookie.
  */

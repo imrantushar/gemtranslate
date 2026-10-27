@@ -1,5 +1,5 @@
 <?php
-namespace Zentranslate\AI;
+namespace GemTranslate\AI;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Builds provider instances from saved settings. Provider config lives in the
- * `ztrans_ai_providers` option as JSON:
+ * `gtrans_ai_providers` option as JSON:
  *
  * {
  *   "default": "openai",
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class TranslatorFactory {
 
-	const OPTION_KEY = 'ztrans_ai_providers';
+	const OPTION_KEY = 'gtrans_ai_providers';
 
 	public static function settings() {
 		$raw  = get_option( self::OPTION_KEY, '' );

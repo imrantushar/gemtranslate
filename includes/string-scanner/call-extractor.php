@@ -1,5 +1,5 @@
 <?php
-namespace Zentranslate\StringScanner;
+namespace GemTranslate\StringScanner;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

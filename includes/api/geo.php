@@ -1,18 +1,18 @@
 <?php
-namespace Zentranslate\API;
+namespace GemTranslate\API;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Language\Context;
-use Zentranslate\Language\CountryContext;
+use GemTranslate\Language\Context;
+use GemTranslate\Language\CountryContext;
 
 /**
  * Geo / country detection REST endpoints.
  *
- * - GET  /ztrans/v1/geo/detect  → run the detector chain, return what was found
- * - POST /ztrans/v1/geo/cookie  → manually set the country cookie (picker UI)
+ * - GET  /gtrans/v1/geo/detect  → run the detector chain, return what was found
+ * - POST /gtrans/v1/geo/cookie  → manually set the country cookie (picker UI)
  *
  * Both endpoints are public — they only echo geo state and don't mutate
  * server-side data.
@@ -63,11 +63,11 @@ class Geo extends Controller {
 		$body    = $request->get_json_params() ?: $request->get_params();
 		$country = strtoupper( (string) ( $body['country'] ?? '' ) );
 		if ( ! preg_match( '/^[A-Z]{2}$/', $country ) ) {
-			return $this->fail( 'ztrans_invalid_country', __( 'country must be an ISO 3166-1 alpha-2 code.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_invalid_country', __( 'country must be an ISO 3166-1 alpha-2 code.', 'gemtranslate' ), 422 );
 		}
 		$ok = CountryContext::write_cookie( $country );
 		if ( ! $ok ) {
-			return $this->fail( 'ztrans_cookie_failed', __( 'Could not set country cookie.', 'zentranslate' ), 500 );
+			return $this->fail( 'gtrans_cookie_failed', __( 'Could not set country cookie.', 'gemtranslate' ), 500 );
 		}
 		return $this->ok( [ 'country' => $country ] );
 	}

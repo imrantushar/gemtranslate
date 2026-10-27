@@ -1,15 +1,15 @@
 <?php
-namespace Zentranslate\I18n;
+namespace GemTranslate\I18n;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Translation\StringTranslator;
+use GemTranslate\Translation\StringTranslator;
 
 /**
  * Bridges translate.wordpress.org community translations into our own
- * `wp_ztrans_string_translations` table so the admin sees them as
+ * `wp_gtrans_string_translations` table so the admin sees them as
  * pre-existing translations rather than empty rows.
  *
  * On a per-package scan we:
@@ -26,7 +26,7 @@ use Zentranslate\Translation\StringTranslator;
  */
 class WporgImporter {
 
-	const TRANSIENT_PREFIX = 'ztrans_wporg_hosted_';
+	const TRANSIENT_PREFIX = 'gtrans_wporg_hosted_';
 	const TRANSIENT_TTL    = DAY_IN_SECONDS;
 
 	/**

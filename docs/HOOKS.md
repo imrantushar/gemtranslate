@@ -1,33 +1,33 @@
 # Actions & filters
 
-Hooks Zentranslate **fires** (for you to subscribe to) and ones it **subscribes to** (so you know where to intercept).
+Hooks GemTranslate **fires** (for you to subscribe to) and ones it **subscribes to** (so you know where to intercept).
 
 ---
 
-## Actions Zentranslate fires
+## Actions GemTranslate fires
 
 | Hook | Args | When |
 |---|---|---|
-| `ztrans_loaded` | — | After `plugins_loaded`. Equivalent to `init`-time bootstrap. |
-| `ztrans_before_init` | — | Just before the dispatcher chain runs. |
-| `ztrans_init` | — | After every Zentranslate subsystem is initialised. |
-| `ztrans_translation_saved` | `int $post_id` | When a translation row changes or a post is saved/deleted. Cache bridges subscribe to this. |
-| `ztrans_language_changed` | `string $event, string $code` | After `LanguageRegistry::insert / update / delete / set_default`. `$event` is one of `inserted`, `updated`, `deleted`, `default_set`. Cache bridges subscribe to this. |
-| `ztrans_run_translation_job` | `array $args` | Internal — Action Scheduler / WP-Cron callback for the async queue. |
+| `gtrans_loaded` | — | After `plugins_loaded`. Equivalent to `init`-time bootstrap. |
+| `gtrans_before_init` | — | Just before the dispatcher chain runs. |
+| `gtrans_init` | — | After every GemTranslate subsystem is initialised. |
+| `gtrans_translation_saved` | `int $post_id` | When a translation row changes or a post is saved/deleted. Cache bridges subscribe to this. |
+| `gtrans_language_changed` | `string $event, string $code` | After `LanguageRegistry::insert / update / delete / set_default`. `$event` is one of `inserted`, `updated`, `deleted`, `default_set`. Cache bridges subscribe to this. |
+| `gtrans_run_translation_job` | `array $args` | Internal — Action Scheduler / WP-Cron callback for the async queue. |
 
 ### Example: trigger an external cache purge
 
 ```php
-add_action( 'ztrans_translation_saved', function ( $post_id ) {
+add_action( 'gtrans_translation_saved', function ( $post_id ) {
     my_external_cdn_purge( $post_id );
 } );
 ```
 
 ---
 
-## Filters Zentranslate hooks into
+## Filters GemTranslate hooks into
 
-The plugin doesn't add new filters of its own for content (yet), but it **subscribes** to a wide set of WordPress filters. If you write a plugin that returns content via these filters, your translations flow through Zentranslate automatically.
+The plugin doesn't add new filters of its own for content (yet), but it **subscribes** to a wide set of WordPress filters. If you write a plugin that returns content via these filters, your translations flow through GemTranslate automatically.
 
 ### Post content
 - `the_title`
@@ -97,27 +97,27 @@ The plugin doesn't add new filters of its own for content (yet), but it **subscr
 
 ## Capabilities
 
-Zentranslate adds a single capability:
+GemTranslate adds a single capability:
 
 ```
-ztrans_translate_content
+gtrans_translate_content
 ```
 
-Granted to `administrator` and `editor` roles on activation (and backfilled on `init` once via the `ztrans_caps_granted` option). Custom role `ztrans_translator` is also registered with just `read` + this cap.
+Granted to `administrator` and `editor` roles on activation (and backfilled on `init` once via the `gtrans_caps_granted` option). Custom role `gtrans_translator` is also registered with just `read` + this cap.
 
 ### Granting / revoking programmatically
 
 ```php
-get_role( 'shop_manager' )->add_cap( 'ztrans_translate_content' );
-get_role( 'editor' )->remove_cap( 'ztrans_translate_content' );
+get_role( 'shop_manager' )->add_cap( 'gtrans_translate_content' );
+get_role( 'editor' )->remove_cap( 'gtrans_translate_content' );
 ```
 
 ### Per-user language scope
 
-User meta `ztrans_assigned_languages` is an array of language codes. Empty = unrestricted; populated = only those languages.
+User meta `gtrans_assigned_languages` is an array of language codes. Empty = unrestricted; populated = only those languages.
 
 ```php
-update_user_meta( $user_id, 'ztrans_assigned_languages', [ 'es', 'pt-br' ] );
+update_user_meta( $user_id, 'gtrans_assigned_languages', [ 'es', 'pt-br' ] );
 ```
 
 The REST layer enforces this scope via `LanguageScope::can_translate( $code )`.
@@ -128,34 +128,34 @@ The REST layer enforces this scope via `LanguageScope::can_translate( $code )`.
 
 | Option | Purpose |
 |---|---|
-| `ztrans_settings` | JSON blob with all admin settings (see [FEATURES.md §27](FEATURES.md#27-settings)). |
-| `ztrans_ai_providers` | JSON config for AI providers (default + per-provider creds, redacted on read). |
-| `ztrans_version` | Plugin version stamp. |
-| `ztrans_db_version` | Schema version — bumped to run migrations. |
-| `ztrans_first_install_time` | Set once at activation. |
-| `ztrans_required_rewrite_flush` | Scheduling flag for `flush_rewrite_rules()` on the next `init`. |
-| `ztrans_caps_granted` | One-shot flag — caps backfilled. |
+| `gtrans_settings` | JSON blob with all admin settings (see [FEATURES.md §27](FEATURES.md#27-settings)). |
+| `gtrans_ai_providers` | JSON config for AI providers (default + per-provider creds, redacted on read). |
+| `gtrans_version` | Plugin version stamp. |
+| `gtrans_db_version` | Schema version — bumped to run migrations. |
+| `gtrans_first_install_time` | Set once at activation. |
+| `gtrans_required_rewrite_flush` | Scheduling flag for `flush_rewrite_rules()` on the next `init`. |
+| `gtrans_caps_granted` | One-shot flag — caps backfilled. |
 
 ## User meta keys
 
 | Key | Purpose |
 |---|---|
-| `ztrans_preferred_language` | The user's chosen admin language. |
-| `ztrans_assigned_languages` | Translator's language scope. |
+| `gtrans_preferred_language` | The user's chosen admin language. |
+| `gtrans_assigned_languages` | Translator's language scope. |
 
 ## Post meta keys
 
 | Key | Purpose |
 |---|---|
-| `_ztrans_group_id` | Translation group ID for a post. |
-| `_ztrans_source_lang` | Language the post was originally authored in. |
-| `_ztrans_source_hash` | MD5 of source `title \x1f content \x1f excerpt` — used for stale detection. |
+| `_gtrans_group_id` | Translation group ID for a post. |
+| `_gtrans_source_lang` | Language the post was originally authored in. |
+| `_gtrans_source_hash` | MD5 of source `title \x1f content \x1f excerpt` — used for stale detection. |
 
 ## Cache groups (object cache)
 
 | Group | What's cached |
 |---|---|
-| `ztrans_languages` | Language list and default-language row. |
-| `ztrans_translations` | Per-post per-language translation rows. |
-| `ztrans_term_translations` | Per-term per-language translation rows. |
-| `ztrans_strings` | UI string-translation map. |
+| `gtrans_languages` | Language list and default-language row. |
+| `gtrans_translations` | Per-post per-language translation rows. |
+| `gtrans_term_translations` | Per-term per-language translation rows. |
+| `gtrans_strings` | UI string-translation map. |

@@ -1,12 +1,12 @@
 <?php
-namespace Zentranslate\Migration;
+namespace GemTranslate\Migration;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Language\LanguageRegistry;
-use Zentranslate\Translation\TranslationLoader;
+use GemTranslate\Language\LanguageRegistry;
+use GemTranslate\Translation\TranslationLoader;
 
 /**
  * Polylang importer.

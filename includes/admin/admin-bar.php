@@ -1,11 +1,11 @@
 <?php
-namespace Zentranslate\Admin;
+namespace GemTranslate\Admin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Language\Context;
+use GemTranslate\Language\Context;
 
 /**
  * Adds a "Language" item to the WP admin bar that quick-switches the
@@ -18,8 +18,8 @@ class AdminBar {
 	public static function init() {
 		$self = new self();
 		add_action( 'admin_bar_menu', [ $self, 'register' ], 100 );
-		add_action( 'admin_post_ztrans_set_user_lang', [ $self, 'handle_set' ] );
-		add_action( 'admin_post_nopriv_ztrans_set_user_lang', [ $self, 'handle_set' ] );
+		add_action( 'admin_post_gtrans_set_user_lang', [ $self, 'handle_set' ] );
+		add_action( 'admin_post_nopriv_gtrans_set_user_lang', [ $self, 'handle_set' ] );
 	}
 
 	public function register( $bar ) {
@@ -43,7 +43,7 @@ class AdminBar {
 				$user_pref = Context::default_code();
 			}
 			if ( $user_pref !== $current ) {
-				$prefix = esc_html__( 'Preview', 'zentranslate' ) . ' · ';
+				$prefix = esc_html__( 'Preview', 'gemtranslate' ) . ' · ';
 			}
 		}
 
@@ -62,8 +62,8 @@ class AdminBar {
 					'parent' => 'ztrans-language',
 					'title'  => esc_html( $lang['name'] ) . ( $code === $current ? ' ✓' : '' ),
 					'href'   => wp_nonce_url(
-						admin_url( 'admin-post.php?action=ztrans_set_user_lang&lang=' . rawurlencode( $code ) ),
-						'ztrans_set_user_lang'
+						admin_url( 'admin-post.php?action=gtrans_set_user_lang&lang=' . rawurlencode( $code ) ),
+						'gtrans_set_user_lang'
 					),
 				]
 			);
@@ -74,7 +74,7 @@ class AdminBar {
 		if ( ! is_user_logged_in() ) {
 			wp_die( 'forbidden', 403 );
 		}
-		check_admin_referer( 'ztrans_set_user_lang' );
+		check_admin_referer( 'gtrans_set_user_lang' );
 
 		$lang     = isset( $_GET['lang'] ) ? sanitize_key( wp_unslash( $_GET['lang'] ) ) : '';
 		$user_id  = get_current_user_id();
@@ -97,7 +97,7 @@ class AdminBar {
 			$this->clear_frontend_cookie();
 		}
 
-		$redirect = remove_query_arg( [ 'ztrans_lang' ], $referer );
+		$redirect = remove_query_arg( [ 'gtrans_lang' ], $referer );
 		if ( $lang && ! $came_from_admin ) {
 			$redirect = $this->frontend_url_for_lang( $redirect, $lang );
 		}
@@ -144,7 +144,7 @@ class AdminBar {
 			return;
 		}
 		setcookie(
-			\Zentranslate\Routing\BrowserRedirect::COOKIE,
+			\GemTranslate\Routing\BrowserRedirect::COOKIE,
 			sanitize_key( $lang ),
 			time() + ( 30 * DAY_IN_SECONDS ),
 			COOKIEPATH ?: '/',
@@ -157,7 +157,7 @@ class AdminBar {
 			return;
 		}
 		setcookie(
-			\Zentranslate\Routing\BrowserRedirect::COOKIE,
+			\GemTranslate\Routing\BrowserRedirect::COOKIE,
 			'',
 			time() - 3600,
 			COOKIEPATH ?: '/',

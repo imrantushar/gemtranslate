@@ -1,13 +1,13 @@
 <?php
-namespace Zentranslate\Language;
+namespace GemTranslate\Language;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Geo\CloudflareDetector;
-use Zentranslate\Geo\CookieDetector;
-use Zentranslate\Geo\MaxmindDetector;
+use GemTranslate\Geo\CloudflareDetector;
+use GemTranslate\Geo\CookieDetector;
+use GemTranslate\Geo\MaxmindDetector;
 
 /**
  * Holds the visitor's resolved country code for the current request.
@@ -19,11 +19,11 @@ use Zentranslate\Geo\MaxmindDetector;
  * Built-in detectors:
  *   - cf_header  → CloudFlare's `CF-IPCountry` request header
  *   - maxmind    → MaxMind GeoLite2 DB lookup against REMOTE_ADDR
- *   - cookie     → `ztrans_user_country` cookie (manual override / fallback)
+ *   - cookie     → `gtrans_user_country` cookie (manual override / fallback)
  */
 class CountryContext {
 
-	const COOKIE = 'ztrans_user_country';
+	const COOKIE = 'gtrans_user_country';
 
 	private static $current = null;
 
@@ -85,7 +85,7 @@ class CountryContext {
 	}
 
 	public static function settings() {
-		$raw = get_option( ZTRANS_SETTINGS_NAME, '{}' );
+		$raw = get_option( GTRANS_SETTINGS_NAME, '{}' );
 		$cfg = json_decode( $raw, true );
 		return is_array( $cfg ) ? $cfg : [];
 	}

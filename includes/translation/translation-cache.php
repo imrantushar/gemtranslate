@@ -1,5 +1,5 @@
 <?php
-namespace Zentranslate\Translation;
+namespace GemTranslate\Translation;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -12,9 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class TranslationCache {
 
-	const GROUP_POSTS = 'ztrans_translations';
-	const GROUP_TERMS = 'ztrans_term_translations';
-	const GROUP_STRINGS = 'ztrans_strings';
+	const GROUP_POSTS = 'gtrans_translations';
+	const GROUP_TERMS = 'gtrans_term_translations';
+	const GROUP_STRINGS = 'gtrans_strings';
 	const TTL = DAY_IN_SECONDS;
 
 	public static function get( $group, $key ) {

@@ -1,6 +1,6 @@
 # Architecture
 
-How a frontend request flows through Zentranslate, where caches sit, why translations are fast.
+How a frontend request flows through GemTranslate, where caches sit, why translations are fast.
 
 ---
 
@@ -18,9 +18,9 @@ Browser → /es/sample-page/
    The plugin adds NO rewrite rules — WP's normal routing handles everything.
 
 3. `wp` action: TranslationLoader::preload($queried_object)
-   └─ One SELECT against wp_ztrans_post_translations
+   └─ One SELECT against wp_gtrans_post_translations
       (covered by PRIMARY KEY (group_id, language_code))
-   └─ Result cached in wp_cache group `ztrans_translations`,
+   └─ Result cached in wp_cache group `gtrans_translations`,
       key `{group_id}:{lang}`, 24h TTL
 
 4. Content filters fire:
@@ -63,7 +63,7 @@ There are three levels of caching, all flushed on writes:
 
 Writes invalidate all three:
 - `save_post` → `TranslationLoader::invalidate_post()` clears the request memo + object cache.
-- `ztrans_translation_saved` action → cache-plugin bridges purge.
+- `gtrans_translation_saved` action → cache-plugin bridges purge.
 - Language CRUD → `Context::flush()` clears the active-language map.
 
 ## Storage strategy
@@ -73,7 +73,7 @@ Writes invalidate all three:
             ▲
             │ post_id reference
             │
-wp_ztrans_post_translations
+wp_gtrans_post_translations
    group_id (FK → translation_groups)
    language_code
    title / content / excerpt / slug / status
@@ -82,46 +82,46 @@ wp_ztrans_post_translations
 ```
 
 - **One canonical post** lives in `wp_posts`. WP_Query never sees translation rows.
-- **Translations** live in `wp_ztrans_post_translations`, keyed by `(group_id, language_code)`.
+- **Translations** live in `wp_gtrans_post_translations`, keyed by `(group_id, language_code)`.
 - **No JOINs** — translation lookup is a single PK index hit per post.
-- **Post meta translations** mirror this pattern in `wp_ztrans_post_meta_translations`.
+- **Post meta translations** mirror this pattern in `wp_gtrans_post_meta_translations`.
 
-This is the headline performance choice. WPML duplicates posts into `wp_posts`; Polylang duplicates and adds a taxonomy link; both inflate `wp_posts` linearly with language count. Zentranslate keeps `wp_posts` flat and stores translation deltas separately.
+This is the headline performance choice. WPML duplicates posts into `wp_posts`; Polylang duplicates and adds a taxonomy link; both inflate `wp_posts` linearly with language count. GemTranslate keeps `wp_posts` flat and stores translation deltas separately.
 
 ## Dispatcher chain
 
 ```
-zentranslate.php (root)
-  Zentranslate::__construct()
+gemtranslate.php (root)
+  GemTranslate::__construct()
     define_constants()
     set_global_settings()
     load_dependency()           ← autoloader + functions + hooks
     register_activation_hook()
-    add_action('plugins_loaded') → on_plugins_loaded() → do_action('ztrans_loaded')
-    add_action('ztrans_loaded')  → init_plugin() → dispatch_hooks():
+    add_action('plugins_loaded') → on_plugins_loaded() → do_action('gtrans_loaded')
+    add_action('gtrans_loaded')  → init_plugin() → dispatch_hooks():
 
-      Zentranslate\Database::init()         (rewrite-flush scheduler)
-      Zentranslate\Language::init()         (lightweight)
-      Zentranslate\Routing::init()          (RequestParser + UrlRewriter + BrowserRedirect)
-      Zentranslate\Translation::init()      (Post/Term/Menu/String/Meta translators)
-      Zentranslate\SEO::init()              (Hreflang + Sitemap + Yoast + RankMath)
-      Zentranslate\AI::init()               (JobRunner)
-      Zentranslate\Cache::init()            (Invalidator)
-      Zentranslate\Compat::init()           (Woo + WP Rocket + W3TC + LiteSpeed + Cloudflare)
-      Zentranslate\API::init()              (12 REST controllers under ztrans/v1)
-      Zentranslate\Assets::init()           (script enqueue + block-editor enqueue)
-      Zentranslate\Frontend::init()         (shortcode + Gutenberg block + widget)
-      Zentranslate\Admin::init()            (menu + bar + profile + Localizer + MailLocalizer)
-      Zentranslate\Multisite::init()        (wp_initialize_site / wpmu_new_blog)
-      Zentranslate\Cli::init()              (WP-CLI commands when WP_CLI is set)
+      GemTranslate\Database::init()         (rewrite-flush scheduler)
+      GemTranslate\Language::init()         (lightweight)
+      GemTranslate\Routing::init()          (RequestParser + UrlRewriter + BrowserRedirect)
+      GemTranslate\Translation::init()      (Post/Term/Menu/String/Meta translators)
+      GemTranslate\SEO::init()              (Hreflang + Sitemap + Yoast + RankMath)
+      GemTranslate\AI::init()               (JobRunner)
+      GemTranslate\Cache::init()            (Invalidator)
+      GemTranslate\Compat::init()           (Woo + WP Rocket + W3TC + LiteSpeed + Cloudflare)
+      GemTranslate\API::init()              (12 REST controllers under gtrans/v1)
+      GemTranslate\Assets::init()           (script enqueue + block-editor enqueue)
+      GemTranslate\Frontend::init()         (shortcode + Gutenberg block + widget)
+      GemTranslate\Admin::init()            (menu + bar + profile + Localizer + MailLocalizer)
+      GemTranslate\Multisite::init()        (wp_initialize_site / wpmu_new_blog)
+      GemTranslate\Cli::init()              (WP-CLI commands when WP_CLI is set)
 ```
 
 ## Autoloader
 
 Custom Academy-style autoloader at `includes/autoload.php`:
 
-- Root namespace `Zentranslate` → `includes/`
-- `Zentranslate\Foo\BarBaz` → `includes/foo/bar-baz.php`
+- Root namespace `GemTranslate` → `includes/`
+- `GemTranslate\Foo\BarBaz` → `includes/foo/bar-baz.php`
 - CamelCase → kebab-case; `\` → `/`; lowercase
 - No Composer required
 
@@ -129,10 +129,10 @@ Side benefit: every class lives in its own file, named predictably.
 
 ## React admin
 
-- **Entry**: `dev_zentranslate/index.jsx` mounts into `#zentranslate-admin-root`.
+- **Entry**: `dev_gemtranslate/index.jsx` mounts into `#gemtranslate-admin-root`.
 - **Routing**: `HashRouter` so deep links work without server-side rewrite rules.
 - **Data layer**: TanStack Query — cache, optimistic updates, refetch-on-mutation.
-- **Styling**: Tailwind v3 with `ztrans-` prefix and `important: '#zentranslate-admin-root'` so utilities only apply inside our subtree (no WP-admin style bleed).
+- **Styling**: Tailwind v3 with `ztrans-` prefix and `important: '#gemtranslate-admin-root'` so utilities only apply inside our subtree (no WP-admin style bleed).
 - **i18n**: `@wordpress/i18n` for `__()` / `sprintf`. `wp_set_script_translations` loads the per-locale JSON when a translation pack exists.
 
 ## Build pipeline
@@ -151,7 +151,7 @@ React UI / WP-CLI / REST
     ▼
 JobRunner::queue_translate_post( $post_id, $lang )
     │
-    │ insert into wp_ztrans_jobs (status=pending)
+    │ insert into wp_gtrans_jobs (status=pending)
     │
     ▼
 Dispatch:

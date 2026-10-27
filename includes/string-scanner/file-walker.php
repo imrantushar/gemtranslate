@@ -1,11 +1,11 @@
 <?php
-namespace Zentranslate\StringScanner;
+namespace GemTranslate\StringScanner;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Translation\StringTranslator;
+use GemTranslate\Translation\StringTranslator;
 
 /**
  * Walks plugin/theme directories, extracts gettext calls, registers them.

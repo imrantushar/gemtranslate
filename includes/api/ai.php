@@ -1,14 +1,14 @@
 <?php
-namespace Zentranslate\API;
+namespace GemTranslate\API;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\AI\Glossary;
-use Zentranslate\AI\TranslationMemory;
-use Zentranslate\AI\TranslatorFactory;
-use Zentranslate\Language\Context;
+use GemTranslate\AI\Glossary;
+use GemTranslate\AI\TranslationMemory;
+use GemTranslate\AI\TranslatorFactory;
+use GemTranslate\Language\Context;
 
 class AI extends Controller {
 
@@ -175,26 +175,26 @@ class AI extends Controller {
 		if ( ! empty( $body['api_key'] ) || ! empty( $body['endpoint'] ) ) {
 			switch ( $name ) {
 				case 'openai':
-					$translator = new \Zentranslate\AI\OpenAiTranslator( $body['api_key'] ?? '', $body['model'] ?? '' );
+					$translator = new \GemTranslate\AI\OpenAiTranslator( $body['api_key'] ?? '', $body['model'] ?? '' );
 					break;
 				case 'deepl':
-					$translator = new \Zentranslate\AI\DeeplTranslator( $body['api_key'] ?? '', ! empty( $body['use_pro'] ) );
+					$translator = new \GemTranslate\AI\DeeplTranslator( $body['api_key'] ?? '', ! empty( $body['use_pro'] ) );
 					break;
 				case 'google':
-					$translator = new \Zentranslate\AI\GoogleTranslator( $body['api_key'] ?? '' );
+					$translator = new \GemTranslate\AI\GoogleTranslator( $body['api_key'] ?? '' );
 					break;
 				case 'cloud':
-					$translator = new \Zentranslate\AI\CloudTranslator( $body['api_key'] ?? '', $body['endpoint'] ?? '' );
+					$translator = new \GemTranslate\AI\CloudTranslator( $body['api_key'] ?? '', $body['endpoint'] ?? '' );
 					break;
 				default:
-					return $this->fail( 'ztrans_unknown_provider', __( 'Unknown provider.', 'zentranslate' ), 400 );
+					return $this->fail( 'gtrans_unknown_provider', __( 'Unknown provider.', 'gemtranslate' ), 400 );
 			}
 		} else {
 			$translator = TranslatorFactory::make( $name );
 		}
 
 		if ( ! $translator ) {
-			return $this->fail( 'ztrans_unknown_provider', __( 'Unknown provider.', 'zentranslate' ), 400 );
+			return $this->fail( 'gtrans_unknown_provider', __( 'Unknown provider.', 'gemtranslate' ), 400 );
 		}
 		$result = $translator->test_credentials();
 		if ( is_wp_error( $result ) ) {
@@ -211,11 +211,11 @@ class AI extends Controller {
 		$provider_name = (string) ( $body['provider'] ?? '' );
 
 		if ( '' === $target ) {
-			return $this->fail( 'ztrans_missing_target', __( 'target_lang is required.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_missing_target', __( 'target_lang is required.', 'gemtranslate' ), 422 );
 		}
 		$translator = $provider_name ? TranslatorFactory::make( $provider_name ) : TranslatorFactory::default_translator();
 		if ( ! $translator ) {
-			return $this->fail( 'ztrans_no_provider', __( 'No translator is configured.', 'zentranslate' ), 400 );
+			return $this->fail( 'gtrans_no_provider', __( 'No translator is configured.', 'gemtranslate' ), 400 );
 		}
 
 		$is_batch = is_array( $text );
@@ -282,7 +282,7 @@ class AI extends Controller {
 			return $err;
 		}
 		global $wpdb;
-		$rows = $wpdb->get_results( "SELECT * FROM " . \Zentranslate\Helper::table( 'glossary' ) . " ORDER BY term_id DESC", ARRAY_A ) ?: [];
+		$rows = $wpdb->get_results( "SELECT * FROM " . \GemTranslate\Helper::table( 'glossary' ) . " ORDER BY term_id DESC", ARRAY_A ) ?: [];
 		return $this->ok( $rows );
 	}
 
@@ -302,7 +302,7 @@ class AI extends Controller {
 			]
 		);
 		if ( ! $ok ) {
-			return $this->fail( 'ztrans_save_failed', __( 'Could not add glossary term.', 'zentranslate' ), 500 );
+			return $this->fail( 'gtrans_save_failed', __( 'Could not add glossary term.', 'gemtranslate' ), 500 );
 		}
 		return $this->ok( [ 'saved' => true ] );
 	}
@@ -333,7 +333,7 @@ class AI extends Controller {
 		$limit  = (int) ( $body['limit'] ?? 5 );
 
 		if ( '' === $target ) {
-			return $this->fail( 'ztrans_missing_target', __( 'target_lang is required.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_missing_target', __( 'target_lang is required.', 'gemtranslate' ), 422 );
 		}
 
 		return $this->ok(

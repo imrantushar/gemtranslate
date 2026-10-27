@@ -1,5 +1,5 @@
 <?php
-namespace Zentranslate\AI;
+namespace GemTranslate\AI;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -27,7 +27,7 @@ class DeeplTranslator implements TranslatorInterface {
 
 	public function translate( $texts, $source_lang, $target_lang, $context = [] ) {
 		if ( empty( $this->api_key ) ) {
-			return new \WP_Error( 'ztrans_no_key', __( 'DeepL API key is not configured.', 'zentranslate' ) );
+			return new \WP_Error( 'gtrans_no_key', __( 'DeepL API key is not configured.', 'gemtranslate' ) );
 		}
 
 		$is_array = is_array( $texts );
@@ -67,11 +67,11 @@ class DeeplTranslator implements TranslatorInterface {
 		$code = (int) wp_remote_retrieve_response_code( $response );
 		$body_raw = wp_remote_retrieve_body( $response );
 		if ( $code < 200 || $code >= 300 ) {
-			return new \WP_Error( 'ztrans_deepl_http_' . $code, $body_raw ?: 'DeepL error', [ 'status' => $code ] );
+			return new \WP_Error( 'gtrans_deepl_http_' . $code, $body_raw ?: 'DeepL error', [ 'status' => $code ] );
 		}
 		$data = json_decode( $body_raw, true );
 		if ( ! isset( $data['translations'] ) ) {
-			return new \WP_Error( 'ztrans_deepl_empty', __( 'DeepL returned no translations.', 'zentranslate' ) );
+			return new \WP_Error( 'gtrans_deepl_empty', __( 'DeepL returned no translations.', 'gemtranslate' ) );
 		}
 		$translations = array_map( fn( $row ) => $row['text'] ?? '', $data['translations'] );
 		if ( ! $is_array ) {

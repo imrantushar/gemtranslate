@@ -1,19 +1,19 @@
 <?php
-namespace Zentranslate\Language;
+namespace GemTranslate\Language;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Helper;
-use Zentranslate\Language\Context;
+use GemTranslate\Helper;
+use GemTranslate\Language\Context;
 
 /**
  * CRUD for the languages table, with object-cache wrapping.
  */
 class LanguageRegistry {
 
-	const CACHE_GROUP = 'ztrans_languages';
+	const CACHE_GROUP = 'gtrans_languages';
 	const CACHE_KEY_ALL = 'all';
 	const CACHE_KEY_DEFAULT = 'default';
 
@@ -78,7 +78,7 @@ class LanguageRegistry {
 		$result = $wpdb->insert( $this->table(), $data );
 		$this->flush_cache();
 		if ( $result ) {
-			do_action( 'ztrans_language_changed', 'inserted', $data['code'] );
+			do_action( 'gtrans_language_changed', 'inserted', $data['code'] );
 			return $data['code'];
 		}
 		return false;
@@ -94,7 +94,7 @@ class LanguageRegistry {
 		$result = $wpdb->update( $this->table(), $data, [ 'code' => $code ] );
 		$this->flush_cache();
 		if ( $result !== false ) {
-			do_action( 'ztrans_language_changed', 'updated', $code );
+			do_action( 'gtrans_language_changed', 'updated', $code );
 			return true;
 		}
 		return false;
@@ -109,7 +109,7 @@ class LanguageRegistry {
 		$result = $wpdb->delete( $this->table(), [ 'code' => $code ] );
 		$this->flush_cache();
 		if ( $result !== false ) {
-			do_action( 'ztrans_language_changed', 'deleted', $code );
+			do_action( 'gtrans_language_changed', 'deleted', $code );
 			return true;
 		}
 		return false;
@@ -123,7 +123,7 @@ class LanguageRegistry {
 		$wpdb->update( $this->table(), [ 'is_default' => 0 ], [ 'is_default' => 1 ] );
 		$wpdb->update( $this->table(), [ 'is_default' => 1, 'active' => 1 ], [ 'code' => $code ] );
 		$this->flush_cache();
-		do_action( 'ztrans_language_changed', 'default_set', $code );
+		do_action( 'gtrans_language_changed', 'default_set', $code );
 	}
 
 	public function flush_cache() {

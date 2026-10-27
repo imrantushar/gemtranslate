@@ -1,9 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
 	prefix: 'ztrans-',
-	important: '#zentranslate-admin-root',
+	important: '#gemtranslate-admin-root',
 	content: [
-		'./dev_zentranslate/**/*.{js,jsx,ts,tsx}',
+		'./dev_gemtranslate/**/*.{js,jsx,ts,tsx}',
 		'./includes/admin/**/*.php',
 	],
 	corePlugins: {

@@ -1,5 +1,5 @@
 <?php
-namespace Zentranslate\Admin;
+namespace GemTranslate\Admin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class AdminMenu {
 
-	const PAGE_SLUG = 'zentranslate';
+	const PAGE_SLUG = 'gemtranslate';
 
 	public static function init() {
 		$self = new self();
@@ -16,8 +16,8 @@ class AdminMenu {
 
 	public function register_menu() {
 		add_menu_page(
-			__( 'Zentranslate', 'zentranslate' ),
-			__( 'Zentranslate', 'zentranslate' ),
+			__( 'GemTranslate', 'gemtranslate' ),
+			__( 'GemTranslate', 'gemtranslate' ),
 			'manage_options',
 			self::PAGE_SLUG,
 			[ $this, 'render_page' ],
@@ -27,8 +27,8 @@ class AdminMenu {
 	}
 
 	public function render_page() {
-		echo '<div id="zentranslate-admin-root" class="zentranslate-admin-root">';
-		echo '<noscript>' . esc_html__( 'Zentranslate requires JavaScript to manage translations.', 'zentranslate' ) . '</noscript>';
+		echo '<div id="gemtranslate-admin-root" class="gemtranslate-admin-root">';
+		echo '<noscript>' . esc_html__( 'GemTranslate requires JavaScript to manage translations.', 'gemtranslate' ) . '</noscript>';
 		echo '</div>';
 	}
 }

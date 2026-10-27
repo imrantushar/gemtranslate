@@ -1,17 +1,17 @@
 <?php
-namespace Zentranslate\API;
+namespace GemTranslate\API;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\AI\TranslationMemory;
-use Zentranslate\AI\TranslatorFactory;
-use Zentranslate\I18n\PackGenerator;
-use Zentranslate\I18n\WporgImporter;
-use Zentranslate\Language\Context;
-use Zentranslate\StringScanner\FileWalker;
-use Zentranslate\Translation\StringTranslator;
+use GemTranslate\AI\TranslationMemory;
+use GemTranslate\AI\TranslatorFactory;
+use GemTranslate\I18n\PackGenerator;
+use GemTranslate\I18n\WporgImporter;
+use GemTranslate\Language\Context;
+use GemTranslate\StringScanner\FileWalker;
+use GemTranslate\Translation\StringTranslator;
 
 class Strings extends Controller {
 
@@ -166,14 +166,14 @@ class Strings extends Controller {
 		$id   = (int) $request['id'];
 		$lang = strtolower( $request['lang'] );
 		if ( ! Context::is_active( $lang ) ) {
-			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_invalid_lang', __( 'Language is not active.', 'gemtranslate' ), 422 );
 		}
 		$body   = $request->get_json_params() ?: $request->get_params();
 		$value  = (string) ( $body['value'] ?? '' );
 		$status = (string) ( $body['status'] ?? 'translated' );
 		$ok     = StringTranslator::save_translation( $id, $lang, $value, $status );
 		if ( ! $ok ) {
-			return $this->fail( 'ztrans_save_failed', __( 'Could not save translation.', 'zentranslate' ), 500 );
+			return $this->fail( 'gtrans_save_failed', __( 'Could not save translation.', 'gemtranslate' ), 500 );
 		}
 		return $this->ok( [ 'saved' => true, 'string_id' => $id, 'language_code' => $lang ] );
 	}
@@ -209,11 +209,11 @@ class Strings extends Controller {
 			case 'custom':
 				$dir = wp_normalize_path( $path );
 				if ( ! $dir || ! is_dir( $dir ) ) {
-					return $this->fail( 'ztrans_bad_path', __( 'Directory does not exist.', 'zentranslate' ), 422 );
+					return $this->fail( 'gtrans_bad_path', __( 'Directory does not exist.', 'gemtranslate' ), 422 );
 				}
 				break;
 			default:
-				return $this->fail( 'ztrans_bad_target', __( 'Unknown scan target.', 'zentranslate' ), 422 );
+				return $this->fail( 'gtrans_bad_target', __( 'Unknown scan target.', 'gemtranslate' ), 422 );
 		}
 
 		$result = FileWalker::scan_directory( $dir );
@@ -349,7 +349,7 @@ class Strings extends Controller {
 		}
 		$lang = strtolower( (string) $request['lang'] );
 		if ( ! Context::is_active( $lang ) ) {
-			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_invalid_lang', __( 'Language is not active.', 'gemtranslate' ), 422 );
 		}
 
 		$body         = $request->get_json_params() ?: $request->get_params();
@@ -428,11 +428,11 @@ class Strings extends Controller {
 		}
 		$lang = strtolower( (string) $request['lang'] );
 		if ( ! Context::is_active( $lang ) ) {
-			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_invalid_lang', __( 'Language is not active.', 'gemtranslate' ), 422 );
 		}
 		$locale = $this->locale_for( $lang );
 		if ( '' === $locale ) {
-			return $this->fail( 'ztrans_no_locale', __( 'Language has no locale configured.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_no_locale', __( 'Language has no locale configured.', 'gemtranslate' ), 422 );
 		}
 
 		$body          = $request->get_json_params() ?: $request->get_params();
@@ -456,7 +456,7 @@ class Strings extends Controller {
 		}
 		$lang = strtolower( (string) $request['lang'] );
 		if ( ! Context::is_active( $lang ) ) {
-			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_invalid_lang', __( 'Language is not active.', 'gemtranslate' ), 422 );
 		}
 		$body       = $request->get_json_params() ?: $request->get_params();
 		$string_ids = array_map( 'intval', (array) ( $body['string_ids'] ?? [] ) );
@@ -466,7 +466,7 @@ class Strings extends Controller {
 
 		// Fetch source text for each id, then probe TM.
 		global $wpdb;
-		$table = \Zentranslate\Helper::table( 'strings' );
+		$table = \GemTranslate\Helper::table( 'strings' );
 		$placeholders = implode( ',', array_fill( 0, count( $string_ids ), '%d' ) );
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$rows = $wpdb->get_results(
@@ -492,7 +492,7 @@ class Strings extends Controller {
 	private function resolve_package( $slug ) {
 		$slug = sanitize_key( $slug );
 		if ( '' === $slug ) {
-			return $this->fail( 'ztrans_bad_slug', __( 'Invalid package slug.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_bad_slug', __( 'Invalid package slug.', 'gemtranslate' ), 422 );
 		}
 		// Try plugin first.
 		foreach ( $this->collect_plugins() as $pkg ) {
@@ -505,7 +505,7 @@ class Strings extends Controller {
 				return $pkg;
 			}
 		}
-		return $this->fail( 'ztrans_not_found', __( 'Package not found.', 'zentranslate' ), 404 );
+		return $this->fail( 'gtrans_not_found', __( 'Package not found.', 'gemtranslate' ), 404 );
 	}
 
 	private function locale_for( $lang ) {

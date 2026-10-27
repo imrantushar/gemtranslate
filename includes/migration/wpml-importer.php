@@ -1,13 +1,13 @@
 <?php
-namespace Zentranslate\Migration;
+namespace GemTranslate\Migration;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Helper;
-use Zentranslate\Language\LanguageRegistry;
-use Zentranslate\Translation\TranslationLoader;
+use GemTranslate\Helper;
+use GemTranslate\Language\LanguageRegistry;
+use GemTranslate\Translation\TranslationLoader;
 
 /**
  * WPML importer.
@@ -17,7 +17,7 @@ use Zentranslate\Translation\TranslationLoader;
  * and `icl_languages` (codes + locales).
  *
  * Our model: one source post + N translation rows in
- * `wp_ztrans_post_translations` keyed by (group_id, language_code).
+ * `wp_gtrans_post_translations` keyed by (group_id, language_code).
  *
  * Walks `icl_translations`, picks the source row per `trid`, copies title
  * /content/excerpt of every translated post into the source's group.

@@ -274,237 +274,237 @@ input:where([type='file']):focus {
 	outline: 1px solid ButtonText;
 	outline: 1px auto -webkit-focus-ring-color;
 }
-#zentranslate-admin-root .ztrans-pointer-events-none {
+#gemtranslate-admin-root .ztrans-pointer-events-none {
 	pointer-events: none;
 }
-#zentranslate-admin-root .ztrans-pointer-events-auto {
+#gemtranslate-admin-root .ztrans-pointer-events-auto {
 	pointer-events: auto;
 }
-#zentranslate-admin-root .ztrans-fixed {
+#gemtranslate-admin-root .ztrans-fixed {
 	position: fixed;
 }
-#zentranslate-admin-root .ztrans-absolute {
+#gemtranslate-admin-root .ztrans-absolute {
 	position: absolute;
 }
-#zentranslate-admin-root .ztrans-relative {
+#gemtranslate-admin-root .ztrans-relative {
 	position: relative;
 }
-#zentranslate-admin-root .ztrans-sticky {
+#gemtranslate-admin-root .ztrans-sticky {
 	position: sticky;
 }
-#zentranslate-admin-root .ztrans-inset-0 {
+#gemtranslate-admin-root .ztrans-inset-0 {
 	inset: 0px;
 }
-#zentranslate-admin-root .ztrans-bottom-6 {
+#gemtranslate-admin-root .ztrans-bottom-6 {
 	bottom: 1.5rem;
 }
-#zentranslate-admin-root .ztrans-right-0 {
+#gemtranslate-admin-root .ztrans-right-0 {
 	right: 0px;
 }
-#zentranslate-admin-root .ztrans-right-6 {
+#gemtranslate-admin-root .ztrans-right-6 {
 	right: 1.5rem;
 }
-#zentranslate-admin-root .ztrans-top-0 {
+#gemtranslate-admin-root .ztrans-top-0 {
 	top: 0px;
 }
-#zentranslate-admin-root .ztrans-z-10 {
+#gemtranslate-admin-root .ztrans-z-10 {
 	z-index: 10;
 }
-#zentranslate-admin-root .ztrans-z-40 {
+#gemtranslate-admin-root .ztrans-z-40 {
 	z-index: 40;
 }
-#zentranslate-admin-root .ztrans-z-50 {
+#gemtranslate-admin-root .ztrans-z-50 {
 	z-index: 50;
 }
-#zentranslate-admin-root .ztrans-m-0 {
+#gemtranslate-admin-root .ztrans-m-0 {
 	margin: 0px;
 }
-#zentranslate-admin-root .ztrans-mx-0\.5 {
+#gemtranslate-admin-root .ztrans-mx-0\.5 {
 	margin-left: 0.125rem;
 	margin-right: 0.125rem;
 }
-#zentranslate-admin-root .ztrans-mx-1 {
+#gemtranslate-admin-root .ztrans-mx-1 {
 	margin-left: 0.25rem;
 	margin-right: 0.25rem;
 }
-#zentranslate-admin-root .-ztrans-ml-px {
+#gemtranslate-admin-root .-ztrans-ml-px {
 	margin-left: -1px;
 }
-#zentranslate-admin-root .ztrans-mb-0 {
+#gemtranslate-admin-root .ztrans-mb-0 {
 	margin-bottom: 0px;
 }
-#zentranslate-admin-root .ztrans-mb-1 {
+#gemtranslate-admin-root .ztrans-mb-1 {
 	margin-bottom: 0.25rem;
 }
-#zentranslate-admin-root .ztrans-mb-1\.5 {
+#gemtranslate-admin-root .ztrans-mb-1\.5 {
 	margin-bottom: 0.375rem;
 }
-#zentranslate-admin-root .ztrans-mb-2 {
+#gemtranslate-admin-root .ztrans-mb-2 {
 	margin-bottom: 0.5rem;
 }
-#zentranslate-admin-root .ztrans-mb-3 {
+#gemtranslate-admin-root .ztrans-mb-3 {
 	margin-bottom: 0.75rem;
 }
-#zentranslate-admin-root .ztrans-mb-4 {
+#gemtranslate-admin-root .ztrans-mb-4 {
 	margin-bottom: 1rem;
 }
-#zentranslate-admin-root .ztrans-mb-6 {
+#gemtranslate-admin-root .ztrans-mb-6 {
 	margin-bottom: 1.5rem;
 }
-#zentranslate-admin-root .ztrans-ml-1 {
+#gemtranslate-admin-root .ztrans-ml-1 {
 	margin-left: 0.25rem;
 }
-#zentranslate-admin-root .ztrans-ml-2 {
+#gemtranslate-admin-root .ztrans-ml-2 {
 	margin-left: 0.5rem;
 }
-#zentranslate-admin-root .ztrans-ml-auto {
+#gemtranslate-admin-root .ztrans-ml-auto {
 	margin-left: auto;
 }
-#zentranslate-admin-root .ztrans-mr-1 {
+#gemtranslate-admin-root .ztrans-mr-1 {
 	margin-right: 0.25rem;
 }
-#zentranslate-admin-root .ztrans-mt-0\.5 {
+#gemtranslate-admin-root .ztrans-mt-0\.5 {
 	margin-top: 0.125rem;
 }
-#zentranslate-admin-root .ztrans-mt-1 {
+#gemtranslate-admin-root .ztrans-mt-1 {
 	margin-top: 0.25rem;
 }
-#zentranslate-admin-root .ztrans-mt-1\.5 {
+#gemtranslate-admin-root .ztrans-mt-1\.5 {
 	margin-top: 0.375rem;
 }
-#zentranslate-admin-root .ztrans-mt-2 {
+#gemtranslate-admin-root .ztrans-mt-2 {
 	margin-top: 0.5rem;
 }
-#zentranslate-admin-root .ztrans-mt-3 {
+#gemtranslate-admin-root .ztrans-mt-3 {
 	margin-top: 0.75rem;
 }
-#zentranslate-admin-root .ztrans-mt-4 {
+#gemtranslate-admin-root .ztrans-mt-4 {
 	margin-top: 1rem;
 }
-#zentranslate-admin-root .ztrans-mt-5 {
+#gemtranslate-admin-root .ztrans-mt-5 {
 	margin-top: 1.25rem;
 }
-#zentranslate-admin-root .ztrans-mt-6 {
+#gemtranslate-admin-root .ztrans-mt-6 {
 	margin-top: 1.5rem;
 }
-#zentranslate-admin-root .ztrans-mt-8 {
+#gemtranslate-admin-root .ztrans-mt-8 {
 	margin-top: 2rem;
 }
-#zentranslate-admin-root .ztrans-block {
+#gemtranslate-admin-root .ztrans-block {
 	display: block;
 }
-#zentranslate-admin-root .ztrans-inline-block {
+#gemtranslate-admin-root .ztrans-inline-block {
 	display: inline-block;
 }
-#zentranslate-admin-root .ztrans-flex {
+#gemtranslate-admin-root .ztrans-flex {
 	display: flex;
 }
-#zentranslate-admin-root .ztrans-inline-flex {
+#gemtranslate-admin-root .ztrans-inline-flex {
 	display: inline-flex;
 }
-#zentranslate-admin-root .ztrans-grid {
+#gemtranslate-admin-root .ztrans-grid {
 	display: grid;
 }
-#zentranslate-admin-root .ztrans-h-1\.5 {
+#gemtranslate-admin-root .ztrans-h-1\.5 {
 	height: 0.375rem;
 }
-#zentranslate-admin-root .ztrans-h-2 {
+#gemtranslate-admin-root .ztrans-h-2 {
 	height: 0.5rem;
 }
-#zentranslate-admin-root .ztrans-h-3 {
+#gemtranslate-admin-root .ztrans-h-3 {
 	height: 0.75rem;
 }
-#zentranslate-admin-root .ztrans-h-3\.5 {
+#gemtranslate-admin-root .ztrans-h-3\.5 {
 	height: 0.875rem;
 }
-#zentranslate-admin-root .ztrans-h-4 {
+#gemtranslate-admin-root .ztrans-h-4 {
 	height: 1rem;
 }
-#zentranslate-admin-root .ztrans-h-6 {
+#gemtranslate-admin-root .ztrans-h-6 {
 	height: 1.5rem;
 }
-#zentranslate-admin-root .ztrans-h-full {
+#gemtranslate-admin-root .ztrans-h-full {
 	height: 100%;
 }
-#zentranslate-admin-root .ztrans-max-h-72 {
+#gemtranslate-admin-root .ztrans-max-h-72 {
 	max-height: 18rem;
 }
-#zentranslate-admin-root .ztrans-min-h-\[2\.5rem\] {
+#gemtranslate-admin-root .ztrans-min-h-\[2\.5rem\] {
 	min-height: 2.5rem;
 }
-#zentranslate-admin-root .ztrans-w-1\/2 {
+#gemtranslate-admin-root .ztrans-w-1\/2 {
 	width: 50%;
 }
-#zentranslate-admin-root .ztrans-w-1\/3 {
+#gemtranslate-admin-root .ztrans-w-1\/3 {
 	width: 33.333333%;
 }
-#zentranslate-admin-root .ztrans-w-10 {
+#gemtranslate-admin-root .ztrans-w-10 {
 	width: 2.5rem;
 }
-#zentranslate-admin-root .ztrans-w-12 {
+#gemtranslate-admin-root .ztrans-w-12 {
 	width: 3rem;
 }
-#zentranslate-admin-root .ztrans-w-24 {
+#gemtranslate-admin-root .ztrans-w-24 {
 	width: 6rem;
 }
-#zentranslate-admin-root .ztrans-w-3 {
+#gemtranslate-admin-root .ztrans-w-3 {
 	width: 0.75rem;
 }
-#zentranslate-admin-root .ztrans-w-3\.5 {
+#gemtranslate-admin-root .ztrans-w-3\.5 {
 	width: 0.875rem;
 }
-#zentranslate-admin-root .ztrans-w-32 {
+#gemtranslate-admin-root .ztrans-w-32 {
 	width: 8rem;
 }
-#zentranslate-admin-root .ztrans-w-6 {
+#gemtranslate-admin-root .ztrans-w-6 {
 	width: 1.5rem;
 }
-#zentranslate-admin-root .ztrans-w-60 {
+#gemtranslate-admin-root .ztrans-w-60 {
 	width: 15rem;
 }
-#zentranslate-admin-root .ztrans-w-72 {
+#gemtranslate-admin-root .ztrans-w-72 {
 	width: 18rem;
 }
-#zentranslate-admin-root .ztrans-w-full {
+#gemtranslate-admin-root .ztrans-w-full {
 	width: 100%;
 }
-#zentranslate-admin-root .ztrans-w-px {
+#gemtranslate-admin-root .ztrans-w-px {
 	width: 1px;
 }
-#zentranslate-admin-root .ztrans-min-w-\[160px\] {
+#gemtranslate-admin-root .ztrans-min-w-\[160px\] {
 	min-width: 160px;
 }
-#zentranslate-admin-root .ztrans-min-w-\[200px\] {
+#gemtranslate-admin-root .ztrans-min-w-\[200px\] {
 	min-width: 200px;
 }
-#zentranslate-admin-root .ztrans-max-w-2xl {
+#gemtranslate-admin-root .ztrans-max-w-2xl {
 	max-width: 42rem;
 }
-#zentranslate-admin-root .ztrans-max-w-3xl {
+#gemtranslate-admin-root .ztrans-max-w-3xl {
 	max-width: 48rem;
 }
-#zentranslate-admin-root .ztrans-max-w-\[280px\] {
+#gemtranslate-admin-root .ztrans-max-w-\[280px\] {
 	max-width: 280px;
 }
-#zentranslate-admin-root .ztrans-max-w-\[360px\] {
+#gemtranslate-admin-root .ztrans-max-w-\[360px\] {
 	max-width: 360px;
 }
-#zentranslate-admin-root .ztrans-max-w-lg {
+#gemtranslate-admin-root .ztrans-max-w-lg {
 	max-width: 32rem;
 }
-#zentranslate-admin-root .ztrans-max-w-md {
+#gemtranslate-admin-root .ztrans-max-w-md {
 	max-width: 28rem;
 }
-#zentranslate-admin-root .ztrans-max-w-xl {
+#gemtranslate-admin-root .ztrans-max-w-xl {
 	max-width: 36rem;
 }
-#zentranslate-admin-root .ztrans-flex-1 {
+#gemtranslate-admin-root .ztrans-flex-1 {
 	flex: 1 1 0%;
 }
-#zentranslate-admin-root .ztrans-flex-shrink-0 {
+#gemtranslate-admin-root .ztrans-flex-shrink-0 {
 	flex-shrink: 0;
 }
-#zentranslate-admin-root .ztrans-shrink-0 {
+#gemtranslate-admin-root .ztrans-shrink-0 {
 	flex-shrink: 0;
 }
 @keyframes ztrans-spin {
@@ -512,569 +512,569 @@ input:where([type='file']):focus {
 		transform: rotate(360deg);
 	}
 }
-#zentranslate-admin-root .ztrans-animate-spin {
+#gemtranslate-admin-root .ztrans-animate-spin {
 	animation: ztrans-spin 1s linear infinite;
 }
-#zentranslate-admin-root .ztrans-cursor-not-allowed {
+#gemtranslate-admin-root .ztrans-cursor-not-allowed {
 	cursor: not-allowed;
 }
-#zentranslate-admin-root .ztrans-cursor-pointer {
+#gemtranslate-admin-root .ztrans-cursor-pointer {
 	cursor: pointer;
 }
-#zentranslate-admin-root .ztrans-select-none {
+#gemtranslate-admin-root .ztrans-select-none {
 	-webkit-user-select: none;
 	   -moz-user-select: none;
 	        user-select: none;
 }
-#zentranslate-admin-root .ztrans-select-all {
+#gemtranslate-admin-root .ztrans-select-all {
 	-webkit-user-select: all;
 	   -moz-user-select: all;
 	        user-select: all;
 }
-#zentranslate-admin-root .ztrans-list-disc {
+#gemtranslate-admin-root .ztrans-list-disc {
 	list-style-type: disc;
 }
-#zentranslate-admin-root .ztrans-list-none {
+#gemtranslate-admin-root .ztrans-list-none {
 	list-style-type: none;
 }
-#zentranslate-admin-root .ztrans-grid-cols-1 {
+#gemtranslate-admin-root .ztrans-grid-cols-1 {
 	grid-template-columns: repeat(1, minmax(0, 1fr));
 }
-#zentranslate-admin-root .ztrans-grid-cols-2 {
+#gemtranslate-admin-root .ztrans-grid-cols-2 {
 	grid-template-columns: repeat(2, minmax(0, 1fr));
 }
-#zentranslate-admin-root .ztrans-flex-col {
+#gemtranslate-admin-root .ztrans-flex-col {
 	flex-direction: column;
 }
-#zentranslate-admin-root .ztrans-flex-wrap {
+#gemtranslate-admin-root .ztrans-flex-wrap {
 	flex-wrap: wrap;
 }
-#zentranslate-admin-root .ztrans-items-start {
+#gemtranslate-admin-root .ztrans-items-start {
 	align-items: flex-start;
 }
-#zentranslate-admin-root .ztrans-items-end {
+#gemtranslate-admin-root .ztrans-items-end {
 	align-items: flex-end;
 }
-#zentranslate-admin-root .ztrans-items-center {
+#gemtranslate-admin-root .ztrans-items-center {
 	align-items: center;
 }
-#zentranslate-admin-root .ztrans-justify-end {
+#gemtranslate-admin-root .ztrans-justify-end {
 	justify-content: flex-end;
 }
-#zentranslate-admin-root .ztrans-justify-center {
+#gemtranslate-admin-root .ztrans-justify-center {
 	justify-content: center;
 }
-#zentranslate-admin-root .ztrans-justify-between {
+#gemtranslate-admin-root .ztrans-justify-between {
 	justify-content: space-between;
 }
-#zentranslate-admin-root .ztrans-gap-1 {
+#gemtranslate-admin-root .ztrans-gap-1 {
 	gap: 0.25rem;
 }
-#zentranslate-admin-root .ztrans-gap-1\.5 {
+#gemtranslate-admin-root .ztrans-gap-1\.5 {
 	gap: 0.375rem;
 }
-#zentranslate-admin-root .ztrans-gap-2 {
+#gemtranslate-admin-root .ztrans-gap-2 {
 	gap: 0.5rem;
 }
-#zentranslate-admin-root .ztrans-gap-3 {
+#gemtranslate-admin-root .ztrans-gap-3 {
 	gap: 0.75rem;
 }
-#zentranslate-admin-root .ztrans-gap-4 {
+#gemtranslate-admin-root .ztrans-gap-4 {
 	gap: 1rem;
 }
-#zentranslate-admin-root .ztrans-gap-5 {
+#gemtranslate-admin-root .ztrans-gap-5 {
 	gap: 1.25rem;
 }
-#zentranslate-admin-root .ztrans-gap-6 {
+#gemtranslate-admin-root .ztrans-gap-6 {
 	gap: 1.5rem;
 }
-#zentranslate-admin-root :is(.ztrans-divide-y > :not([hidden]) ~ :not([hidden])) {
+#gemtranslate-admin-root :is(.ztrans-divide-y > :not([hidden]) ~ :not([hidden])) {
 	--tw-divide-y-reverse: 0;
 	border-top-width: calc(1px * calc(1 - var(--tw-divide-y-reverse)));
 	border-bottom-width: calc(1px * var(--tw-divide-y-reverse));
 }
-#zentranslate-admin-root :is(.ztrans-divide-ztrans-border > :not([hidden]) ~ :not([hidden])) {
+#gemtranslate-admin-root :is(.ztrans-divide-ztrans-border > :not([hidden]) ~ :not([hidden])) {
 	--tw-divide-opacity: 1;
 	border-color: rgb(229 231 235 / var(--tw-divide-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-overflow-auto {
+#gemtranslate-admin-root .ztrans-overflow-auto {
 	overflow: auto;
 }
-#zentranslate-admin-root .ztrans-overflow-hidden {
+#gemtranslate-admin-root .ztrans-overflow-hidden {
 	overflow: hidden;
 }
-#zentranslate-admin-root .ztrans-overflow-x-auto {
+#gemtranslate-admin-root .ztrans-overflow-x-auto {
 	overflow-x: auto;
 }
-#zentranslate-admin-root .ztrans-truncate {
+#gemtranslate-admin-root .ztrans-truncate {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
-#zentranslate-admin-root .ztrans-whitespace-nowrap {
+#gemtranslate-admin-root .ztrans-whitespace-nowrap {
 	white-space: nowrap;
 }
-#zentranslate-admin-root .ztrans-whitespace-pre-wrap {
+#gemtranslate-admin-root .ztrans-whitespace-pre-wrap {
 	white-space: pre-wrap;
 }
-#zentranslate-admin-root .ztrans-rounded {
+#gemtranslate-admin-root .ztrans-rounded {
 	border-radius: 0.25rem;
 }
-#zentranslate-admin-root .ztrans-rounded-full {
+#gemtranslate-admin-root .ztrans-rounded-full {
 	border-radius: 9999px;
 }
-#zentranslate-admin-root .ztrans-rounded-lg {
+#gemtranslate-admin-root .ztrans-rounded-lg {
 	border-radius: 0.5rem;
 }
-#zentranslate-admin-root .ztrans-rounded-md {
+#gemtranslate-admin-root .ztrans-rounded-md {
 	border-radius: 0.375rem;
 }
-#zentranslate-admin-root .ztrans-rounded-l-md {
+#gemtranslate-admin-root .ztrans-rounded-l-md {
 	border-top-left-radius: 0.375rem;
 	border-bottom-left-radius: 0.375rem;
 }
-#zentranslate-admin-root .ztrans-rounded-r-md {
+#gemtranslate-admin-root .ztrans-rounded-r-md {
 	border-top-right-radius: 0.375rem;
 	border-bottom-right-radius: 0.375rem;
 }
-#zentranslate-admin-root .ztrans-border {
+#gemtranslate-admin-root .ztrans-border {
 	border-width: 1px;
 }
-#zentranslate-admin-root .ztrans-border-2 {
+#gemtranslate-admin-root .ztrans-border-2 {
 	border-width: 2px;
 }
-#zentranslate-admin-root .ztrans-border-b {
+#gemtranslate-admin-root .ztrans-border-b {
 	border-bottom-width: 1px;
 }
-#zentranslate-admin-root .ztrans-border-b-2 {
+#gemtranslate-admin-root .ztrans-border-b-2 {
 	border-bottom-width: 2px;
 }
-#zentranslate-admin-root .ztrans-border-r {
+#gemtranslate-admin-root .ztrans-border-r {
 	border-right-width: 1px;
 }
-#zentranslate-admin-root .ztrans-border-t {
+#gemtranslate-admin-root .ztrans-border-t {
 	border-top-width: 1px;
 }
-#zentranslate-admin-root .ztrans-border-amber-200 {
+#gemtranslate-admin-root .ztrans-border-amber-200 {
 	--tw-border-opacity: 1;
 	border-color: rgb(253 230 138 / var(--tw-border-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-border-blue-200 {
+#gemtranslate-admin-root .ztrans-border-blue-200 {
 	--tw-border-opacity: 1;
 	border-color: rgb(191 219 254 / var(--tw-border-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-border-current {
+#gemtranslate-admin-root .ztrans-border-current {
 	border-color: currentColor;
 }
-#zentranslate-admin-root .ztrans-border-green-200 {
+#gemtranslate-admin-root .ztrans-border-green-200 {
 	--tw-border-opacity: 1;
 	border-color: rgb(187 247 208 / var(--tw-border-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-border-red-200 {
+#gemtranslate-admin-root .ztrans-border-red-200 {
 	--tw-border-opacity: 1;
 	border-color: rgb(254 202 202 / var(--tw-border-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-border-transparent {
+#gemtranslate-admin-root .ztrans-border-transparent {
 	border-color: transparent;
 }
-#zentranslate-admin-root .ztrans-border-ztrans-border {
+#gemtranslate-admin-root .ztrans-border-ztrans-border {
 	--tw-border-opacity: 1;
 	border-color: rgb(229 231 235 / var(--tw-border-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-border-ztrans-primary {
+#gemtranslate-admin-root .ztrans-border-ztrans-primary {
 	--tw-border-opacity: 1;
 	border-color: rgb(67 56 202 / var(--tw-border-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-border-t-transparent {
+#gemtranslate-admin-root .ztrans-border-t-transparent {
 	border-top-color: transparent;
 }
-#zentranslate-admin-root .ztrans-bg-amber-100 {
+#gemtranslate-admin-root .ztrans-bg-amber-100 {
 	--tw-bg-opacity: 1;
 	background-color: rgb(254 243 199 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-bg-amber-50 {
+#gemtranslate-admin-root .ztrans-bg-amber-50 {
 	--tw-bg-opacity: 1;
 	background-color: rgb(255 251 235 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-bg-black\/40 {
+#gemtranslate-admin-root .ztrans-bg-black\/40 {
 	background-color: rgb(0 0 0 / 0.4);
 }
-#zentranslate-admin-root .ztrans-bg-blue-100 {
+#gemtranslate-admin-root .ztrans-bg-blue-100 {
 	--tw-bg-opacity: 1;
 	background-color: rgb(219 234 254 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-bg-blue-50 {
+#gemtranslate-admin-root .ztrans-bg-blue-50 {
 	--tw-bg-opacity: 1;
 	background-color: rgb(239 246 255 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-bg-emerald-100 {
+#gemtranslate-admin-root .ztrans-bg-emerald-100 {
 	--tw-bg-opacity: 1;
 	background-color: rgb(209 250 229 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-bg-emerald-500 {
+#gemtranslate-admin-root .ztrans-bg-emerald-500 {
 	--tw-bg-opacity: 1;
 	background-color: rgb(16 185 129 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-bg-gray-100 {
+#gemtranslate-admin-root .ztrans-bg-gray-100 {
 	--tw-bg-opacity: 1;
 	background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-bg-gray-200 {
+#gemtranslate-admin-root .ztrans-bg-gray-200 {
 	--tw-bg-opacity: 1;
 	background-color: rgb(229 231 235 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-bg-green-100 {
+#gemtranslate-admin-root .ztrans-bg-green-100 {
 	--tw-bg-opacity: 1;
 	background-color: rgb(220 252 231 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-bg-green-50 {
+#gemtranslate-admin-root .ztrans-bg-green-50 {
 	--tw-bg-opacity: 1;
 	background-color: rgb(240 253 244 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-bg-green-500 {
+#gemtranslate-admin-root .ztrans-bg-green-500 {
 	--tw-bg-opacity: 1;
 	background-color: rgb(34 197 94 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-bg-indigo-100 {
+#gemtranslate-admin-root .ztrans-bg-indigo-100 {
 	--tw-bg-opacity: 1;
 	background-color: rgb(224 231 255 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-bg-indigo-50 {
+#gemtranslate-admin-root .ztrans-bg-indigo-50 {
 	--tw-bg-opacity: 1;
 	background-color: rgb(238 242 255 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-bg-purple-100 {
+#gemtranslate-admin-root .ztrans-bg-purple-100 {
 	--tw-bg-opacity: 1;
 	background-color: rgb(243 232 255 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-bg-red-50 {
+#gemtranslate-admin-root .ztrans-bg-red-50 {
 	--tw-bg-opacity: 1;
 	background-color: rgb(254 242 242 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-bg-transparent {
+#gemtranslate-admin-root .ztrans-bg-transparent {
 	background-color: transparent;
 }
-#zentranslate-admin-root .ztrans-bg-white {
+#gemtranslate-admin-root .ztrans-bg-white {
 	--tw-bg-opacity: 1;
 	background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-bg-ztrans-bg {
+#gemtranslate-admin-root .ztrans-bg-ztrans-bg {
 	--tw-bg-opacity: 1;
 	background-color: rgb(248 250 252 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-bg-ztrans-border {
+#gemtranslate-admin-root .ztrans-bg-ztrans-border {
 	--tw-bg-opacity: 1;
 	background-color: rgb(229 231 235 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-bg-ztrans-danger {
+#gemtranslate-admin-root .ztrans-bg-ztrans-danger {
 	--tw-bg-opacity: 1;
 	background-color: rgb(220 38 38 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-bg-ztrans-primary {
+#gemtranslate-admin-root .ztrans-bg-ztrans-primary {
 	--tw-bg-opacity: 1;
 	background-color: rgb(67 56 202 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-bg-ztrans-primary\/5 {
+#gemtranslate-admin-root .ztrans-bg-ztrans-primary\/5 {
 	background-color: rgb(67 56 202 / 0.05);
 }
-#zentranslate-admin-root .ztrans-p-0 {
+#gemtranslate-admin-root .ztrans-p-0 {
 	padding: 0px;
 }
-#zentranslate-admin-root .ztrans-p-1 {
+#gemtranslate-admin-root .ztrans-p-1 {
 	padding: 0.25rem;
 }
-#zentranslate-admin-root .ztrans-p-2 {
+#gemtranslate-admin-root .ztrans-p-2 {
 	padding: 0.5rem;
 }
-#zentranslate-admin-root .ztrans-p-2\.5 {
+#gemtranslate-admin-root .ztrans-p-2\.5 {
 	padding: 0.625rem;
 }
-#zentranslate-admin-root .ztrans-p-3 {
+#gemtranslate-admin-root .ztrans-p-3 {
 	padding: 0.75rem;
 }
-#zentranslate-admin-root .ztrans-p-4 {
+#gemtranslate-admin-root .ztrans-p-4 {
 	padding: 1rem;
 }
-#zentranslate-admin-root .ztrans-p-5 {
+#gemtranslate-admin-root .ztrans-p-5 {
 	padding: 1.25rem;
 }
-#zentranslate-admin-root .ztrans-p-8 {
+#gemtranslate-admin-root .ztrans-p-8 {
 	padding: 2rem;
 }
-#zentranslate-admin-root .ztrans-px-1 {
+#gemtranslate-admin-root .ztrans-px-1 {
 	padding-left: 0.25rem;
 	padding-right: 0.25rem;
 }
-#zentranslate-admin-root .ztrans-px-1\.5 {
+#gemtranslate-admin-root .ztrans-px-1\.5 {
 	padding-left: 0.375rem;
 	padding-right: 0.375rem;
 }
-#zentranslate-admin-root .ztrans-px-2 {
+#gemtranslate-admin-root .ztrans-px-2 {
 	padding-left: 0.5rem;
 	padding-right: 0.5rem;
 }
-#zentranslate-admin-root .ztrans-px-2\.5 {
+#gemtranslate-admin-root .ztrans-px-2\.5 {
 	padding-left: 0.625rem;
 	padding-right: 0.625rem;
 }
-#zentranslate-admin-root .ztrans-px-3 {
+#gemtranslate-admin-root .ztrans-px-3 {
 	padding-left: 0.75rem;
 	padding-right: 0.75rem;
 }
-#zentranslate-admin-root .ztrans-px-4 {
+#gemtranslate-admin-root .ztrans-px-4 {
 	padding-left: 1rem;
 	padding-right: 1rem;
 }
-#zentranslate-admin-root .ztrans-px-5 {
+#gemtranslate-admin-root .ztrans-px-5 {
 	padding-left: 1.25rem;
 	padding-right: 1.25rem;
 }
-#zentranslate-admin-root .ztrans-py-0\.5 {
+#gemtranslate-admin-root .ztrans-py-0\.5 {
 	padding-top: 0.125rem;
 	padding-bottom: 0.125rem;
 }
-#zentranslate-admin-root .ztrans-py-1 {
+#gemtranslate-admin-root .ztrans-py-1 {
 	padding-top: 0.25rem;
 	padding-bottom: 0.25rem;
 }
-#zentranslate-admin-root .ztrans-py-1\.5 {
+#gemtranslate-admin-root .ztrans-py-1\.5 {
 	padding-top: 0.375rem;
 	padding-bottom: 0.375rem;
 }
-#zentranslate-admin-root .ztrans-py-10 {
+#gemtranslate-admin-root .ztrans-py-10 {
 	padding-top: 2.5rem;
 	padding-bottom: 2.5rem;
 }
-#zentranslate-admin-root .ztrans-py-2 {
+#gemtranslate-admin-root .ztrans-py-2 {
 	padding-top: 0.5rem;
 	padding-bottom: 0.5rem;
 }
-#zentranslate-admin-root .ztrans-py-2\.5 {
+#gemtranslate-admin-root .ztrans-py-2\.5 {
 	padding-top: 0.625rem;
 	padding-bottom: 0.625rem;
 }
-#zentranslate-admin-root .ztrans-py-3 {
+#gemtranslate-admin-root .ztrans-py-3 {
 	padding-top: 0.75rem;
 	padding-bottom: 0.75rem;
 }
-#zentranslate-admin-root .ztrans-py-4 {
+#gemtranslate-admin-root .ztrans-py-4 {
 	padding-top: 1rem;
 	padding-bottom: 1rem;
 }
-#zentranslate-admin-root .ztrans-py-6 {
+#gemtranslate-admin-root .ztrans-py-6 {
 	padding-top: 1.5rem;
 	padding-bottom: 1.5rem;
 }
-#zentranslate-admin-root .ztrans-py-8 {
+#gemtranslate-admin-root .ztrans-py-8 {
 	padding-top: 2rem;
 	padding-bottom: 2rem;
 }
-#zentranslate-admin-root .ztrans-pl-5 {
+#gemtranslate-admin-root .ztrans-pl-5 {
 	padding-left: 1.25rem;
 }
-#zentranslate-admin-root .ztrans-text-left {
+#gemtranslate-admin-root .ztrans-text-left {
 	text-align: left;
 }
-#zentranslate-admin-root .ztrans-text-center {
+#gemtranslate-admin-root .ztrans-text-center {
 	text-align: center;
 }
-#zentranslate-admin-root .ztrans-text-right {
+#gemtranslate-admin-root .ztrans-text-right {
 	text-align: right;
 }
-#zentranslate-admin-root .ztrans-align-baseline {
+#gemtranslate-admin-root .ztrans-align-baseline {
 	vertical-align: baseline;
 }
-#zentranslate-admin-root .ztrans-align-top {
+#gemtranslate-admin-root .ztrans-align-top {
 	vertical-align: top;
 }
-#zentranslate-admin-root .ztrans-font-mono {
+#gemtranslate-admin-root .ztrans-font-mono {
 	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
-#zentranslate-admin-root .ztrans-text-2xl {
+#gemtranslate-admin-root .ztrans-text-2xl {
 	font-size: 1.5rem;
 	line-height: 2rem;
 }
-#zentranslate-admin-root .ztrans-text-\[10px\] {
+#gemtranslate-admin-root .ztrans-text-\[10px\] {
 	font-size: 10px;
 }
-#zentranslate-admin-root .ztrans-text-\[11px\] {
+#gemtranslate-admin-root .ztrans-text-\[11px\] {
 	font-size: 11px;
 }
-#zentranslate-admin-root .ztrans-text-base {
+#gemtranslate-admin-root .ztrans-text-base {
 	font-size: 1rem;
 	line-height: 1.5rem;
 }
-#zentranslate-admin-root .ztrans-text-lg {
+#gemtranslate-admin-root .ztrans-text-lg {
 	font-size: 1.125rem;
 	line-height: 1.75rem;
 }
-#zentranslate-admin-root .ztrans-text-sm {
+#gemtranslate-admin-root .ztrans-text-sm {
 	font-size: 0.875rem;
 	line-height: 1.25rem;
 }
-#zentranslate-admin-root .ztrans-text-xl {
+#gemtranslate-admin-root .ztrans-text-xl {
 	font-size: 1.25rem;
 	line-height: 1.75rem;
 }
-#zentranslate-admin-root .ztrans-text-xs {
+#gemtranslate-admin-root .ztrans-text-xs {
 	font-size: 0.75rem;
 	line-height: 1rem;
 }
-#zentranslate-admin-root .ztrans-font-medium {
+#gemtranslate-admin-root .ztrans-font-medium {
 	font-weight: 500;
 }
-#zentranslate-admin-root .ztrans-font-normal {
+#gemtranslate-admin-root .ztrans-font-normal {
 	font-weight: 400;
 }
-#zentranslate-admin-root .ztrans-font-semibold {
+#gemtranslate-admin-root .ztrans-font-semibold {
 	font-weight: 600;
 }
-#zentranslate-admin-root .ztrans-uppercase {
+#gemtranslate-admin-root .ztrans-uppercase {
 	text-transform: uppercase;
 }
-#zentranslate-admin-root .ztrans-normal-case {
+#gemtranslate-admin-root .ztrans-normal-case {
 	text-transform: none;
 }
-#zentranslate-admin-root .ztrans-italic {
+#gemtranslate-admin-root .ztrans-italic {
 	font-style: italic;
 }
-#zentranslate-admin-root .ztrans-leading-relaxed {
+#gemtranslate-admin-root .ztrans-leading-relaxed {
 	line-height: 1.625;
 }
-#zentranslate-admin-root .ztrans-leading-snug {
+#gemtranslate-admin-root .ztrans-leading-snug {
 	line-height: 1.375;
 }
-#zentranslate-admin-root .ztrans-tracking-wide {
+#gemtranslate-admin-root .ztrans-tracking-wide {
 	letter-spacing: 0.025em;
 }
-#zentranslate-admin-root .ztrans-text-amber-700 {
+#gemtranslate-admin-root .ztrans-text-amber-700 {
 	--tw-text-opacity: 1;
 	color: rgb(180 83 9 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-text-amber-800 {
+#gemtranslate-admin-root .ztrans-text-amber-800 {
 	--tw-text-opacity: 1;
 	color: rgb(146 64 14 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-text-blue-700 {
+#gemtranslate-admin-root .ztrans-text-blue-700 {
 	--tw-text-opacity: 1;
 	color: rgb(29 78 216 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-text-blue-800 {
+#gemtranslate-admin-root .ztrans-text-blue-800 {
 	--tw-text-opacity: 1;
 	color: rgb(30 64 175 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-text-emerald-700 {
+#gemtranslate-admin-root .ztrans-text-emerald-700 {
 	--tw-text-opacity: 1;
 	color: rgb(4 120 87 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-text-emerald-800 {
+#gemtranslate-admin-root .ztrans-text-emerald-800 {
 	--tw-text-opacity: 1;
 	color: rgb(6 95 70 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-text-gray-500 {
+#gemtranslate-admin-root .ztrans-text-gray-500 {
 	--tw-text-opacity: 1;
 	color: rgb(107 114 128 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-text-gray-600 {
+#gemtranslate-admin-root .ztrans-text-gray-600 {
 	--tw-text-opacity: 1;
 	color: rgb(75 85 99 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-text-gray-700 {
+#gemtranslate-admin-root .ztrans-text-gray-700 {
 	--tw-text-opacity: 1;
 	color: rgb(55 65 81 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-text-gray-800 {
+#gemtranslate-admin-root .ztrans-text-gray-800 {
 	--tw-text-opacity: 1;
 	color: rgb(31 41 55 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-text-gray-900 {
+#gemtranslate-admin-root .ztrans-text-gray-900 {
 	--tw-text-opacity: 1;
 	color: rgb(17 24 39 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-text-green-700 {
+#gemtranslate-admin-root .ztrans-text-green-700 {
 	--tw-text-opacity: 1;
 	color: rgb(21 128 61 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-text-green-800 {
+#gemtranslate-admin-root .ztrans-text-green-800 {
 	--tw-text-opacity: 1;
 	color: rgb(22 101 52 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-text-indigo-600 {
+#gemtranslate-admin-root .ztrans-text-indigo-600 {
 	--tw-text-opacity: 1;
 	color: rgb(79 70 229 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-text-indigo-700 {
+#gemtranslate-admin-root .ztrans-text-indigo-700 {
 	--tw-text-opacity: 1;
 	color: rgb(67 56 202 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-text-indigo-800 {
+#gemtranslate-admin-root .ztrans-text-indigo-800 {
 	--tw-text-opacity: 1;
 	color: rgb(55 48 163 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-text-purple-800 {
+#gemtranslate-admin-root .ztrans-text-purple-800 {
 	--tw-text-opacity: 1;
 	color: rgb(107 33 168 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-text-red-600 {
+#gemtranslate-admin-root .ztrans-text-red-600 {
 	--tw-text-opacity: 1;
 	color: rgb(220 38 38 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-text-red-800 {
+#gemtranslate-admin-root .ztrans-text-red-800 {
 	--tw-text-opacity: 1;
 	color: rgb(153 27 27 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-text-white {
+#gemtranslate-admin-root .ztrans-text-white {
 	--tw-text-opacity: 1;
 	color: rgb(255 255 255 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-text-ztrans-danger {
+#gemtranslate-admin-root .ztrans-text-ztrans-danger {
 	--tw-text-opacity: 1;
 	color: rgb(220 38 38 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-text-ztrans-muted {
+#gemtranslate-admin-root .ztrans-text-ztrans-muted {
 	--tw-text-opacity: 1;
 	color: rgb(107 114 128 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-text-ztrans-primary {
+#gemtranslate-admin-root .ztrans-text-ztrans-primary {
 	--tw-text-opacity: 1;
 	color: rgb(67 56 202 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .ztrans-no-underline {
+#gemtranslate-admin-root .ztrans-no-underline {
 	text-decoration-line: none;
 }
-#zentranslate-admin-root .ztrans-opacity-50 {
+#gemtranslate-admin-root .ztrans-opacity-50 {
 	opacity: 0.5;
 }
-#zentranslate-admin-root .ztrans-opacity-80 {
+#gemtranslate-admin-root .ztrans-opacity-80 {
 	opacity: 0.8;
 }
-#zentranslate-admin-root .ztrans-shadow-card {
+#gemtranslate-admin-root .ztrans-shadow-card {
 	--tw-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
 	--tw-shadow-colored: 0 1px 3px var(--tw-shadow-color), 0 1px 2px var(--tw-shadow-color);
 	box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
-#zentranslate-admin-root .ztrans-shadow-sm {
+#gemtranslate-admin-root .ztrans-shadow-sm {
 	--tw-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 	--tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
 	box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
-#zentranslate-admin-root .ztrans-transition {
+#gemtranslate-admin-root .ztrans-transition {
 	transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
 	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 	transition-duration: 150ms;
 }
-#zentranslate-admin-root .ztrans-transition-all {
+#gemtranslate-admin-root .ztrans-transition-all {
 	transition-property: all;
 	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 	transition-duration: 150ms;
 }
-#zentranslate-admin-root .ztrans-transition-colors {
+#gemtranslate-admin-root .ztrans-transition-colors {
 	transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
 	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 	transition-duration: 150ms;
 }
 
-#zentranslate-admin-root {
+#gemtranslate-admin-root {
 	margin: 1rem 1.25rem 1rem 0;
 	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
 	color: #1f2937;
@@ -1085,19 +1085,19 @@ input:where([type='file']):focus {
 	box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
 }
 
-#zentranslate-admin-root .ztrans-app {
+#gemtranslate-admin-root .ztrans-app {
 	display: flex;
 	min-height: calc(100vh - 7rem);
 }
 
-#zentranslate-admin-root button:not(.ztrans-bare),
-#zentranslate-admin-root .ztrans-btn {
+#gemtranslate-admin-root button:not(.ztrans-bare),
+#gemtranslate-admin-root .ztrans-btn {
 	font: inherit;
 }
 
-#zentranslate-admin-root input,
-#zentranslate-admin-root textarea,
-#zentranslate-admin-root select {
+#gemtranslate-admin-root input,
+#gemtranslate-admin-root textarea,
+#gemtranslate-admin-root select {
 	border-radius: 0.375rem;
 	border-width: 1px;
 	--tw-border-opacity: 1;
@@ -1112,9 +1112,9 @@ input:where([type='file']):focus {
 	line-height: 1.25rem;
 }
 
-#zentranslate-admin-root input:focus,
-#zentranslate-admin-root textarea:focus,
-#zentranslate-admin-root select:focus {
+#gemtranslate-admin-root input:focus,
+#gemtranslate-admin-root textarea:focus,
+#gemtranslate-admin-root select:focus {
 	--tw-border-opacity: 1;
 	border-color: rgb(67 56 202 / var(--tw-border-opacity, 1));
 	--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
@@ -1124,7 +1124,7 @@ input:where([type='file']):focus {
 	--tw-ring-color: rgb(67 56 202 / var(--tw-ring-opacity, 1));
 }
 
-#zentranslate-admin-root code {
+#gemtranslate-admin-root code {
 	border-radius: 0.25rem;
 	--tw-bg-opacity: 1;
 	background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1));
@@ -1139,137 +1139,137 @@ input:where([type='file']):focus {
 }
 
 /* Nav active state — override WP admin's global <a> colour/decoration rules. */
-#zentranslate-admin-root nav a[aria-current="page"],
-#zentranslate-admin-root nav a[aria-current="page"]:hover,
-#zentranslate-admin-root nav a[aria-current="page"]:focus,
-#zentranslate-admin-root nav a[aria-current="page"]:visited {
+#gemtranslate-admin-root nav a[aria-current="page"],
+#gemtranslate-admin-root nav a[aria-current="page"]:hover,
+#gemtranslate-admin-root nav a[aria-current="page"]:focus,
+#gemtranslate-admin-root nav a[aria-current="page"]:visited {
 	background-color: #4338ca !important;
 	color: #ffffff !important;
 	text-decoration: none !important;
 }
 
 /* Keep inactive nav links from inheriting WP admin link colours. */
-#zentranslate-admin-root nav a:not([aria-current="page"]),
-#zentranslate-admin-root nav a:not([aria-current="page"]):visited {
+#gemtranslate-admin-root nav a:not([aria-current="page"]),
+#gemtranslate-admin-root nav a:not([aria-current="page"]):visited {
 	color: #374151 !important;
 	text-decoration: none !important;
 }
 
 /* ---- Advanced editor: token-aware contentEditable field ---- */
-#zentranslate-admin-root .ztrans-tokenfield:empty::before {
+#gemtranslate-admin-root .ztrans-tokenfield:empty::before {
 	content: attr(data-placeholder);
 	color: #9ca3af;
 	pointer-events: none;
 }
-#zentranslate-admin-root .ztrans-tokenfield:focus {
+#gemtranslate-admin-root .ztrans-tokenfield:focus {
 	box-shadow: 0 0 0 1px #4338ca;
 }
-#zentranslate-admin-root .ztrans-tok {
+#gemtranslate-admin-root .ztrans-tok {
 	line-height: 1.4;
 	cursor: default;
 }
 /* Glossary term highlight in the source pane. */
-#zentranslate-admin-root .ztrans-gloss {
+#gemtranslate-admin-root .ztrans-gloss {
 	border-bottom: 2px solid #f59e0b;
 	background: rgba(245, 158, 11, 0.12);
 	border-radius: 2px;
 	padding: 0 1px;
 	cursor: help;
 }
-#zentranslate-admin-root .ztrans-gloss-dnt {
+#gemtranslate-admin-root .ztrans-gloss-dnt {
 	border-bottom-color: #6b7280;
 	background: rgba(107, 114, 128, 0.12);
 }
-#zentranslate-admin-root .hover\:ztrans-bg-amber-100:hover {
+#gemtranslate-admin-root .hover\:ztrans-bg-amber-100:hover {
 	--tw-bg-opacity: 1;
 	background-color: rgb(254 243 199 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .hover\:ztrans-bg-gray-100:hover {
+#gemtranslate-admin-root .hover\:ztrans-bg-gray-100:hover {
 	--tw-bg-opacity: 1;
 	background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .hover\:ztrans-bg-gray-50:hover {
+#gemtranslate-admin-root .hover\:ztrans-bg-gray-50:hover {
 	--tw-bg-opacity: 1;
 	background-color: rgb(249 250 251 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .hover\:ztrans-bg-indigo-100:hover {
+#gemtranslate-admin-root .hover\:ztrans-bg-indigo-100:hover {
 	--tw-bg-opacity: 1;
 	background-color: rgb(224 231 255 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .hover\:ztrans-bg-indigo-50:hover {
+#gemtranslate-admin-root .hover\:ztrans-bg-indigo-50:hover {
 	--tw-bg-opacity: 1;
 	background-color: rgb(238 242 255 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .hover\:ztrans-bg-red-700:hover {
+#gemtranslate-admin-root .hover\:ztrans-bg-red-700:hover {
 	--tw-bg-opacity: 1;
 	background-color: rgb(185 28 28 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .hover\:ztrans-bg-ztrans-bg:hover {
+#gemtranslate-admin-root .hover\:ztrans-bg-ztrans-bg:hover {
 	--tw-bg-opacity: 1;
 	background-color: rgb(248 250 252 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .hover\:ztrans-bg-ztrans-primary-hover:hover {
+#gemtranslate-admin-root .hover\:ztrans-bg-ztrans-primary-hover:hover {
 	--tw-bg-opacity: 1;
 	background-color: rgb(55 48 163 / var(--tw-bg-opacity, 1));
 }
-#zentranslate-admin-root .hover\:ztrans-text-gray-700:hover {
+#gemtranslate-admin-root .hover\:ztrans-text-gray-700:hover {
 	--tw-text-opacity: 1;
 	color: rgb(55 65 81 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .hover\:ztrans-text-gray-900:hover {
+#gemtranslate-admin-root .hover\:ztrans-text-gray-900:hover {
 	--tw-text-opacity: 1;
 	color: rgb(17 24 39 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .hover\:ztrans-text-red-600:hover {
+#gemtranslate-admin-root .hover\:ztrans-text-red-600:hover {
 	--tw-text-opacity: 1;
 	color: rgb(220 38 38 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .hover\:ztrans-text-ztrans-primary:hover {
+#gemtranslate-admin-root .hover\:ztrans-text-ztrans-primary:hover {
 	--tw-text-opacity: 1;
 	color: rgb(67 56 202 / var(--tw-text-opacity, 1));
 }
-#zentranslate-admin-root .focus\:ztrans-border-ztrans-primary:focus {
+#gemtranslate-admin-root .focus\:ztrans-border-ztrans-primary:focus {
 	--tw-border-opacity: 1;
 	border-color: rgb(67 56 202 / var(--tw-border-opacity, 1));
 }
-#zentranslate-admin-root .focus\:ztrans-outline-none:focus {
+#gemtranslate-admin-root .focus\:ztrans-outline-none:focus {
 	outline: 2px solid transparent;
 	outline-offset: 2px;
 }
-#zentranslate-admin-root .disabled\:ztrans-cursor-not-allowed:disabled {
+#gemtranslate-admin-root .disabled\:ztrans-cursor-not-allowed:disabled {
 	cursor: not-allowed;
 }
-#zentranslate-admin-root .disabled\:ztrans-opacity-50:disabled {
+#gemtranslate-admin-root .disabled\:ztrans-opacity-50:disabled {
 	opacity: 0.5;
 }
-#zentranslate-admin-root .disabled\:ztrans-opacity-60:disabled {
+#gemtranslate-admin-root .disabled\:ztrans-opacity-60:disabled {
 	opacity: 0.6;
 }
 @media (min-width: 768px) {
-	#zentranslate-admin-root .md\:ztrans-col-span-2 {
+	#gemtranslate-admin-root .md\:ztrans-col-span-2 {
 		grid-column: span 2 / span 2;
 	}
-	#zentranslate-admin-root .md\:ztrans-grid-cols-2 {
+	#gemtranslate-admin-root .md\:ztrans-grid-cols-2 {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
-	#zentranslate-admin-root .md\:ztrans-grid-cols-3 {
+	#gemtranslate-admin-root .md\:ztrans-grid-cols-3 {
 		grid-template-columns: repeat(3, minmax(0, 1fr));
 	}
-	#zentranslate-admin-root .md\:ztrans-grid-cols-4 {
+	#gemtranslate-admin-root .md\:ztrans-grid-cols-4 {
 		grid-template-columns: repeat(4, minmax(0, 1fr));
 	}
 }
 @media (min-width: 1024px) {
-	#zentranslate-admin-root .lg\:ztrans-grid-cols-2 {
+	#gemtranslate-admin-root .lg\:ztrans-grid-cols-2 {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
-	#zentranslate-admin-root .lg\:ztrans-grid-cols-3 {
+	#gemtranslate-admin-root .lg\:ztrans-grid-cols-3 {
 		grid-template-columns: repeat(3, minmax(0, 1fr));
 	}
-	#zentranslate-admin-root .lg\:ztrans-grid-cols-\[1fr_1fr_auto\] {
+	#gemtranslate-admin-root .lg\:ztrans-grid-cols-\[1fr_1fr_auto\] {
 		grid-template-columns: 1fr 1fr auto;
 	}
-	#zentranslate-admin-root .lg\:ztrans-pt-6 {
+	#gemtranslate-admin-root .lg\:ztrans-pt-6 {
 		padding-top: 1.5rem;
 	}
 }

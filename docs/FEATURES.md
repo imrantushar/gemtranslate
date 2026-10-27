@@ -1,4 +1,4 @@
-# Zentranslate — Feature catalogue
+# GemTranslate — Feature catalogue
 
 Every capability the plugin ships with. Grouped by area for fast scanning.
 
@@ -6,11 +6,11 @@ Every capability the plugin ships with. Grouped by area for fast scanning.
 
 ## 1. Languages
 
-- **Custom languages table** (`wp_ztrans_languages`) — no taxonomy hacks, plain SQL row per language.
+- **Custom languages table** (`wp_gtrans_languages`) — no taxonomy hacks, plain SQL row per language.
 - **Fields per language**: code (`en`, `pt-br`), locale (`en_US`, `pt_BR`), English name, native name, flag code, RTL flag, default flag, active flag, sort position.
 - **Default language** is the site's WP locale on first install. Switch any time.
 - **RTL support** — switcher emits `dir="rtl"`-ready markup; auto-loaded `backend-rtl.css` for the admin UI.
-- **Object-cached registry** — language list cached in `wp_cache` group `ztrans_languages`, flushed on CRUD writes.
+- **Object-cached registry** — language list cached in `wp_cache` group `gtrans_languages`, flushed on CRUD writes.
 - **Active / inactive toggle** — hide a language from the switcher without losing its translations.
 - **REST CRUD**: `GET / POST / PATCH / DELETE` under `/languages/`, plus `/languages/{code}/default`.
 - **Onboarding presets**: 10 ready-to-use languages (Spanish, French, German, Italian, Portuguese-BR, Japanese, Chinese-CN, Arabic, Hindi, Bengali) one-click in the setup wizard.
@@ -24,8 +24,8 @@ Every capability the plugin ships with. Grouped by area for fast scanning.
 
 ## 3. Language switcher
 
-- **Shortcode**: `[zentranslate_language_switcher display=inline|dropdown show_flag=1 show_name=1 show_native=0]`.
-- **Gutenberg block**: `zentranslate/language-switcher` — server-rendered, all four attributes editable in the inspector.
+- **Shortcode**: `[gemtranslate_language_switcher display=inline|dropdown show_flag=1 show_name=1 show_native=0]`.
+- **Gutenberg block**: `gemtranslate/language-switcher` — server-rendered, all four attributes editable in the inspector.
 - **WP_Widget**: classic widget for legacy themes, with title + display + flag/name/native toggles.
 - **Emoji flags** — auto-derived from country code (BG → 🇧🇬, ES → 🇪🇸); falls back to plain code when no mapping exists.
 - **hreflang + lang attributes** on every link for accessibility.
@@ -36,16 +36,16 @@ Every capability the plugin ships with. Grouped by area for fast scanning.
 - **Opt-in setting** (`auto_redirect_browser_lang`).
 - **Accept-Language parsing** with q-value sorting.
 - **Exact + short-code fallback** (visitor's `en-US` matches site `en`).
-- **Cookie persistence** — `ztrans_user_lang` survives 30 days.
+- **Cookie persistence** — `gtrans_user_lang` survives 30 days.
 - **Bot detection** — skips Googlebot, Bingbot, facebookexternalhit, DuckDuckBot, etc. to keep SEO clean.
 - **Fires once per visitor** — no redirect loops; respects manual switches.
 
 ## 5. Post / page translation
 
-- **Translation tables, not duplicate posts** — `wp_ztrans_post_translations` keyed on `(group_id, language_code)`.
-- **TranslationGroups** link variants across languages via `_ztrans_group_id` post meta.
-- **Single-query preload** per request: `SELECT * FROM wp_ztrans_post_translations WHERE group_id = ? AND language_code = ?`.
-- **Two cache layers**: object cache (cross-request, group `ztrans_translations`, 24h TTL) + per-request memo.
+- **Translation tables, not duplicate posts** — `wp_gtrans_post_translations` keyed on `(group_id, language_code)`.
+- **TranslationGroups** link variants across languages via `_gtrans_group_id` post meta.
+- **Single-query preload** per request: `SELECT * FROM wp_gtrans_post_translations WHERE group_id = ? AND language_code = ?`.
+- **Two cache layers**: object cache (cross-request, group `gtrans_translations`, 24h TTL) + per-request memo.
 - **Content filters**: `the_title`, `the_content`, `the_excerpt`, `get_the_excerpt`, `single_post_title` — all short-circuit on the default language.
 - **Auto-invalidation** on `save_post` and `before_delete_post`.
 - **`source_hash` stale detection** — translations marked "stale" in the UI when the source post changes after they were saved.
@@ -62,15 +62,15 @@ Every capability the plugin ships with. Grouped by area for fast scanning.
 
 ### 5b. Custom fields & ACF
 
-- **`wp_ztrans_post_meta_translations`** table.
+- **`wp_gtrans_post_meta_translations`** table.
 - **`get_post_metadata` filter** swaps values when current language is non-default and a translation exists.
 - **ACF auto-detect** — `get_field_objects()` is consulted for human-readable labels.
-- **Internal keys skipped** — `_ztrans_*`, `_edit_*`, `_wp_*`, ACF field-key refs (underscore-prefixed).
+- **Internal keys skipped** — `_gtrans_*`, `_edit_*`, `_wp_*`, ACF field-key refs (underscore-prefixed).
 - **REST + UI tab** for editing meta translations per language.
 
 ### 5c. Translation history / revisions
 
-- **`wp_ztrans_post_translation_revisions`** table.
+- **`wp_gtrans_post_translation_revisions`** table.
 - **Auto-snapshot on save** — the previous row is captured before being overwritten.
 - **Up to 20 revisions per (post, language)** kept; older entries pruned automatically.
 - **REST**: list, show, diff, revert.
@@ -78,22 +78,22 @@ Every capability the plugin ships with. Grouped by area for fast scanning.
 
 ## 6. Term translation
 
-- **`wp_ztrans_term_translations`** table — keyed on `(group_id, language_code)`.
+- **`wp_gtrans_term_translations`** table — keyed on `(group_id, language_code)`.
 - **Filters**: `get_term`, `get_terms`, `single_term_title`.
 - **Per-term fields**: name, description, slug.
-- **Cross-language linkage** via `_ztrans_group_id` term meta.
+- **Cross-language linkage** via `_gtrans_group_id` term meta.
 - **REST CRUD** + dedicated Taxonomies UI page.
 
 ## 7. Menu translation
 
-- **`wp_ztrans_menu_translations`** table — keyed on `(menu_item_id, language_code)`.
+- **`wp_gtrans_menu_translations`** table — keyed on `(menu_item_id, language_code)`.
 - **`wp_nav_menu_objects` filter** — one query per menu for the whole list.
 - **Translatable fields**: item title + URL override.
 - **REST**: list menus, list items, save per item.
 
 ## 8. String translation
 
-- **`wp_ztrans_strings` + `wp_ztrans_string_translations`** tables.
+- **`wp_gtrans_strings` + `wp_gtrans_string_translations`** tables.
 - **Runtime override**: `gettext`, `gettext_with_context`, `ngettext` filters.
 - **O(1) lookups** from an in-memory hash table loaded once per request.
 - **String scanner** walks any directory and registers every `__()` / `_e()` / `esc_html__()` / `_x()` / `_ex()` / `esc_html_x()` call via PHP's `token_get_all` (never executes the scanned code).
@@ -115,7 +115,7 @@ Every capability the plugin ships with. Grouped by area for fast scanning.
 
 - **Product title / description / short description** translated via `woocommerce_product_get_*` filters.
 - **Variation getters** translated via `woocommerce_product_variation_get_*`.
-- **No duplicate products** — uses the same `wp_ztrans_post_translations` rows as regular posts.
+- **No duplicate products** — uses the same `wp_gtrans_post_translations` rows as regular posts.
 - **Hooks load only when WooCommerce is active.**
 
 ## 11. AI translation (BYOK + Cloud)
@@ -125,16 +125,16 @@ Every capability the plugin ships with. Grouped by area for fast scanning.
   - **OpenAI** — Chat Completions, configurable model (default `gpt-4o-mini`), strict system prompt for delimiter-preserving batch output, HTML/markdown preservation.
   - **DeepL** — free and pro endpoints, `tag_handling=html`, `preserve_formatting=1`.
   - **Google Cloud Translation v2** — API-key auth, HTML format toggle.
-  - **Zentranslate Cloud** — hosted proxy contract (Bearer license key, `/translate` and `/ping` endpoints). Plugin ships the client; you host the proxy.
-- **Translator factory** (`TranslatorFactory`) reads `ztrans_ai_providers` JSON option, redacts keys on read.
+  - **GemTranslate Cloud** — hosted proxy contract (Bearer license key, `/translate` and `/ping` endpoints). Plugin ships the client; you host the proxy.
+- **Translator factory** (`TranslatorFactory`) reads `gtrans_ai_providers` JSON option, redacts keys on read.
 - **Test credentials** button per provider — does a real round-trip to validate.
 - **Inline key support** — test a provider with an unsaved key.
-- **Translation Memory** (`wp_ztrans_translation_memory`):
+- **Translation Memory** (`wp_gtrans_translation_memory`):
   - SHA-256 hash of `source + source_lang + target_lang`.
   - Hit-count tracked.
   - Per-provider attribution.
   - Stats endpoint (`entries`, `hits`).
-- **Glossary** (`wp_ztrans_glossary`):
+- **Glossary** (`wp_gtrans_glossary`):
   - Brand terms / proper nouns per language pair.
   - Case-sensitive flag.
   - Do-Not-Translate flag.
@@ -143,7 +143,7 @@ Every capability the plugin ships with. Grouped by area for fast scanning.
 
 ## 12. Async job queue
 
-- **`wp_ztrans_jobs`** table + Action Scheduler integration (`as_enqueue_async_action`) with **WP-Cron fallback** when AS isn't installed.
+- **`wp_gtrans_jobs`** table + Action Scheduler integration (`as_enqueue_async_action`) with **WP-Cron fallback** when AS isn't installed.
 - **Idempotent** — double-fired runs skip already-completed jobs.
 - **Retry with linear backoff** — up to 3 attempts, then permanent failure with error stored.
 - **Job types**: `post_translate`.
@@ -158,7 +158,7 @@ Every capability the plugin ships with. Grouped by area for fast scanning.
 - **PO writer** with reference comments + locale headers.
 - **MO writer** (Gettext binary format from scratch).
 - **JSON writer** for `wp_set_script_translations` lookups.
-- **`PackGenerator`** — reads `languages/zentranslate.pot`, batches every untranslated msgid through the configured AI provider, writes the four files to `languages/`.
+- **`PackGenerator`** — reads `languages/gemtranslate.pot`, batches every untranslated msgid through the configured AI provider, writes the four files to `languages/`.
 - **TM-aware** — already-translated entries skip the API call.
 - **Glossary-aware** — passes the pairs map to the provider.
 - **REST**: status, generate, delete.
@@ -166,7 +166,7 @@ Every capability the plugin ships with. Grouped by area for fast scanning.
 
 ## 14. React + Tailwind admin
 
-- **Stack**: React 18, `@wordpress/scripts`, TanStack Query, React Router (HashRouter), Tailwind v3 (`ztrans-` prefix, scoped via `important: '#zentranslate-admin-root'`).
+- **Stack**: React 18, `@wordpress/scripts`, TanStack Query, React Router (HashRouter), Tailwind v3 (`ztrans-` prefix, scoped via `important: '#gemtranslate-admin-root'`).
 - **All pages** wired and live:
   1. **Dashboard** — stats cards (active languages, translated posts, strings, TM entries) + per-language coverage + language list.
   2. **Languages** — full CRUD with preset chips, RTL/active toggles, set-default action.
@@ -190,7 +190,7 @@ Every capability the plugin ships with. Grouped by area for fast scanning.
 
 - **All user-facing strings** wrapped in `__()` / `sprintf()` from `@wordpress/i18n`.
 - **`wp_set_script_translations`** wired in `Assets::enqueue_admin`.
-- **403 translatable strings** extracted to `languages/zentranslate.pot`.
+- **403 translatable strings** extracted to `languages/gemtranslate.pot`.
 
 ### 14b. Components
 
@@ -198,18 +198,18 @@ Every capability the plugin ships with. Grouped by area for fast scanning.
 
 ## 15. Per-user admin language
 
-- **User meta**: `ztrans_preferred_language`.
+- **User meta**: `gtrans_preferred_language`.
 - **WP user-profile picker** — drops into Users → Your Profile.
 - **Admin bar 🌐 dropdown** — one-click switch, nonce-protected.
 - **React sidebar `LanguagePicker`** — same behaviour, in-app.
-- **Localizer**: filters WordPress `locale` + `plugin_locale` in admin to the user's preferred locale — pulls the whole admin UI (core, plugins, themes, Zentranslate React) into the chosen language.
+- **Localizer**: filters WordPress `locale` + `plugin_locale` in admin to the user's preferred locale — pulls the whole admin UI (core, plugins, themes, GemTranslate React) into the chosen language.
 - **REST**: `GET / PUT /me/language` (logged-in users only).
 
 ## 16. Translator role + language scope
 
-- **Custom role**: `ztrans_translator`.
-- **Capability**: `ztrans_translate_content` — granted to `administrator` + `editor` on activation (idempotent backfill on `init`).
-- **Per-user language scope** (`ztrans_assigned_languages` user meta) — empty array means unrestricted; populated array means "only these languages".
+- **Custom role**: `gtrans_translator`.
+- **Capability**: `gtrans_translate_content` — granted to `administrator` + `editor` on activation (idempotent backfill on `init`).
+- **Per-user language scope** (`gtrans_assigned_languages` user meta) — empty array means unrestricted; populated array means "only these languages".
 - **Enforced in `permissions_translate`** — REST returns 403 when a route's `:lang` param isn't in the user's scope.
 - **Translators UI** — list every cap-holder, tick languages, save.
 
@@ -217,7 +217,7 @@ Every capability the plugin ships with. Grouped by area for fast scanning.
 
 - **WPML** — reads `icl_translations` (joined by `trid`) + `icl_languages`. Walks every group, links the source post to its translated siblings via our `TranslationLoader`.
 - **Polylang** — reads `language` taxonomy + `post_translations` term descriptions (serialized `[lang_code => post_id]` arrays).
-- **TranslatePress** — reads every `wp_trp_dictionary_*_*` table and registers each `(original, translated)` pair as a Zentranslate string + translation.
+- **TranslatePress** — reads every `wp_trp_dictionary_*_*` table and registers each `(original, translated)` pair as a GemTranslate string + translation.
 - **Detection** — checks for source plugin tables/taxonomies before running.
 - **REST**: detect + import.
 - **UI**: side-by-side cards with detection pill, run-import button, and result counts.
@@ -244,24 +244,24 @@ Every capability the plugin ships with. Grouped by area for fast scanning.
 
 - **Separate webpack entry** — bundles into 3.3 KiB JS (most deps live in WP's bundled libraries).
 - **Enqueued only on the block editor** (`enqueue_block_editor_assets`).
-- **`PluginSidebar`** titled "Zentranslate" with a translation icon in the editor top-right.
+- **`PluginSidebar`** titled "GemTranslate" with a translation icon in the editor top-right.
 - **Per-language status pill** for the current post.
 - **"AI" button** queues a translation job inline — visible in the Jobs page seconds later.
-- **"Edit" button** deep-links into the full Zentranslate translation editor.
+- **"Edit" button** deep-links into the full GemTranslate translation editor.
 - **Refresh button** for manual reload.
 
 ## 21. Transactional email locale switch
 
 - **Opt-in** via `translate_emails` setting.
 - **Hooks `wp_mail`** at priority 1 (before the message renders).
-- **Resolves the primary recipient** → looks up `ztrans_preferred_language` user meta → maps to a WP locale.
-- **Swaps WordPress `locale` for the send** + reloads `default` and `zentranslate` textdomains so already-loaded translations refresh.
+- **Resolves the primary recipient** → looks up `gtrans_preferred_language` user meta → maps to a WP locale.
+- **Swaps WordPress `locale` for the send** + reloads `default` and `gemtranslate` textdomains so already-loaded translations refresh.
 - **Restores on `wp_mail_succeeded` / `wp_mail_failed`** — stack-based so nested mails are safe.
 - **Covers everything that funnels through `wp_mail`**: password reset, comment notifications, WooCommerce emails, plugin transactionals.
 
 ## 22. Cache plugin compatibility
 
-- **WP Rocket** — `rocket_cache_dynamic_cookies` registers `ztrans_user_lang`; `rocket_clean_domain` on `ztrans_translation_saved` and `ztrans_language_changed`.
+- **WP Rocket** — `rocket_cache_dynamic_cookies` registers `gtrans_user_lang`; `rocket_clean_domain` on `gtrans_translation_saved` and `gtrans_language_changed`.
 - **W3 Total Cache** — `w3tc_flush_all` on the same events.
 - **LiteSpeed Cache** — `litespeed_purge_all` on the same events.
 - **Cloudflare** — appends `Cookie` to the `Vary` header on every response.
@@ -291,7 +291,7 @@ See [WP-CLI.md](WP-CLI.md) for full syntax.
 
 ## 25. REST API
 
-42 endpoints under `/wp-json/ztrans/v1/`. See [REST-API.md](REST-API.md).
+42 endpoints under `/wp-json/gtrans/v1/`. See [REST-API.md](REST-API.md).
 
 ## 26. Performance architecture
 
@@ -312,14 +312,14 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the request-pipeline walk-through.
 | `show_switcher_for_default` | `true` | Include the default language in the switcher list. |
 | `object_cache_enabled` | `true` | Use `wp_cache_*` for translation reads (recommended). |
 | `debug_log_enabled` | `false` | Verbose logging to the WP debug log. |
-| `remove_data_on_uninstall` | `false` | Drop all `wp_ztrans_*` tables + options on plugin delete. |
+| `remove_data_on_uninstall` | `false` | Drop all `wp_gtrans_*` tables + options on plugin delete. |
 | `onboarding_complete` | `false` | Auto-redirects first-time users to `/onboarding`. |
 | `auto_redirect_browser_lang` | `false` | First-visit redirect by `Accept-Language`. |
 | `translate_emails` | `false` | Switch locale per recipient inside `wp_mail`. |
 
 ## 28. Database schema
 
-14 tables, all prefixed `wp_ztrans_`:
+14 tables, all prefixed `wp_gtrans_`:
 
 | Table | Purpose |
 |---|---|
@@ -338,4 +338,4 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the request-pipeline walk-through.
 | `post_meta_translations` | Translated post meta / ACF fields. |
 | `post_translation_revisions` | Per-translation revision history. |
 
-Schema version stored in `ztrans_db_version` option (`1.2`); `Migrator::maybe_upgrade()` runs on `init` if behind.
+Schema version stored in `gtrans_db_version` option (`1.2`); `Migrator::maybe_upgrade()` runs on `init` if behind.

@@ -1,5 +1,5 @@
 <?php
-namespace Zentranslate\AI;
+namespace GemTranslate\AI;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class OpenAiTranslator implements TranslatorInterface {
 
 	const ENDPOINT     = 'https://api.openai.com/v1/chat/completions';
-	const DELIMITER    = "\n%%%ZTRANS_SPLIT%%%\n";
+	const DELIMITER    = "\n%%%GTRANS_SPLIT%%%\n";
 	const DEFAULT_MODEL = 'gpt-4o-mini';
 
 	private $api_key;
@@ -32,7 +32,7 @@ class OpenAiTranslator implements TranslatorInterface {
 
 	public function translate( $texts, $source_lang, $target_lang, $context = [] ) {
 		if ( empty( $this->api_key ) ) {
-			return new \WP_Error( 'ztrans_no_key', __( 'OpenAI API key is not configured.', 'zentranslate' ) );
+			return new \WP_Error( 'gtrans_no_key', __( 'OpenAI API key is not configured.', 'gemtranslate' ) );
 		}
 
 		$is_array = is_array( $texts );
@@ -94,13 +94,13 @@ class OpenAiTranslator implements TranslatorInterface {
 		$code = (int) wp_remote_retrieve_response_code( $response );
 		$body = wp_remote_retrieve_body( $response );
 		if ( $code < 200 || $code >= 300 ) {
-			return new \WP_Error( 'ztrans_openai_http_' . $code, $body ?: 'OpenAI error', [ 'status' => $code ] );
+			return new \WP_Error( 'gtrans_openai_http_' . $code, $body ?: 'OpenAI error', [ 'status' => $code ] );
 		}
 
 		$data = json_decode( $body, true );
 		$out  = $data['choices'][0]['message']['content'] ?? '';
 		if ( '' === $out ) {
-			return new \WP_Error( 'ztrans_openai_empty', __( 'OpenAI returned an empty response.', 'zentranslate' ) );
+			return new \WP_Error( 'gtrans_openai_empty', __( 'OpenAI returned an empty response.', 'gemtranslate' ) );
 		}
 
 		$translations = $is_array ? array_map( 'trim', explode( self::DELIMITER, $out ) ) : [ trim( $out ) ];

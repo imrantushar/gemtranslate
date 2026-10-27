@@ -1,6 +1,6 @@
 # REST API reference
 
-All endpoints live under **`/wp-json/ztrans/v1/`**.
+All endpoints live under **`/wp-json/gtrans/v1/`**.
 
 ## Authentication
 
@@ -25,7 +25,7 @@ Errors return a `WP_Error` with code, message, and HTTP status.
 | Permission | Granted to | Used on |
 |---|---|---|
 | `manage_options` | Administrators | Languages CRUD, AI provider config, settings, migration, packs, translators. |
-| `ztrans_translate_content` | Administrators, Editors, Translators | Post / term / menu / string / SEO / job / IO endpoints. Scoped by `ztrans_assigned_languages` user meta. |
+| `gtrans_translate_content` | Administrators, Editors, Translators | Post / term / menu / string / SEO / job / IO endpoints. Scoped by `gtrans_assigned_languages` user meta. |
 | logged-in | Any user | `/me/language`. |
 
 ---
@@ -45,54 +45,54 @@ Errors return a `WP_Error` with code, message, and HTTP status.
 
 | Method | Path | Cap | Description |
 |---|---|---|---|
-| GET | `/post-types` | `ztrans_translate_content` | Public, editable post types for the current user. |
-| GET | `/posts` | `ztrans_translate_content` | Paginated list with per-language status. Args: `page`, `per_page`, `search`, `post_type`, `status`. |
-| GET | `/posts/{id}/translations` | `ztrans_translate_content` | Full translation set + source post (with content). |
-| GET | `/posts/{id}/translations/{lang}` | `ztrans_translate_content` | Single translation row. |
-| PUT | `/posts/{id}/translations/{lang}` | `ztrans_translate_content` | Save a translation. Body: `title`, `content`, `excerpt`, `slug?`, `status?`. |
-| DELETE | `/posts/{id}/translations/{lang}` | `ztrans_translate_content` | Delete a translation. |
-| GET | `/posts/{id}/blocks/{lang}` | `ztrans_translate_content` | Block-aware field list. Returns `is_block_content` + `fields[]`. |
-| PUT | `/posts/{id}/blocks/{lang}` | `ztrans_translate_content` | Save per-block fields. Body: `fields: [{ path, value }]`. |
-| GET | `/posts/{id}/meta-translations/{lang}` | `ztrans_translate_content` | Per-post meta / ACF fields. |
-| PUT | `/posts/{id}/meta-translations/{lang}` | `ztrans_translate_content` | Save meta translations. Body: `fields: [{ key, value }]`. |
-| GET | `/posts/{id}/translations/{lang}/revisions` | `ztrans_translate_content` | List revisions for this translation. |
-| GET | `/posts/{id}/translations/{lang}/revisions/{revision_id}` | `ztrans_translate_content` | Show a revision. |
-| POST | `/posts/{id}/translations/{lang}/revisions/{revision_id}/revert` | `ztrans_translate_content` | Revert the live translation. |
-| GET | `/posts/{id}/translations/{lang}/diff?a=<id>&b=<id>` | `ztrans_translate_content` | Compare two revisions. |
+| GET | `/post-types` | `gtrans_translate_content` | Public, editable post types for the current user. |
+| GET | `/posts` | `gtrans_translate_content` | Paginated list with per-language status. Args: `page`, `per_page`, `search`, `post_type`, `status`. |
+| GET | `/posts/{id}/translations` | `gtrans_translate_content` | Full translation set + source post (with content). |
+| GET | `/posts/{id}/translations/{lang}` | `gtrans_translate_content` | Single translation row. |
+| PUT | `/posts/{id}/translations/{lang}` | `gtrans_translate_content` | Save a translation. Body: `title`, `content`, `excerpt`, `slug?`, `status?`. |
+| DELETE | `/posts/{id}/translations/{lang}` | `gtrans_translate_content` | Delete a translation. |
+| GET | `/posts/{id}/blocks/{lang}` | `gtrans_translate_content` | Block-aware field list. Returns `is_block_content` + `fields[]`. |
+| PUT | `/posts/{id}/blocks/{lang}` | `gtrans_translate_content` | Save per-block fields. Body: `fields: [{ path, value }]`. |
+| GET | `/posts/{id}/meta-translations/{lang}` | `gtrans_translate_content` | Per-post meta / ACF fields. |
+| PUT | `/posts/{id}/meta-translations/{lang}` | `gtrans_translate_content` | Save meta translations. Body: `fields: [{ key, value }]`. |
+| GET | `/posts/{id}/translations/{lang}/revisions` | `gtrans_translate_content` | List revisions for this translation. |
+| GET | `/posts/{id}/translations/{lang}/revisions/{revision_id}` | `gtrans_translate_content` | Show a revision. |
+| POST | `/posts/{id}/translations/{lang}/revisions/{revision_id}/revert` | `gtrans_translate_content` | Revert the live translation. |
+| GET | `/posts/{id}/translations/{lang}/diff?a=<id>&b=<id>` | `gtrans_translate_content` | Compare two revisions. |
 
 ## Terms
 
 | Method | Path | Cap |
 |---|---|---|
-| GET | `/terms?taxonomy=…&search=…&page=…` | `ztrans_translate_content` |
-| GET | `/terms/{id}/translations` | `ztrans_translate_content` |
-| PUT | `/terms/{id}/translations/{lang}` | `ztrans_translate_content` |
-| DELETE | `/terms/{id}/translations/{lang}` | `ztrans_translate_content` |
+| GET | `/terms?taxonomy=…&search=…&page=…` | `gtrans_translate_content` |
+| GET | `/terms/{id}/translations` | `gtrans_translate_content` |
+| PUT | `/terms/{id}/translations/{lang}` | `gtrans_translate_content` |
+| DELETE | `/terms/{id}/translations/{lang}` | `gtrans_translate_content` |
 
 ## Menus
 
 | Method | Path | Cap |
 |---|---|---|
-| GET | `/menus` | `ztrans_translate_content` |
-| GET | `/menus/{id}/items` | `ztrans_translate_content` |
-| PUT | `/menus/items/{item_id}/translations/{lang}` | `ztrans_translate_content` |
+| GET | `/menus` | `gtrans_translate_content` |
+| GET | `/menus/{id}/items` | `gtrans_translate_content` |
+| PUT | `/menus/items/{item_id}/translations/{lang}` | `gtrans_translate_content` |
 
 ## Strings
 
 | Method | Path | Cap |
 |---|---|---|
-| GET | `/strings?lang=…&search=…&domain=…&page=…&per_page=…` | `ztrans_translate_content` |
-| GET | `/strings/domains` | `ztrans_translate_content` |
-| PUT | `/strings/{id}/translations/{lang}` | `ztrans_translate_content` |
-| PATCH | `/strings/bulk` | `ztrans_translate_content` |
-| POST | `/strings/scan` | `ztrans_translate_content` |
+| GET | `/strings?lang=…&search=…&domain=…&page=…&per_page=…` | `gtrans_translate_content` |
+| GET | `/strings/domains` | `gtrans_translate_content` |
+| PUT | `/strings/{id}/translations/{lang}` | `gtrans_translate_content` |
+| PATCH | `/strings/bulk` | `gtrans_translate_content` |
+| POST | `/strings/scan` | `gtrans_translate_content` |
 
 ## SEO
 
 | Method | Path | Cap |
 |---|---|---|
-| GET | `/seo/posts/{post_id}/{lang}` | `ztrans_translate_content` |
-| PUT | `/seo/posts/{post_id}/{lang}` | `ztrans_translate_content` |
+| GET | `/seo/posts/{post_id}/{lang}` | `gtrans_translate_content` |
+| PUT | `/seo/posts/{post_id}/{lang}` | `gtrans_translate_content` |
 
 ## AI
 
@@ -111,13 +111,13 @@ Errors return a `WP_Error` with code, message, and HTTP status.
 
 | Method | Path | Cap |
 |---|---|---|
-| GET | `/jobs?status=…&page=…&per_page=…` | `ztrans_translate_content` |
-| GET | `/jobs/counts` | `ztrans_translate_content` |
-| POST | `/jobs` | `ztrans_translate_content` |
-| POST | `/jobs/bulk-translate` | `ztrans_translate_content` |
-| GET | `/jobs/{id}` | `ztrans_translate_content` |
-| POST | `/jobs/{id}/retry` | `ztrans_translate_content` |
-| DELETE | `/jobs/{id}` | `ztrans_translate_content` |
+| GET | `/jobs?status=…&page=…&per_page=…` | `gtrans_translate_content` |
+| GET | `/jobs/counts` | `gtrans_translate_content` |
+| POST | `/jobs` | `gtrans_translate_content` |
+| POST | `/jobs/bulk-translate` | `gtrans_translate_content` |
+| GET | `/jobs/{id}` | `gtrans_translate_content` |
+| POST | `/jobs/{id}/retry` | `gtrans_translate_content` |
+| DELETE | `/jobs/{id}` | `gtrans_translate_content` |
 
 ## Plugin translation packs
 
@@ -146,10 +146,10 @@ Errors return a `WP_Error` with code, message, and HTTP status.
 
 | Method | Path | Cap |
 |---|---|---|
-| GET | `/io/export/strings?lang=…&format=xliff\|csv` | `ztrans_translate_content` |
-| GET | `/io/export/posts?lang=…&format=xliff\|csv&post_type=…` | `ztrans_translate_content` |
-| POST | `/io/import/strings` (body: `lang`, `format`, `body`) | `ztrans_translate_content` |
-| POST | `/io/import/posts` (body: `lang`, `format`, `body`) | `ztrans_translate_content` |
+| GET | `/io/export/strings?lang=…&format=xliff\|csv` | `gtrans_translate_content` |
+| GET | `/io/export/posts?lang=…&format=xliff\|csv&post_type=…` | `gtrans_translate_content` |
+| POST | `/io/import/strings` (body: `lang`, `format`, `body`) | `gtrans_translate_content` |
+| POST | `/io/import/posts` (body: `lang`, `format`, `body`) | `gtrans_translate_content` |
 
 ## Current user
 
@@ -164,4 +164,4 @@ Errors return a `WP_Error` with code, message, and HTTP status.
 |---|---|---|
 | GET | `/settings` | `manage_options` |
 | PUT | `/settings` | `manage_options` |
-| GET | `/stats` | `ztrans_translate_content` |
+| GET | `/stats` | `gtrans_translate_content` |

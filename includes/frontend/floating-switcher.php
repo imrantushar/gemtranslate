@@ -1,12 +1,12 @@
 <?php
-namespace Zentranslate\Frontend;
+namespace GemTranslate\Frontend;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Language\Context;
-use Zentranslate\Routing\UrlRewriter;
+use GemTranslate\Language\Context;
+use GemTranslate\Routing\UrlRewriter;
 
 /**
  * Injects a floating language-switcher button on every frontend page via
@@ -28,7 +28,7 @@ class FloatingSwitcher {
 			return;
 		}
 
-		$g            = $GLOBALS['ztrans_settings'] ?? null;
+		$g            = $GLOBALS['gtrans_settings'] ?? null;
 		$enabled      = isset( $g->float_switcher_enabled ) ? (bool) $g->float_switcher_enabled : false;
 		$is_admin_cap = current_user_can( 'manage_options' );
 
@@ -72,14 +72,14 @@ class FloatingSwitcher {
 		// Admin-only "Add new language" link — always shown to admins.
 		$admin_item_html = '';
 		if ( $is_admin_cap ) {
-			$add_url = admin_url( 'admin.php?page=zentranslate' ) . '#/languages';
+			$add_url = admin_url( 'admin.php?page=gemtranslate' ) . '#/languages';
 			if ( '' !== $items_html ) {
 				$admin_item_html .= '<li class="ztrans-float__divider" role="separator"></li>';
 			}
 			$admin_item_html .= sprintf(
 				'<li class="ztrans-float__item ztrans-float__item--admin"><a href="%s" target="_blank" rel="noopener noreferrer">%s</a></li>',
 				esc_url( $add_url ),
-				'<span class="ztrans-float__flag" aria-hidden="true">+</span> ' . esc_html__( 'Add new language', 'zentranslate' )
+				'<span class="ztrans-float__flag" aria-hidden="true">+</span> ' . esc_html__( 'Add new language', 'gemtranslate' )
 			);
 		}
 
@@ -101,9 +101,9 @@ class FloatingSwitcher {
 				class="ztrans-float__trigger"
 				aria-haspopup="listbox"
 				aria-expanded="false"
-				aria-label="<?php esc_attr_e( 'Switch language', 'zentranslate' ); ?>"
+				aria-label="<?php esc_attr_e( 'Switch language', 'gemtranslate' ); ?>"
 			><?php echo $trigger_label; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></button>
-			<ul class="ztrans-float__menu" role="listbox" aria-label="<?php esc_attr_e( 'Languages', 'zentranslate' ); ?>">
+			<ul class="ztrans-float__menu" role="listbox" aria-label="<?php esc_attr_e( 'Languages', 'gemtranslate' ); ?>">
 				<?php echo $items_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<?php echo $admin_item_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			</ul>
