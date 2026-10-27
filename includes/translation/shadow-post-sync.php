@@ -75,13 +75,21 @@ class ShadowPostSync {
 			}
 		}
 
+		// Seed waterfall: explicit seed → existing row's translated value →
+		// source post's value. This prevents an empty $seed[] from wiping
+		// previously-saved translation content.
+		$shadow_title   = $seed['title']   ?? $row['title']   ?? $source->post_title;
+		$shadow_content = $seed['content'] ?? $row['content'] ?? $source->post_content;
+		$shadow_excerpt = $seed['excerpt'] ?? $row['excerpt'] ?? $source->post_excerpt;
+		$shadow_slug    = $seed['slug']    ?? $row['slug']    ?? $source->post_name;
+
 		$shadow_id = wp_insert_post(
 			[
 				'post_type'    => $source->post_type,
 				'post_status'  => 'publish',
-				'post_title'   => (string) ( $seed['title']   ?? $source->post_title ),
-				'post_content' => (string) ( $seed['content'] ?? $source->post_content ),
-				'post_excerpt' => (string) ( $seed['excerpt'] ?? $source->post_excerpt ),
+				'post_title'   => (string) $shadow_title,
+				'post_content' => (string) $shadow_content,
+				'post_excerpt' => (string) $shadow_excerpt,
 				'post_author'  => $source->post_author ?: get_current_user_id(),
 				// Unique slug — we never expose it as a URL, but WP needs one.
 				'post_name'    => self::derive_shadow_slug( $source, $language, $country ),
@@ -97,17 +105,21 @@ class ShadowPostSync {
 			return 0;
 		}
 
-		// Persist the link in our row.
-		TranslationLoader::save_translation( $source_post_id, $language, [
-			'title'            => (string) ( $seed['title']   ?? '' ),
-			'content'          => (string) ( $seed['content'] ?? '' ),
-			'excerpt'          => (string) ( $seed['excerpt'] ?? '' ),
-			'slug'             => (string) ( $seed['slug']    ?? $source->post_name ),
-			'status'           => 'publish',
+		// Persist the link in our row — only writing fields we actually have
+		// values for so TranslationLoader's partial-update logic keeps
+		// anything else the row already has.
+		$persist = [
 			'country_code'     => $country,
 			'translation_mode' => TranslationLoader::MODE_CUSTOM_LAYOUT,
 			'shadow_post_id'   => (int) $shadow_id,
-		] );
+			'status'           => (string) ( $seed['status'] ?? $row['status'] ?? 'publish' ),
+		];
+		foreach ( [ 'title', 'content', 'excerpt', 'slug' ] as $k ) {
+			if ( array_key_exists( $k, $seed ) ) {
+				$persist[ $k ] = (string) $seed[ $k ];
+			}
+		}
+		TranslationLoader::save_translation( $source_post_id, $language, $persist );
 
 		return (int) $shadow_id;
 	}
