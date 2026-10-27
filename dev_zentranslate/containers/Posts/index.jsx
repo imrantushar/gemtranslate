@@ -9,6 +9,7 @@ import { Field, Select, TextInput, Checkbox } from '../../components/Input';
 import { LoadingBlock } from '../../components/Spinner';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
+import { hasFeature } from '../../hooks/useFeatures';
 import { usePosts } from '../../hooks/usePosts';
 import { useLanguages } from '../../hooks/useLanguages';
 import { usePostTypes } from '../../hooks/usePostTypes';
@@ -48,16 +49,21 @@ export default function PostsPage() {
 	}, [languages.data]);
 
 	const visibleIds = useMemo(() => (posts.data?.rows || []).map((r) => r.id), [posts.data]);
-	const allVisibleSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedIds.includes(id));
+	const allVisibleSelected =
+		visibleIds.length > 0 && visibleIds.every((id) => selectedIds.includes(id));
 
 	const toggleSelectAll = () => {
-		setSelectedIds((s) => allVisibleSelected ? s.filter((id) => !visibleIds.includes(id)) : Array.from(new Set([ ...s, ...visibleIds ])));
+		setSelectedIds((s) =>
+			allVisibleSelected
+				? s.filter((id) => !visibleIds.includes(id))
+				: Array.from(new Set([...s, ...visibleIds]))
+		);
 	};
 	const toggleOne = (id) =>
-		setSelectedIds((s) => s.includes(id) ? s.filter((x) => x !== id) : [ ...s, id ]);
+		setSelectedIds((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
 
 	const toggleLang = (code) =>
-		setSelectedLangs((s) => s.includes(code) ? s.filter((x) => x !== code) : [ ...s, code ]);
+		setSelectedLangs((s) => (s.includes(code) ? s.filter((x) => x !== code) : [...s, code]));
 
 	const runSearch = (e) => {
 		e.preventDefault();
@@ -90,14 +96,23 @@ export default function PostsPage() {
 		<>
 			<PageHeader
 				title={__('Posts & Pages', 'zentranslate')}
-				description={__('Pick a post to translate it into your active languages, or bulk-translate with AI.', 'zentranslate')}
+				description={__(
+					'Pick a post to translate it into your active languages, or bulk-translate with AI.',
+					'zentranslate'
+				)}
 			/>
 
 			<Card padded={false}>
-				<form onSubmit={runSearch} className="ztrans-flex ztrans-flex-wrap ztrans-items-end ztrans-gap-3 ztrans-border-b ztrans-border-ztrans-border ztrans-px-4 ztrans-py-3">
+				<form
+					onSubmit={runSearch}
+					className="ztrans-flex ztrans-flex-wrap ztrans-items-end ztrans-gap-3 ztrans-border-b ztrans-border-ztrans-border ztrans-px-4 ztrans-py-3"
+				>
 					<div className="ztrans-min-w-[160px]">
 						<Field label={__('Post type', 'zentranslate')}>
-							<Select value={filters.post_type} onChange={(e) => setFilters((f) => ({ ...f, post_type: e.target.value, page: 1 }))}>
+							<Select
+								value={filters.post_type}
+								onChange={(e) => setFilters((f) => ({ ...f, post_type: e.target.value, page: 1 }))}
+							>
 								{types.length === 0 ? (
 									<>
 										<option value="post">{__('Posts', 'zentranslate')}</option>
@@ -105,7 +120,9 @@ export default function PostsPage() {
 									</>
 								) : (
 									types.map((t) => (
-										<option key={t.name} value={t.name}>{t.label}</option>
+										<option key={t.name} value={t.name}>
+											{t.label}
+										</option>
 									))
 								)}
 							</Select>
@@ -113,13 +130,19 @@ export default function PostsPage() {
 					</div>
 					<div className="ztrans-min-w-[200px] ztrans-flex-1">
 						<Field label={__('Search', 'zentranslate')}>
-							<TextInput value={search} onChange={(e) => setSearch(e.target.value)} placeholder={__('Search by title…', 'zentranslate')} />
+							<TextInput
+								value={search}
+								onChange={(e) => setSearch(e.target.value)}
+								placeholder={__('Search by title…', 'zentranslate')}
+							/>
 						</Field>
 					</div>
-					<Button type="submit" variant="secondary">{__('Filter', 'zentranslate')}</Button>
+					<Button type="submit" variant="secondary">
+						{__('Filter', 'zentranslate')}
+					</Button>
 				</form>
 
-				{selectedIds.length > 0 && (
+				{selectedIds.length > 0 && hasFeature('ai_bulk') && (
 					<div className="ztrans-flex ztrans-flex-wrap ztrans-items-center ztrans-justify-between ztrans-gap-3 ztrans-border-b ztrans-border-ztrans-border ztrans-bg-blue-50 ztrans-px-4 ztrans-py-3 ztrans-text-sm">
 						<div className="ztrans-flex ztrans-flex-wrap ztrans-items-center ztrans-gap-3">
 							<strong>
@@ -139,13 +162,22 @@ export default function PostsPage() {
 									/>
 								))}
 							</div>
-							<Checkbox label={__('Overwrite existing', 'zentranslate')} checked={overwrite} onChange={(e) => setOverwrite(e.target.checked)} />
+							<Checkbox
+								label={__('Overwrite existing', 'zentranslate')}
+								checked={overwrite}
+								onChange={(e) => setOverwrite(e.target.checked)}
+							/>
 						</div>
 						<div className="ztrans-flex ztrans-gap-2">
 							<Button variant="ghost" size="sm" onClick={() => setSelectedIds([])}>
 								{__('Clear', 'zentranslate')}
 							</Button>
-							<Button size="sm" onClick={runBulk} loading={bulk.isPending} disabled={selectedLangs.length === 0}>
+							<Button
+								size="sm"
+								onClick={runBulk}
+								loading={bulk.isPending}
+								disabled={selectedLangs.length === 0}
+							>
 								{__('Translate selected with AI', 'zentranslate')}
 							</Button>
 						</div>
@@ -163,12 +195,19 @@ export default function PostsPage() {
 						<thead className="ztrans-bg-ztrans-bg ztrans-text-left ztrans-text-xs ztrans-uppercase ztrans-text-ztrans-muted">
 							<tr>
 								<th className="ztrans-px-4 ztrans-py-3 ztrans-w-10">
-									<input type="checkbox" checked={allVisibleSelected} onChange={toggleSelectAll} aria-label={__('Select all visible', 'zentranslate')} />
+									<input
+										type="checkbox"
+										checked={allVisibleSelected}
+										onChange={toggleSelectAll}
+										aria-label={__('Select all visible', 'zentranslate')}
+									/>
 								</th>
 								<th className="ztrans-px-4 ztrans-py-3">{__('Title', 'zentranslate')}</th>
 								<th className="ztrans-px-4 ztrans-py-3">{__('Status', 'zentranslate')}</th>
 								{nonDefault.map((l) => (
-									<th key={l.code} className="ztrans-px-4 ztrans-py-3">{l.code.toUpperCase()}</th>
+									<th key={l.code} className="ztrans-px-4 ztrans-py-3">
+										{l.code.toUpperCase()}
+									</th>
 								))}
 								<th className="ztrans-px-4 ztrans-py-3" />
 							</tr>
@@ -177,10 +216,17 @@ export default function PostsPage() {
 							{(posts.data?.rows || []).map((row) => (
 								<tr key={row.id} className="ztrans-border-t ztrans-border-ztrans-border">
 									<td className="ztrans-px-4 ztrans-py-3">
-										<input type="checkbox" checked={selectedIds.includes(row.id)} onChange={() => toggleOne(row.id)} aria-label={`Select post ${row.id}`} />
+										<input
+											type="checkbox"
+											checked={selectedIds.includes(row.id)}
+											onChange={() => toggleOne(row.id)}
+											aria-label={`Select post ${row.id}`}
+										/>
 									</td>
 									<td className="ztrans-px-4 ztrans-py-3 ztrans-max-w-[360px]">
-										<div className="ztrans-font-medium ztrans-text-gray-900">{truncate(row.title, 60)}</div>
+										<div className="ztrans-font-medium ztrans-text-gray-900">
+											{truncate(row.title, 60)}
+										</div>
 										<div className="ztrans-text-xs ztrans-text-ztrans-muted">/{row.slug}</div>
 									</td>
 									<td className="ztrans-px-4 ztrans-py-3">
@@ -201,7 +247,10 @@ export default function PostsPage() {
 										);
 									})}
 									<td className="ztrans-px-4 ztrans-py-3 ztrans-text-right">
-										<Link to={`/posts/${row.id}`} className="ztrans-rounded-md ztrans-bg-ztrans-primary ztrans-px-3 ztrans-py-1.5 ztrans-text-xs ztrans-text-white ztrans-no-underline">
+										<Link
+											to={`/posts/${row.id}`}
+											className="ztrans-rounded-md ztrans-bg-ztrans-primary ztrans-px-3 ztrans-py-1.5 ztrans-text-xs ztrans-text-white ztrans-no-underline"
+										>
 											{__('Translate', 'zentranslate')}
 										</Link>
 									</td>
@@ -222,10 +271,20 @@ export default function PostsPage() {
 							)}
 						</span>
 						<div className="ztrans-flex ztrans-gap-2">
-							<Button variant="ghost" size="sm" disabled={filters.page <= 1} onClick={() => setFilters((f) => ({ ...f, page: f.page - 1 }))}>
+							<Button
+								variant="ghost"
+								size="sm"
+								disabled={filters.page <= 1}
+								onClick={() => setFilters((f) => ({ ...f, page: f.page - 1 }))}
+							>
 								{__('Previous', 'zentranslate')}
 							</Button>
-							<Button variant="ghost" size="sm" disabled={filters.page >= posts.data.meta.total_pages} onClick={() => setFilters((f) => ({ ...f, page: f.page + 1 }))}>
+							<Button
+								variant="ghost"
+								size="sm"
+								disabled={filters.page >= posts.data.meta.total_pages}
+								onClick={() => setFilters((f) => ({ ...f, page: f.page + 1 }))}
+							>
 								{__('Next', 'zentranslate')}
 							</Button>
 						</div>

@@ -101,6 +101,22 @@ class AI extends Controller {
 				'permission_callback' => [ $this, 'permissions_check' ],
 			]
 		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/memory/suggest',
+			[
+				'methods'             => \WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'memory_suggest' ],
+				'permission_callback' => [ $this, 'permissions_check' ],
+				'args'                => [
+					'text'        => [ 'type' => 'string', 'required' => true ],
+					'source_lang' => [ 'type' => 'string' ],
+					'target_lang' => [ 'type' => 'string', 'required' => true ],
+					'limit'       => [ 'type' => 'integer', 'default' => 5 ],
+				],
+			]
+		);
 	}
 
 	public function list_providers( $request ) {
@@ -207,7 +223,13 @@ class AI extends Controller {
 		$translations = array_fill( 0, count( $texts ), null );
 		$to_fetch     = [];
 
-		if ( ! empty( $body['use_memory'] ) ) {
+		// Translation Memory + Glossary are Pro enhancements. The single-text
+		// "AI taste" still works in free; it just skips TM/glossary when Pro is
+		// inactive (classes absent).
+		$has_memory   = ! empty( $body['use_memory'] ) && class_exists( TranslationMemory::class );
+		$has_glossary = class_exists( Glossary::class );
+
+		if ( $has_memory ) {
 			foreach ( $texts as $i => $t ) {
 				$cached = TranslationMemory::get( $t, $source, $target );
 				if ( null !== $cached ) {
@@ -223,14 +245,14 @@ class AI extends Controller {
 		}
 
 		if ( ! empty( $to_fetch ) ) {
-			$glossary = Glossary::build_context( $source, $target );
-			$result   = $translator->translate(
+			$glossary_pairs = $has_glossary ? Glossary::build_context( $source, $target )['pairs'] : [];
+			$result         = $translator->translate(
 				array_values( $to_fetch ),
 				$source,
 				$target,
 				[
 					'preserve_html' => ! empty( $body['preserve_html'] ),
-					'glossary'      => $glossary['pairs'],
+					'glossary'      => $glossary_pairs,
 				]
 			);
 			if ( is_wp_error( $result ) ) {
@@ -240,7 +262,7 @@ class AI extends Controller {
 			foreach ( array_keys( $to_fetch ) as $orig_index ) {
 				$value = $result['translations'][ $i ] ?? '';
 				$translations[ $orig_index ] = $value;
-				if ( ! empty( $body['use_memory'] ) && '' !== $value ) {
+				if ( $has_memory && '' !== $value ) {
 					TranslationMemory::set( $to_fetch[ $orig_index ], $value, $source, $target, $result['provider'] );
 				}
 				$i++;
@@ -256,12 +278,18 @@ class AI extends Controller {
 	}
 
 	public function list_glossary( $request ) {
+		if ( $err = $this->require_pro( 'glossary' ) ) {
+			return $err;
+		}
 		global $wpdb;
 		$rows = $wpdb->get_results( "SELECT * FROM " . \Zentranslate\Helper::table( 'glossary' ) . " ORDER BY term_id DESC", ARRAY_A ) ?: [];
 		return $this->ok( $rows );
 	}
 
 	public function add_glossary( $request ) {
+		if ( $err = $this->require_pro( 'glossary' ) ) {
+			return $err;
+		}
 		$body = $request->get_json_params() ?: $request->get_params();
 		$ok   = Glossary::add(
 			(string) ( $body['source_lang'] ?? '' ),
@@ -280,11 +308,36 @@ class AI extends Controller {
 	}
 
 	public function delete_glossary( $request ) {
+		if ( $err = $this->require_pro( 'glossary' ) ) {
+			return $err;
+		}
 		Glossary::delete( (int) $request['id'] );
 		return $this->ok( [ 'deleted' => true ] );
 	}
 
 	public function memory_stats( $request ) {
+		if ( $err = $this->require_pro( 'translation_memory' ) ) {
+			return $err;
+		}
 		return $this->ok( TranslationMemory::stats() );
+	}
+
+	public function memory_suggest( $request ) {
+		if ( $err = $this->require_pro( 'translation_memory' ) ) {
+			return $err;
+		}
+		$body   = $request->get_json_params() ?: $request->get_params();
+		$text   = (string) ( $body['text'] ?? '' );
+		$source = (string) ( $body['source_lang'] ?? Context::default_code() );
+		$target = (string) ( $body['target_lang'] ?? '' );
+		$limit  = (int) ( $body['limit'] ?? 5 );
+
+		if ( '' === $target ) {
+			return $this->fail( 'ztrans_missing_target', __( 'target_lang is required.', 'zentranslate' ), 422 );
+		}
+
+		return $this->ok(
+			[ 'suggestions' => TranslationMemory::suggest( $text, $source, $target, $limit ) ]
+		);
 	}
 }

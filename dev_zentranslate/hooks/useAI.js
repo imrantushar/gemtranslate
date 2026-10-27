@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, unwrap } from '../lib/api';
+import { hasFeature } from './useFeatures';
 
 export function useAIProviders() {
 	return useQuery({
@@ -18,7 +19,8 @@ export function useSaveAIProviders() {
 
 export function useTestAIProvider() {
 	return useMutation({
-		mutationFn: async ({ name, ...rest }) => unwrap(await api.post(`ai/providers/${name}/test`, rest)),
+		mutationFn: async ({ name, ...rest }) =>
+			unwrap(await api.post(`ai/providers/${name}/test`, rest)),
 	});
 }
 
@@ -28,10 +30,18 @@ export function useTranslateWithAI() {
 	});
 }
 
+export function useSuggestFromMemory() {
+	return useMutation({
+		mutationFn: async (payload) => unwrap(await api.post('ai/memory/suggest', payload)),
+	});
+}
+
 export function useMemoryStats() {
 	return useQuery({
 		queryKey: ['ai', 'memory'],
 		queryFn: async () => unwrap(await api.get('ai/memory/stats')),
+		// Translation Memory is Pro — don't hit the 402-gated endpoint in free.
+		enabled: hasFeature('translation_memory'),
 	});
 }
 
@@ -39,6 +49,7 @@ export function useGlossary() {
 	return useQuery({
 		queryKey: ['ai', 'glossary'],
 		queryFn: async () => unwrap(await api.get('ai/glossary')) || [],
+		enabled: hasFeature('glossary'),
 	});
 }
 

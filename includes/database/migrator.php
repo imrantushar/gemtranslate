@@ -28,6 +28,9 @@ class Migrator {
 		self::ensure_country_code_column( $prefix );
 		self::ensure_post_translations_pk( $prefix );
 
+		// Free-tier tables. Pro tables (jobs, translation_memory, glossary,
+		// seo_meta, post_meta_translations, post_translation_revisions) are
+		// created by zentranslate-pro's own migrator.
 		CreateLanguagesTable::up( $prefix, $charset_collate );
 		CreateTranslationGroupsTable::up( $prefix, $charset_collate );
 		CreatePostTranslationsTable::up( $prefix, $charset_collate );
@@ -35,13 +38,7 @@ class Migrator {
 		CreateMenuTranslationsTable::up( $prefix, $charset_collate );
 		CreateStringsTable::up( $prefix, $charset_collate );
 		CreateStringTranslationsTable::up( $prefix, $charset_collate );
-		CreateSeoMetaTable::up( $prefix, $charset_collate );
 		CreateSlugsTable::up( $prefix, $charset_collate );
-		CreateJobsTable::up( $prefix, $charset_collate );
-		CreateTranslationMemoryTable::up( $prefix, $charset_collate );
-		CreateGlossaryTable::up( $prefix, $charset_collate );
-		CreatePostMetaTranslationsTable::up( $prefix, $charset_collate );
-		CreatePostTranslationRevisionsTable::up( $prefix, $charset_collate );
 
 		update_option( 'ztrans_db_version', ZTRANS_DB_VERSION );
 	}

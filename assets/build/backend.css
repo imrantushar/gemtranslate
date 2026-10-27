@@ -289,6 +289,9 @@ input:where([type='file']):focus {
 #zentranslate-admin-root .ztrans-relative {
 	position: relative;
 }
+#zentranslate-admin-root .ztrans-sticky {
+	position: sticky;
+}
 #zentranslate-admin-root .ztrans-inset-0 {
 	inset: 0px;
 }
@@ -300,6 +303,9 @@ input:where([type='file']):focus {
 }
 #zentranslate-admin-root .ztrans-right-6 {
 	right: 1.5rem;
+}
+#zentranslate-admin-root .ztrans-top-0 {
+	top: 0px;
 }
 #zentranslate-admin-root .ztrans-z-10 {
 	z-index: 10;
@@ -313,11 +319,25 @@ input:where([type='file']):focus {
 #zentranslate-admin-root .ztrans-m-0 {
 	margin: 0px;
 }
+#zentranslate-admin-root .ztrans-mx-0\.5 {
+	margin-left: 0.125rem;
+	margin-right: 0.125rem;
+}
+#zentranslate-admin-root .ztrans-mx-1 {
+	margin-left: 0.25rem;
+	margin-right: 0.25rem;
+}
+#zentranslate-admin-root .-ztrans-ml-px {
+	margin-left: -1px;
+}
 #zentranslate-admin-root .ztrans-mb-0 {
 	margin-bottom: 0px;
 }
 #zentranslate-admin-root .ztrans-mb-1 {
 	margin-bottom: 0.25rem;
+}
+#zentranslate-admin-root .ztrans-mb-1\.5 {
+	margin-bottom: 0.375rem;
 }
 #zentranslate-admin-root .ztrans-mb-2 {
 	margin-bottom: 0.5rem;
@@ -348,6 +368,9 @@ input:where([type='file']):focus {
 }
 #zentranslate-admin-root .ztrans-mt-1 {
 	margin-top: 0.25rem;
+}
+#zentranslate-admin-root .ztrans-mt-1\.5 {
+	margin-top: 0.375rem;
 }
 #zentranslate-admin-root .ztrans-mt-2 {
 	margin-top: 0.5rem;
@@ -385,8 +408,17 @@ input:where([type='file']):focus {
 #zentranslate-admin-root .ztrans-h-1\.5 {
 	height: 0.375rem;
 }
+#zentranslate-admin-root .ztrans-h-2 {
+	height: 0.5rem;
+}
 #zentranslate-admin-root .ztrans-h-3 {
 	height: 0.75rem;
+}
+#zentranslate-admin-root .ztrans-h-3\.5 {
+	height: 0.875rem;
+}
+#zentranslate-admin-root .ztrans-h-4 {
+	height: 1rem;
 }
 #zentranslate-admin-root .ztrans-h-6 {
 	height: 1.5rem;
@@ -396,6 +428,9 @@ input:where([type='file']):focus {
 }
 #zentranslate-admin-root .ztrans-max-h-72 {
 	max-height: 18rem;
+}
+#zentranslate-admin-root .ztrans-min-h-\[2\.5rem\] {
+	min-height: 2.5rem;
 }
 #zentranslate-admin-root .ztrans-w-1\/2 {
 	width: 50%;
@@ -415,6 +450,9 @@ input:where([type='file']):focus {
 #zentranslate-admin-root .ztrans-w-3 {
 	width: 0.75rem;
 }
+#zentranslate-admin-root .ztrans-w-3\.5 {
+	width: 0.875rem;
+}
 #zentranslate-admin-root .ztrans-w-32 {
 	width: 8rem;
 }
@@ -430,6 +468,9 @@ input:where([type='file']):focus {
 #zentranslate-admin-root .ztrans-w-full {
 	width: 100%;
 }
+#zentranslate-admin-root .ztrans-w-px {
+	width: 1px;
+}
 #zentranslate-admin-root .ztrans-min-w-\[160px\] {
 	min-width: 160px;
 }
@@ -442,8 +483,14 @@ input:where([type='file']):focus {
 #zentranslate-admin-root .ztrans-max-w-3xl {
 	max-width: 48rem;
 }
+#zentranslate-admin-root .ztrans-max-w-\[280px\] {
+	max-width: 280px;
+}
 #zentranslate-admin-root .ztrans-max-w-\[360px\] {
 	max-width: 360px;
+}
+#zentranslate-admin-root .ztrans-max-w-lg {
+	max-width: 32rem;
 }
 #zentranslate-admin-root .ztrans-max-w-md {
 	max-width: 28rem;
@@ -455,6 +502,9 @@ input:where([type='file']):focus {
 	flex: 1 1 0%;
 }
 #zentranslate-admin-root .ztrans-flex-shrink-0 {
+	flex-shrink: 0;
+}
+#zentranslate-admin-root .ztrans-shrink-0 {
 	flex-shrink: 0;
 }
 @keyframes ztrans-spin {
@@ -470,6 +520,11 @@ input:where([type='file']):focus {
 }
 #zentranslate-admin-root .ztrans-cursor-pointer {
 	cursor: pointer;
+}
+#zentranslate-admin-root .ztrans-select-none {
+	-webkit-user-select: none;
+	   -moz-user-select: none;
+	        user-select: none;
 }
 #zentranslate-admin-root .ztrans-select-all {
 	-webkit-user-select: all;
@@ -527,8 +582,20 @@ input:where([type='file']):focus {
 #zentranslate-admin-root .ztrans-gap-4 {
 	gap: 1rem;
 }
+#zentranslate-admin-root .ztrans-gap-5 {
+	gap: 1.25rem;
+}
 #zentranslate-admin-root .ztrans-gap-6 {
 	gap: 1.5rem;
+}
+#zentranslate-admin-root :is(.ztrans-divide-y > :not([hidden]) ~ :not([hidden])) {
+	--tw-divide-y-reverse: 0;
+	border-top-width: calc(1px * calc(1 - var(--tw-divide-y-reverse)));
+	border-bottom-width: calc(1px * var(--tw-divide-y-reverse));
+}
+#zentranslate-admin-root :is(.ztrans-divide-ztrans-border > :not([hidden]) ~ :not([hidden])) {
+	--tw-divide-opacity: 1;
+	border-color: rgb(229 231 235 / var(--tw-divide-opacity, 1));
 }
 #zentranslate-admin-root .ztrans-overflow-auto {
 	overflow: auto;
@@ -538,6 +605,14 @@ input:where([type='file']):focus {
 }
 #zentranslate-admin-root .ztrans-overflow-x-auto {
 	overflow-x: auto;
+}
+#zentranslate-admin-root .ztrans-truncate {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+#zentranslate-admin-root .ztrans-whitespace-nowrap {
+	white-space: nowrap;
 }
 #zentranslate-admin-root .ztrans-whitespace-pre-wrap {
 	white-space: pre-wrap;
@@ -553,6 +628,14 @@ input:where([type='file']):focus {
 }
 #zentranslate-admin-root .ztrans-rounded-md {
 	border-radius: 0.375rem;
+}
+#zentranslate-admin-root .ztrans-rounded-l-md {
+	border-top-left-radius: 0.375rem;
+	border-bottom-left-radius: 0.375rem;
+}
+#zentranslate-admin-root .ztrans-rounded-r-md {
+	border-top-right-radius: 0.375rem;
+	border-bottom-right-radius: 0.375rem;
 }
 #zentranslate-admin-root .ztrans-border {
 	border-width: 1px;
@@ -571,6 +654,10 @@ input:where([type='file']):focus {
 }
 #zentranslate-admin-root .ztrans-border-t {
 	border-top-width: 1px;
+}
+#zentranslate-admin-root .ztrans-border-amber-200 {
+	--tw-border-opacity: 1;
+	border-color: rgb(253 230 138 / var(--tw-border-opacity, 1));
 }
 #zentranslate-admin-root .ztrans-border-blue-200 {
 	--tw-border-opacity: 1;
@@ -644,6 +731,10 @@ input:where([type='file']):focus {
 	--tw-bg-opacity: 1;
 	background-color: rgb(240 253 244 / var(--tw-bg-opacity, 1));
 }
+#zentranslate-admin-root .ztrans-bg-green-500 {
+	--tw-bg-opacity: 1;
+	background-color: rgb(34 197 94 / var(--tw-bg-opacity, 1));
+}
 #zentranslate-admin-root .ztrans-bg-indigo-100 {
 	--tw-bg-opacity: 1;
 	background-color: rgb(224 231 255 / var(--tw-bg-opacity, 1));
@@ -695,6 +786,9 @@ input:where([type='file']):focus {
 #zentranslate-admin-root .ztrans-p-2 {
 	padding: 0.5rem;
 }
+#zentranslate-admin-root .ztrans-p-2\.5 {
+	padding: 0.625rem;
+}
 #zentranslate-admin-root .ztrans-p-3 {
 	padding: 0.75rem;
 }
@@ -706,6 +800,10 @@ input:where([type='file']):focus {
 }
 #zentranslate-admin-root .ztrans-p-8 {
 	padding: 2rem;
+}
+#zentranslate-admin-root .ztrans-px-1 {
+	padding-left: 0.25rem;
+	padding-right: 0.25rem;
 }
 #zentranslate-admin-root .ztrans-px-1\.5 {
 	padding-left: 0.375rem;
@@ -759,6 +857,10 @@ input:where([type='file']):focus {
 	padding-top: 0.75rem;
 	padding-bottom: 0.75rem;
 }
+#zentranslate-admin-root .ztrans-py-4 {
+	padding-top: 1rem;
+	padding-bottom: 1rem;
+}
 #zentranslate-admin-root .ztrans-py-6 {
 	padding-top: 1.5rem;
 	padding-bottom: 1.5rem;
@@ -778,6 +880,9 @@ input:where([type='file']):focus {
 }
 #zentranslate-admin-root .ztrans-text-right {
 	text-align: right;
+}
+#zentranslate-admin-root .ztrans-align-baseline {
+	vertical-align: baseline;
 }
 #zentranslate-admin-root .ztrans-align-top {
 	vertical-align: top;
@@ -818,11 +923,17 @@ input:where([type='file']):focus {
 #zentranslate-admin-root .ztrans-font-medium {
 	font-weight: 500;
 }
+#zentranslate-admin-root .ztrans-font-normal {
+	font-weight: 400;
+}
 #zentranslate-admin-root .ztrans-font-semibold {
 	font-weight: 600;
 }
 #zentranslate-admin-root .ztrans-uppercase {
 	text-transform: uppercase;
+}
+#zentranslate-admin-root .ztrans-normal-case {
+	text-transform: none;
 }
 #zentranslate-admin-root .ztrans-italic {
 	font-style: italic;
@@ -888,6 +999,10 @@ input:where([type='file']):focus {
 	--tw-text-opacity: 1;
 	color: rgb(22 101 52 / var(--tw-text-opacity, 1));
 }
+#zentranslate-admin-root .ztrans-text-indigo-600 {
+	--tw-text-opacity: 1;
+	color: rgb(79 70 229 / var(--tw-text-opacity, 1));
+}
 #zentranslate-admin-root .ztrans-text-indigo-700 {
 	--tw-text-opacity: 1;
 	color: rgb(67 56 202 / var(--tw-text-opacity, 1));
@@ -927,6 +1042,9 @@ input:where([type='file']):focus {
 #zentranslate-admin-root .ztrans-no-underline {
 	text-decoration-line: none;
 }
+#zentranslate-admin-root .ztrans-opacity-50 {
+	opacity: 0.5;
+}
 #zentranslate-admin-root .ztrans-opacity-80 {
 	opacity: 0.8;
 }
@@ -942,6 +1060,11 @@ input:where([type='file']):focus {
 }
 #zentranslate-admin-root .ztrans-transition {
 	transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 150ms;
+}
+#zentranslate-admin-root .ztrans-transition-all {
+	transition-property: all;
 	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 	transition-duration: 150ms;
 }
@@ -1031,6 +1154,36 @@ input:where([type='file']):focus {
 	color: #374151 !important;
 	text-decoration: none !important;
 }
+
+/* ---- Advanced editor: token-aware contentEditable field ---- */
+#zentranslate-admin-root .ztrans-tokenfield:empty::before {
+	content: attr(data-placeholder);
+	color: #9ca3af;
+	pointer-events: none;
+}
+#zentranslate-admin-root .ztrans-tokenfield:focus {
+	box-shadow: 0 0 0 1px #4338ca;
+}
+#zentranslate-admin-root .ztrans-tok {
+	line-height: 1.4;
+	cursor: default;
+}
+/* Glossary term highlight in the source pane. */
+#zentranslate-admin-root .ztrans-gloss {
+	border-bottom: 2px solid #f59e0b;
+	background: rgba(245, 158, 11, 0.12);
+	border-radius: 2px;
+	padding: 0 1px;
+	cursor: help;
+}
+#zentranslate-admin-root .ztrans-gloss-dnt {
+	border-bottom-color: #6b7280;
+	background: rgba(107, 114, 128, 0.12);
+}
+#zentranslate-admin-root .hover\:ztrans-bg-amber-100:hover {
+	--tw-bg-opacity: 1;
+	background-color: rgb(254 243 199 / var(--tw-bg-opacity, 1));
+}
 #zentranslate-admin-root .hover\:ztrans-bg-gray-100:hover {
 	--tw-bg-opacity: 1;
 	background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1));
@@ -1042,6 +1195,10 @@ input:where([type='file']):focus {
 #zentranslate-admin-root .hover\:ztrans-bg-indigo-100:hover {
 	--tw-bg-opacity: 1;
 	background-color: rgb(224 231 255 / var(--tw-bg-opacity, 1));
+}
+#zentranslate-admin-root .hover\:ztrans-bg-indigo-50:hover {
+	--tw-bg-opacity: 1;
+	background-color: rgb(238 242 255 / var(--tw-bg-opacity, 1));
 }
 #zentranslate-admin-root .hover\:ztrans-bg-red-700:hover {
 	--tw-bg-opacity: 1;
@@ -1071,8 +1228,19 @@ input:where([type='file']):focus {
 	--tw-text-opacity: 1;
 	color: rgb(67 56 202 / var(--tw-text-opacity, 1));
 }
+#zentranslate-admin-root .focus\:ztrans-border-ztrans-primary:focus {
+	--tw-border-opacity: 1;
+	border-color: rgb(67 56 202 / var(--tw-border-opacity, 1));
+}
+#zentranslate-admin-root .focus\:ztrans-outline-none:focus {
+	outline: 2px solid transparent;
+	outline-offset: 2px;
+}
 #zentranslate-admin-root .disabled\:ztrans-cursor-not-allowed:disabled {
 	cursor: not-allowed;
+}
+#zentranslate-admin-root .disabled\:ztrans-opacity-50:disabled {
+	opacity: 0.5;
 }
 #zentranslate-admin-root .disabled\:ztrans-opacity-60:disabled {
 	opacity: 0.6;
@@ -1097,6 +1265,12 @@ input:where([type='file']):focus {
 	}
 	#zentranslate-admin-root .lg\:ztrans-grid-cols-3 {
 		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+	#zentranslate-admin-root .lg\:ztrans-grid-cols-\[1fr_1fr_auto\] {
+		grid-template-columns: 1fr 1fr auto;
+	}
+	#zentranslate-admin-root .lg\:ztrans-pt-6 {
+		padding-top: 1.5rem;
 	}
 }
 

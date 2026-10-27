@@ -26,30 +26,44 @@ class Autoload {
 		return self::$instance;
 	}
 
+	/**
+	 * Register a directory for a namespace. Multiple directories may be added
+	 * for the SAME namespace — this is how zentranslate-pro maps its own
+	 * `Zentranslate\*` classes onto a second directory while keeping the free
+	 * plugin's classes resolvable. Directories are searched in registration
+	 * order; the first readable file wins.
+	 */
 	public function add_namespace_directory( $namespace, $directory ) {
-		$this->autoload_directories[ $namespace ] = $directory;
+		if ( ! isset( $this->autoload_directories[ $namespace ] ) ) {
+			$this->autoload_directories[ $namespace ] = [];
+		}
+		$this->autoload_directories[ $namespace ][] = $directory;
 	}
 
 	public function autoload( $class ) {
-		foreach ( $this->autoload_directories as $namespace => $directory ) {
-			if ( 0 === strpos( $class, $namespace ) ) {
-				$filename = strtolower(
-					preg_replace(
-						[ '/^' . $namespace . '\\\/', '/([a-z])([A-Z])/', '/_/', '/\\\/' ],
-						[ '', '$1-$2', '-', DIRECTORY_SEPARATOR ],
-						$class
-					)
-				);
+		foreach ( $this->autoload_directories as $namespace => $directories ) {
+			if ( 0 !== strpos( $class, $namespace ) ) {
+				continue;
+			}
+			$filename = strtolower(
+				preg_replace(
+					[ '/^' . $namespace . '\\\/', '/([a-z])([A-Z])/', '/_/', '/\\\/' ],
+					[ '', '$1-$2', '-', DIRECTORY_SEPARATOR ],
+					$class
+				)
+			);
+			foreach ( (array) $directories as $directory ) {
 				$file = $directory . $filename . '.php';
 				if ( is_readable( $file ) ) {
 					require_once $file;
+					return;
 				}
 			}
 		}
 	}
 
 	public function __construct() {
-		$this->autoload_directories['Zentranslate'] = ZTRANS_INCLUDES_DIR_PATH;
+		$this->add_namespace_directory( 'Zentranslate', ZTRANS_INCLUDES_DIR_PATH );
 		spl_autoload_register( [ $this, 'autoload' ] );
 	}
 }

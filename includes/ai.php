@@ -7,6 +7,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class AI {
 	public static function init() {
-		AI\JobRunner::init();
+		// The provider layer (TranslatorFactory + translators) lives in free for
+		// the per-field "AI taste". The async job runner, translation memory, and
+		// glossary are Pro (zentranslate-pro) and self-register on `ztrans_init`.
 	}
 }

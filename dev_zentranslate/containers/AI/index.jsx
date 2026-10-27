@@ -14,12 +14,31 @@ import {
 	useMemoryStats,
 } from '../../hooks/useAI';
 import { formatErrorMessage } from '../../lib/format';
+import { hasFeature } from '../../hooks/useFeatures';
+import { UpsellCard } from '../../components/ProGate';
 
 const PROVIDERS = [
-	{ key: 'openai', label: 'OpenAI', hint: () => __('Uses GPT models. Best quality, BYOK.', 'zentranslate') },
-	{ key: 'deepl', label: 'DeepL', hint: () => __('Specialized translation API. BYOK.', 'zentranslate') },
-	{ key: 'google', label: 'Google', hint: () => __('Cloud Translation v2 (API key auth).', 'zentranslate') },
-	{ key: 'cloud', label: 'Zentranslate Cloud', hint: () => __('Hosted proxy with credit packs. Set the endpoint and license key.', 'zentranslate') },
+	{
+		key: 'openai',
+		label: 'OpenAI',
+		hint: () => __('Uses GPT models. Best quality, BYOK.', 'zentranslate'),
+	},
+	{
+		key: 'deepl',
+		label: 'DeepL',
+		hint: () => __('Specialized translation API. BYOK.', 'zentranslate'),
+	},
+	{
+		key: 'google',
+		label: 'Google',
+		hint: () => __('Cloud Translation v2 (API key auth).', 'zentranslate'),
+	},
+	{
+		key: 'cloud',
+		label: 'Zentranslate Cloud',
+		hint: () =>
+			__('Hosted proxy with credit packs. Set the endpoint and license key.', 'zentranslate'),
+	},
 ];
 
 export default function AIPage() {
@@ -36,7 +55,8 @@ export default function AIPage() {
 		}
 	}, [providers.data, state]);
 
-	if (providers.isLoading || !state) return <LoadingBlock>{__('Loading AI providers…', 'zentranslate')}</LoadingBlock>;
+	if (providers.isLoading || !state)
+		return <LoadingBlock>{__('Loading AI providers…', 'zentranslate')}</LoadingBlock>;
 
 	const update = (name, key, value) =>
 		setState((s) => ({
@@ -85,16 +105,28 @@ export default function AIPage() {
 		<>
 			<PageHeader
 				title={__('AI Translation', 'zentranslate')}
-				description={__('Connect your own AI provider keys. Translations stay on your site.', 'zentranslate')}
-				actions={<Button onClick={onSave} loading={save.isPending}>{__('Save changes', 'zentranslate')}</Button>}
+				description={__(
+					'Connect your own AI provider keys. Translations stay on your site.',
+					'zentranslate'
+				)}
+				actions={
+					<Button onClick={onSave} loading={save.isPending}>
+						{__('Save changes', 'zentranslate')}
+					</Button>
+				}
 			/>
 
 			<Card title={__('Default provider', 'zentranslate')} className="ztrans-mb-6">
 				<Field label={__("Used when 'Translate with AI' is clicked", 'zentranslate')}>
-					<Select value={state.default || ''} onChange={(e) => setState((s) => ({ ...s, default: e.target.value }))}>
+					<Select
+						value={state.default || ''}
+						onChange={(e) => setState((s) => ({ ...s, default: e.target.value }))}
+					>
 						<option value="">{__('— Pick one —', 'zentranslate')}</option>
 						{PROVIDERS.map((p) => (
-							<option key={p.key} value={p.key}>{p.label}</option>
+							<option key={p.key} value={p.key}>
+								{p.label}
+							</option>
 						))}
 					</Select>
 				</Field>
@@ -109,7 +141,11 @@ export default function AIPage() {
 							<div className="ztrans-flex ztrans-flex-col ztrans-gap-3">
 								<Field
 									label={__('API key', 'zentranslate')}
-									hint={cfg.has_key ? __('Key saved. Enter a new value to replace.', 'zentranslate') : __('Required.', 'zentranslate')}
+									hint={
+										cfg.has_key
+											? __('Key saved. Enter a new value to replace.', 'zentranslate')
+											: __('Required.', 'zentranslate')
+									}
 								>
 									<TextInput
 										value={cfg.api_key || ''}
@@ -119,7 +155,10 @@ export default function AIPage() {
 									/>
 								</Field>
 								{p.key === 'openai' && (
-									<Field label={__('Model', 'zentranslate')} hint={__('Default: gpt-4o-mini', 'zentranslate')}>
+									<Field
+										label={__('Model', 'zentranslate')}
+										hint={__('Default: gpt-4o-mini', 'zentranslate')}
+									>
 										<TextInput
 											value={cfg.model || ''}
 											onChange={(e) => update(p.key, 'model', e.target.value)}
@@ -135,7 +174,10 @@ export default function AIPage() {
 									/>
 								)}
 								{p.key === 'cloud' && (
-									<Field label={__('Cloud endpoint', 'zentranslate')} hint={__('https://your-zentranslate-cloud.example.com', 'zentranslate')}>
+									<Field
+										label={__('Cloud endpoint', 'zentranslate')}
+										hint={__('https://your-zentranslate-cloud.example.com', 'zentranslate')}
+									>
 										<TextInput
 											value={cfg.endpoint || ''}
 											onChange={(e) => update(p.key, 'endpoint', e.target.value)}
@@ -143,7 +185,12 @@ export default function AIPage() {
 										/>
 									</Field>
 								)}
-								<Button variant="secondary" size="sm" onClick={() => onTest(p.key)} loading={test.isPending}>
+								<Button
+									variant="secondary"
+									size="sm"
+									onClick={() => onTest(p.key)}
+									loading={test.isPending}
+								>
 									{__('Test credentials', 'zentranslate')}
 								</Button>
 							</div>
@@ -152,22 +199,42 @@ export default function AIPage() {
 				})}
 			</div>
 
-			<Card title={__('Translation memory', 'zentranslate')} className="ztrans-mt-6">
-				{memory.isLoading ? (
-					<LoadingBlock>{__('Loading memory stats…', 'zentranslate')}</LoadingBlock>
-				) : (
-					<div className="ztrans-grid ztrans-grid-cols-2 ztrans-gap-4 ztrans-text-sm">
-						<div>
-							<div className="ztrans-text-xs ztrans-uppercase ztrans-text-ztrans-muted">{__('Cached entries', 'zentranslate')}</div>
-							<div className="ztrans-mt-1 ztrans-text-xl ztrans-font-semibold">{memory.data?.entries ?? 0}</div>
+			{hasFeature('translation_memory') ? (
+				<Card title={__('Translation memory', 'zentranslate')} className="ztrans-mt-6">
+					{memory.isLoading ? (
+						<LoadingBlock>{__('Loading memory stats…', 'zentranslate')}</LoadingBlock>
+					) : (
+						<div className="ztrans-grid ztrans-grid-cols-2 ztrans-gap-4 ztrans-text-sm">
+							<div>
+								<div className="ztrans-text-xs ztrans-uppercase ztrans-text-ztrans-muted">
+									{__('Cached entries', 'zentranslate')}
+								</div>
+								<div className="ztrans-mt-1 ztrans-text-xl ztrans-font-semibold">
+									{memory.data?.entries ?? 0}
+								</div>
+							</div>
+							<div>
+								<div className="ztrans-text-xs ztrans-uppercase ztrans-text-ztrans-muted">
+									{__('Reuse hits', 'zentranslate')}
+								</div>
+								<div className="ztrans-mt-1 ztrans-text-xl ztrans-font-semibold">
+									{memory.data?.hits ?? 0}
+								</div>
+							</div>
 						</div>
-						<div>
-							<div className="ztrans-text-xs ztrans-uppercase ztrans-text-ztrans-muted">{__('Reuse hits', 'zentranslate')}</div>
-							<div className="ztrans-mt-1 ztrans-text-xl ztrans-font-semibold">{memory.data?.hits ?? 0}</div>
-						</div>
-					</div>
-				)}
-			</Card>
+					)}
+				</Card>
+			) : (
+				<div className="ztrans-mt-6">
+					<UpsellCard
+						title={__('Translation memory & glossary', 'zentranslate')}
+						description={__(
+							'Reuse past translations to cut cost, and keep brand terms consistent — with Zentranslate Pro.',
+							'zentranslate'
+						)}
+					/>
+				</div>
+			)}
 
 			<Toast message={toast?.message} tone={toast?.tone} onClear={() => setToast(null)} />
 		</>

@@ -44,6 +44,7 @@ class Assets {
 				'nonce'     => wp_create_nonce( 'wp_rest' ),
 				'adminUrl'  => admin_url(),
 				'version'   => ZTRANS_VERSION,
+				'features'  => ztrans_feature_flags(),
 			]
 		);
 		wp_set_script_translations( 'zentranslate-editor', 'zentranslate', ZTRANS_ROOT_DIR_PATH . 'languages' );
@@ -98,9 +99,11 @@ class Assets {
 				'pluginUrl'    => ZTRANS_PLUGIN_ROOT_URI,
 				'version'      => ZTRANS_VERSION,
 				'currentUser'  => [
-					'id'       => get_current_user_id(),
-					'language' => (string) get_user_meta( get_current_user_id(), 'ztrans_preferred_language', true ),
+					'id'         => get_current_user_id(),
+					'language'   => (string) get_user_meta( get_current_user_id(), 'ztrans_preferred_language', true ),
+					'canManage'  => current_user_can( 'manage_options' ),
 				],
+				'features'     => ztrans_feature_flags(),
 			]
 		);
 

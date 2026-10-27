@@ -7,9 +7,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class SEO {
 	public static function init() {
+		// Basic hreflang + sitemap alternates are free (table stakes). The
+		// Yoast / Rank Math bridges + per-translation SEO meta are Pro.
 		SEO\HreflangOutput::init();
 		SEO\SitemapProvider::init();
-		SEO\YoastBridge::init();
-		SEO\RankMathBridge::init();
 	}
 }

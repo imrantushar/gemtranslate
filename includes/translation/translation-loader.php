@@ -67,12 +67,54 @@ class TranslationLoader {
 		}
 
 		$row = self::fetch_row( $group_id, $lang, $country );
+		if ( $row && ! self::is_servable( $row ) ) {
+			$row = null;
+		}
 		if ( ! $row && '' !== $country ) {
 			// Fall back to language-default variant.
 			$row = self::fetch_row( $group_id, $lang, '' );
+			if ( $row && ! self::is_servable( $row ) ) {
+				$row = null;
+			}
 		}
 		self::$memo[ $memo_key ] = $row ?: false;
 		return $row;
+	}
+
+	/**
+	 * Statuses that are NOT shown to visitors. A translation held for review (or
+	 * rejected) must never render on the front end until it is approved — the
+	 * page falls back to the source instead.
+	 */
+	const HIDDEN_STATUSES = [ 'needs_review', 'rejected' ];
+
+	private static function is_servable( $row ) {
+		return ! in_array( (string) ( $row['status'] ?? '' ), self::HIDDEN_STATUSES, true );
+	}
+
+	/**
+	 * Flip a translation row's status (e.g. approve `needs_review` → `publish`)
+	 * and invalidate caches so the change is visible immediately.
+	 */
+	public static function set_translation_status( $post_id, $language_code, $status, $country = null ) {
+		$post_id  = (int) $post_id;
+		$language = strtolower( $language_code );
+		$group_id = self::group_id_for_post( $post_id );
+		if ( ! $group_id || '' === $language ) {
+			return false;
+		}
+		$where = [ 'group_id' => $group_id, 'language_code' => $language ];
+		if ( null !== $country ) {
+			$where['country_code'] = self::normalize_country( $country );
+		}
+		global $wpdb;
+		$ok = $wpdb->update(
+			Helper::table( 'post_translations' ),
+			[ 'status' => (string) $status, 'updated_at' => Helper::get_time() ],
+			$where
+		);
+		self::invalidate_post( $post_id );
+		return false !== $ok;
 	}
 
 	private static function fetch_row( $group_id, $lang, $country ) {
@@ -270,7 +312,7 @@ class TranslationLoader {
 		$post_id      = (int) $post_id;
 		$source_hash  = self::get_source_hash( $post_id );
 		$translations = self::all_for_post( $post_id );
-		$priority     = [ 'translated' => 4, 'publish' => 4, 'pending' => 3, 'draft' => 2, 'stale' => 1, 'missing' => 0 ];
+		$priority     = [ 'translated' => 6, 'publish' => 6, 'needs_review' => 5, 'pending' => 4, 'draft' => 3, 'stale' => 2, 'rejected' => 1, 'missing' => 0 ];
 		$map          = [];
 		foreach ( $translations as $row ) {
 			$lang   = (string) $row['language_code'];
@@ -367,7 +409,10 @@ class TranslationLoader {
 		];
 
 		if ( $existing ) {
-			TranslationHistory::snapshot_existing( $existing );
+			// Revision history is a Pro feature — snapshot only when present.
+			if ( class_exists( TranslationHistory::class ) ) {
+				TranslationHistory::snapshot_existing( $existing );
+			}
 			$ok = $wpdb->update(
 				$table,
 				$data,

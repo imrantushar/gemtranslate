@@ -18,8 +18,10 @@ import { formatErrorMessage } from '../../lib/format';
 import SeoTab from './SeoTab';
 import MetaTab from './MetaTab';
 import FieldsTab from './FieldsTab';
+import AdvancedEditor from './AdvancedEditor';
 import HistoryTab from './HistoryTab';
 import ModeSwitcher from './ModeSwitcher';
+import { hasFeature } from '../../hooks/useFeatures';
 
 export default function TranslationEditor() {
 	const { id } = useParams();
@@ -30,6 +32,7 @@ export default function TranslationEditor() {
 	const [selectedLang, setSelectedLang] = useState('');
 	const [country, setCountry] = useState('');
 	const [tab, setTab] = useState('content');
+	const [contentMode, setContentMode] = useState('advanced');
 	const [toast, setToast] = useState(null);
 	const variants = usePostVariants(id, selectedLang);
 
@@ -45,7 +48,8 @@ export default function TranslationEditor() {
 		setSelectedLang((current) => current || langs[0].language.code);
 	}, [data.data]);
 
-	if (data.isLoading) return <LoadingBlock>{__('Loading translation editor…', 'zentranslate')}</LoadingBlock>;
+	if (data.isLoading)
+		return <LoadingBlock>{__('Loading translation editor…', 'zentranslate')}</LoadingBlock>;
 	if (data.error) return <p className="ztrans-text-red-600">{formatErrorMessage(data.error)}</p>;
 	if (!data.data) return null;
 
@@ -63,11 +67,17 @@ export default function TranslationEditor() {
 				)}
 				description={sprintf(
 					/* translators: %s: source language code. */
-					__('Source language: %s. Pick a target language and edit the translation.', 'zentranslate'),
+					__(
+						'Source language: %s. Pick a target language and edit the translation.',
+						'zentranslate'
+					),
 					defaultLang
 				)}
 				actions={
-					<Link to="/posts" className="ztrans-text-sm ztrans-text-ztrans-primary ztrans-no-underline">
+					<Link
+						to="/posts"
+						className="ztrans-text-sm ztrans-text-ztrans-primary ztrans-no-underline"
+					>
 						{__('← Back to posts', 'zentranslate')}
 					</Link>
 				}
@@ -76,7 +86,10 @@ export default function TranslationEditor() {
 			{targetLangs.length === 0 ? (
 				<Card>
 					<p className="ztrans-m-0 ztrans-text-sm ztrans-text-ztrans-muted">
-						{__('Add at least one non-default language to start translating posts.', 'zentranslate')}
+						{__(
+							'Add at least one non-default language to start translating posts.',
+							'zentranslate'
+						)}
 					</p>
 				</Card>
 			) : (
@@ -131,14 +144,23 @@ export default function TranslationEditor() {
 							loading={createVariant.isPending}
 							onClick={async () => {
 								// eslint-disable-next-line no-alert
-								const next = (window.prompt(__('ISO 2-letter country code (e.g. MX)', 'zentranslate')) || '')
+								const next = (
+									window.prompt(__('ISO 2-letter country code (e.g. MX)', 'zentranslate')) || ''
+								)
 									.trim()
 									.toUpperCase();
 								if (!/^[A-Z]{2}$/.test(next)) return;
 								try {
-									await createVariant.mutateAsync({ postId: post.id, lang: selectedLang, country_code: next });
+									await createVariant.mutateAsync({
+										postId: post.id,
+										lang: selectedLang,
+										country_code: next,
+									});
 									setCountry(next);
-									setToast({ tone: 'success', message: __('Country variant added.', 'zentranslate') });
+									setToast({
+										tone: 'success',
+										message: __('Country variant added.', 'zentranslate'),
+									});
 								} catch (err) {
 									setToast({ tone: 'error', message: formatErrorMessage(err) });
 								}
@@ -160,7 +182,13 @@ export default function TranslationEditor() {
 							try {
 								await promote.mutateAsync({ postId: post.id, lang: selectedLang, country });
 								setTab('content');
-								setToast({ tone: 'success', message: __('Switched to custom layout. Open it in your editor to design the page.', 'zentranslate') });
+								setToast({
+									tone: 'success',
+									message: __(
+										'Switched to custom layout. Open it in your editor to design the page.',
+										'zentranslate'
+									),
+								});
 							} catch (err) {
 								setToast({ tone: 'error', message: formatErrorMessage(err) });
 							}
@@ -169,7 +197,10 @@ export default function TranslationEditor() {
 							try {
 								await demote.mutateAsync({ postId: post.id, lang: selectedLang, country });
 								setTab('content');
-								setToast({ tone: 'success', message: __('Reverted to strings-only mode.', 'zentranslate') });
+								setToast({
+									tone: 'success',
+									message: __('Reverted to strings-only mode.', 'zentranslate'),
+								});
 							} catch (err) {
 								setToast({ tone: 'error', message: formatErrorMessage(err) });
 							}
@@ -180,36 +211,89 @@ export default function TranslationEditor() {
 					<div className="ztrans-mb-4 ztrans-flex ztrans-border-b ztrans-border-ztrans-border">
 						{[
 							{ key: 'content', label: __('Content', 'zentranslate') },
-							{ key: 'meta', label: __('Custom fields', 'zentranslate') },
-							{ key: 'seo', label: __('SEO', 'zentranslate') },
-							{ key: 'history', label: __('History', 'zentranslate') },
-						].map((t) => (
-							<button
-								key={t.key}
-								type="button"
-								onClick={() => setTab(t.key)}
-								className={`ztrans-bare ztrans-px-4 ztrans-py-2 ztrans-text-sm ztrans-border-b-2 ${
-									tab === t.key
-										? 'ztrans-border-ztrans-primary ztrans-text-ztrans-primary ztrans-font-semibold'
-										: 'ztrans-border-transparent ztrans-text-gray-600 hover:ztrans-text-gray-900'
-								}`}
-							>
-								{t.label}
-							</button>
-						))}
+							{ key: 'meta', label: __('Custom fields', 'zentranslate'), pro: 'custom_fields' },
+							{ key: 'seo', label: __('SEO', 'zentranslate'), pro: 'seo_advanced' },
+							{ key: 'history', label: __('History', 'zentranslate'), pro: 'revisions' },
+						]
+							.filter((t) => !t.pro || hasFeature(t.pro))
+							.map((t) => (
+								<button
+									key={t.key}
+									type="button"
+									onClick={() => setTab(t.key)}
+									className={`ztrans-bare ztrans-px-4 ztrans-py-2 ztrans-text-sm ztrans-border-b-2 ${
+										tab === t.key
+											? 'ztrans-border-ztrans-primary ztrans-text-ztrans-primary ztrans-font-semibold'
+											: 'ztrans-border-transparent ztrans-text-gray-600 hover:ztrans-text-gray-900'
+									}`}
+								>
+									{t.label}
+								</button>
+							))}
 					</div>
 
 					{/* ---- Tab content ---- */}
 					{tab === 'meta' ? (
 						<MetaTab postId={post.id} sourceLang={defaultLang} targetLang={selectedLang} />
 					) : tab === 'seo' ? (
-						<SeoTab postId={post.id} sourceLang={defaultLang} targetLang={selectedLang} onToast={setToast} />
+						<SeoTab
+							postId={post.id}
+							sourceLang={defaultLang}
+							targetLang={selectedLang}
+							onToast={setToast}
+						/>
 					) : tab === 'history' ? (
 						<HistoryTab postId={post.id} targetLang={selectedLang} />
 					) : mode === 'string_only' ? (
-						<FieldsTab postId={post.id} sourceLang={defaultLang} targetLang={selectedLang} country={country} />
+						<>
+							<div className="ztrans-mb-3 ztrans-flex ztrans-items-center ztrans-justify-end ztrans-gap-1 ztrans-text-xs">
+								<span className="ztrans-mr-1 ztrans-text-ztrans-muted">
+									{__('Editor:', 'zentranslate')}
+								</span>
+								<button
+									type="button"
+									onClick={() => setContentMode('advanced')}
+									className={`ztrans-bare ztrans-rounded-l-md ztrans-border ztrans-border-ztrans-border ztrans-px-3 ztrans-py-1 ${
+										contentMode === 'advanced'
+											? 'ztrans-bg-ztrans-primary ztrans-text-white'
+											: 'ztrans-bg-white ztrans-text-gray-700'
+									}`}
+								>
+									{__('Advanced', 'zentranslate')}
+								</button>
+								<button
+									type="button"
+									onClick={() => setContentMode('simple')}
+									className={`ztrans-bare -ztrans-ml-px ztrans-rounded-r-md ztrans-border ztrans-border-ztrans-border ztrans-px-3 ztrans-py-1 ${
+										contentMode === 'simple'
+											? 'ztrans-bg-ztrans-primary ztrans-text-white'
+											: 'ztrans-bg-white ztrans-text-gray-700'
+									}`}
+								>
+									{__('Simple', 'zentranslate')}
+								</button>
+							</div>
+							{contentMode === 'advanced' ? (
+								<AdvancedEditor
+									postId={post.id}
+									sourceLang={defaultLang}
+									targetLang={selectedLang}
+									country={country}
+								/>
+							) : (
+								<FieldsTab
+									postId={post.id}
+									sourceLang={defaultLang}
+									targetLang={selectedLang}
+									country={country}
+								/>
+							)}
+						</>
 					) : (
-						<CustomLayoutPanel variantRow={variantRow} updatedAt={targetRow?.translation?.updated_at} />
+						<CustomLayoutPanel
+							variantRow={variantRow}
+							updatedAt={targetRow?.translation?.updated_at}
+						/>
 					)}
 				</>
 			)}
@@ -248,7 +332,10 @@ function CustomLayoutPanel({ variantRow, updatedAt }) {
 	return (
 		<Card title={__('Edit in WordPress', 'zentranslate')}>
 			<p className="ztrans-mb-3 ztrans-text-sm ztrans-text-gray-700">
-				{__('This translation is a real WordPress post — edit it in Gutenberg, Elementor, Beaver, Divi, Bricks, or any builder you have installed.', 'zentranslate')}
+				{__(
+					'This translation is a real WordPress post — edit it in Gutenberg, Elementor, Beaver, Divi, Bricks, or any builder you have installed.',
+					'zentranslate'
+				)}
 			</p>
 			<div className="ztrans-flex ztrans-flex-wrap ztrans-items-center ztrans-gap-3">
 				<a
@@ -261,7 +348,10 @@ function CustomLayoutPanel({ variantRow, updatedAt }) {
 				</a>
 				{updatedAt && (
 					<span className="ztrans-text-xs ztrans-text-ztrans-muted">
-						{sprintf(/* translators: %s: ISO timestamp. */ __('Last edited %s', 'zentranslate'), updatedAt)}
+						{sprintf(
+							/* translators: %s: ISO timestamp. */ __('Last edited %s', 'zentranslate'),
+							updatedAt
+						)}
 					</span>
 				)}
 				<span className="ztrans-ml-auto ztrans-text-xs ztrans-text-ztrans-muted">
@@ -269,7 +359,10 @@ function CustomLayoutPanel({ variantRow, updatedAt }) {
 				</span>
 			</div>
 			<p className="ztrans-mt-4 ztrans-mb-0 ztrans-text-xs ztrans-text-ztrans-muted">
-				{__('Use "Revert to strings" in the mode switcher above to discard this layout and switch back to text-only translation.', 'zentranslate')}
+				{__(
+					'Use "Revert to strings" in the mode switcher above to discard this layout and switch back to text-only translation.',
+					'zentranslate'
+				)}
 			</p>
 		</Card>
 	);

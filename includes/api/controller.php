@@ -82,4 +82,25 @@ abstract class Controller {
 	protected function fail( $code, $message, $status = 400, $data = [] ) {
 		return new \WP_Error( $code, $message, array_merge( [ 'status' => $status ], $data ) );
 	}
+
+	/**
+	 * Guard a Pro-only endpoint. Returns a WP_Error when the feature is
+	 * unavailable (zentranslate-pro inactive / unlicensed), else null so the
+	 * caller proceeds. React hides these surfaces via `window.ztrans.features`,
+	 * so this is a defense-in-depth backstop for direct API calls.
+	 *
+	 * @param string $feature Flag key from ztrans_feature_flags().
+	 * @return \WP_Error|null
+	 */
+	protected function require_pro( $feature ) {
+		if ( ztrans_feature( $feature ) ) {
+			return null;
+		}
+		return $this->fail(
+			'ztrans_pro_required',
+			__( 'This is a Zentranslate Pro feature.', 'zentranslate' ),
+			402,
+			[ 'feature' => $feature, 'upgrade' => true ]
+		);
+	}
 }

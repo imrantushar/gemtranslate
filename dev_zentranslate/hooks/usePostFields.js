@@ -23,10 +23,52 @@ export function useSavePostFields() {
 	return useMutation({
 		mutationFn: async ({ postId, lang, country = '', fields }) =>
 			unwrap(
-				await api.put(`posts/${postId}/fields/${lang}`, { fields }, { params: countryQuery(country) })
+				await api.put(
+					`posts/${postId}/fields/${lang}`,
+					{ fields },
+					{ params: countryQuery(country) }
+				)
 			),
 		onSuccess: (_d, vars) => {
 			qc.invalidateQueries({ queryKey: ['posts', pid(vars.postId)] });
+		},
+	});
+}
+
+export function useConfirmedSegments(postId, lang, country = '') {
+	return useQuery({
+		queryKey: ['posts', pid(postId), 'segments-confirmed', lang, country],
+		queryFn: async () =>
+			unwrap(
+				await api.get(`posts/${postId}/segments/${lang}/confirmed`, {
+					params: countryQuery(country),
+				})
+			),
+		enabled: !!postId && !!lang,
+	});
+}
+
+export function useSaveConfirmedSegments() {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: async ({ postId, lang, country = '', confirmed }) =>
+			unwrap(
+				await api.put(
+					`posts/${postId}/segments/${lang}/confirmed`,
+					{ confirmed },
+					{ params: countryQuery(country) }
+				)
+			),
+		// Optimistic — the toggle should feel instant; the server just persists.
+		onMutate: async (vars) => {
+			const key = ['posts', pid(vars.postId), 'segments-confirmed', vars.lang, vars.country || ''];
+			await qc.cancelQueries({ queryKey: key });
+			const prev = qc.getQueryData(key);
+			qc.setQueryData(key, { confirmed: vars.confirmed });
+			return { key, prev };
+		},
+		onError: (_e, _vars, ctx) => {
+			if (ctx?.key) qc.setQueryData(ctx.key, ctx.prev);
 		},
 	});
 }

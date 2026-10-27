@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Compat {
 	public static function init() {
-		Compat\WooCommerce::init();
+		// WooCommerce translation is Pro. Cache-plugin compatibility is free.
 		Compat\WpRocket::init();
 		Compat\W3TC::init();
 		Compat\LiteSpeed::init();

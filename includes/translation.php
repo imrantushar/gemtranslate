@@ -11,7 +11,8 @@ class Translation {
 		Translation\TermTranslator::init();
 		Translation\MenuTranslator::init();
 		Translation\StringTranslator::init();
-		Translation\MetaTranslator::init();
 		Translation\ShadowPostSync::init();
+		// MetaTranslator (custom fields/ACF) and AutoTranslate (Translate
+		// Everything) are Pro — registered by zentranslate-pro on `ztrans_init`.
 	}
 }

@@ -197,6 +197,9 @@ class Command {
 	 * : Re-translate even if a translation already exists.
 	 */
 	public function translate_all( $args, $assoc ) {
+		if ( ! class_exists( JobRunner::class ) ) {
+			\WP_CLI::error( 'Bulk AI translation requires Zentranslate Pro.' );
+		}
 		$lang = strtolower( (string) ( $args[0] ?? '' ) );
 		if ( '' === $lang || ! Context::is_active( $lang ) ) {
 			\WP_CLI::error( 'A valid active target language is required.' );
@@ -237,6 +240,9 @@ class Command {
 	 * : status | clear
 	 */
 	public function jobs( $args ) {
+		if ( ! class_exists( JobRunner::class ) ) {
+			\WP_CLI::error( 'The job queue requires Zentranslate Pro.' );
+		}
 		$sub = $args[0] ?? 'status';
 		if ( 'status' === $sub ) {
 			$counts = JobRunner::counts();
@@ -256,6 +262,9 @@ class Command {
 	 * Translation memory stats.
 	 */
 	public function memory() {
+		if ( ! class_exists( TranslationMemory::class ) ) {
+			\WP_CLI::error( 'Translation memory requires Zentranslate Pro.' );
+		}
 		$stats = TranslationMemory::stats();
 		\WP_CLI\Utils\format_items( 'table', [ $stats ], [ 'entries', 'hits' ] );
 	}

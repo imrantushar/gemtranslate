@@ -12,15 +12,12 @@ class API {
 		API\TermTranslations::init();
 		API\Menus::init();
 		API\Strings::init();
-		API\SEO::init();
 		API\AI::init();
-		API\Jobs::init();
-		API\Translators::init();
 		API\Migration::init();
-		API\Revisions::init();
-		API\Io::init();
 		API\Settings::init();
 		API\Stats::init();
 		API\Geo::init();
+		// Pro API controllers (SEO meta, Jobs, Translators, Revisions, Import/Export)
+		// are registered by zentranslate-pro on `ztrans_init`.
 	}
 }

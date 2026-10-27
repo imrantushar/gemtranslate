@@ -338,6 +338,11 @@ class Strings extends Controller {
 	 * strings are filled instantly without an AI call.
 	 */
 	public function translate_all_in_package( $request ) {
+		// Bulk AI string translation (with TM + pack generation) is Pro; manual
+		// per-string editing stays free.
+		if ( $err = $this->require_pro( 'ai_bulk' ) ) {
+			return $err;
+		}
 		$pkg = $this->resolve_package( (string) $request['slug'] );
 		if ( is_wp_error( $pkg ) ) {
 			return $pkg;
@@ -446,6 +451,9 @@ class Strings extends Controller {
 	}
 
 	public function memory_suggestions( $request ) {
+		if ( $err = $this->require_pro( 'translation_memory' ) ) {
+			return $err;
+		}
 		$lang = strtolower( (string) $request['lang'] );
 		if ( ! Context::is_active( $lang ) ) {
 			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );

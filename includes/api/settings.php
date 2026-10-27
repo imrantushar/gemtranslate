@@ -19,6 +19,12 @@ class Settings extends Controller {
 		'onboarding_complete',
 		'auto_redirect_browser_lang',
 		'translate_emails',
+		// Translate Everything (auto-translation).
+		'auto_translate',
+		'auto_translate_strategy',
+		'auto_translate_post_types',
+		'auto_translate_languages',
+		'auto_retranslate_on_update',
 		// Language switcher appearance.
 		'switcher_display',
 		'switcher_show_flag',
@@ -155,6 +161,12 @@ class Settings extends Controller {
 			'onboarding_complete'      => false,
 			'auto_redirect_browser_lang' => false,
 			'translate_emails'          => false,
+			// Translate Everything (auto-translation).
+			'auto_translate'             => false,
+			'auto_translate_strategy'    => 'review',
+			'auto_translate_post_types'  => [ 'post', 'page' ],
+			'auto_translate_languages'   => [],
+			'auto_retranslate_on_update' => false,
 			// Language switcher appearance.
 			'switcher_display'          => 'inline',
 			'switcher_show_flag'        => true,

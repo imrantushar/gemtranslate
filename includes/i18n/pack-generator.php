@@ -262,13 +262,17 @@ class PackGenerator {
 	 * @return array Index-aligned map of translated strings.
 	 */
 	private static function translate_entries( array $entries, $source_lang, $target_lang, $translator ) {
-		$glossary = Glossary::build_context( $source_lang, $target_lang );
+		// TM + Glossary are Pro; degrade gracefully if unavailable.
+		$has_tm       = class_exists( TranslationMemory::class );
+		$glossary     = class_exists( Glossary::class )
+			? Glossary::build_context( $source_lang, $target_lang )
+			: [ 'pairs' => [] ];
 
 		$translations = [];
 		$pending      = [];
 		foreach ( $entries as $i => $e ) {
 			$msgid  = is_array( $e ) ? (string) ( $e['msgid'] ?? '' ) : (string) $e;
-			$cached = TranslationMemory::get( $msgid, $source_lang, $target_lang );
+			$cached = $has_tm ? TranslationMemory::get( $msgid, $source_lang, $target_lang ) : null;
 			if ( null !== $cached ) {
 				$translations[ $i ] = $cached;
 			} else {
@@ -296,7 +300,7 @@ class PackGenerator {
 			foreach ( $indexes as $j => $orig_index ) {
 				$value = $result['translations'][ $j ] ?? '';
 				$translations[ $orig_index ] = $value;
-				if ( '' !== $value ) {
+				if ( '' !== $value && $has_tm ) {
 					TranslationMemory::set( $texts[ $j ], $value, $source_lang, $target_lang, $result['provider'] ?? '' );
 				}
 			}

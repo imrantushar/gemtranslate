@@ -78,6 +78,64 @@ class PostTranslations extends Controller {
 			]
 		);
 
+		// Per-segment "confirmed" state for the Advanced editor (post-meta backed,
+		// no schema change). Body/response: { confirmed: [ "<hash>", … ] }.
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>\d+)/segments/(?P<lang>[a-z0-9\-]{2,10})/confirmed',
+			[
+				[
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'get_confirmed_segments' ],
+					'permission_callback' => [ $this, 'permissions_translate' ],
+				],
+				[
+					'methods'             => 'PUT',
+					'callback'            => [ $this, 'save_confirmed_segments' ],
+					'permission_callback' => [ $this, 'permissions_translate' ],
+				],
+			]
+		);
+
+		// Review queue for "Translate Everything" (held translations).
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/review-queue',
+			[
+				'methods'             => \WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'review_queue' ],
+				'permission_callback' => [ $this, 'permissions_translate' ],
+			]
+		);
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>\d+)/translations/(?P<lang>[a-z0-9\-]{2,10})/approve',
+			[
+				'methods'             => \WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'approve_translation' ],
+				'permission_callback' => [ $this, 'permissions_translate' ],
+			]
+		);
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>\d+)/translations/(?P<lang>[a-z0-9\-]{2,10})/reject',
+			[
+				'methods'             => \WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'reject_translation' ],
+				'permission_callback' => [ $this, 'permissions_translate' ],
+			]
+		);
+		// Backfill: enqueue auto-translation for existing published content.
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/backfill-auto',
+			[
+				'methods'             => \WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'backfill_auto' ],
+				'permission_callback' => [ $this, 'permissions_translate' ],
+			]
+		);
+
 		// Mode-flip endpoints.
 		register_rest_route(
 			$this->namespace,
@@ -474,6 +532,191 @@ class PostTranslations extends Controller {
 	}
 
 	/**
+	 * Post-meta key holding the set of confirmed segment hashes for a
+	 * (language, country) pair. Country-default uses the bare lang suffix.
+	 */
+	private function confirmed_meta_key( $lang, $country ) {
+		$suffix = $country ? $lang . '_' . strtolower( $country ) : $lang;
+		return '_ztrans_seg_confirmed_' . $suffix;
+	}
+
+	public function get_confirmed_segments( $request ) {
+		$post_id = (int) $request['id'];
+		$lang    = strtolower( $request['lang'] );
+		$country = $this->country_param( $request );
+		if ( ! get_post( $post_id ) ) {
+			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
+		}
+		$stored = get_post_meta( $post_id, $this->confirmed_meta_key( $lang, $country ), true );
+		$list   = is_array( $stored ) ? array_values( array_filter( array_map( 'strval', $stored ) ) ) : [];
+		return $this->ok( [ 'confirmed' => $list ] );
+	}
+
+	public function save_confirmed_segments( $request ) {
+		$post_id = (int) $request['id'];
+		$lang    = strtolower( $request['lang'] );
+		$country = $this->country_param( $request );
+		if ( ! get_post( $post_id ) ) {
+			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
+		}
+		$body = $request->get_json_params() ?: $request->get_params();
+		$raw  = (array) ( $body['confirmed'] ?? [] );
+		// Segment hashes are hex SHA-1 (40 chars) produced client-side; keep the
+		// stored set clean and bounded.
+		$clean = [];
+		foreach ( $raw as $h ) {
+			$h = (string) $h;
+			if ( preg_match( '/^[a-f0-9]{6,64}$/', $h ) ) {
+				$clean[ $h ] = true;
+			}
+		}
+		$clean = array_slice( array_keys( $clean ), 0, 2000 );
+		update_post_meta( $post_id, $this->confirmed_meta_key( $lang, $country ), $clean );
+		return $this->ok( [ 'confirmed' => $clean ] );
+	}
+
+	// -----------------------------------------------------------------------
+	// Review queue (Translate Everything)
+	// -----------------------------------------------------------------------
+
+	public function review_queue( $request ) {
+		if ( $err = $this->require_pro( 'translate_everything' ) ) {
+			return $err;
+		}
+		global $wpdb;
+		$page     = max( 1, (int) $request->get_param( 'page' ) ?: 1 );
+		$per_page = max( 1, min( 100, (int) $request->get_param( 'per_page' ) ?: 20 ) );
+		$offset   = ( $page - 1 ) * $per_page;
+
+		$pt    = \Zentranslate\Helper::table( 'post_translations' );
+		$posts = $wpdb->posts;
+
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT pt.post_id, pt.language_code, pt.country_code, pt.title, pt.content, pt.updated_at,
+				        p.post_title AS source_title, p.post_type
+				 FROM $pt pt
+				 INNER JOIN $posts p ON p.ID = pt.post_id
+				 WHERE pt.status = 'needs_review'
+				 ORDER BY pt.updated_at DESC
+				 LIMIT %d OFFSET %d",
+				$per_page,
+				$offset
+			),
+			ARRAY_A
+		) ?: [];
+
+		$total = (int) $wpdb->get_var(
+			"SELECT COUNT(*) FROM $pt pt INNER JOIN $posts p ON p.ID = pt.post_id WHERE pt.status = 'needs_review'"
+		);
+
+		$items = array_map(
+			function ( $r ) {
+				$snippet = trim( wp_strip_all_tags( (string) $r['content'] ) );
+				if ( '' === $snippet ) {
+					$snippet = (string) $r['title'];
+				}
+				return [
+					'post_id'       => (int) $r['post_id'],
+					'language_code' => (string) $r['language_code'],
+					'country_code'  => (string) $r['country_code'],
+					'source_title'  => (string) $r['source_title'],
+					'translated_title' => (string) $r['title'],
+					'post_type'     => (string) $r['post_type'],
+					'snippet'       => wp_trim_words( $snippet, 24, '…' ),
+					'updated_at'    => (string) $r['updated_at'],
+				];
+			},
+			$rows
+		);
+
+		return $this->ok(
+			[
+				'rows' => $items,
+				'meta' => [ 'total' => $total, 'page' => $page, 'per_page' => $per_page, 'total_pages' => (int) ceil( $total / $per_page ) ],
+			]
+		);
+	}
+
+	public function approve_translation( $request ) {
+		if ( $err = $this->require_pro( 'translate_everything' ) ) {
+			return $err;
+		}
+		$post_id = (int) $request['id'];
+		$lang    = strtolower( $request['lang'] );
+		$country = $this->country_param( $request );
+		$ok      = TranslationLoader::set_translation_status( $post_id, $lang, 'publish', $country );
+		if ( ! $ok ) {
+			return $this->fail( 'ztrans_approve_failed', __( 'Could not approve this translation.', 'zentranslate' ), 500 );
+		}
+		return $this->ok( [ 'approved' => true, 'status' => 'publish' ] );
+	}
+
+	public function reject_translation( $request ) {
+		if ( $err = $this->require_pro( 'translate_everything' ) ) {
+			return $err;
+		}
+		$post_id = (int) $request['id'];
+		$lang    = strtolower( $request['lang'] );
+		$country = $this->country_param( $request );
+		TranslationLoader::delete_translation( $post_id, $lang, $country );
+		return $this->ok( [ 'rejected' => true ] );
+	}
+
+	public function backfill_auto( $request ) {
+		if ( $err = $this->require_pro( 'translate_everything' ) ) {
+			return $err;
+		}
+		$body     = $request->get_json_params() ?: $request->get_params();
+		$limit    = max( 1, min( 500, (int) ( $body['limit'] ?? 200 ) ) );
+		$offset   = max( 0, (int) ( $body['offset'] ?? 0 ) );
+		$targets  = \Zentranslate\Translation\AutoTranslate::target_languages();
+		if ( empty( $targets ) ) {
+			return $this->fail( 'ztrans_no_targets', __( 'No target languages are configured.', 'zentranslate' ), 422 );
+		}
+
+		$types = (array) \Zentranslate\Helper::get_settings( 'auto_translate_post_types', [ 'post', 'page' ] );
+		$query = new \WP_Query(
+			[
+				'post_type'      => $types,
+				'post_status'    => 'publish',
+				'posts_per_page' => $limit,
+				'offset'         => $offset,
+				'fields'         => 'ids',
+				'orderby'        => 'ID',
+				'order'          => 'ASC',
+				'no_found_rows'  => false,
+				'meta_query'     => [
+					[
+						'key'     => \Zentranslate\Translation\AutoTranslate::META_SOURCE,
+						'compare' => 'NOT EXISTS',
+					],
+				],
+			]
+		);
+
+		$queued = 0;
+		foreach ( $query->posts as $pid ) {
+			$queued += \Zentranslate\Translation\AutoTranslate::enqueue_for_post( (int) $pid, $targets, false );
+		}
+
+		$scanned   = count( $query->posts );
+		$total     = (int) $query->found_posts;
+		$next      = $offset + $scanned;
+		$done      = $next >= $total || 0 === $scanned;
+
+		return $this->ok(
+			[
+				'queued'  => $queued,
+				'scanned' => $scanned,
+				'offset'  => $next,
+				'total'   => $total,
+				'done'    => $done,
+			]
+		);
+	}
+
+	/**
 	 * Return the tokenised source value for a given path. This IS the storage
 	 * key used by `save_string_translation` — must match what the render path
 	 * (PostFieldTranslator) extracts from the same source.
@@ -637,6 +880,9 @@ class PostTranslations extends Controller {
 	}
 
 	public function create_variant( $request ) {
+		if ( $err = $this->require_pro( 'country_variants' ) ) {
+			return $err;
+		}
 		$post_id = (int) $request['id'];
 		$lang    = strtolower( $request['lang'] );
 		$body    = $request->get_json_params() ?: $request->get_params();
@@ -676,6 +922,9 @@ class PostTranslations extends Controller {
 	// -----------------------------------------------------------------------
 
 	public function get_meta( $request ) {
+		if ( $err = $this->require_pro( 'custom_fields' ) ) {
+			return $err;
+		}
 		$post_id = (int) $request['id'];
 		$lang    = strtolower( $request['lang'] );
 		if ( ! get_post( $post_id ) && ! $this->get_academy_hp_lesson_as_post( $post_id ) ) {
@@ -702,6 +951,9 @@ class PostTranslations extends Controller {
 	}
 
 	public function save_meta( $request ) {
+		if ( $err = $this->require_pro( 'custom_fields' ) ) {
+			return $err;
+		}
 		$post_id = (int) $request['id'];
 		$lang    = strtolower( $request['lang'] );
 		if ( ! Context::is_active( $lang ) ) {
