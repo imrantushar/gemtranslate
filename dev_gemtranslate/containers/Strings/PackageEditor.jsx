@@ -22,6 +22,7 @@ import {
 } from '../../hooks/usePackages';
 import { useLanguages } from '../../hooks/useLanguages';
 import { formatErrorMessage } from '../../lib/format';
+import AiTranslateModal from './AiTranslateModal';
 
 const PAGE_SIZE = 50;
 
@@ -46,8 +47,9 @@ export default function PackageEditor() {
 	const [statusFilter, setStatusFilter] = useState('all'); // all | untranslated | translated
 	const [drafts, setDrafts] = useState({}); // string_id -> {value, dirty}
 	const [toast, setToast] = useState(null);
+	const [aiOpen, setAiOpen] = useState(false);
 
-	const pkg = (packages.data?.rows || []).find((p) => p.slug === slug) || null;
+	const pkg =(packages.data?.rows || []).find((p) => p.slug === slug) || null;
 	const targetLangs = (languages.data || []).filter((l) => !l.is_default);
 	const langRow = (languages.data || []).find((l) => l.code === lang);
 
@@ -221,43 +223,8 @@ export default function PackageEditor() {
 
 	return (
 		<>
-			<PageHeader
-				title={`${pkg.name} · ${langRow?.name || lang}`}
-				description={
-					<span className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-3">
-						<code>{pkg.text_domain}</code>
-						<span className="gtrans-flex gtrans-items-center gtrans-gap-2">
-							<span
-								className="gtrans-block gtrans-h-1.5 gtrans-w-40 gtrans-overflow-hidden gtrans-rounded-full gtrans-bg-body"
-								role="progressbar"
-								aria-valuenow={progressPct}
-								aria-valuemin={0}
-								aria-valuemax={100}
-							>
-								<span className="gtrans-block gtrans-h-full gtrans-bg-primary" style={{ width: progressPct + '%' }} />
-							</span>
-							{sprintf(
-								/* translators: 1: done count, 2: total, 3: percent. */
-								__('%1$d / %2$d translated (%3$d%%)', 'gemtranslate'),
-								doneCount,
-								stats.total || 0,
-								progressPct
-							)}
-						</span>
-					</span>
-				}
-				actions={
-					<Link
-						to="/strings"
-						className="gtrans-text-sm gtrans-text-primary gtrans-no-underline"
-					>
-						{__('← Back to plugins', 'gemtranslate')}
-					</Link>
-				}
-			/>
-
 			<TopbarActions>
-				<Button size="sm" variant="ghost" loading={scan.isPending} onClick={onRescan}>
+				<Button variant="ghost" loading={scan.isPending} onClick={onRescan}>
 					{__('Re-scan', 'gemtranslate')}
 				</Button>
 				<ExportMenu
@@ -268,7 +235,6 @@ export default function PackageEditor() {
 					wpOrgProjectUrl={wpOrgProjectUrl}
 				/>
 				<Button
-					size="sm"
 					loading={bulkSave.isPending}
 					disabled={dirtyCount === 0}
 					title={__('Ctrl/Cmd + S', 'gemtranslate')}
@@ -284,52 +250,90 @@ export default function PackageEditor() {
 				</Button>
 			</TopbarActions>
 
-			<Card table>
-				{/* ---- Toolbar ---- */}
-				<div className="gtrans-sticky-toolbar gtrans--mx-6 gtrans--mt-6 gtrans-mb-4 gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-x-4 gtrans-gap-y-2 gtrans-border-b gtrans-border-line gtrans-px-6 gtrans-py-2">
-					<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-x-4 gtrans-gap-y-1">
-						<div className="gtrans-flex gtrans-items-center gtrans-gap-2 gtrans-text-xs">
-							<span className="gtrans-text-muted">{__('Language:', 'gemtranslate')}</span>
-							<Select
-								className="gtrans-min-w-[180px]"
-								value={lang}
-								onChange={(e) => navigate(`/strings/${slug}/${e.target.value}`)}
-							>
-								{targetLangs.map((l) => (
-									<option key={l.code} value={l.code}>
-										{l.name} ({l.code})
-									</option>
-								))}
-							</Select>
+			<div className="gtrans-sticky-head">
+				<header className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-justify-between gtrans-gap-x-4 gtrans-gap-y-2 gtrans-pb-4">
+					<div className="gtrans-flex gtrans-min-w-0 gtrans-flex-col gtrans-gap-1">
+						<h1 className="gtrans-m-0 gtrans-text-xl gtrans-font-semibold gtrans-text-heading">
+							{`${pkg.name} · ${langRow?.name || lang}`}
+						</h1>
+						<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-3 gtrans-text-sm gtrans-text-description">
+							<code>{pkg.text_domain}</code>
+							<span className="gtrans-flex gtrans-items-center gtrans-gap-2">
+								<span
+									className="gtrans-block gtrans-h-1.5 gtrans-w-40 gtrans-overflow-hidden gtrans-rounded-full gtrans-bg-line"
+									role="progressbar"
+									aria-valuenow={progressPct}
+									aria-valuemin={0}
+									aria-valuemax={100}
+								>
+									<span className="gtrans-block gtrans-h-full gtrans-bg-primary" style={{ width: progressPct + '%' }} />
+								</span>
+								{sprintf(
+									/* translators: 1: done count, 2: total, 3: percent. */
+									__('%1$d / %2$d translated (%3$d%%)', 'gemtranslate'),
+									doneCount,
+									stats.total || 0,
+									progressPct
+								)}
+							</span>
 						</div>
-
-						<StatusTabs
-							value={statusFilter}
-							onChange={(key) => {
-								setStatusFilter(key);
-								setPage(1);
-							}}
-							tabs={[
-								{ value: 'all', label: __('All', 'gemtranslate') },
-								{ value: 'untranslated', label: __('Untranslated', 'gemtranslate') },
-								{ value: 'translated', label: __('Translated', 'gemtranslate') },
-							]}
-						/>
 					</div>
+					<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-justify-end gtrans-gap-4">
+						<Select
+							aria-label={__('Language', 'gemtranslate')}
+							className="gtrans-min-w-[200px]"
+							value={lang}
+							onChange={(e) => navigate(`/strings/${slug}/${e.target.value}`)}
+						>
+							{targetLangs.map((l) => (
+								<option key={l.code} value={l.code}>
+									{l.name} ({l.code})
+								</option>
+							))}
+						</Select>
+						<Link to="/strings" className="gtrans-text-sm gtrans-text-primary gtrans-no-underline">
+							{__('← Back to plugins', 'gemtranslate')}
+						</Link>
+					</div>
+				</header>
 
-					<div className="gtrans-ml-auto gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-justify-end gtrans-gap-2">
-						<SearchBox
-							className="gtrans-w-52"
-							value={search}
-							placeholder={__('Search…', 'gemtranslate')}
-							onSearch={(keyword) => {
-								setPage(1);
-								setSearch(keyword);
-							}}
-						/>
+				<div className="gtrans-rounded-t-lg gtrans-border gtrans-border-b-0 gtrans-border-edge gtrans-bg-surface gtrans-px-6 gtrans-pt-3">
+					<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-x-4 gtrans-gap-y-2 gtrans-border-b gtrans-border-line gtrans-pb-2">
+						<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-x-4 gtrans-gap-y-1">
+							<StatusTabs
+								value={statusFilter}
+								onChange={(key) => {
+									setStatusFilter(key);
+									setPage(1);
+								}}
+								tabs={[
+									{ value: 'all', label: __('All', 'gemtranslate') },
+									{ value: 'untranslated', label: __('Untranslated', 'gemtranslate') },
+									{ value: 'translated', label: __('Translated', 'gemtranslate') },
+								]}
+							/>
+						</div>
+	
+						<div className="gtrans-ml-auto gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-justify-end gtrans-gap-2">
+							<SearchBox
+								className="gtrans-w-52"
+								value={search}
+								placeholder={__('Search…', 'gemtranslate')}
+								onSearch={(keyword) => {
+									setPage(1);
+									setSearch(keyword);
+								}}
+							/>
+						</div>
+					</div>
+					<div className="gtrans-mt-3 gtrans-grid gtrans-grid-cols-2 gtrans-rounded gtrans-bg-body gtrans-px-3 gtrans-py-3 gtrans-text-sm gtrans-font-semibold gtrans-text-ink">
+						<span>{__('Source', 'gemtranslate')}</span>
+						<span>{__('Translation', 'gemtranslate')}</span>
 					</div>
 				</div>
+			</div>
 
+			<Card table className="gtrans-rounded-t-none gtrans-border-t-0 [&>div]:gtrans-pt-0">
 				{/* ---- Rows ---- */}
 				{rows.length === 0 ? (
 					<Table.Empty columns={[__('Source', 'gemtranslate'), __('Translation', 'gemtranslate')]}>
@@ -339,12 +343,6 @@ export default function PackageEditor() {
 					</Table.Empty>
 				) : (
 					<Table.Root>
-						<Table.Header>
-							<Table.Row>
-								<Table.ColumnHeader className="gtrans-w-1/2">{__('Source', 'gemtranslate')}</Table.ColumnHeader>
-								<Table.ColumnHeader>{__('Translation', 'gemtranslate')}</Table.ColumnHeader>
-							</Table.Row>
-						</Table.Header>
 						<Table.Body>
 							{rows.map((row) => (
 								<StringRow
@@ -401,6 +399,17 @@ export default function PackageEditor() {
 						</Button>
 					</span>
 				</div>
+			)}
+
+			{aiOpen && (
+				<AiTranslateModal
+					pkg={pkg}
+					lang={lang}
+					langRow={langRow}
+					sourceName={(languages.data || []).find((l) => l.is_default)?.name || 'English'}
+					onClose={() => setAiOpen(false)}
+					onNotify={setToast}
+				/>
 			)}
 
 			<Toast message={toast?.message} tone={toast?.tone} onClear={() => setToast(null)} />
@@ -495,7 +504,7 @@ function ExportMenu({ onExport, loading, pkg, lang, wpOrgProjectUrl }) {
 
 	return (
 		<div className="gtrans-relative">
-			<Button size="sm" variant="ghost" loading={loading} onClick={() => setOpen((o) => !o)}>
+			<Button variant="ghost" loading={loading} onClick={() => setOpen((o) => !o)}>
 				{__('Export ▾', 'gemtranslate')}
 			</Button>
 			{open && (
