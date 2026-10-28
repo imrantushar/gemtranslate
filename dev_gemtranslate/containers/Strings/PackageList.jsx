@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
@@ -11,7 +11,8 @@ import StatusTabs from '../../components/StatusTabs';
 import Toast from '../../components/Toast';
 import { TextInput } from '../../components/Input';
 import { PageSkeleton } from '../../components/Skeleton';
-import { usePackages, useScanPackage } from '../../hooks/usePackages';
+import { usePackages, useScanPackage, useAuditPackage } from '../../hooks/usePackages';
+import AuditModal, { auditIssueCount } from './AuditModal';
 import { useLanguages } from '../../hooks/useLanguages';
 import { formatErrorMessage } from '../../lib/format';
 
@@ -28,6 +29,10 @@ export default function PackageList() {
 	const [typeFilter, setTypeFilter] = useState('all'); // all | plugin | theme
 	const [toast, setToast] = useState(null);
 	const [scanningSlug, setScanningSlug] = useState('');
+	const audit = useAuditPackage();
+	const [auditingSlug, setAuditingSlug] = useState('');
+	const [auditProgress, setAuditProgress] = useState(null);
+	const [auditView, setAuditView] = useState(null); // package whose findings are open
 
 	if (packages.isLoading) return <PageSkeleton />;
 	if (packages.error) return <p className="gtrans-text-red-600">{formatErrorMessage(packages.error)}</p>;
@@ -67,6 +72,39 @@ export default function PackageList() {
 			setToast({ tone: 'error', message: formatErrorMessage(err) });
 		} finally {
 			setScanningSlug('');
+		}
+	};
+
+	const onAudit = async (row, { openAfter = true } = {}) => {
+		setAuditingSlug(row.slug);
+		setAuditProgress(null);
+		try {
+			const result = await audit.mutateAsync({
+				slug: row.slug,
+				onProgress: (done, total) => setAuditProgress({ done, total }),
+			});
+			if (openAfter) setAuditView(row);
+			const issues = auditIssueCount(result?.counts);
+			setToast({
+				tone: issues ? 'info' : 'success',
+				message: issues
+					? sprintf(
+							/* translators: 1: plugin name, 2: issue count. */
+							__('Audited %1$s — %2$d translation issues found.', 'gemtranslate'),
+							row.name,
+							issues
+						)
+					: sprintf(
+							/* translators: %s: plugin name. */
+							__('Audited %s — no translation issues found.', 'gemtranslate'),
+							row.name
+						),
+			});
+		} catch (err) {
+			setToast({ tone: 'error', message: formatErrorMessage(err) });
+		} finally {
+			setAuditingSlug('');
+			setAuditProgress(null);
 		}
 	};
 
@@ -126,7 +164,7 @@ export default function PackageList() {
 							<Table.ColumnHeader className="gtrans-w-32">{__('Text domain', 'gemtranslate')}</Table.ColumnHeader>
 							<Table.ColumnHeader className="gtrans-w-24">{__('Strings', 'gemtranslate')}</Table.ColumnHeader>
 							<Table.ColumnHeader>{__('Translation progress', 'gemtranslate')}</Table.ColumnHeader>
-							<Table.ColumnHeader className="gtrans-w-32" />
+							<Table.ColumnHeader className="gtrans-w-56" />
 						</Table.Row>
 					</Table.Header>
 					<Table.Body>
@@ -140,6 +178,10 @@ export default function PackageList() {
 								onScan={onScan}
 								scanning={scanningSlug === row.slug}
 								defaultLang={defaultLang}
+								onAudit={onAudit}
+								onViewAudit={setAuditView}
+								auditing={auditingSlug === row.slug}
+								auditProgress={auditingSlug === row.slug ? auditProgress : null}
 							/>
 						))}
 						{rows.length === 0 && (
@@ -153,12 +195,82 @@ export default function PackageList() {
 				</Table.Root>
 			</Card>
 
+			{auditView && (
+				<AuditModal
+					pkg={auditView}
+					onClose={() => setAuditView(null)}
+					onRerun={() => onAudit(auditView, { openAfter: false })}
+					running={auditingSlug === auditView.slug}
+					progress={auditingSlug === auditView.slug ? auditProgress : null}
+				/>
+			)}
+
 			<Toast message={toast?.message} tone={toast?.tone} onClear={() => setToast(null)} />
 		</>
 	);
 }
 
-function PackageRow({ row, langCodes, langByCode, firstTargetLang, onScan, scanning, defaultLang }) {
+/**
+ * Per-row audit control: "Audit" until it has been run once, then a badge with
+ * the issue count that opens the findings.
+ */
+function AuditButton({ row, onAudit, onViewAudit, auditing, progress }) {
+	const issues = auditIssueCount(row.audit);
+
+	if (auditing) {
+		return (
+			<Button size="sm" variant="secondary" loading disabled>
+				{progress ? `${progress.done}/${progress.total}` : __('Audit', 'gemtranslate')}
+			</Button>
+		);
+	}
+	if (!row.audit) {
+		return (
+			<Button
+				size="sm"
+				variant="secondary"
+				onClick={() => onAudit(row)}
+				title={__('Check for missing text domains and hardcoded text', 'gemtranslate')}
+			>
+				{__('Audit', 'gemtranslate')}
+			</Button>
+		);
+	}
+	return (
+		<button
+			type="button"
+			onClick={() => onViewAudit(row)}
+			title={__('View translation-readiness findings', 'gemtranslate')}
+			className={`gtrans-bare gtrans-cursor-pointer gtrans-rounded-md gtrans-border gtrans-border-solid gtrans-px-2.5 gtrans-py-1.5 gtrans-text-xs gtrans-font-medium ${
+				issues
+					? 'gtrans-border-amber-300 gtrans-bg-amber-50 gtrans-text-amber-800'
+					: 'gtrans-border-emerald-300 gtrans-bg-emerald-50 gtrans-text-emerald-800'
+			}`}
+		>
+			{issues
+				? sprintf(
+						/* translators: %d: number of translation issues. */
+						_n('%d issue', '%d issues', issues, 'gemtranslate'),
+						issues
+					)
+				: __('✓ Clean', 'gemtranslate')}
+		</button>
+	);
+}
+
+function PackageRow({
+	row,
+	langCodes,
+	langByCode,
+	firstTargetLang,
+	onScan,
+	scanning,
+	defaultLang,
+	onAudit,
+	onViewAudit,
+	auditing,
+	auditProgress,
+}) {
 	const hasStrings = row.string_count > 0;
 	return (
 		<Table.Row className="gtrans-align-top">
@@ -241,18 +353,27 @@ function PackageRow({ row, langCodes, langByCode, firstTargetLang, onScan, scann
 				)}
 			</Table.Cell>
 			<Table.Cell className="gtrans-text-right">
-				{hasStrings ? (
-					<Link
-						to={`/strings/${row.slug}/${firstTargetLang}`}
-						className="gtrans-inline-flex gtrans-items-center gtrans-rounded-md gtrans-bg-primary gtrans-px-3 gtrans-py-1.5 gtrans-text-xs gtrans-font-medium gtrans-text-white gtrans-no-underline hover:gtrans-bg-primary-hover"
-					>
-						{__('Open', 'gemtranslate')}
-					</Link>
-				) : (
-					<Button size="sm" variant="secondary" loading={scanning} onClick={() => onScan(row)}>
-						{__('Scan', 'gemtranslate')}
-					</Button>
-				)}
+				<div className="gtrans-flex gtrans-items-center gtrans-justify-end gtrans-gap-2">
+					<AuditButton
+						row={row}
+						onAudit={onAudit}
+						onViewAudit={onViewAudit}
+						auditing={auditing}
+						progress={auditProgress}
+					/>
+					{hasStrings ? (
+						<Link
+							to={`/strings/${row.slug}/${firstTargetLang}`}
+							className="gtrans-inline-flex gtrans-items-center gtrans-rounded-md gtrans-bg-primary gtrans-px-3 gtrans-py-1.5 gtrans-text-xs gtrans-font-medium gtrans-text-white gtrans-no-underline hover:gtrans-bg-primary-hover"
+						>
+							{__('Open', 'gemtranslate')}
+						</Link>
+					) : (
+						<Button size="sm" variant="secondary" loading={scanning} onClick={() => onScan(row)}>
+							{__('Scan', 'gemtranslate')}
+						</Button>
+					)}
+				</div>
 			</Table.Cell>
 		</Table.Row>
 	);

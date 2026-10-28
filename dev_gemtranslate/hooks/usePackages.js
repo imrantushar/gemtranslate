@@ -19,6 +19,35 @@ export function useScanPackage() {
 	});
 }
 
+/** Stored audit findings for one package (null until it has been audited). */
+export function usePackageAudit(slug, enabled = true) {
+	return useQuery({
+		queryKey: ['strings', 'audit', slug],
+		enabled: !!slug && enabled,
+		queryFn: async () => unwrap(await api.get(`strings/packages/${slug}/audit`)),
+	});
+}
+
+/**
+ * Run the audit to completion. The server works in time-boxed chunks, so keep
+ * calling with the returned offset until it reports `done`.
+ */
+export function useAuditPackage() {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: async ({ slug, onProgress }) => {
+			let offset = 0;
+			for (;;) {
+				const res = unwrap(await api.post(`strings/packages/${slug}/audit`, { offset }));
+				if (onProgress) onProgress(res.next_offset, res.total_files);
+				if (res.done) return res.audit;
+				offset = res.next_offset;
+			}
+		},
+		onSuccess: () => qc.invalidateQueries({ queryKey: ['strings'] }),
+	});
+}
+
 export function useExportPackage() {
 	return useMutation({
 		mutationFn: async ({ slug, lang, exclude_status = '' }) =>

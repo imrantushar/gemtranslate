@@ -63,7 +63,7 @@ class FileWalker {
 		return [ 'files' => $file_count, 'strings' => $string_count ];
 	}
 
-	private static function collect_files( $dir, $skip_vendor ) {
+	public static function collect_files( $dir, $skip_vendor, $php_only = false ) {
 		if ( ! is_dir( $dir ) ) {
 			return [];
 		}
@@ -74,10 +74,10 @@ class FileWalker {
 		$iterator = new \RecursiveIteratorIterator(
 			new \RecursiveCallbackFilterIterator(
 				new \RecursiveDirectoryIterator( $dir, \FilesystemIterator::SKIP_DOTS ),
-				function ( $current ) use ( $skip_vendor, $skip_dirs ) {
+				function ( $current ) use ( $skip_vendor, $skip_dirs, $php_only ) {
 					$name = $current->getFilename();
 					if ( $current->isDir() ) {
-						if ( in_array( $name, $skip_dirs, true ) ) {
+						if ( in_array( $name, $skip_dirs, true ) || '.' === substr( $name, 0, 1 ) ) {
 							return false;
 						}
 						if ( $skip_vendor && in_array( $name, [ 'vendor', 'libraries' ], true ) ) {
@@ -88,6 +88,9 @@ class FileWalker {
 					// PHP source files.
 					if ( self::ends_with( $name, '.php' ) ) {
 						return true;
+					}
+					if ( $php_only ) {
+						return false;
 					}
 					// JS/JSX source files — skip compiled/minified variants.
 					if ( self::ends_with( $name, '.jsx' ) ) {
@@ -105,6 +108,8 @@ class FileWalker {
 		foreach ( $iterator as $f ) {
 			$paths[] = $f->getPathname();
 		}
+		// Stable order so chunked callers can resume from an offset.
+		sort( $paths );
 		return $paths;
 	}
 

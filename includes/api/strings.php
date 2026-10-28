@@ -8,6 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 use GemTranslate\I18n\PackGenerator;
 use GemTranslate\I18n\WporgImporter;
 use GemTranslate\Language\Context;
+use GemTranslate\StringScanner\Auditor;
 use GemTranslate\StringScanner\FileWalker;
 use GemTranslate\Translation\StringTranslator;
 
@@ -102,6 +103,23 @@ class Strings extends Controller {
 				'methods'             => \WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'scan_package' ],
 				'permission_callback' => [ $this, 'permissions_translate' ],
+			]
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/packages/(?P<slug>[A-Za-z0-9_\-]+)/audit',
+			[
+				[
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'get_audit' ],
+					'permission_callback' => [ $this, 'permissions_check' ],
+				],
+				[
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => [ $this, 'run_audit' ],
+					'permission_callback' => [ $this, 'permissions_check' ],
+				],
 			]
 		);
 
@@ -216,13 +234,18 @@ class Strings extends Controller {
 			}
 		}
 
+		$summaries = get_option( self::AUDIT_SUMMARIES_OPTION, [] );
+		$summaries = is_array( $summaries ) ? $summaries : [];
+
 		$packages = [];
 		foreach ( $this->collect_plugins() as $pkg ) {
 			$pkg['per_lang'] = StringTranslator::translation_progress( $pkg['text_domain'], $lang_codes );
+			$pkg['audit']    = $summaries[ $pkg['slug'] ] ?? null;
 			$packages[]     = $pkg;
 		}
 		foreach ( $this->collect_themes() as $pkg ) {
 			$pkg['per_lang'] = StringTranslator::translation_progress( $pkg['text_domain'], $lang_codes );
+			$pkg['audit']    = $summaries[ $pkg['slug'] ] ?? null;
 			$packages[]     = $pkg;
 		}
 
@@ -308,6 +331,84 @@ class Strings extends Controller {
 			'wporg'     => $import,
 			'string_count' => StringTranslator::count_strings( $pkg['text_domain'] ),
 		] ) );
+	}
+
+	// =====================================================================
+	// Translation-readiness audit (missing/wrong text domain, hardcoded text)
+	// =====================================================================
+
+	const AUDIT_SUMMARIES_OPTION = 'gtrans_audit_summaries';
+	const AUDIT_MAX_FINDINGS     = 400;
+
+	private function audit_option( $slug ) {
+		return 'gtrans_audit_' . sanitize_key( $slug );
+	}
+
+	/** Stored findings + summary for one package (null when never audited). */
+	public function get_audit( $request ) {
+		$pkg = $this->resolve_package( (string) $request['slug'] );
+		if ( is_wp_error( $pkg ) ) {
+			return $pkg;
+		}
+		$stored = get_option( $this->audit_option( $pkg['slug'] ), null );
+		return $this->ok( $stored ?: null );
+	}
+
+	/**
+	 * Run one chunk of the audit. The client calls this repeatedly, passing the
+	 * returned `next_offset`, until `done` is true. offset=0 starts afresh.
+	 */
+	public function run_audit( $request ) {
+		$pkg = $this->resolve_package( (string) $request['slug'] );
+		if ( is_wp_error( $pkg ) ) {
+			return $pkg;
+		}
+		$body   = $request->get_json_params() ?: $request->get_params();
+		$offset = max( 0, (int) ( $body['offset'] ?? 0 ) );
+		$key    = $this->audit_option( $pkg['slug'] );
+
+		$chunk = Auditor::run_chunk( $pkg['path'], $pkg['text_domain'], $offset );
+
+		$data = ( $offset > 0 ) ? get_option( $key, null ) : null;
+		if ( ! is_array( $data ) ) {
+			$data = [
+				'counts'   => [ 'missing_domain' => 0, 'wrong_domain' => 0, 'hardcoded' => 0, 'calls' => 0 ],
+				'findings' => [],
+			];
+		}
+		foreach ( $chunk['counts'] as $type => $n ) {
+			$data['counts'][ $type ] = ( $data['counts'][ $type ] ?? 0 ) + $n;
+		}
+		// Counts stay exact; the stored list is capped to keep the option small.
+		$room = max( 0, self::AUDIT_MAX_FINDINGS - count( $data['findings'] ) );
+		$data['findings'] = array_merge( $data['findings'], array_slice( $chunk['findings'], 0, $room ) );
+
+		$data['text_domain']  = $pkg['text_domain'];
+		$data['total_files']  = $chunk['total_files'];
+		$data['scanned_files'] = $chunk['next_offset'];
+		$data['truncated']    = $data['counts']['missing_domain'] + $data['counts']['wrong_domain'] + $data['counts']['hardcoded'] > count( $data['findings'] );
+		$data['updated_at']   = time();
+		update_option( $key, $data, false );
+
+		if ( $chunk['done'] ) {
+			$summaries = get_option( self::AUDIT_SUMMARIES_OPTION, [] );
+			$summaries = is_array( $summaries ) ? $summaries : [];
+			$summaries[ $pkg['slug'] ] = [
+				'missing_domain' => $data['counts']['missing_domain'],
+				'wrong_domain'   => $data['counts']['wrong_domain'],
+				'hardcoded'      => $data['counts']['hardcoded'],
+				'calls'          => $data['counts']['calls'],
+				'updated_at'     => $data['updated_at'],
+			];
+			update_option( self::AUDIT_SUMMARIES_OPTION, $summaries, false );
+		}
+
+		return $this->ok( [
+			'done'          => $chunk['done'],
+			'next_offset'   => $chunk['next_offset'],
+			'total_files'   => $chunk['total_files'],
+			'audit'         => $chunk['done'] ? $data : null,
+		] );
 	}
 
 	public function export_package( $request ) {
