@@ -195,6 +195,11 @@ class Strings extends Controller {
 			if ( ! $id || ! Context::is_active( $lang ) ) {
 				continue;
 			}
+			// The route has no `:lang` segment, so permissions_translate() could
+			// not scope-check it. Check every row against the user's assignment.
+			if ( ! \GemTranslate\Admin\LanguageScope::can_translate( $lang ) ) {
+				continue;
+			}
 			if ( StringTranslator::save_translation( $id, $lang, (string) ( $row['value'] ?? '' ), (string) ( $row['status'] ?? 'translated' ) ) ) {
 				$saved++;
 			}
@@ -214,10 +219,16 @@ class Strings extends Controller {
 				$dir = WP_PLUGIN_DIR;
 				break;
 			case 'custom':
-				$dir = wp_normalize_path( $path );
-				if ( ! $dir || ! is_dir( $dir ) ) {
-					return $this->fail( 'gtrans_bad_path', __( 'Directory does not exist.', 'gemtranslate' ), 422 );
+				// An arbitrary server path is an admin-only, wp-content-only tool.
+				if ( ! current_user_can( 'manage_options' ) ) {
+					return $this->fail( 'gtrans_forbidden', __( 'You do not have permission to scan custom paths.', 'gemtranslate' ), 403 );
 				}
+				$real = $path ? realpath( $path ) : false;
+				$root = realpath( WP_CONTENT_DIR );
+				if ( ! $real || ! $root || ! is_dir( $real ) || 0 !== strpos( wp_normalize_path( $real ) . '/', wp_normalize_path( $root ) . '/' ) ) {
+					return $this->fail( 'gtrans_bad_path', __( 'Directory does not exist or is outside wp-content.', 'gemtranslate' ), 422 );
+				}
+				$dir = wp_normalize_path( $real );
 				break;
 			default:
 				return $this->fail( 'gtrans_bad_target', __( 'Unknown scan target.', 'gemtranslate' ), 422 );

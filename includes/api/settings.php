@@ -37,6 +37,7 @@ class Settings extends Controller {
 		'geo_country_picker_banner',
 		'geo_cookie_ttl_days',
 		'geo_auto_redirect_country',
+		'geo_trusted_proxies',
 	];
 
 	public static function init() {

@@ -148,8 +148,8 @@ class TermTranslator {
 			'language_code' => $lang,
 			'term_id'       => $term_id,
 			'taxonomy'      => $term->taxonomy,
-			'name'          => (string) ( $fields['name'] ?? '' ),
-			'description'   => (string) ( $fields['description'] ?? '' ),
+			'name'          => Helper::sanitize_markup( $fields['name'] ?? '' ),
+			'description'   => Helper::sanitize_markup( $fields['description'] ?? '' ),
 			'slug'          => sanitize_title( $fields['slug'] ?? '' ),
 			'updated_at'    => Helper::get_time(),
 		];

@@ -79,6 +79,9 @@ class BrowserRedirect {
 		$relative = '/' . ltrim( $relative, '/' );
 		$target   = home_url( '/' . $lang . $relative );
 		self::write_cookie( $lang );
+		// The target depends on this visitor's headers, so a shared cache must
+		// not remember the redirect for the next visitor.
+		\GemTranslate\Cache\NoCache::send();
 		wp_safe_redirect( $target, 302 );
 		exit;
 	}
@@ -87,7 +90,17 @@ class BrowserRedirect {
 		if ( headers_sent() ) {
 			return;
 		}
-		setcookie( self::COOKIE, sanitize_key( $lang ), time() + ( 30 * DAY_IN_SECONDS ), COOKIEPATH ?: '/', COOKIE_DOMAIN ?: '' );
+		setcookie(
+			self::COOKIE,
+			sanitize_key( $lang ),
+			[
+				'expires'  => time() + ( 30 * DAY_IN_SECONDS ),
+				'path'     => COOKIEPATH ?: '/',
+				'domain'   => COOKIE_DOMAIN ?: '',
+				'secure'   => is_ssl(),
+				'samesite' => 'Lax',
+			]
+		);
 	}
 
 	private static function best_match_from_accept_language() {

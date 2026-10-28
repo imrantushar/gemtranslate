@@ -27,6 +27,8 @@ class WpRocket {
 
 	public static function register_cookie( $cookies ) {
 		$cookies[] = 'gtrans_user_lang';
+		// Country picks the content variant on the same URL, so cache per value.
+		$cookies[] = 'gtrans_user_country';
 		return $cookies;
 	}
 

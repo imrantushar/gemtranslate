@@ -126,8 +126,21 @@ class CountryRedirector {
 		// Write the language cookie so BrowserRedirect doesn't bounce the
 		// visitor back on subsequent visits.
 		if ( ! headers_sent() ) {
-			setcookie( BrowserRedirect::COOKIE, sanitize_key( $lang ), time() + ( 30 * DAY_IN_SECONDS ), COOKIEPATH ?: '/', COOKIE_DOMAIN ?: '' );
+			setcookie(
+				BrowserRedirect::COOKIE,
+				sanitize_key( $lang ),
+				[
+					'expires'  => time() + ( 30 * DAY_IN_SECONDS ),
+					'path'     => COOKIEPATH ?: '/',
+					'domain'   => COOKIE_DOMAIN ?: '',
+					'secure'   => is_ssl(),
+					'samesite' => 'Lax',
+				]
+			);
 		}
+		// The target depends on this visitor's country, so a shared cache must
+		// not remember the redirect for the next visitor.
+		\GemTranslate\Cache\NoCache::send();
 		wp_safe_redirect( $target, 302 );
 		exit;
 	}

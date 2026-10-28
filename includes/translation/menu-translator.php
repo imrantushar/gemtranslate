@@ -66,8 +66,9 @@ class MenuTranslator {
 		$data = [
 			'menu_item_id' => (int) $menu_item_id,
 			'language_code' => $lang,
-			'title'         => (string) ( $fields['title'] ?? '' ),
-			'url_override'  => (string) ( $fields['url_override'] ?? '' ),
+			'title'         => Helper::sanitize_markup( $fields['title'] ?? '' ),
+			// esc_url_raw drops `javascript:` and other non-web schemes.
+			'url_override'  => esc_url_raw( (string) ( $fields['url_override'] ?? '' ) ),
 			'updated_at'    => Helper::get_time(),
 		];
 

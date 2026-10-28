@@ -48,6 +48,10 @@ class ShadowPostSync {
 
 		// Hide shadows from admin posts list, frontend search, sitemaps, etc.
 		add_action( 'pre_get_posts', [ __CLASS__, 'hide_shadows' ] );
+
+		// Hiding covers list queries. A shadow is still a real published post,
+		// so fetching it by ID has to be refused too (REST single-item reads).
+		add_filter( 'rest_request_before_callbacks', [ __CLASS__, 'block_shadow_in_rest' ], 10, 3 );
 	}
 
 	/**
@@ -217,10 +221,17 @@ class ShadowPostSync {
 		if ( EditorContext::is_render_target() ) {
 			return $posts;
 		}
-		if ( Context::is_default() ) {
+		if ( empty( $posts ) || ! is_array( $posts ) ) {
 			return $posts;
 		}
-		if ( empty( $posts ) || ! is_array( $posts ) ) {
+		// A shadow has no public URL. If a request resolved straight to one
+		// (`?p=<id>`, its slug), drop it so WordPress answers 404 — in every
+		// language, not only the non-default ones.
+		$posts = self::drop_direct_shadows( $posts, $query );
+		if ( empty( $posts ) ) {
+			return $posts;
+		}
+		if ( Context::is_default() ) {
 			return $posts;
 		}
 		foreach ( $posts as $i => $post ) {
@@ -249,9 +260,77 @@ class ShadowPostSync {
 			// still match the language-prefixed URL the visitor used.
 			$shadow->post_name = $post->post_name;
 			$shadow->guid      = $post->guid;
+			// Visibility belongs to the source. The shadow is always stored as
+			// published and unprotected, so carry the source's password and
+			// status across — otherwise swapping would hand a password-
+			// protected or private page's content to anyone.
+			$shadow->post_password = $post->post_password;
+			$shadow->post_status   = $post->post_status;
 			$posts[ $i ]       = $shadow;
 		}
 		return $posts;
+	}
+
+	/**
+	 * Remove shadow posts a visitor reached directly. Only the queries that can
+	 * land on a single post by ID or slug are inspected, so list queries keep
+	 * their cheap path.
+	 */
+	private static function drop_direct_shadows( array $posts, $query ) {
+		if ( ! ( $query instanceof \WP_Query ) ) {
+			return $posts;
+		}
+		$targeted = $query->is_main_query()
+			|| $query->get( 'p' )
+			|| $query->get( 'page_id' )
+			|| $query->get( 'post__in' )
+			|| $query->get( 'name' )
+			|| $query->get( 'pagename' );
+		if ( ! $targeted ) {
+			return $posts;
+		}
+		foreach ( $posts as $i => $post ) {
+			if ( ! is_object( $post ) || ! isset( $post->ID ) ) {
+				continue;
+			}
+			if ( ! get_post_meta( $post->ID, self::META_SOURCE, true ) ) {
+				continue;
+			}
+			// Editors previewing a translation keep access.
+			if ( current_user_can( 'edit_post', $post->ID ) ) {
+				continue;
+			}
+			unset( $posts[ $i ] );
+		}
+		return array_values( $posts );
+	}
+
+	/**
+	 * `GET /wp/v2/<type>/<shadow id>` reads the post with get_post(), which
+	 * bypasses hide_shadows(). Answer as if it did not exist unless the caller
+	 * can edit it. Runs before the route callback, so no core controller sees
+	 * the shadow. Collections are already filtered by hide_shadows().
+	 *
+	 * @param mixed            $response Null, or an error from an earlier filter.
+	 * @param array            $handler  Matched route handler (unused).
+	 * @param \WP_REST_Request $request
+	 * @return mixed
+	 */
+	public static function block_shadow_in_rest( $response, $handler, $request ) {
+		if ( is_wp_error( $response ) || ! ( $request instanceof \WP_REST_Request ) ) {
+			return $response;
+		}
+		if ( ! preg_match( '#^/wp/v2/[^/]+/(\d+)(?:/|$)#', $request->get_route(), $m ) ) {
+			return $response;
+		}
+		$post_id = (int) $m[1];
+		if ( ! get_post_meta( $post_id, self::META_SOURCE, true ) ) {
+			return $response;
+		}
+		if ( current_user_can( 'edit_post', $post_id ) ) {
+			return $response;
+		}
+		return new \WP_Error( 'rest_post_invalid_id', __( 'Invalid post ID.', 'gemtranslate' ), [ 'status' => 404 ] );
 	}
 
 	/**

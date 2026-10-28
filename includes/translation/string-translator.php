@@ -218,7 +218,7 @@ class StringTranslator {
 		$data  = [
 			'string_id'     => (int) $string_id,
 			'language_code' => $lang,
-			'value'         => (string) $value,
+			'value'         => Helper::sanitize_markup( $value ),
 			'status'        => (string) $status,
 			'updated_at'    => Helper::get_time(),
 		];

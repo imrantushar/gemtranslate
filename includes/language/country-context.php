@@ -126,9 +126,13 @@ class CountryContext {
 		setcookie(
 			self::COOKIE,
 			$iso,
-			time() + ( $ttl_days * DAY_IN_SECONDS ),
-			COOKIEPATH ?: '/',
-			COOKIE_DOMAIN ?: ''
+			[
+				'expires'  => time() + ( $ttl_days * DAY_IN_SECONDS ),
+				'path'     => COOKIEPATH ?: '/',
+				'domain'   => COOKIE_DOMAIN ?: '',
+				'secure'   => is_ssl(),
+				'samesite' => 'Lax',
+			]
 		);
 		self::set( $iso );
 		return true;

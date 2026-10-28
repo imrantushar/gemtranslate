@@ -52,8 +52,9 @@ class TranslationLoader {
 		if ( $post_id <= 0 ) {
 			return null;
 		}
-		$lang    = Context::current();
-		$country = self::normalize_country( $country !== null ? $country : self::detect_country() );
+		$lang             = Context::current();
+		$auto_country     = null === $country;
+		$country          = self::normalize_country( $country !== null ? $country : self::detect_country() );
 
 		$memo_key = $post_id . ':' . $lang . ':' . $country;
 		if ( array_key_exists( $memo_key, self::$memo ) ) {
@@ -64,6 +65,13 @@ class TranslationLoader {
 		if ( ! $group_id ) {
 			self::$memo[ $memo_key ] = false;
 			return null;
+		}
+
+		// The variant is picked from the visitor's country, not the URL. A page
+		// cache would store one country's variant and serve it to everyone, so
+		// such responses are marked uncacheable.
+		if ( $auto_country && CountryContext::enabled() && self::has_country_variant( $group_id ) ) {
+			\GemTranslate\Cache\NoCache::send();
 		}
 
 		$row = self::fetch_row( $group_id, $lang, $country );
@@ -252,6 +260,22 @@ class TranslationLoader {
 		}
 	}
 
+	/**
+	 * Does this translation group have any country-specific variant?
+	 */
+	private static function has_country_variant( $group_id ) {
+		static $memo = [];
+		if ( ! array_key_exists( $group_id, $memo ) ) {
+			$memo[ $group_id ] = (bool) array_filter(
+				self::known_countries_for_group( $group_id ),
+				static function ( $c ) {
+					return '' !== $c;
+				}
+			);
+		}
+		return $memo[ $group_id ];
+	}
+
 	private static function known_countries_for_group( $group_id ) {
 		global $wpdb;
 		$table = Helper::table( 'post_translations' );
@@ -398,9 +422,9 @@ class TranslationLoader {
 			'country_code'     => $country,
 			'post_id'          => $post_id,
 			'shadow_post_id'   => $shadow_post_id,
-			'title'            => (string) ( $fields['title'] ?? '' ),
-			'content'          => (string) ( $fields['content'] ?? '' ),
-			'excerpt'          => (string) ( $fields['excerpt'] ?? '' ),
+			'title'            => Helper::sanitize_markup( $fields['title'] ?? '' ),
+			'content'          => Helper::sanitize_markup( $fields['content'] ?? '' ),
+			'excerpt'          => Helper::sanitize_markup( $fields['excerpt'] ?? '' ),
 			'slug'             => $slug,
 			'status'           => (string) ( $fields['status'] ?? 'publish' ),
 			'translation_mode' => $mode,

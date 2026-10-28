@@ -31,7 +31,7 @@ class PostTranslations extends Controller {
 			[
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'list_post_types' ],
-				'permission_callback' => [ $this, 'permissions_translate' ],
+				'permission_callback' => [ $this, 'permissions_translate_post' ],
 			]
 		);
 
@@ -42,7 +42,7 @@ class PostTranslations extends Controller {
 			[
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'index' ],
-				'permission_callback' => [ $this, 'permissions_translate' ],
+				'permission_callback' => [ $this, 'permissions_translate_post' ],
 				'args'                => [
 					'page'      => [ 'type' => 'integer', 'default' => 1 ],
 					'per_page'  => [ 'type' => 'integer', 'default' => 20 ],
@@ -59,7 +59,7 @@ class PostTranslations extends Controller {
 			[
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_translations' ],
-				'permission_callback' => [ $this, 'permissions_translate' ],
+				'permission_callback' => [ $this, 'permissions_translate_post' ],
 			]
 		);
 
@@ -71,12 +71,12 @@ class PostTranslations extends Controller {
 				[
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'get_fields' ],
-					'permission_callback' => [ $this, 'permissions_translate' ],
+					'permission_callback' => [ $this, 'permissions_translate_post' ],
 				],
 				[
 					'methods'             => 'PUT',
 					'callback'            => [ $this, 'save_fields' ],
-					'permission_callback' => [ $this, 'permissions_translate' ],
+					'permission_callback' => [ $this, 'permissions_translate_post' ],
 				],
 			]
 		);
@@ -89,12 +89,12 @@ class PostTranslations extends Controller {
 				[
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'get_units' ],
-					'permission_callback' => [ $this, 'permissions_translate' ],
+					'permission_callback' => [ $this, 'permissions_translate_post' ],
 				],
 				[
 					'methods'             => 'PUT',
 					'callback'            => [ $this, 'save_units' ],
-					'permission_callback' => [ $this, 'permissions_translate' ],
+					'permission_callback' => [ $this, 'permissions_translate_post' ],
 				],
 			]
 		);
@@ -108,12 +108,12 @@ class PostTranslations extends Controller {
 				[
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'get_confirmed_segments' ],
-					'permission_callback' => [ $this, 'permissions_translate' ],
+					'permission_callback' => [ $this, 'permissions_translate_post' ],
 				],
 				[
 					'methods'             => 'PUT',
 					'callback'            => [ $this, 'save_confirmed_segments' ],
-					'permission_callback' => [ $this, 'permissions_translate' ],
+					'permission_callback' => [ $this, 'permissions_translate_post' ],
 				],
 			]
 		);
@@ -125,7 +125,7 @@ class PostTranslations extends Controller {
 			[
 				'methods'             => \WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'promote_to_layout' ],
-				'permission_callback' => [ $this, 'permissions_translate' ],
+				'permission_callback' => [ $this, 'permissions_translate_post' ],
 			]
 		);
 		register_rest_route(
@@ -134,7 +134,7 @@ class PostTranslations extends Controller {
 			[
 				'methods'             => \WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'demote_to_strings' ],
-				'permission_callback' => [ $this, 'permissions_translate' ],
+				'permission_callback' => [ $this, 'permissions_translate_post' ],
 			]
 		);
 
@@ -146,12 +146,12 @@ class PostTranslations extends Controller {
 				[
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'list_variants' ],
-					'permission_callback' => [ $this, 'permissions_translate' ],
+					'permission_callback' => [ $this, 'permissions_translate_post' ],
 				],
 				[
 					'methods'             => \WP_REST_Server::CREATABLE,
 					'callback'            => [ $this, 'create_variant' ],
-					'permission_callback' => [ $this, 'permissions_translate' ],
+					'permission_callback' => [ $this, 'permissions_translate_post' ],
 				],
 			]
 		);
@@ -163,12 +163,12 @@ class PostTranslations extends Controller {
 				[
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'get_meta' ],
-					'permission_callback' => [ $this, 'permissions_translate' ],
+					'permission_callback' => [ $this, 'permissions_translate_post' ],
 				],
 				[
 					'methods'             => 'PUT',
 					'callback'            => [ $this, 'save_meta' ],
-					'permission_callback' => [ $this, 'permissions_translate' ],
+					'permission_callback' => [ $this, 'permissions_translate_post' ],
 				],
 			]
 		);
@@ -180,20 +180,65 @@ class PostTranslations extends Controller {
 				[
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'show_translation' ],
-					'permission_callback' => [ $this, 'permissions_translate' ],
+					'permission_callback' => [ $this, 'permissions_translate_post' ],
 				],
 				[
 					'methods'             => 'PUT',
 					'callback'            => [ $this, 'save_translation' ],
-					'permission_callback' => [ $this, 'permissions_translate' ],
+					'permission_callback' => [ $this, 'permissions_translate_post' ],
 				],
 				[
 					'methods'             => \WP_REST_Server::DELETABLE,
 					'callback'            => [ $this, 'delete_translation' ],
-					'permission_callback' => [ $this, 'permissions_translate' ],
+					'permission_callback' => [ $this, 'permissions_translate_post' ],
 				],
 			]
 		);
+	}
+
+	/**
+	 * Translator permission plus a per-post check for routes that address a
+	 * post (`/posts/{id}/...`). The translator capability alone must not open
+	 * every post on the site: drafts, private and password-protected content
+	 * stays limited to people who can edit it.
+	 */
+	public function permissions_translate_post( $request ) {
+		$allowed = $this->permissions_translate( $request );
+		if ( true !== $allowed ) {
+			return $allowed;
+		}
+		$post_id = (int) $request->get_param( 'id' );
+		if ( $post_id > 0 ) {
+			$post = get_post( $post_id );
+			if ( $post && ! self::user_can_translate_post( $post ) ) {
+				return new \WP_Error(
+					'gtrans_forbidden_post',
+					__( 'You are not allowed to translate this item.', 'gemtranslate' ),
+					[ 'status' => rest_authorization_required_code() ]
+				);
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Who may read or translate a given post: anyone who can edit it, or a
+	 * translator for published, unprotected content of a public post type.
+	 *
+	 * @param \WP_Post $post
+	 * @return bool
+	 */
+	public static function user_can_translate_post( $post ) {
+		if ( current_user_can( 'edit_post', $post->ID ) ) {
+			return true;
+		}
+		// Shadow posts are internal storage, never a translation target.
+		if ( get_post_meta( $post->ID, \GemTranslate\Translation\ShadowPostSync::META_SOURCE, true ) ) {
+			return false;
+		}
+		$type    = get_post_type_object( $post->post_type );
+		$allowed = $type && $type->public && 'publish' === $post->post_status && '' === (string) $post->post_password;
+		return (bool) apply_filters( 'gtrans_user_can_translate_post', $allowed, $post );
 	}
 
 	/**
@@ -207,7 +252,7 @@ class PostTranslations extends Controller {
 			if ( 'attachment' === $type->name ) {
 				continue;
 			}
-			if ( ! current_user_can( $type->cap->edit_posts ?? 'edit_posts' ) ) {
+			if ( ! current_user_can( $type->cap->edit_posts ?? 'edit_posts' ) && ! current_user_can( self::CAP_TRANSLATE ) ) {
 				continue;
 			}
 			$out[] = [
@@ -221,6 +266,14 @@ class PostTranslations extends Controller {
 	public function index( $request ) {
 		$post_type = $request->get_param( 'post_type' ) ?: 'post';
 
+		// Only public post types are translatable; anything else (orders,
+		// templates, other plugins' private types) must not be enumerable here.
+		$type_object = get_post_type_object( $post_type );
+		if ( ! $type_object || ! $type_object->public || 'attachment' === $post_type ) {
+			return $this->fail( 'gtrans_bad_post_type', __( 'Unknown or non-translatable post type.', 'gemtranslate' ), 422 );
+		}
+		$can_edit_type = current_user_can( $type_object->cap->edit_posts ?? 'edit_posts' );
+
 		// Academy LMS stores lessons in a custom table when HP lesson mode is active.
 		if ( 'academy_lessons' === $post_type && $this->is_academy_hp_mode() ) {
 			return $this->index_academy_hp_lessons( $request );
@@ -228,13 +281,18 @@ class PostTranslations extends Controller {
 
 		$args = [
 			'post_type'      => $post_type,
-			'post_status'    => $request->get_param( 'status' ) ?: 'any',
+			'post_status'    => $can_edit_type ? ( $request->get_param( 'status' ) ?: 'any' ) : 'publish',
 			'posts_per_page' => max( 1, min( 100, (int) $request->get_param( 'per_page' ) ) ),
 			'paged'          => max( 1, (int) $request->get_param( 'page' ) ),
 			's'              => (string) $request->get_param( 'search' ),
 			'orderby'        => 'date',
 			'order'          => 'DESC',
 		];
+
+		if ( ! $can_edit_type ) {
+			// Translators without edit rights never see protected posts.
+			$args['has_password'] = false;
+		}
 
 		$query = new \WP_Query( $args );
 		$rows  = [];

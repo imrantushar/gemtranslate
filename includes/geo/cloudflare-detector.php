@@ -16,6 +16,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 class CloudflareDetector implements Detector {
 
 	public function detect() {
+		// Any client can send this header to an origin it can reach directly;
+		// only trust it when the connection really came through a proxy.
+		if ( ! TrustedProxy::is_trusted_peer() ) {
+			return '';
+		}
 		$iso = strtoupper( trim( (string) ( $_SERVER['HTTP_CF_IPCOUNTRY'] ?? '' ) ) );
 		if ( '' === $iso || 'XX' === $iso || 'T1' === $iso ) {
 			return '';
