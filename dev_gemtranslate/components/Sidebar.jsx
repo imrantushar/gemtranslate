@@ -34,17 +34,11 @@ export const NAV = [
 		pro: 'ai_bulk',
 	},
 	{
-		to: '/assignments',
-		label: () => __('Assignments', 'gemtranslate'),
-		icon: 'clipboard',
-		pro: 'translators',
-		badge: 'assignments',
-	},
-	{
 		to: '/translators',
 		label: () => __('Translators', 'gemtranslate'),
 		icon: 'users',
 		pro: 'translators',
+		children: 'translators',
 	},
 	{ to: '/migration', label: () => __('Migration', 'gemtranslate'), icon: 'swap' },
 	{
@@ -93,18 +87,26 @@ function useSubmenus() {
 		{ key: 'advanced', label: __('Advanced', 'gemtranslate') },
 	].map((c) => ({ ...c, to: `/settings?tab=${c.key}`, param: 'tab', isDefault: c.key === 'general' }));
 
-	return { postTypes: posts, taxonomies, settings };
+	const translators = [
+		{ key: 'contributor', label: __('Contributor', 'gemtranslate'), to: '/assignments', badge: 'assignments' },
+	];
+
+	return { postTypes: posts, taxonomies, settings, translators };
 }
 
-function SubMenu({ items }) {
-	const { search } = useLocation();
+function SubMenu({ items, openAssignments }) {
+	const { pathname, search } = useLocation();
 	const params = new URLSearchParams(search);
 
 	return (
 		<div className="gtrans-ml-5 gtrans-mt-1 gtrans-flex gtrans-flex-col gtrans-gap-0.5 gtrans-border-l gtrans-border-edge gtrans-pl-3">
 			{items.map((child) => {
-				const current = params.get(child.param);
-				const active = current ? current === child.key : child.isDefault;
+				const current = child.param ? params.get(child.param) : null;
+				const active = child.param
+					? current
+						? current === child.key
+						: child.isDefault
+					: pathname === child.to || pathname.startsWith(`${child.to}/`);
 				return (
 					<Link
 						key={child.key}
@@ -118,6 +120,11 @@ function SubMenu({ items }) {
 						aria-current={active ? 'page' : undefined}
 					>
 						{child.label}
+						{child.badge === 'assignments' && openAssignments > 0 && (
+							<span className="gtrans-ml-2 gtrans-rounded-full gtrans-bg-primary-light gtrans-px-2 gtrans-py-0.5 gtrans-text-11 gtrans-font-medium gtrans-text-primary">
+								{openAssignments}
+							</span>
+						)}
 					</Link>
 				);
 			})}
@@ -146,7 +153,10 @@ export default function Sidebar({ collapsed = false }) {
 			<nav className="gtrans-flex gtrans-flex-col gtrans-gap-1">
 				{NAV.map((item) => {
 					const kids = item.children && !collapsed ? submenus[item.children] : null;
-					const isOpen = kids ? open[item.to] ?? pathname.startsWith(item.to) : false;
+					const childPathActive = kids?.some(
+						(child) => child.to && (pathname === child.to || pathname.startsWith(`${child.to}/`))
+					);
+					const isOpen = kids ? open[item.to] ?? (pathname.startsWith(item.to) || childPathActive) : false;
 					return (
 					<div key={item.to}>
 					<div className="gtrans-relative">
@@ -157,7 +167,7 @@ export default function Sidebar({ collapsed = false }) {
 							clsx(
 								'gtrans-relative gtrans-flex gtrans-items-center gtrans-gap-3 gtrans-rounded gtrans-py-2 gtrans-text-sm gtrans-no-underline gtrans-transition-colors',
 								collapsed ? 'gtrans-justify-center gtrans-px-0' : 'gtrans-px-3',
-								isActive
+								isActive || childPathActive
 									? kids
 										? 'gtrans-nav-parent gtrans-text-primary gtrans-font-medium'
 										: 'gtrans-bg-navactive gtrans-text-primary gtrans-font-medium'
@@ -204,7 +214,7 @@ export default function Sidebar({ collapsed = false }) {
 						</button>
 					)}
 					</div>
-					{isOpen && <SubMenu items={kids} />}
+					{isOpen && <SubMenu items={kids} openAssignments={openAssignments} />}
 					</div>
 					);
 				})}

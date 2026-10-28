@@ -43,7 +43,7 @@ export default function TranslatorsPage() {
 	const onSave = async (userId) => {
 		try {
 			await save.mutateAsync({ userId, languages: drafts[userId] || [] });
-			setToast({ tone: 'success', message: __('Assignments saved.', 'gemtranslate') });
+			setToast({ tone: 'success', message: __('Contributor languages saved.', 'gemtranslate') });
 		} catch (err) {
 			setToast({ tone: 'error', message: formatErrorMessage(err) });
 		}

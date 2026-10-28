@@ -47,14 +47,14 @@ export function getProFeature(key) {
 			],
 		},
 		translators: {
-			title: __('Translator roles & assignments', 'gemtranslate'),
+			title: __('Translator roles & contributor workflow', 'gemtranslate'),
 			description: __(
-				'Bring in human translators with exactly the access they need, and track the work from assignment to completion.',
+				'Bring in human translators with exactly the access they need, and track contributor work through completion.',
 				'gemtranslate'
 			),
 			items: [
 				{ icon: 'users', title: __('Scoped access', 'gemtranslate'), desc: __('Limit each translator to specific languages.', 'gemtranslate') },
-				{ icon: 'clipboard', title: __('Assignments', 'gemtranslate'), desc: __('Assign content, add notes and follow progress in one place.', 'gemtranslate') },
+				{ icon: 'clipboard', title: __('Contributor work', 'gemtranslate'), desc: __('Assign content, add notes and follow progress in one place.', 'gemtranslate') },
 				{ icon: 'check', title: __('Email notifications', 'gemtranslate'), desc: __('Translators are notified when work is assigned or completed.', 'gemtranslate') },
 			],
 		},

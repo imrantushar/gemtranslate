@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
+import Modal from '../../components/Modal';
 import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
 import StatusTabs from '../../components/StatusTabs';
@@ -48,6 +49,7 @@ const statusLabel = (s) =>
 export default function AssignmentsPage() {
 	const [scope, setScope] = useState(canManage ? 'all' : 'mine');
 	const [status, setStatus] = useState('');
+	const [newContributorOpen, setNewContributorOpen] = useState(false);
 	const params = useMemo(() => ({ scope, ...(status ? { status } : {}) }), [scope, status]);
 	const list = useAssignments(params);
 	const update = useUpdateAssignment();
@@ -68,10 +70,17 @@ export default function AssignmentsPage() {
 	return (
 		<>
 			<PageHeader
-				title={__('Assignments', 'gemtranslate')}
+				title={__('Contributor', 'gemtranslate')}
+				actions={
+					canManage && (
+						<Button size="sm" onClick={() => setNewContributorOpen(true)}>
+							{__('Add New Contributor', 'gemtranslate')}
+						</Button>
+					)
+				}
 				description={
 					canManage
-						? __('Assign posts to translators and track their progress.', 'gemtranslate')
+						? __('Assign posts to contributors and track their progress.', 'gemtranslate')
 						: __(
 								'Translation work assigned to you. Open a post to translate it, then mark it complete.',
 								'gemtranslate'
@@ -79,7 +88,13 @@ export default function AssignmentsPage() {
 				}
 			/>
 
-			{canManage && <NewAssignment onToast={setToast} />}
+			{canManage && newContributorOpen && (
+				<NewAssignment
+					open
+					onClose={() => setNewContributorOpen(false)}
+					onToast={setToast}
+				/>
+			)}
 
 			<Card table>
 				<Table.Toolbar variant="tabs">
@@ -114,8 +129,8 @@ export default function AssignmentsPage() {
 				{list.isLoading ? (
 					<TableSkeleton />
 				) : rows.length === 0 ? (
-					<Table.Empty columns={[__('Content', 'gemtranslate'), __('Language', 'gemtranslate'), __('Translator', 'gemtranslate'), __('Status', 'gemtranslate'), '']}>
-						{__('No assignments yet.', 'gemtranslate')}
+					<Table.Empty columns={[__('Content', 'gemtranslate'), __('Language', 'gemtranslate'), __('Contributor', 'gemtranslate'), __('Status', 'gemtranslate'), '']}>
+						{__('No contributor work yet.', 'gemtranslate')}
 					</Table.Empty>
 				) : (
 					<Table.Root>
@@ -124,7 +139,7 @@ export default function AssignmentsPage() {
 								<Table.ColumnHeader>{__('Content', 'gemtranslate')}</Table.ColumnHeader>
 								<Table.ColumnHeader>{__('Language', 'gemtranslate')}</Table.ColumnHeader>
 								{canManage && (
-									<Table.ColumnHeader>{__('Translator', 'gemtranslate')}</Table.ColumnHeader>
+									<Table.ColumnHeader>{__('Contributor', 'gemtranslate')}</Table.ColumnHeader>
 								)}
 								<Table.ColumnHeader>{__('Status', 'gemtranslate')}</Table.ColumnHeader>
 								<Table.ColumnHeader className="gtrans-text-right">
@@ -220,7 +235,7 @@ export default function AssignmentsPage() {
 }
 
 /** Manager-only: assign a post + language to a translator. */
-function NewAssignment({ onToast }) {
+function NewAssignment({ open, onClose, onToast }) {
 	const postTypes = usePostTypes();
 	const [postType, setPostType] = useState('post');
 	const [search, setSearch] = useState('');
@@ -242,7 +257,7 @@ function NewAssignment({ onToast }) {
 		if (!postId || !lang || !translatorId) {
 			onToast({
 				tone: 'error',
-				message: __('Pick a post, language and translator.', 'gemtranslate'),
+				message: __('Pick a post, language and contributor.', 'gemtranslate'),
 			});
 			return;
 		}
@@ -257,15 +272,31 @@ function NewAssignment({ onToast }) {
 			setNote('');
 			onToast({
 				tone: 'success',
-				message: __('Assignment created and the translator notified.', 'gemtranslate'),
+				message: __('Contributor work created and the contributor notified.', 'gemtranslate'),
 			});
+			onClose();
 		} catch (err) {
 			onToast({ tone: 'error', message: formatErrorMessage(err) });
 		}
 	};
 
 	return (
-		<Card title={__('New assignment', 'gemtranslate')} className="gtrans-mb-6">
+		<Modal
+			open={open}
+			onClose={onClose}
+			title={__('Add New Contributor', 'gemtranslate')}
+			size="lg"
+			footer={
+				<>
+					<Button variant="secondary" onClick={onClose}>
+						{__('Cancel', 'gemtranslate')}
+					</Button>
+					<Button onClick={submit} loading={create.isPending}>
+						{__('Assign & notify', 'gemtranslate')}
+					</Button>
+				</>
+			}
+		>
 			<div className="gtrans-grid gtrans-gap-3 md:gtrans-grid-cols-2">
 				<Field label={__('Post type', 'gemtranslate')}>
 					<Select
@@ -316,9 +347,9 @@ function NewAssignment({ onToast }) {
 						))}
 					</Select>
 				</Field>
-				<Field label={__('Translator', 'gemtranslate')}>
+				<Field label={__('Contributor', 'gemtranslate')}>
 					<Select value={translatorId} onChange={(e) => setTranslatorId(e.target.value)}>
-						<option value="">{__('— Pick translator —', 'gemtranslate')}</option>
+						<option value="">{__('— Pick contributor —', 'gemtranslate')}</option>
 						{(translators.data || []).map((t) => (
 							<option key={t.id} value={t.id}>
 								{t.name}
@@ -331,15 +362,10 @@ function NewAssignment({ onToast }) {
 						rows={2}
 						value={note}
 						onChange={(e) => setNote(e.target.value)}
-						placeholder={__('Instructions for the translator…', 'gemtranslate')}
+						placeholder={__('Instructions for the contributor…', 'gemtranslate')}
 					/>
 				</Field>
 			</div>
-			<div className="gtrans-mt-4 gtrans-flex gtrans-justify-end">
-				<Button onClick={submit} loading={create.isPending}>
-					{__('Assign & notify', 'gemtranslate')}
-				</Button>
-			</div>
-		</Card>
+		</Modal>
 	);
 }

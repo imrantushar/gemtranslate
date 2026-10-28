@@ -113,7 +113,7 @@ export default function App() {
 						<ProGate
 							feature="translators"
 							header={__('Translators', 'gemtranslate')}
-							title={__('Translator roles & assignments', 'gemtranslate')}
+							title={__('Translator roles & contributor workflow', 'gemtranslate')}
 							description={__(
 								'Give translators scoped access to specific languages — with GemTranslate Pro.',
 								'gemtranslate'
@@ -128,10 +128,10 @@ export default function App() {
 					element={
 						<ProGate
 							feature="translators"
-							header={__('Assignments', 'gemtranslate')}
-							title={__('Translator assignments & workflow', 'gemtranslate')}
+							header={__('Contributor', 'gemtranslate')}
+							title={__('Contributor workflow', 'gemtranslate')}
 							description={__(
-								'Assign content to translators, track their progress, and notify them by email — with GemTranslate Pro.',
+								'Assign content to contributors, track their progress, and notify them by email — with GemTranslate Pro.',
 								'gemtranslate'
 							)}
 						>
