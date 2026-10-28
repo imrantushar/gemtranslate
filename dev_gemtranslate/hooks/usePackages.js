@@ -48,6 +48,26 @@ export function useAuditPackage() {
 	});
 }
 
+/** Check (commit=false) or save (commit=true) a CSV returned by an AI model. */
+export function useCsvImport() {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: async ({ slug, lang, csv, overwrite = false, commit = false }) =>
+			unwrap(await api.post(`strings/packages/${slug}/${lang}/csv-import`, { csv, overwrite, commit })),
+		onSuccess: (data) => {
+			if (data?.committed) qc.invalidateQueries({ queryKey: ['strings'] });
+		},
+	});
+}
+
+/** The next batch of untranslated strings for a plugin/theme, plus the remaining total. */
+export async function fetchUntranslated({ domain, lang, limit }) {
+	const res = await api.get('strings', {
+		params: { domain, lang, status: 'untranslated', page: 1, per_page: limit },
+	});
+	return { rows: unwrap(res) || [], total: getMeta(res).total || 0 };
+}
+
 export function useExportPackage() {
 	return useMutation({
 		mutationFn: async ({ slug, lang, exclude_status = '' }) =>

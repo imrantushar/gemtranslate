@@ -5,6 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use GemTranslate\Io\AiImporter;
 use GemTranslate\I18n\PackGenerator;
 use GemTranslate\I18n\WporgImporter;
 use GemTranslate\Language\Context;
@@ -102,6 +103,16 @@ class Strings extends Controller {
 			[
 				'methods'             => \WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'scan_package' ],
+				'permission_callback' => [ $this, 'permissions_translate' ],
+			]
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/packages/(?P<slug>[A-Za-z0-9_\-]+)/(?P<lang>[a-z0-9\-]{2,10})/csv-import',
+			[
+				'methods'             => \WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'csv_import' ],
 				'permission_callback' => [ $this, 'permissions_translate' ],
 			]
 		);
@@ -331,6 +342,48 @@ class Strings extends Controller {
 			'wporg'     => $import,
 			'string_count' => StringTranslator::count_strings( $pkg['text_domain'] ),
 		] ) );
+	}
+
+	/**
+	 * Import a CSV (typically translated by an external AI model) into one
+	 * plugin/theme. With `commit` false it only reports what would happen.
+	 */
+	public function csv_import( $request ) {
+		$pkg = $this->resolve_package( (string) $request['slug'] );
+		if ( is_wp_error( $pkg ) ) {
+			return $pkg;
+		}
+		$lang = strtolower( (string) $request['lang'] );
+		if ( ! Context::is_active( $lang ) || $lang === Context::default_code() ) {
+			return $this->fail( 'gtrans_invalid_lang', __( 'Pick an active, non-default language.', 'gemtranslate' ), 422 );
+		}
+
+		$body      = $request->get_json_params() ?: $request->get_params();
+		$rows      = AiImporter::parse( (string) ( $body['csv'] ?? '' ) );
+		$overwrite = ! empty( $body['overwrite'] );
+		$commit    = ! empty( $body['commit'] );
+
+		if ( ! $rows ) {
+			return $this->fail( 'gtrans_empty_csv', __( 'No CSV rows found. Paste the full CSV, including the header line (id,source,context,target).', 'gemtranslate' ), 422 );
+		}
+
+		$result = AiImporter::analyze( $rows, $pkg['text_domain'], $lang, $overwrite );
+
+		$saved = 0;
+		if ( $commit ) {
+			foreach ( $result['valid'] as $id => $target ) {
+				if ( StringTranslator::save_translation( $id, $lang, $target, 'translated' ) ) {
+					$saved++;
+				}
+			}
+		}
+
+		return $this->ok( [
+			'committed' => $commit,
+			'saved'     => $saved,
+			'counts'    => $result['counts'],
+			'issues'    => $result['issues'],
+		] );
 	}
 
 	// =====================================================================
