@@ -338,7 +338,7 @@ class Strings extends Controller {
 	// =====================================================================
 
 	const AUDIT_SUMMARIES_OPTION = 'gtrans_audit_summaries';
-	const AUDIT_MAX_FINDINGS     = 400;
+	const AUDIT_MAX_FINDINGS     = 3000;
 
 	private function audit_option( $slug ) {
 		return 'gtrans_audit_' . sanitize_key( $slug );

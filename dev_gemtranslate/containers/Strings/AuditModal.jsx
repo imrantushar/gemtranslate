@@ -28,6 +28,30 @@ const TYPES = [
 	},
 ];
 
+const VISIBLE_ROWS = 300;
+
+/** Save the full stored report as a .json file, entirely in the browser. */
+function downloadReport(pkg, audit) {
+	const report = {
+		package: pkg.name,
+		slug: pkg.slug,
+		text_domain: audit.text_domain || pkg.text_domain,
+		generated_at: new Date((audit.updated_at || Date.now() / 1000) * 1000).toISOString(),
+		counts: audit.counts,
+		truncated: !!audit.truncated,
+		findings: audit.findings || [],
+	};
+	const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+	const url = URL.createObjectURL(blob);
+	const a = document.createElement('a');
+	a.href = url;
+	a.download = `${pkg.slug}-translation-audit.json`;
+	document.body.appendChild(a);
+	a.click();
+	a.remove();
+	URL.revokeObjectURL(url);
+}
+
 /** Total issues across the three finding types. */
 export function auditIssueCount(audit) {
 	if (!audit) return 0;
@@ -41,7 +65,8 @@ export default function AuditModal({ pkg, onClose, onRerun, running, progress })
 	const audit = detail.data;
 	const counts = audit?.counts || {};
 	const active = type || TYPES.find((t) => (counts[t.key] || 0) > 0)?.key || TYPES[0].key;
-	const findings = (audit?.findings || []).filter((f) => f.type === active);
+	const allOfType = (audit?.findings || []).filter((f) => f.type === active);
+	const findings = allOfType.slice(0, VISIBLE_ROWS);
 	const activeMeta = TYPES.find((t) => t.key === active);
 
 	return (
@@ -63,6 +88,9 @@ export default function AuditModal({ pkg, onClose, onRerun, running, progress })
 				<>
 					<Button variant="secondary" onClick={onClose}>
 						{__('Close', 'gemtranslate')}
+					</Button>
+					<Button variant="secondary" disabled={!audit} onClick={() => downloadReport(pkg, audit)}>
+						{__('Download JSON', 'gemtranslate')}
 					</Button>
 					<Button loading={running} onClick={onRerun}>
 						{running && progress
@@ -142,9 +170,20 @@ export default function AuditModal({ pkg, onClose, onRerun, running, progress })
 						</div>
 					)}
 
+					{allOfType.length > VISIBLE_ROWS && (
+						<p className="gtrans-mb-0 gtrans-mt-3 gtrans-text-xs gtrans-text-muted">
+							{sprintf(
+								/* translators: 1: rows shown, 2: total rows. */
+								__('Showing the first %1$d of %2$d. Download the JSON for the full list.', 'gemtranslate'),
+								VISIBLE_ROWS,
+								allOfType.length
+							)}
+						</p>
+					)}
+
 					{audit.truncated && (
 						<p className="gtrans-mb-0 gtrans-mt-3 gtrans-text-xs gtrans-text-muted">
-							{__('The list is capped; the counts above are complete.', 'gemtranslate')}
+							{__('The stored list is capped at 3,000 findings; the counts above are complete.', 'gemtranslate')}
 						</p>
 					)}
 				</>
