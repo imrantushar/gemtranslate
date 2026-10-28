@@ -6,6 +6,7 @@ import MenuToggle from './MenuToggle';
 import { TOPBAR_ACTIONS_ID } from './TopbarActions';
 import { NAV } from './Sidebar';
 import { useThemeMode } from '../lib/theme';
+import { canManage } from '../lib/currentUser';
 
 export default function Topbar({ collapsed, onToggle }) {
 	const { pathname } = useLocation();
@@ -14,12 +15,12 @@ export default function Topbar({ collapsed, onToggle }) {
 	const current = NAV.find((item) => pathname === item.to || pathname.startsWith(`${item.to}/`));
 
 	return (
-		<header className="gtrans-topbar gtrans-flex gtrans-h-14 gtrans-flex-shrink-0 gtrans-items-center gtrans-justify-between gtrans-border-b gtrans-border-edge gtrans-bg-surface gtrans-px-4">
+		<header className="gtrans-topbar gtrans-flex gtrans-h-[72px] gtrans-flex-shrink-0 gtrans-items-center gtrans-justify-between gtrans-border-b gtrans-border-edge gtrans-bg-surface gtrans-px-5">
 			<div className="gtrans-flex gtrans-items-center gtrans-gap-3">
-				<span className="gtrans-flex gtrans-h-8 gtrans-w-8 gtrans-flex-shrink-0 gtrans-items-center gtrans-justify-center gtrans-rounded-lg gtrans-bg-primary gtrans-text-white" aria-hidden="true">
+				<span className="gtrans-flex gtrans-h-[34px] gtrans-w-[34px] gtrans-flex-shrink-0 gtrans-items-center gtrans-justify-center gtrans-rounded-lg gtrans-bg-primary gtrans-text-white" aria-hidden="true">
 					<span className="dashicons dashicons-translation" style={{ width: 20, height: 20, fontSize: 20 }} />
 				</span>
-				<span className="gtrans-text-base gtrans-font-semibold gtrans-text-ink">
+				<span className="gtrans-text-lg gtrans-font-semibold gtrans-text-ink">
 					gem<span className="gtrans-text-primary">Translate</span>
 				</span>
 
@@ -30,13 +31,13 @@ export default function Topbar({ collapsed, onToggle }) {
 					</span>
 				)}
 
-				{collapsed && <MenuToggle collapsed={collapsed} onToggle={onToggle} />}
+				{canManage && collapsed && <MenuToggle collapsed={collapsed} onToggle={onToggle} />}
 			</div>
 
 			<div className="gtrans-flex gtrans-items-center gtrans-gap-3">
 				{/* Pages portal their primary actions here (see <TopbarActions>). */}
 				<div id={TOPBAR_ACTIONS_ID} className="gtrans-flex gtrans-items-center gtrans-gap-2" />
-				<span className="gtrans-rounded-full gtrans-border gtrans-border-line gtrans-px-2 gtrans-py-0.5 gtrans-text-2xs gtrans-text-muted">
+				<span className="gtrans-rounded-full gtrans-border gtrans-border-line gtrans-px-2 gtrans-py-0.5 gtrans-text-xs gtrans-text-muted">
 					v{window.gtrans?.version || '1.0.0'}
 				</span>
 				<button
@@ -44,7 +45,7 @@ export default function Topbar({ collapsed, onToggle }) {
 					onClick={toggleTheme}
 					title={themeLabel}
 					aria-label={themeLabel}
-					className="gtrans-bare gtrans-flex gtrans-h-9 gtrans-w-9 gtrans-cursor-pointer gtrans-items-center gtrans-justify-center gtrans-rounded-md gtrans-border gtrans-border-solid gtrans-border-line gtrans-bg-surface gtrans-p-0 gtrans-text-description hover:gtrans-text-primary"
+					className="gtrans-bare gtrans-flex gtrans-h-10 gtrans-w-10 gtrans-cursor-pointer gtrans-items-center gtrans-justify-center gtrans-rounded-md gtrans-border gtrans-border-solid gtrans-border-line gtrans-bg-surface gtrans-p-0 gtrans-text-description hover:gtrans-text-primary"
 				>
 					<Icon name={isDark ? 'sun' : 'moon'} size={18} />
 				</button>

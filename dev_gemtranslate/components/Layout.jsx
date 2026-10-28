@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
+import { canManage } from '../lib/currentUser';
 
 const STORAGE_KEY = 'gtrans_menu_collapsed';
 
@@ -30,7 +31,8 @@ export default function Layout({ children }) {
 		<div className="gtrans-app">
 			<Topbar collapsed={collapsed} onToggle={toggle} />
 			<div className="gtrans-flex gtrans-min-w-0 gtrans-flex-1">
-				<Sidebar collapsed={collapsed} onToggle={toggle} />
+				{/* Translators only have the assignments screen, so no menu for them. */}
+				{canManage && <Sidebar collapsed={collapsed} onToggle={toggle} />}
 				<main className="gtrans-min-w-0 gtrans-flex-1 gtrans-overflow-x-clip gtrans-bg-body gtrans-p-6">
 					{children}
 				</main>
