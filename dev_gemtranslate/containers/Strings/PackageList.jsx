@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
@@ -22,6 +22,7 @@ import { formatErrorMessage } from '../../lib/format';
  * its dedicated editor.
  */
 export default function PackageList() {
+	const navigate = useNavigate();
 	const packages = usePackages();
 	const languages = useLanguages();
 	const scan = useScanPackage();
@@ -199,6 +200,15 @@ export default function PackageList() {
 				<AuditModal
 					pkg={auditView}
 					onClose={() => setAuditView(null)}
+					onStart={
+						firstTargetLang
+							? () => {
+									const slug = auditView.slug;
+									setAuditView(null);
+									navigate(`/strings/${slug}/${firstTargetLang}`);
+							  }
+							: undefined
+					}
 					onRerun={() => onAudit(auditView, { openAfter: false })}
 					running={auditingSlug === auditView.slug}
 					progress={auditingSlug === auditView.slug ? auditProgress : null}

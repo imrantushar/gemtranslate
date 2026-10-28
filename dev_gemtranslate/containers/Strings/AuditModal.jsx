@@ -58,7 +58,7 @@ export function auditIssueCount(audit) {
 	return (audit.missing_domain || 0) + (audit.wrong_domain || 0) + (audit.hardcoded || 0);
 }
 
-export default function AuditModal({ pkg, onClose, onRerun, running, progress }) {
+export default function AuditModal({ pkg, onClose, onStart, onRerun, running, progress }) {
 	const detail = usePackageAudit(pkg.slug);
 	const [type, setType] = useState('');
 
@@ -86,13 +86,10 @@ export default function AuditModal({ pkg, onClose, onRerun, running, progress })
 			)}
 			footer={
 				<>
-					<Button variant="secondary" onClick={onClose}>
-						{__('Close', 'gemtranslate')}
-					</Button>
 					<Button variant="secondary" disabled={!audit} onClick={() => downloadReport(pkg, audit)}>
 						{__('Download JSON', 'gemtranslate')}
 					</Button>
-					<Button loading={running} onClick={onRerun}>
+					<Button variant="secondary" loading={running} onClick={onRerun}>
 						{running && progress
 							? sprintf(
 									/* translators: 1: files done, 2: total files. */
@@ -101,6 +98,17 @@ export default function AuditModal({ pkg, onClose, onRerun, running, progress })
 									progress.total
 								)
 							: __('Re-run audit', 'gemtranslate')}
+					</Button>
+					<Button
+						disabled={!onStart || !(pkg.string_count > 0)}
+						title={
+							pkg.string_count > 0
+								? undefined
+								: __('Scan this plugin first to find its strings.', 'gemtranslate')
+						}
+						onClick={onStart}
+					>
+						{__('Start translating →', 'gemtranslate')}
 					</Button>
 				</>
 			}
