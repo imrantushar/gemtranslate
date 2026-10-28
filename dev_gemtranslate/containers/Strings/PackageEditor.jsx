@@ -224,8 +224,8 @@ export default function PackageEditor() {
 	return (
 		<>
 			<TopbarActions>
-				<Button variant="ghost" loading={scan.isPending} onClick={onRescan}>
-					{__('Re-scan', 'gemtranslate')}
+				<Button variant="secondary" onClick={() => setAiOpen(true)}>
+					{__('Translate with AI', 'gemtranslate')}
 				</Button>
 				<ExportMenu
 					onExport={onExport}
@@ -291,9 +291,6 @@ export default function PackageEditor() {
 								</option>
 							))}
 						</Select>
-						<Link to="/strings" className="gtrans-text-sm gtrans-text-primary gtrans-no-underline">
-							{__('← Back to plugins', 'gemtranslate')}
-						</Link>
 					</div>
 				</header>
 
@@ -315,6 +312,9 @@ export default function PackageEditor() {
 						</div>
 	
 						<div className="gtrans-ml-auto gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-justify-end gtrans-gap-2">
+							<Button variant="secondary" loading={scan.isPending} onClick={onRescan}>
+								{__('Re-scan', 'gemtranslate')}
+							</Button>
 							<SearchBox
 								className="gtrans-w-52"
 								value={search}
@@ -431,7 +431,7 @@ function StringRow({ row, draft, wpOrgProjectUrl, onChange }) {
 					{row.source}
 				</div>
 				{(row.file_ref || row.context) && (
-					<div className="gtrans-mt-1.5 gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-x-3 gtrans-gap-y-1 gtrans-text-11 gtrans-text-muted">
+					<div className="gtrans-mt-1.5 gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-x-3 gtrans-gap-y-1 gtrans-text-xs gtrans-text-muted">
 						{row.file_ref && (
 							<span title={row.file_ref} className="gtrans-font-mono">
 								{shortRef(row.file_ref)}
@@ -457,7 +457,7 @@ function StringRow({ row, draft, wpOrgProjectUrl, onChange }) {
 						<button
 							type="button"
 							onClick={() => onChange(row.string_id, row.source || '')}
-							className="gtrans-bare gtrans-cursor-pointer gtrans-border-0 gtrans-bg-transparent gtrans-p-0 gtrans-text-11 gtrans-text-primary hover:gtrans-underline"
+							className="gtrans-bare gtrans-cursor-pointer gtrans-border-0 gtrans-bg-transparent gtrans-p-0 gtrans-text-xs gtrans-text-primary hover:gtrans-underline"
 						>
 							{__('Copy source', 'gemtranslate')}
 						</button>
@@ -487,7 +487,7 @@ function StringRow({ row, draft, wpOrgProjectUrl, onChange }) {
 							href={`${wpOrgProjectUrl}?filters[term]=${encodeURIComponent(row.source)}`}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="gtrans-text-11 gtrans-text-muted gtrans-no-underline hover:gtrans-text-primary"
+							className="gtrans-text-xs gtrans-text-muted gtrans-no-underline hover:gtrans-text-primary"
 						>
 							{__('Suggest on WP.org →', 'gemtranslate')}
 						</a>
@@ -504,7 +504,7 @@ function ExportMenu({ onExport, loading, pkg, lang, wpOrgProjectUrl }) {
 
 	return (
 		<div className="gtrans-relative">
-			<Button variant="ghost" loading={loading} onClick={() => setOpen((o) => !o)}>
+			<Button variant="secondary" loading={loading} onClick={() => setOpen((o) => !o)}>
 				{__('Export ▾', 'gemtranslate')}
 			</Button>
 			{open && (
