@@ -14,7 +14,6 @@ import PackageEditor from './containers/Strings/PackageEditor';
 import StringsLegacy from './containers/Strings/StringsLegacy';
 import Terms from './containers/Terms';
 import Menus from './containers/Menus';
-import SeoPage from './containers/SEO';
 import TranslatorsPage from './containers/Translators';
 import MigrationPage from './containers/Migration';
 import ImportExportPage from './containers/ImportExport';
@@ -76,22 +75,6 @@ export default function App() {
 				<Route path="/strings/legacy" element={<StringsLegacy />} />
 				<Route path="/strings/:slug/:lang" element={<PackageEditor />} />
 				<Route path="/menus" element={<Menus />} />
-				<Route
-					path="/seo"
-					element={
-						<ProGate
-							feature="seo_advanced"
-							header={__('SEO', 'gemtranslate')}
-							title={__('Advanced multilingual SEO', 'gemtranslate')}
-							description={__(
-								'Translate SEO titles, meta descriptions and Open Graph, with Yoast and Rank Math integration — with GemTranslate Pro.',
-								'gemtranslate'
-							)}
-						>
-							<SeoPage />
-						</ProGate>
-					}
-				/>
 				<Route
 					path="/translators"
 					element={
