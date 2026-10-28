@@ -149,8 +149,8 @@ function TokenChip({ number, html }) {
 			title={html}
 			className="gtrans-inline-flex gtrans-items-center gtrans-gap-1 gtrans-rounded gtrans-bg-body gtrans-px-1.5 gtrans-py-0.5 gtrans-text-label"
 		>
-			<code className="gtrans-text-[11px]">{`{${number}}`}</code>
-			<span className="gtrans-text-[11px]">= {label}</span>
+			<code className="gtrans-text-xs">{`{${number}}`}</code>
+			<span className="gtrans-text-xs">= {label}</span>
 		</span>
 	);
 }

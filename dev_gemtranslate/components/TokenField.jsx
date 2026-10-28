@@ -47,7 +47,7 @@ export default function TokenField({
 			span.setAttribute('data-n', String(n));
 			span.setAttribute('title', `${meta.label} — ${meta.raw}`);
 			span.className =
-				'gtrans-tok gtrans-inline-flex gtrans-items-center gtrans-align-baseline gtrans-mx-0.5 gtrans-rounded gtrans-bg-indigo-100 gtrans-px-1 gtrans-text-[11px] gtrans-font-semibold gtrans-text-indigo-700 gtrans-select-none';
+				'gtrans-tok gtrans-inline-flex gtrans-items-center gtrans-align-baseline gtrans-mx-0.5 gtrans-rounded gtrans-bg-indigo-100 gtrans-px-1 gtrans-text-xs gtrans-font-semibold gtrans-text-indigo-700 gtrans-select-none';
 			span.textContent = meta.glyph;
 			return span;
 		},

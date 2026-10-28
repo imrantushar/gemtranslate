@@ -288,7 +288,7 @@ function SegmentRow({
 							type="button"
 							title={a.label}
 							onClick={() => insertRef.current && insertRef.current(a)}
-							className="gtrans-bare gtrans-rounded gtrans-border gtrans-border-line gtrans-bg-surface gtrans-px-1.5 gtrans-py-0.5 gtrans-text-[11px] gtrans-font-semibold gtrans-text-muted hover:gtrans-bg-body"
+							className="gtrans-bare gtrans-rounded gtrans-border gtrans-border-line gtrans-bg-surface gtrans-px-1.5 gtrans-py-0.5 gtrans-text-xs gtrans-font-semibold gtrans-text-muted hover:gtrans-bg-body"
 						>
 							{a.glyph}
 						</button>
@@ -298,7 +298,7 @@ function SegmentRow({
 						type="button"
 						title={__('Copy source', 'gemtranslate')}
 						onClick={() => onChange(seg.core)}
-						className="gtrans-bare gtrans-rounded gtrans-border gtrans-border-line gtrans-bg-surface gtrans-px-1.5 gtrans-py-0.5 gtrans-text-[11px] gtrans-text-muted hover:gtrans-bg-body"
+						className="gtrans-bare gtrans-rounded gtrans-border gtrans-border-line gtrans-bg-surface gtrans-px-1.5 gtrans-py-0.5 gtrans-text-xs gtrans-text-muted hover:gtrans-bg-body"
 					>
 						⧉
 					</button>
@@ -313,7 +313,7 @@ function SegmentRow({
 				/>
 
 				{mismatch && (
-					<div className="gtrans-mt-1 gtrans-text-[11px] gtrans-text-amber-700">
+					<div className="gtrans-mt-1 gtrans-text-xs gtrans-text-amber-700">
 						{sprintf(
 							/* translators: 1: source token count, 2: translation token count. */
 							__(
@@ -368,7 +368,7 @@ function renderSource(text, tokens) {
 				<span
 					key={i}
 					title={`${meta.label} — ${meta.raw}`}
-					className="gtrans-tok gtrans-mx-0.5 gtrans-inline-flex gtrans-items-center gtrans-rounded gtrans-bg-indigo-100 gtrans-px-1 gtrans-text-[11px] gtrans-font-semibold gtrans-text-indigo-700"
+					className="gtrans-tok gtrans-mx-0.5 gtrans-inline-flex gtrans-items-center gtrans-rounded gtrans-bg-indigo-100 gtrans-px-1 gtrans-text-xs gtrans-font-semibold gtrans-text-indigo-700"
 				>
 					{meta.glyph}
 				</span>

@@ -18,6 +18,9 @@ body.toplevel_page_gemtranslate #wpfooter {
 #gemtranslate-admin-root {
 	--gtrans-topbar-h: 72px;
 	margin: 0;
+	/* GemCRM body default: 14px / 20px (wp-admin's 13px is too small). */
+	font-size: 14px;
+	line-height: 20px;
 	font-family: var(--gtrans-font);
 	color: var(--gtrans-font-color);
 	background: var(--gtrans-body-background);
@@ -196,6 +199,11 @@ body.toplevel_page_gemtranslate #wpfooter {
 
 /* react-select (classNamePrefix="gtrans-select"). Menu is portaled to
    <body> (outside #gemtranslate-admin-root), so these rules are global. */
+.gtrans-select__control,
+.gtrans-select__menu {
+	font-size: 14px;
+	line-height: 20px;
+}
 .gtrans-select__control {
 	background-color: var(--gtrans-background) !important;
 	/* react-select's own 1px border loses to the border-width reset above. */
