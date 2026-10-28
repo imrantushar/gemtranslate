@@ -85,11 +85,11 @@ function SubMenu({ items, openAssignments }) {
 		<div className="gtrans-ml-5 gtrans-mt-1 gtrans-flex gtrans-flex-col gtrans-gap-0.5 gtrans-border-l gtrans-border-edge gtrans-pl-3">
 			{items.map((child) => {
 				const current = child.param ? params.get(child.param) : null;
-				const active = child.param
-					? current
-						? current === child.key
-						: child.isDefault
-					: pathname === child.to || pathname.startsWith(`${child.to}/`);
+				const childPath = child.to.split('?')[0];
+				const onChildPage = pathname === childPath || pathname.startsWith(`${childPath}/`);
+				const active = onChildPage && (
+					child.param ? (current ? current === child.key : child.isDefault) : true
+				);
 				return (
 					<Link
 						key={child.key}
