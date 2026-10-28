@@ -421,11 +421,17 @@ input:where([type='file']):focus{
 #gemtranslate-admin-root .gtrans-right-1{
 	left: 0.25rem;
 }
+#gemtranslate-admin-root .gtrans-right-1\.5{
+	left: 0.375rem;
+}
 #gemtranslate-admin-root .gtrans-right-3{
 	left: 0.75rem;
 }
 #gemtranslate-admin-root .gtrans-right-6{
 	left: 1.5rem;
+}
+#gemtranslate-admin-root .gtrans-top-1\.5{
+	top: 0.375rem;
 }
 #gemtranslate-admin-root .gtrans-top-1\/2{
 	top: 50%;
@@ -451,10 +457,6 @@ input:where([type='file']):focus{
 #gemtranslate-admin-root .gtrans-mx-0\.5{
 	margin-right: 0.125rem;
 	margin-left: 0.125rem;
-}
-#gemtranslate-admin-root .gtrans-mx-1{
-	margin-right: 0.25rem;
-	margin-left: 0.25rem;
 }
 #gemtranslate-admin-root .gtrans-mx-2{
 	margin-right: 0.5rem;
@@ -683,9 +685,6 @@ input:where([type='file']):focus{
 #gemtranslate-admin-root .gtrans-w-24{
 	width: 6rem;
 }
-#gemtranslate-admin-root .gtrans-w-3\.5{
-	width: 0.875rem;
-}
 #gemtranslate-admin-root .gtrans-w-3\/4{
 	width: 75%;
 }
@@ -805,6 +804,9 @@ input:where([type='file']):focus{
 	flex: 1 1 0%;
 }
 #gemtranslate-admin-root .gtrans-flex-shrink-0{
+	flex-shrink: 0;
+}
+#gemtranslate-admin-root .gtrans-shrink-0{
 	flex-shrink: 0;
 }
 #gemtranslate-admin-root .gtrans-border-collapse{
@@ -1152,10 +1154,6 @@ input:where([type='file']):focus{
 	--tw-bg-opacity: 1;
 	background-color: rgb(209 213 219 / var(--tw-bg-opacity, 1));
 }
-#gemtranslate-admin-root .gtrans-bg-green-50{
-	--tw-bg-opacity: 1;
-	background-color: rgb(240 253 244 / var(--tw-bg-opacity, 1));
-}
 #gemtranslate-admin-root .gtrans-bg-green-500{
 	--tw-bg-opacity: 1;
 	background-color: rgb(34 197 94 / var(--tw-bg-opacity, 1));
@@ -1210,9 +1208,6 @@ input:where([type='file']):focus{
 }
 #gemtranslate-admin-root .gtrans-p-2{
 	padding: 0.5rem;
-}
-#gemtranslate-admin-root .gtrans-p-2\.5{
-	padding: 0.625rem;
 }
 #gemtranslate-admin-root .gtrans-p-3{
 	padding: 0.75rem;
@@ -1333,6 +1328,9 @@ input:where([type='file']):focus{
 #gemtranslate-admin-root .gtrans-pl-3{
 	padding-right: 0.75rem;
 }
+#gemtranslate-admin-root .gtrans-pr-11{
+	padding-left: 2.75rem;
+}
 #gemtranslate-admin-root .gtrans-pr-3{
 	padding-left: 0.75rem;
 }
@@ -1344,6 +1342,9 @@ input:where([type='file']):focus{
 }
 #gemtranslate-admin-root .gtrans-pt-1\.5{
 	padding-top: 0.375rem;
+}
+#gemtranslate-admin-root .gtrans-pt-2\.5{
+	padding-top: 0.625rem;
 }
 #gemtranslate-admin-root .gtrans-pt-3{
 	padding-top: 0.75rem;
@@ -1473,10 +1474,6 @@ input:where([type='file']):focus{
 	--tw-text-opacity: 1;
 	color: rgb(6 95 70 / var(--tw-text-opacity, 1));
 }
-#gemtranslate-admin-root .gtrans-text-green-700{
-	--tw-text-opacity: 1;
-	color: rgb(21 128 61 / var(--tw-text-opacity, 1));
-}
 #gemtranslate-admin-root .gtrans-text-heading{
 	color: var(--gtrans-heading-color);
 }
@@ -1523,6 +1520,9 @@ input:where([type='file']):focus{
 }
 #gemtranslate-admin-root .gtrans-no-underline{
 	text-decoration-line: none;
+}
+#gemtranslate-admin-root .gtrans-accent-green-500{
+	accent-color: #22c55e;
 }
 #gemtranslate-admin-root .gtrans-opacity-50{
 	opacity: 0.5;
@@ -1893,6 +1893,11 @@ body.toplevel_page_gemtranslate #wpfooter {
 }
 
 /* ---- Advanced editor: token-aware contentEditable field ---- */
+/* Preflight is off, so a w-full field with padding + border would otherwise be
+   content-box and spill past its column by the padding width. */
+#gemtranslate-admin-root .gtrans-tokenfield {
+	box-sizing: border-box;
+}
 #gemtranslate-admin-root .gtrans-tokenfield:empty::before {
 	content: attr(data-placeholder);
 	color: var(--gtrans-placeholder);
@@ -2039,14 +2044,17 @@ body.toplevel_page_gemtranslate #wpfooter {
 	}
 }
 @media (min-width: 1024px){
+	#gemtranslate-admin-root .lg\:gtrans-block{
+		display: block;
+	}
+	#gemtranslate-admin-root .lg\:gtrans-hidden{
+		display: none;
+	}
 	#gemtranslate-admin-root .lg\:gtrans-grid-cols-2{
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
-	#gemtranslate-admin-root .lg\:gtrans-grid-cols-\[1fr_1fr_auto\]{
-		grid-template-columns: 1fr 1fr auto;
-	}
-	#gemtranslate-admin-root .lg\:gtrans-pt-6{
-		padding-top: 1.5rem;
+	#gemtranslate-admin-root .lg\:gtrans-grid-cols-\[auto_minmax\(0\2c 1fr\)_minmax\(0\2c 1fr\)\]{
+		grid-template-columns: auto minmax(0,1fr) minmax(0,1fr);
 	}
 }
 @media (min-width: 1280px){
