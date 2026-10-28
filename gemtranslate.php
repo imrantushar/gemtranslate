@@ -84,7 +84,6 @@ final class GemTranslate {
 		GemTranslate\Routing::init();
 		GemTranslate\Translation::init();
 		GemTranslate\SEO::init();
-		GemTranslate\AI::init();
 		GemTranslate\Cache::init();
 		GemTranslate\Compat::init();
 		GemTranslate\API::init();

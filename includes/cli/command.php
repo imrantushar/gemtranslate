@@ -7,7 +7,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use GemTranslate\AI\JobRunner;
 use GemTranslate\AI\TranslationMemory;
-use GemTranslate\AI\TranslatorFactory;
 use GemTranslate\I18n\PackGenerator;
 use GemTranslate\Language\Context;
 use GemTranslate\Language\LanguageRegistry;

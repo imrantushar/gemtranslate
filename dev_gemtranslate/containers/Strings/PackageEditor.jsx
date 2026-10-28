@@ -16,13 +16,10 @@ import { useStrings } from '../../hooks/useStrings';
 import {
 	useBulkSaveStrings,
 	useExportPackage,
-	useMemorySuggestions,
 	usePackages,
 	useScanPackage,
-	useTranslateAllInPackage,
 } from '../../hooks/usePackages';
 import { useLanguages } from '../../hooks/useLanguages';
-import { useTranslateWithAI } from '../../hooks/useAI';
 import { formatErrorMessage } from '../../lib/format';
 
 const PAGE_SIZE = 50;
@@ -33,23 +30,18 @@ export default function PackageEditor() {
 	const packages = usePackages();
 	const languages = useLanguages();
 	const scan = useScanPackage();
-	const ai = useTranslateWithAI();
-	const bulkAI = useTranslateAllInPackage();
 	const bulkSave = useBulkSaveStrings();
 	const exportPack = useExportPackage();
-	const memorySuggestions = useMemorySuggestions();
 
 	const [page, setPage] = useState(1);
 	const [search, setSearch] = useState('');
 	const [statusFilter, setStatusFilter] = useState('all'); // all | untranslated | translated
 	const [drafts, setDrafts] = useState({}); // string_id -> {value, dirty}
-	const [memoryHits, setMemoryHits] = useState({}); // string_id -> suggested value
 	const [toast, setToast] = useState(null);
 
 	const pkg = (packages.data?.rows || []).find((p) => p.slug === slug) || null;
 	const targetLangs = (languages.data || []).filter((l) => !l.is_default);
 	const langRow = (languages.data || []).find((l) => l.code === lang);
-	const defaultLang = (languages.data || []).find((l) => l.is_default);
 
 	const apiStatus = statusFilter === 'all' ? '' : statusFilter;
 	const strings = useStrings({
@@ -61,8 +53,8 @@ export default function PackageEditor() {
 		status: apiStatus,
 	});
 
-	// On data load, pre-populate drafts from existing translations (so editing
-	// reflects current saved value) and request TM suggestions for empty rows.
+	// On data load, pre-populate drafts from existing translations so editing
+	// reflects the current saved value.
 	useEffect(() => {
 		if (!strings.data) return;
 		setDrafts((d) => {
@@ -77,20 +69,7 @@ export default function PackageEditor() {
 			});
 			return next;
 		});
-
-		// Request TM suggestions for rows that have NO translation in this language.
-		const candidates = (strings.data.rows || [])
-			.filter((r) => !r.translation || r.translation === '')
-			.map((r) => r.string_id);
-		if (candidates.length === 0 || !slug || !lang) return;
-		memorySuggestions.mutateAsync({ slug, lang, string_ids: candidates })
-			.then((hits) => {
-				if (!hits || typeof hits !== 'object') return;
-				setMemoryHits((m) => ({ ...m, ...hits }));
-			})
-			.catch(() => {});
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [strings.data, slug, lang]);
+	}, [strings.data]);
 
 	if (packages.isLoading || strings.isLoading || languages.isLoading) {
 		return <PageSkeleton />;
@@ -126,25 +105,6 @@ export default function PackageEditor() {
 		}));
 	};
 
-	const onAiOne = async (row) => {
-		try {
-			const res = await ai.mutateAsync({
-				text: row.source,
-				source_lang: defaultLang?.code || 'en',
-				target_lang: lang,
-				preserve_html: false,
-				use_memory: true,
-			});
-			onChange(row.string_id, res.translations);
-		} catch (err) {
-			setToast({ tone: 'error', message: formatErrorMessage(err) });
-		}
-	};
-
-	const onUseSuggestion = (id, value) => {
-		onChange(id, value);
-	};
-
 	const onSaveAll = async () => {
 		const translations = Object.entries(drafts)
 			.filter(([, d]) => d.dirty)
@@ -172,26 +132,6 @@ export default function PackageEditor() {
 					result?.saved ?? translations.length
 				),
 			});
-		} catch (err) {
-			setToast({ tone: 'error', message: formatErrorMessage(err) });
-		}
-	};
-
-	const onTranslateAll = async () => {
-		try {
-			const result = await bulkAI.mutateAsync({ slug, lang, status: 'draft' });
-			setToast({
-				tone: 'success',
-				message: sprintf(
-					/* translators: 1: total translated, 2: from memory, 3: from AI. */
-					__('Translated %1$d strings (%2$d from memory, %3$d from AI).', 'gemtranslate'),
-					result?.translated ?? 0,
-					result?.from_memory ?? 0,
-					result?.from_ai ?? 0
-				),
-			});
-			// Drop drafts so the refetched data lands; React Query already invalidated.
-			setDrafts({});
 		} catch (err) {
 			setToast({ tone: 'error', message: formatErrorMessage(err) });
 		}
@@ -305,14 +245,6 @@ export default function PackageEditor() {
 							}}
 						/>
 					<span className="gtrans-flex gtrans-items-center gtrans-gap-2">
-						<Button
-							size="sm"
-							variant="secondary"
-							loading={bulkAI.isPending}
-							onClick={onTranslateAll}
-						>
-							{__('Translate all untranslated with AI', 'gemtranslate')}
-						</Button>
 						<Button size="sm" variant="ghost" loading={scan.isPending} onClick={onRescan}>
 							{__('Re-scan', 'gemtranslate')}
 						</Button>
@@ -343,7 +275,7 @@ export default function PackageEditor() {
 
 				{/* ---- Rows ---- */}
 				{rows.length === 0 ? (
-					<Table.Empty columns={[__('Source', 'gemtranslate'), __('Translation', 'gemtranslate'), '']}>
+					<Table.Empty columns={[__('Source', 'gemtranslate'), __('Translation', 'gemtranslate')]}>
 						{statusFilter === 'untranslated'
 							? __('Nothing untranslated. Nice work.', 'gemtranslate')
 							: __('No strings match.', 'gemtranslate')}
@@ -354,7 +286,6 @@ export default function PackageEditor() {
 							<Table.Row>
 								<Table.ColumnHeader className="gtrans-w-1/2">{__('Source', 'gemtranslate')}</Table.ColumnHeader>
 								<Table.ColumnHeader>{__('Translation', 'gemtranslate')}</Table.ColumnHeader>
-								<Table.ColumnHeader className="gtrans-w-24" />
 							</Table.Row>
 						</Table.Header>
 						<Table.Body>
@@ -363,12 +294,8 @@ export default function PackageEditor() {
 									key={row.string_id}
 									row={row}
 									draft={drafts[row.string_id]}
-									suggestion={memoryHits[row.string_id]}
 									wpOrgProjectUrl={wpOrgProjectUrl}
 									onChange={onChange}
-									onAi={onAiOne}
-									onUseSuggestion={onUseSuggestion}
-									aiBusy={ai.isPending}
 								/>
 							))}
 						</Table.Body>
@@ -404,12 +331,11 @@ export default function PackageEditor() {
 	);
 }
 
-function StringRow({ row, draft, suggestion, wpOrgProjectUrl, onChange, onAi, onUseSuggestion, aiBusy }) {
+function StringRow({ row, draft, wpOrgProjectUrl, onChange }) {
 	const value = draft?.value ?? row.translation ?? '';
 	const dirty = draft?.dirty;
 	const status = draft?.status || row.translation_status || '';
 	const fromWpOrg = status === 'wp_org';
-	const hasSuggestion = !value && suggestion;
 
 	return (
 		<Table.Row
@@ -455,18 +381,6 @@ function StringRow({ row, draft, suggestion, wpOrgProjectUrl, onChange, onAi, on
 							{__('Unsaved', 'gemtranslate')}
 						</span>
 					)}
-					{hasSuggestion && (
-						<button
-							type="button"
-							onClick={() => onUseSuggestion(row.string_id, suggestion)}
-							className="gtrans-bare gtrans-inline-flex gtrans-items-center gtrans-gap-1 gtrans-rounded gtrans-bg-indigo-50 gtrans-px-1.5 gtrans-py-0.5 gtrans-text-indigo-700 hover:gtrans-bg-indigo-100"
-							title={suggestion}
-						>
-							💡 {__('Used elsewhere:', 'gemtranslate')}{' '}
-							<span className="gtrans-italic">{truncate(suggestion, 40)}</span>
-							<span className="gtrans-ml-1 gtrans-font-semibold">{__('Use', 'gemtranslate')}</span>
-						</button>
-					)}
 					{wpOrgProjectUrl && status === 'translated' && !dirty && (
 						<a
 							href={`${wpOrgProjectUrl}?filters[term]=${encodeURIComponent(row.source)}`}
@@ -478,11 +392,6 @@ function StringRow({ row, draft, suggestion, wpOrgProjectUrl, onChange, onAi, on
 						</a>
 					)}
 				</div>
-			</Table.Cell>
-			<Table.Cell className="gtrans-text-right">
-				<Button size="sm" variant="ghost" loading={aiBusy} onClick={() => onAi(row)}>
-					{__('AI', 'gemtranslate')}
-				</Button>
 			</Table.Cell>
 		</Table.Row>
 	);
@@ -549,9 +458,4 @@ function ExportMenu({ onExport, loading, pkg, lang, wpOrgProjectUrl }) {
 			)}
 		</div>
 	);
-}
-
-function truncate(s, n) {
-	const str = String(s || '');
-	return str.length > n ? str.slice(0, n - 1) + '…' : str;
 }

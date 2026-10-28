@@ -34,18 +34,6 @@ export function getProFeature(key) {
 				{ icon: 'globe', title: __('hreflang & sitemaps', 'gemtranslate'), desc: __('Language alternates and per-language sitemap entries for search engines.', 'gemtranslate') },
 			],
 		},
-		glossary: {
-			title: __('Glossary & do-not-translate terms', 'gemtranslate'),
-			description: __(
-				'Keep brand names and key terms consistent across every translation, whether a human or an AI does the work.',
-				'gemtranslate'
-			),
-			items: [
-				{ icon: 'book', title: __('Preferred translations', 'gemtranslate'), desc: __('Define exactly how a term is translated for each language pair.', 'gemtranslate') },
-				{ icon: 'check', title: __('Do-not-translate', 'gemtranslate'), desc: __('Protect brand names and product terms from being translated.', 'gemtranslate') },
-				{ icon: 'sparkles', title: __('Applied to AI output', 'gemtranslate'), desc: __('Glossary rules are fed to the AI provider on every request.', 'gemtranslate') },
-			],
-		},
 		ai_bulk: {
 			title: __('Bulk & background translation', 'gemtranslate'),
 			description: __(

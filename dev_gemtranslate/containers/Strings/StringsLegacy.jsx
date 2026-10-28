@@ -13,14 +13,12 @@ import { Field, TextInput, TextArea } from '../../components/Input';
 import { Select } from '../../components/ui/Select';
 import { useScanStrings, useSaveStringTranslation, useStringDomains, useStrings } from '../../hooks/useStrings';
 import { useLanguages } from '../../hooks/useLanguages';
-import { useTranslateWithAI } from '../../hooks/useAI';
 import { formatErrorMessage, truncate } from '../../lib/format';
 
 export default function StringsLegacy() {
 	const languages = useLanguages();
 	const langs = languages.data || [];
 	const nonDefault = langs.filter((l) => !l.is_default);
-	const defaultLang = langs.find((l) => l.is_default);
 
 	const [filters, setFilters] = useState({
 		page: 1,
@@ -33,7 +31,6 @@ export default function StringsLegacy() {
 	const domains = useStringDomains();
 	const save = useSaveStringTranslation();
 	const scan = useScanStrings();
-	const ai = useTranslateWithAI();
 	const [drafts, setDrafts] = useState({});
 	const [toast, setToast] = useState(null);
 
@@ -46,21 +43,6 @@ export default function StringsLegacy() {
 		try {
 			await save.mutateAsync({ id, lang: filters.lang, value, status: 'translated' });
 			setToast({ tone: 'success', message: __('Translation saved.', 'gemtranslate') });
-		} catch (err) {
-			setToast({ tone: 'error', message: formatErrorMessage(err) });
-		}
-	};
-
-	const onAI = async (row) => {
-		try {
-			const res = await ai.mutateAsync({
-				text: row.source,
-				source_lang: defaultLang?.code || 'en',
-				target_lang: filters.lang,
-				preserve_html: false,
-				use_memory: true,
-			});
-			setDrafts((d) => ({ ...d, [row.string_id]: res.translations }));
 		} catch (err) {
 			setToast({ tone: 'error', message: formatErrorMessage(err) });
 		}
@@ -181,14 +163,9 @@ export default function StringsLegacy() {
 										</Table.Cell>
 										<Table.Cell className="gtrans-text-xs gtrans-text-muted">{row.domain || '—'}</Table.Cell>
 										<Table.Cell className="gtrans-text-right">
-											<div className="gtrans-flex gtrans-flex-col gtrans-gap-1">
-												<Button size="sm" onClick={() => onSave(row.string_id)}>
-													{__('Save', 'gemtranslate')}
-												</Button>
-												<Button size="sm" variant="ghost" onClick={() => onAI(row)}>
-													{__('AI', 'gemtranslate')}
-												</Button>
-											</div>
+											<Button size="sm" onClick={() => onSave(row.string_id)}>
+												{__('Save', 'gemtranslate')}
+											</Button>
 										</Table.Cell>
 									</Table.Row>
 								);

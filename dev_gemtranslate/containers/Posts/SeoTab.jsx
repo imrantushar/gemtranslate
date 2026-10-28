@@ -6,7 +6,6 @@ import Button from '../../components/Button';
 import { Field, TextInput, TextArea } from '../../components/Input';
 import { FormSkeleton } from '../../components/Skeleton';
 import { usePostSeo, useSavePostSeo } from '../../hooks/useSeo';
-import { useTranslateWithAI } from '../../hooks/useAI';
 import { formatErrorMessage } from '../../lib/format';
 
 const FIELDS = [
@@ -17,10 +16,9 @@ const FIELDS = [
 	{ key: 'canonical_override', label: () => __('Canonical override', 'gemtranslate') },
 ];
 
-export default function SeoTab({ postId, sourceLang, targetLang, onToast }) {
+export default function SeoTab({ postId, targetLang, onToast }) {
 	const seo = usePostSeo(postId, targetLang);
 	const save = useSavePostSeo();
-	const ai = useTranslateWithAI();
 	const [form, setForm] = useState({});
 
 	useEffect(() => {
@@ -46,43 +44,20 @@ export default function SeoTab({ postId, sourceLang, targetLang, onToast }) {
 		}
 	};
 
-	const aiFill = async (key) => {
-		const original = (form[key] || '').trim();
-		const source = original || (key === 'meta_title' || key === 'og_title' ? __('(no source)', 'gemtranslate') : '');
-		if (!source) return;
-		try {
-			const res = await ai.mutateAsync({
-				text: source,
-				source_lang: sourceLang,
-				target_lang: targetLang,
-				preserve_html: false,
-				use_memory: true,
-			});
-			setForm((f) => ({ ...f, [key]: res.translations }));
-		} catch (err) {
-			onToast({ tone: 'error', message: formatErrorMessage(err) });
-		}
-	};
-
 	if (seo.isLoading) return <FormSkeleton />;
 
 	return (
 		<Card title={__('SEO meta for this translation', 'gemtranslate')}>
 			<form onSubmit={submit} className="gtrans-flex gtrans-flex-col gtrans-gap-3">
 				{FIELDS.map((f) => (
-					<div key={f.key} className="gtrans-flex gtrans-items-end gtrans-gap-2">
-						<div className="gtrans-flex-1">
-							<Field label={f.label()}>
-								{f.key.includes('desc') ? (
-									<TextArea rows={3} value={form[f.key] || ''} onChange={set(f.key)} />
-								) : (
-									<TextInput value={form[f.key] || ''} onChange={set(f.key)} />
-								)}
-							</Field>
-						</div>
-						<Button variant="ghost" size="sm" onClick={() => aiFill(f.key)}>
-							{__('AI', 'gemtranslate')}
-						</Button>
+					<div key={f.key}>
+						<Field label={f.label()}>
+							{f.key.includes('desc') ? (
+								<TextArea rows={3} value={form[f.key] || ''} onChange={set(f.key)} />
+							) : (
+								<TextInput value={form[f.key] || ''} onChange={set(f.key)} />
+							)}
+						</Field>
 					</div>
 				))}
 				<div className="gtrans-flex gtrans-justify-end">

@@ -16,8 +16,6 @@ import StringsLegacy from './containers/Strings/StringsLegacy';
 import Terms from './containers/Terms';
 import Menus from './containers/Menus';
 import SeoPage from './containers/SEO';
-import AIPage from './containers/AI';
-import GlossaryPage from './containers/Glossary';
 import JobsPage from './containers/Jobs';
 import TranslatorsPage from './containers/Translators';
 import MigrationPage from './containers/Migration';
@@ -90,23 +88,6 @@ export default function App() {
 							)}
 						>
 							<SeoPage />
-						</ProGate>
-					}
-				/>
-				<Route path="/ai" element={<AIPage />} />
-				<Route
-					path="/glossary"
-					element={
-						<ProGate
-							feature="glossary"
-							header={__('Glossary', 'gemtranslate')}
-							title={__('Glossary & do-not-translate terms', 'gemtranslate')}
-							description={__(
-								'Keep brand terms and proper nouns consistent across every translation — with GemTranslate Pro.',
-								'gemtranslate'
-							)}
-						>
-							<GlossaryPage />
 						</ProGate>
 					}
 				/>

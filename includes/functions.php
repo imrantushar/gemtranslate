@@ -51,8 +51,6 @@ if ( ! function_exists( 'gtrans_feature_flags' ) ) {
 		$defaults = [
 			'ai_bulk'             => false, // Bulk AI translation.
 			'translate_everything' => false, // Auto-translate on publish + review queue.
-			'translation_memory'  => false,
-			'glossary'            => false,
 			'woocommerce'         => false,
 			'seo_advanced'        => false, // Yoast/RankMath bridges + per-translation meta.
 			'country_variants'    => false,

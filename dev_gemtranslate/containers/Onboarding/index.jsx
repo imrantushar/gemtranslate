@@ -7,11 +7,8 @@ import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
 import Stepper from '../../components/Stepper';
-import { Checkbox, Field, TextInput } from '../../components/Input';
-import { Select } from '../../components/ui/Select';
 import { PageSkeleton } from '../../components/Skeleton';
 import { useLanguages, useCreateLanguage } from '../../hooks/useLanguages';
-import { useAIProviders, useSaveAIProviders, useTestAIProvider } from '../../hooks/useAI';
 import { useSaveSettings } from '../../hooks/useSettings';
 import { formatErrorMessage } from '../../lib/format';
 
@@ -34,7 +31,6 @@ const QUICK_LANGS = [
 const STEPS = [
 	{ key: 'welcome', label: () => __('Welcome', 'gemtranslate') },
 	{ key: 'languages', label: () => __('Languages', 'gemtranslate') },
-	{ key: 'ai', label: () => __('AI provider', 'gemtranslate') },
 	{ key: 'done', label: () => __('Done', 'gemtranslate') },
 ];
 
@@ -42,20 +38,14 @@ export default function Onboarding() {
 	const navigate = useNavigate();
 	const languages = useLanguages();
 	const createLang = useCreateLanguage();
-	const providers = useAIProviders();
-	const saveProviders = useSaveAIProviders();
-	const testProvider = useTestAIProvider();
 	const saveSettings = useSaveSettings();
 
 	const [step, setStep] = useState('welcome');
 	const [picked, setPicked] = useState([]);
-	const [aiProvider, setAiProvider] = useState('openai');
-	const [aiKey, setAiKey] = useState('');
-	const [aiModel, setAiModel] = useState('gpt-4o-mini');
 	const [toast, setToast] = useState(null);
 	const [working, setWorking] = useState(false);
 
-	if (languages.isLoading || providers.isLoading) return <PageSkeleton />;
+	if (languages.isLoading) return <PageSkeleton />;
 
 	const existingCodes = new Set((languages.data || []).map((l) => l.code));
 	const togglePick = (code) =>
@@ -97,29 +87,6 @@ export default function Onboarding() {
 		}
 	};
 
-	const saveAi = async () => {
-		if (!aiKey) {
-			goNext();
-			return;
-		}
-		setWorking(true);
-		try {
-			await testProvider.mutateAsync({ name: aiProvider, api_key: aiKey, model: aiModel });
-			await saveProviders.mutateAsync({
-				default: aiProvider,
-				providers: {
-					[aiProvider]: { api_key: aiKey, ...(aiProvider === 'openai' ? { model: aiModel } : {}) },
-				},
-			});
-			setToast({ tone: 'success', message: __('AI provider configured.', 'gemtranslate') });
-			goNext();
-		} catch (err) {
-			setToast({ tone: 'error', message: formatErrorMessage(err) });
-		} finally {
-			setWorking(false);
-		}
-	};
-
 	const finish = async () => {
 		setWorking(true);
 		try {
@@ -136,7 +103,7 @@ export default function Onboarding() {
 		<>
 			<PageHeader
 				title={__('Welcome to GemTranslate', 'gemtranslate')}
-				description={__('Quick setup — pick languages, add an AI key (optional), done.', 'gemtranslate')}
+				description={__('Quick setup — pick your languages and you\'re ready.', 'gemtranslate')}
 			/>
 
 			<div className="gtrans-mb-6 gtrans-rounded-lg gtrans-border gtrans-border-edge gtrans-bg-surface gtrans-px-6 gtrans-py-4">
@@ -150,7 +117,7 @@ export default function Onboarding() {
 			{step === 'welcome' && (
 				<Card>
 					<p className="gtrans-text-sm gtrans-text-label">
-						{__('GemTranslate makes your WordPress site multilingual without slowing it down. We\'ll set up your languages, optionally connect an AI translator, and you\'ll be ready to translate.', 'gemtranslate')}
+						{__('GemTranslate makes your WordPress site multilingual without slowing it down. We\'ll set up your languages and you\'ll be ready to translate.', 'gemtranslate')}
 					</p>
 					<div className="gtrans-mt-4 gtrans-flex gtrans-justify-end">
 						<Button onClick={goNext}>{__('Get started', 'gemtranslate')}</Button>
@@ -192,38 +159,6 @@ export default function Onboarding() {
 							<Button onClick={saveLanguages} loading={working} disabled={picked.length === 0}>
 								{__('Add and continue', 'gemtranslate')}
 							</Button>
-						</div>
-					</div>
-				</Card>
-			)}
-
-			{step === 'ai' && (
-				<Card title={__('Optional: connect an AI translator', 'gemtranslate')}>
-					<p className="gtrans-mb-4 gtrans-text-xs gtrans-text-muted">
-						{__('Bring your own API key. Skip to set up later from AI Translation.', 'gemtranslate')}
-					</p>
-					<div className="gtrans-grid gtrans-grid-cols-1 md:gtrans-grid-cols-3 gtrans-gap-4">
-						<Field label={__('Provider', 'gemtranslate')}>
-							<Select value={aiProvider} onChange={(e) => setAiProvider(e.target.value)}>
-								<option value="openai">OpenAI</option>
-								<option value="deepl">DeepL</option>
-								<option value="google">Google</option>
-							</Select>
-						</Field>
-						<Field label={__('API key', 'gemtranslate')}>
-							<TextInput type="password" value={aiKey} onChange={(e) => setAiKey(e.target.value)} placeholder="sk-…" />
-						</Field>
-						{aiProvider === 'openai' && (
-							<Field label={__('Model', 'gemtranslate')} hint={__('Default: gpt-4o-mini', 'gemtranslate')}>
-								<TextInput value={aiModel} onChange={(e) => setAiModel(e.target.value)} />
-							</Field>
-						)}
-					</div>
-					<div className="gtrans-mt-4 gtrans-flex gtrans-justify-between">
-						<Button variant="ghost" onClick={goBack}>{__('Back', 'gemtranslate')}</Button>
-						<div className="gtrans-flex gtrans-gap-2">
-							<Button variant="secondary" onClick={goNext}>{__('Skip', 'gemtranslate')}</Button>
-							<Button onClick={saveAi} loading={working}>{__('Test & save', 'gemtranslate')}</Button>
 						</div>
 					</div>
 				</Card>

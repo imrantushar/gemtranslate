@@ -12,37 +12,26 @@ import {
 	useConfirmedSegments,
 	useSaveConfirmedSegments,
 } from '../../hooks/usePostFields';
-import { useTranslateWithAI, useSuggestFromMemory, useGlossary } from '../../hooks/useAI';
 import { splitSentences, joinSegments, segmentHash } from '../../lib/segment';
 import { buildToolbar, describeToken, countTokens } from '../../lib/tokens';
 import { formatErrorMessage } from '../../lib/format';
-import { hasFeature } from '../../hooks/useFeatures';
-
-// Pro enhancements inside the (free) Advanced editor.
-const HAS_TM = hasFeature('translation_memory');
-const HAS_GLOSSARY = hasFeature('glossary');
-const HAS_BULK = hasFeature('ai_bulk');
 
 /**
  * WPML-style Advanced translation editor. Sentence-segmented, side-by-side,
- * with a formatting toolbar (no raw {N} tokens), inline translation-memory
- * suggestions, glossary highlighting, and per-segment completion + progress.
+ * with a formatting toolbar (no raw {N} tokens) and per-segment completion +
+ * progress.
  *
  * Segmentation is presentational only — on save each field's segments are
  * re-joined into the one tokenised whole-field string the storage/render
  * contract expects (see lib/segment.js).
  */
-export default function AdvancedEditor({ postId, sourceLang, targetLang, country = '' }) {
+export default function AdvancedEditor({ postId, targetLang, country = '' }) {
 	const data = usePostFields(postId, targetLang, country);
-	const glossary = useGlossary();
 	const confirmedQ = useConfirmedSegments(postId, targetLang, country);
 	const save = useSavePostFields();
 	const saveConfirmed = useSaveConfirmedSegments();
-	const ai = useTranslateWithAI();
-	const suggest = useSuggestFromMemory();
 
 	const [drafts, setDrafts] = useState({}); // { path: [segTranslation, …] }
-	const [suggestions, setSuggestions] = useState({}); // { segKey: [ {target, score, …} ] }
 	const [toast, setToast] = useState(null);
 
 	// Editable fields with a non-empty source, each split into source segments.
@@ -82,27 +71,7 @@ export default function AdvancedEditor({ postId, sourceLang, targetLang, country
 			next[f.path] = f.initial.slice();
 		});
 		setDrafts(next);
-		setSuggestions({});
 	}, [fields]);
-
-	const glossaryPairs = useMemo(() => {
-		if (!HAS_GLOSSARY) return [];
-		const s = (sourceLang || '').toLowerCase();
-		const t = (targetLang || '').toLowerCase();
-		return (glossary.data || [])
-			.filter(
-				(g) =>
-					(g.source_lang || '').toLowerCase() === s && (g.target_lang || '').toLowerCase() === t
-			)
-			.map((g) => ({
-				term: String(g.source_term || ''),
-				target: String(g.target_term || ''),
-				caseSensitive: Number(g.case_sensitive) === 1,
-				dnt: Number(g.do_not_translate) === 1,
-			}))
-			.filter((g) => g.term !== '')
-			.sort((a, b) => b.term.length - a.term.length);
-	}, [glossary.data, sourceLang, targetLang]);
 
 	const confirmedSet = useMemo(() => new Set(confirmedQ.data?.confirmed || []), [confirmedQ.data]);
 
@@ -184,73 +153,6 @@ export default function AdvancedEditor({ postId, sourceLang, targetLang, country
 		}
 	};
 
-	const translateSegment = async (path, idx, source) => {
-		try {
-			const res = await ai.mutateAsync({
-				text: source,
-				source_lang: sourceLang,
-				target_lang: targetLang,
-				preserve_html: false,
-				use_memory: true,
-			});
-			setSeg(path, idx, res.translations || '');
-		} catch (err) {
-			setToast({ tone: 'error', message: formatErrorMessage(err) });
-		}
-	};
-
-	const translateAll = async () => {
-		// One batched call over every untranslated segment.
-		const jobs = [];
-		fields.forEach((f) => {
-			f.segs.forEach((seg, i) => {
-				if ((drafts[f.path]?.[i] ?? '').trim() === '')
-					jobs.push({ path: f.path, idx: i, source: seg.core });
-			});
-		});
-		if (jobs.length === 0) return;
-		try {
-			const res = await ai.mutateAsync({
-				text: jobs.map((j) => j.source),
-				source_lang: sourceLang,
-				target_lang: targetLang,
-				preserve_html: false,
-				use_memory: true,
-			});
-			const list = res.translations || [];
-			setDrafts((d) => {
-				const next = { ...d };
-				jobs.forEach((j, k) => {
-					const arr = (next[j.path] || []).slice();
-					arr[j.idx] = list[k] || arr[j.idx] || '';
-					next[j.path] = arr;
-				});
-				return next;
-			});
-		} catch (err) {
-			setToast({ tone: 'error', message: formatErrorMessage(err) });
-		}
-	};
-
-	const fetchSuggestions = async (key, source) => {
-		if (!HAS_TM) return; // Translation Memory is Pro.
-		if (suggestions[key]) return; // already loaded
-		try {
-			const res = await suggest.mutateAsync({
-				text: source,
-				source_lang: sourceLang,
-				target_lang: targetLang,
-				limit: 5,
-			});
-			setSuggestions((s) => ({
-				...s,
-				[key]: res.suggestions || [],
-			}));
-		} catch (err) {
-			setSuggestions((s) => ({ ...s, [key]: [] }));
-		}
-	};
-
 	const pct = totalSegs ? Math.round((confirmedSegs / totalSegs) * 100) : 0;
 
 	return (
@@ -275,11 +177,6 @@ export default function AdvancedEditor({ postId, sourceLang, targetLang, country
 						</span>
 					</div>
 					<div className="gtrans-flex gtrans-gap-2">
-						{HAS_BULK && (
-							<Button variant="secondary" size="sm" onClick={translateAll} loading={ai.isPending}>
-								{__('Translate all with AI', 'gemtranslate')}
-							</Button>
-						)}
 						<Button size="sm" onClick={saveAll} loading={save.isPending}>
 							{__('Save translations', 'gemtranslate')}
 						</Button>
@@ -293,27 +190,15 @@ export default function AdvancedEditor({ postId, sourceLang, targetLang, country
 				</div>
 			</div>
 
-			{glossaryPairs.length > 0 && (
-				<p className="gtrans-mb-3 gtrans-text-xs gtrans-text-muted">
-					<span className="gtrans-gloss gtrans-mr-1">{__('highlighted', 'gemtranslate')}</span>
-					{__('words are glossary terms — hover to see the preferred translation.', 'gemtranslate')}
-				</p>
-			)}
-
 			<div className="gtrans-flex gtrans-flex-col gtrans-gap-5">
 				{fields.map((f) => (
 					<FieldGroup
 						key={f.path}
 						field={f}
 						drafts={drafts[f.path] || []}
-						glossaryPairs={glossaryPairs}
 						confirmedSet={confirmedSet}
-						suggestions={suggestions}
 						onChangeSeg={setSeg}
 						onToggleConfirm={toggleConfirm}
-						onAISeg={translateSegment}
-						aiBusy={ai.isPending}
-						onFetchSuggestions={fetchSuggestions}
 					/>
 				))}
 			</div>
@@ -338,14 +223,9 @@ function labelFor(f) {
 function FieldGroup({
 	field,
 	drafts,
-	glossaryPairs,
 	confirmedSet,
-	suggestions,
 	onChangeSeg,
 	onToggleConfirm,
-	onAISeg,
-	aiBusy,
-	onFetchSuggestions,
 }) {
 	const toolbar = useMemo(() => buildToolbar(field.tokens || {}), [field.tokens]);
 	return (
@@ -362,20 +242,13 @@ function FieldGroup({
 				{field.segs.map((seg, i) => (
 					<SegmentRow
 						key={`${field.path}-${i}`}
-						fieldPath={field.path}
-						index={i}
 						seg={seg}
 						tokens={field.tokens || {}}
 						toolbar={toolbar}
 						draft={drafts[i] ?? ''}
-						glossaryPairs={glossaryPairs}
 						confirmed={confirmedSet.has(segKey(field.path, i, seg.core))}
-						suggestions={suggestions[segKey(field.path, i, seg.core)]}
 						onChange={(v) => onChangeSeg(field.path, i, v)}
 						onToggleConfirm={() => onToggleConfirm(field.path, i, seg.core)}
-						onAI={() => onAISeg(field.path, i, seg.core)}
-						aiBusy={aiBusy}
-						onFocus={() => onFetchSuggestions(segKey(field.path, i, seg.core), seg.core)}
 					/>
 				))}
 			</div>
@@ -388,17 +261,11 @@ function SegmentRow({
 	tokens,
 	toolbar,
 	draft,
-	glossaryPairs,
 	confirmed,
-	suggestions,
 	onChange,
 	onToggleConfirm,
-	onAI,
-	aiBusy,
-	onFocus,
 }) {
 	const insertRef = useRef(null);
-	const [showSug, setShowSug] = useState(false);
 
 	const srcTokens = countTokens(seg.core);
 	const dstTokens = countTokens(draft);
@@ -409,7 +276,7 @@ function SegmentRow({
 		<div className="gtrans-grid gtrans-grid-cols-1 lg:gtrans-grid-cols-[1fr_1fr_auto] gtrans-gap-3 gtrans-p-4">
 			{/* Source */}
 			<div className="gtrans-rounded-md gtrans-bg-body gtrans-p-2.5 gtrans-text-sm gtrans-leading-relaxed gtrans-text-label">
-				{renderSource(seg.core, tokens, glossaryPairs)}
+				{renderSource(seg.core, tokens)}
 			</div>
 
 			{/* Translation */}
@@ -435,28 +302,6 @@ function SegmentRow({
 					>
 						⧉
 					</button>
-					<button
-						type="button"
-						title={__('Translate with AI', 'gemtranslate')}
-						onClick={onAI}
-						disabled={aiBusy}
-						className="gtrans-bare gtrans-rounded gtrans-border gtrans-border-line gtrans-bg-surface gtrans-px-1.5 gtrans-py-0.5 gtrans-text-[11px] gtrans-text-indigo-600 hover:gtrans-bg-indigo-50 disabled:gtrans-opacity-50"
-					>
-						{__('AI', 'gemtranslate')}
-					</button>
-					{suggestions !== undefined && suggestions.length > 0 && (
-						<button
-							type="button"
-							onClick={() => setShowSug((v) => !v)}
-							className="gtrans-bare gtrans-rounded gtrans-border gtrans-border-amber-200 gtrans-bg-amber-50 gtrans-px-1.5 gtrans-py-0.5 gtrans-text-[11px] gtrans-text-amber-700"
-						>
-							{sprintf(
-								/* translators: %d: number of translation-memory matches. */
-								__('TM · %d', 'gemtranslate'),
-								suggestions.length
-							)}
-						</button>
-					)}
 				</div>
 
 				<TokenField
@@ -465,7 +310,6 @@ function SegmentRow({
 					toolbarRef={insertRef}
 					singleLine={false}
 					onChange={onChange}
-					onFocus={onFocus}
 				/>
 
 				{mismatch && (
@@ -479,38 +323,6 @@ function SegmentRow({
 							srcTokens,
 							dstTokens
 						)}
-					</div>
-				)}
-
-				{showSug && suggestions && suggestions.length > 0 && (
-					<div className="gtrans-mt-1.5 gtrans-rounded-md gtrans-border gtrans-border-amber-200 gtrans-bg-amber-50 gtrans-p-2">
-						<div className="gtrans-mb-1 gtrans-text-[10px] gtrans-font-semibold gtrans-uppercase gtrans-text-amber-700">
-							{__('Translation memory', 'gemtranslate')}
-						</div>
-						<div className="gtrans-flex gtrans-flex-col gtrans-gap-1">
-							{suggestions.map((s, k) => (
-								<button
-									key={k}
-									type="button"
-									onClick={() => {
-										onChange(s.target);
-										setShowSug(false);
-									}}
-									className="gtrans-bare gtrans-flex gtrans-items-center gtrans-gap-2 gtrans-rounded gtrans-bg-surface gtrans-px-2 gtrans-py-1 gtrans-text-left gtrans-text-xs gtrans-text-label hover:gtrans-bg-amber-100"
-								>
-									<span
-										className={`gtrans-shrink-0 gtrans-rounded gtrans-px-1 gtrans-text-[10px] gtrans-font-semibold ${
-											s.exact
-												? 'gtrans-bg-green-100 gtrans-text-green-700'
-												: 'gtrans-bg-amber-100 gtrans-text-amber-700'
-										}`}
-									>
-										{s.score}%
-									</span>
-									<span className="gtrans-truncate">{s.target}</span>
-								</button>
-							))}
-						</div>
 					</div>
 				)}
 			</div>
@@ -543,9 +355,9 @@ function SegmentRow({
 
 /**
  * Render tokenised source text as read-only nodes: `{N}` tokens become styled
- * chips; plain text runs get glossary terms highlighted.
+ * chips.
  */
-function renderSource(text, tokens, glossaryPairs) {
+function renderSource(text, tokens) {
 	const parts = String(text).split(/(\{\d+\})/g);
 	return parts.map((part, i) => {
 		if (!part) return null;
@@ -562,65 +374,6 @@ function renderSource(text, tokens, glossaryPairs) {
 				</span>
 			);
 		}
-		return <span key={i}>{highlightGlossary(part, glossaryPairs)}</span>;
+		return <span key={i}>{part}</span>;
 	});
-}
-
-/** Wrap glossary-term occurrences in a plain text run. */
-function highlightGlossary(text, pairs) {
-	if (!pairs || pairs.length === 0) return text;
-
-	// Collect non-overlapping matches (longest term wins).
-	const matches = [];
-	pairs.forEach((p) => {
-		const flags = p.caseSensitive ? 'g' : 'gi';
-		let re;
-		try {
-			re = new RegExp(escapeRegExp(p.term), flags);
-		} catch (e) {
-			return;
-		}
-		let mm;
-		while ((mm = re.exec(text)) !== null) {
-			matches.push({
-				start: mm.index,
-				end: mm.index + mm[0].length,
-				text: mm[0],
-				pair: p,
-			});
-			if (mm.index === re.lastIndex) re.lastIndex++;
-		}
-	});
-	if (matches.length === 0) return text;
-	matches.sort((a, b) => a.start - b.start || b.end - a.end);
-
-	const out = [];
-	let cursor = 0;
-	matches.forEach((mt, i) => {
-		if (mt.start < cursor) return; // overlaps an earlier match
-		if (mt.start > cursor) out.push(text.slice(cursor, mt.start));
-		out.push(
-			<span
-				key={`g${i}`}
-				className={`gtrans-gloss ${mt.pair.dnt ? 'gtrans-gloss-dnt' : ''}`}
-				title={
-					mt.pair.dnt
-						? __('Do not translate', 'gemtranslate')
-						: sprintf(
-								/* translators: %s: preferred translation. */ __('Preferred: %s', 'gemtranslate'),
-								mt.pair.target
-						  )
-				}
-			>
-				{mt.text}
-			</span>
-		);
-		cursor = mt.end;
-	});
-	if (cursor < text.length) out.push(text.slice(cursor));
-	return out;
-}
-
-function escapeRegExp(s) {
-	return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

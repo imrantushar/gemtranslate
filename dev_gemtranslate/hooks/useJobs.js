@@ -25,17 +25,6 @@ export function useJobCounts() {
 	});
 }
 
-export function useBulkTranslate() {
-	const qc = useQueryClient();
-	return useMutation({
-		mutationFn: async (payload) => unwrap(await api.post('jobs/bulk-translate', payload)),
-		onSuccess: () => {
-			qc.invalidateQueries({ queryKey: ['jobs'] });
-			qc.invalidateQueries({ queryKey: ['posts'] });
-		},
-	});
-}
-
 export function useRetryJob() {
 	const qc = useQueryClient();
 	return useMutation({

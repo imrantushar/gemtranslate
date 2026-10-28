@@ -14,7 +14,6 @@ import { Select } from '../../components/ui/Select';
 import { PageSkeleton, TableSkeleton } from '../../components/Skeleton';
 import { useTerms, useTermTranslations, useSaveTermTranslation } from '../../hooks/useTerms';
 import { useLanguages } from '../../hooks/useLanguages';
-import { useTranslateWithAI } from '../../hooks/useAI';
 import { formatErrorMessage } from '../../lib/format';
 
 export default function TermsPage() {
@@ -34,7 +33,6 @@ export default function TermsPage() {
 	const terms = useTerms({ ...filters, taxonomy });
 	const detail = useTermTranslations(selectedTerm);
 	const save = useSaveTermTranslation();
-	const ai = useTranslateWithAI();
 
 	useEffect(() => {
 		setSelectedTerm(null);
@@ -60,42 +58,6 @@ export default function TermsPage() {
 		try {
 			await save.mutateAsync({ termId: selectedTerm, lang: selectedLang, payload: form });
 			setToast({ tone: 'success', message: __('Term translation saved.', 'gemtranslate') });
-		} catch (err) {
-			setToast({ tone: 'error', message: formatErrorMessage(err) });
-		}
-	};
-
-	const aiFill = async (field, sourceText) => {
-		try {
-			const res = await ai.mutateAsync({
-				text: sourceText,
-				source_lang: defaultLang?.code || 'en',
-				target_lang: selectedLang,
-				preserve_html: field === 'description',
-				use_memory: true,
-			});
-			setForm((f) => ({ ...f, [field]: res.translations }));
-		} catch (err) {
-			setToast({ tone: 'error', message: formatErrorMessage(err) });
-		}
-	};
-
-	const aiFillAll = async () => {
-		if (!detail.data?.term) return;
-		const t = detail.data.term;
-		try {
-			const res = await ai.mutateAsync({
-				text: [t.name, t.description || ''],
-				source_lang: defaultLang?.code || 'en',
-				target_lang: selectedLang,
-				preserve_html: true,
-				use_memory: true,
-			});
-			setForm((f) => ({
-				...f,
-				name: res.translations[0] || f.name,
-				description: res.translations[1] || f.description,
-			}));
 		} catch (err) {
 			setToast({ tone: 'error', message: formatErrorMessage(err) });
 		}
@@ -199,33 +161,16 @@ export default function TermsPage() {
 						}
 					>
 						<form onSubmit={submit} className="gtrans-flex gtrans-flex-col gtrans-gap-3">
-							<div className="gtrans-flex gtrans-items-end gtrans-gap-2">
-								<div className="gtrans-flex-1">
-									<Field label={__('Name', 'gemtranslate')}>
-										<TextInput value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
-									</Field>
-								</div>
-								<Button variant="ghost" size="sm" onClick={() => aiFill('name', detail.data.term.name)}>
-									{__('AI', 'gemtranslate')}
-								</Button>
-							</div>
+							<Field label={__('Name', 'gemtranslate')}>
+								<TextInput value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
+							</Field>
 							<Field label={__('Slug', 'gemtranslate')}>
 								<TextInput value={form.slug} onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))} />
 							</Field>
-							<div className="gtrans-flex gtrans-items-end gtrans-gap-2">
-								<div className="gtrans-flex-1">
-									<Field label={__('Description', 'gemtranslate')}>
-										<TextArea rows={5} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
-									</Field>
-								</div>
-								<Button variant="ghost" size="sm" onClick={() => aiFill('description', detail.data.term.description || '')}>
-									{__('AI', 'gemtranslate')}
-								</Button>
-							</div>
-							<div className="gtrans-mt-2 gtrans-flex gtrans-justify-between">
-								<Button variant="secondary" size="sm" onClick={aiFillAll} loading={ai.isPending}>
-									{__('Translate all with AI', 'gemtranslate')}
-								</Button>
+							<Field label={__('Description', 'gemtranslate')}>
+								<TextArea rows={5} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
+							</Field>
+							<div className="gtrans-mt-2 gtrans-flex gtrans-justify-end">
 								<Button type="submit" loading={save.isPending}>
 									{__('Save translation', 'gemtranslate')}
 								</Button>

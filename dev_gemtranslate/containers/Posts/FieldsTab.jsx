@@ -7,7 +7,6 @@ import Toast from '../../components/Toast';
 import { Field, TextArea, TextInput } from '../../components/Input';
 import { FormSkeleton } from '../../components/Skeleton';
 import { usePostFields, useSavePostFields } from '../../hooks/usePostFields';
-import { useTranslateWithAI } from '../../hooks/useAI';
 import { formatErrorMessage } from '../../lib/format';
 
 /**
@@ -24,7 +23,6 @@ import { formatErrorMessage } from '../../lib/format';
 export default function FieldsTab({ postId, sourceLang, targetLang, country = '' }) {
 	const data = usePostFields(postId, targetLang, country);
 	const save = useSavePostFields();
-	const ai = useTranslateWithAI();
 	const [drafts, setDrafts] = useState({});
 	const [toast, setToast] = useState(null);
 
@@ -55,41 +53,6 @@ export default function FieldsTab({ postId, sourceLang, targetLang, country = ''
 		}
 	};
 
-	const aiFillAll = async () => {
-		const sources = (data.data.fields || []).map((f) => f.source);
-		try {
-			const res = await ai.mutateAsync({
-				text: sources,
-				source_lang: sourceLang,
-				target_lang: targetLang,
-				preserve_html: false,
-				use_memory: true,
-			});
-			const next = { ...drafts };
-			(data.data.fields || []).forEach((f, i) => {
-				next[f.path] = res.translations[i] || next[f.path] || '';
-			});
-			setDrafts(next);
-		} catch (err) {
-			setToast({ tone: 'error', message: formatErrorMessage(err) });
-		}
-	};
-
-	const aiFillOne = async (path, source) => {
-		try {
-			const res = await ai.mutateAsync({
-				text: source,
-				source_lang: sourceLang,
-				target_lang: targetLang,
-				preserve_html: false,
-				use_memory: true,
-			});
-			set(path, res.translations);
-		} catch (err) {
-			setToast({ tone: 'error', message: formatErrorMessage(err) });
-		}
-	};
-
 	const labelFor = (f) => {
 		if (f.path === 'title') return __('Title', 'gemtranslate');
 		if (f.path === 'excerpt') return __('Excerpt', 'gemtranslate');
@@ -99,14 +62,7 @@ export default function FieldsTab({ postId, sourceLang, targetLang, country = ''
 
 	return (
 		<>
-			<Card
-				title={__('String-only translation', 'gemtranslate')}
-				action={
-					<Button variant="secondary" size="sm" onClick={aiFillAll} loading={ai.isPending}>
-						{__('Translate all with AI', 'gemtranslate')}
-					</Button>
-				}
-			>
+			<Card title={__('String-only translation', 'gemtranslate')}>
 				<p className="gtrans-mb-3 gtrans-text-xs gtrans-text-muted">
 					{__(
 						'Translate text only — block wrappers and inline tags are protected. Use {1} {2} placeholders for bold/links/etc; the legend under each field shows what each token means.',
@@ -121,8 +77,6 @@ export default function FieldsTab({ postId, sourceLang, targetLang, country = ''
 							label={labelFor(f)}
 							draft={drafts[f.path] ?? ''}
 							onChange={(v) => set(f.path, v)}
-							onAI={() => aiFillOne(f.path, f.source)}
-							aiBusy={ai.isPending}
 						/>
 					))}
 					<div className="gtrans-mt-2 gtrans-flex gtrans-justify-end">
@@ -136,7 +90,7 @@ export default function FieldsTab({ postId, sourceLang, targetLang, country = ''
 }
 
 /** One row: source on the left, translation on the right, legend underneath. */
-function FieldRow({ field, label, draft, onChange, onAI, aiBusy }) {
+function FieldRow({ field, label, draft, onChange }) {
 	const tokens = field.tokens || {};
 	const tokenNumbers = Object.keys(tokens);
 	const sourceTokenCount = countPlaceholders(field.source);
@@ -147,11 +101,8 @@ function FieldRow({ field, label, draft, onChange, onAI, aiBusy }) {
 
 	return (
 		<div className="gtrans-rounded-md gtrans-border gtrans-border-line gtrans-p-3">
-			<div className="gtrans-mb-2 gtrans-flex gtrans-items-center gtrans-justify-between gtrans-text-xs gtrans-text-muted">
+			<div className="gtrans-mb-2 gtrans-text-xs gtrans-text-muted">
 				<code>{label}</code>
-				<Button variant="ghost" size="sm" onClick={onAI} loading={aiBusy}>
-					{__('AI', 'gemtranslate')}
-				</Button>
 			</div>
 			<div className="gtrans-grid gtrans-grid-cols-1 lg:gtrans-grid-cols-2 gtrans-gap-3">
 				<Field label={__('Source', 'gemtranslate')}>

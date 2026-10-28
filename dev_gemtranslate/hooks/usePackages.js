@@ -19,15 +19,6 @@ export function useScanPackage() {
 	});
 }
 
-export function useTranslateAllInPackage() {
-	const qc = useQueryClient();
-	return useMutation({
-		mutationFn: async ({ slug, lang, status = 'draft' }) =>
-			unwrap(await api.post(`strings/packages/${slug}/${lang}/translate-all`, { status })),
-		onSuccess: () => qc.invalidateQueries({ queryKey: ['strings'] }),
-	});
-}
-
 export function useExportPackage() {
 	return useMutation({
 		mutationFn: async ({ slug, lang, exclude_status = '', ai_fill = false }) =>
@@ -35,17 +26,6 @@ export function useExportPackage() {
 				await api.post(`strings/packages/${slug}/${lang}/export`, {
 					exclude_status,
 					ai_fill,
-				})
-			),
-	});
-}
-
-export function useMemorySuggestions() {
-	return useMutation({
-		mutationFn: async ({ slug, lang, string_ids }) =>
-			unwrap(
-				await api.post(`strings/packages/${slug}/${lang}/memory-suggestions`, {
-					string_ids,
 				})
 			),
 	});

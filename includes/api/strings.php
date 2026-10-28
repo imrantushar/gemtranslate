@@ -5,8 +5,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use GemTranslate\AI\TranslationMemory;
-use GemTranslate\AI\TranslatorFactory;
 use GemTranslate\I18n\PackGenerator;
 use GemTranslate\I18n\WporgImporter;
 use GemTranslate\Language\Context;
@@ -109,30 +107,10 @@ class Strings extends Controller {
 
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/packages/(?P<slug>[A-Za-z0-9_\-]+)/(?P<lang>[a-z0-9\-]{2,10})/translate-all',
-			[
-				'methods'             => \WP_REST_Server::CREATABLE,
-				'callback'            => [ $this, 'translate_all_in_package' ],
-				'permission_callback' => [ $this, 'permissions_translate' ],
-			]
-		);
-
-		register_rest_route(
-			$this->namespace,
 			'/' . $this->rest_base . '/packages/(?P<slug>[A-Za-z0-9_\-]+)/(?P<lang>[a-z0-9\-]{2,10})/export',
 			[
 				'methods'             => \WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'export_package' ],
-				'permission_callback' => [ $this, 'permissions_translate' ],
-			]
-		);
-
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/packages/(?P<slug>[A-Za-z0-9_\-]+)/(?P<lang>[a-z0-9\-]{2,10})/memory-suggestions',
-			[
-				'methods'             => \WP_REST_Server::CREATABLE,
-				'callback'            => [ $this, 'memory_suggestions' ],
 				'permission_callback' => [ $this, 'permissions_translate' ],
 			]
 		);
@@ -332,95 +310,6 @@ class Strings extends Controller {
 		] ) );
 	}
 
-	/**
-	 * Bulk-AI-translate every untranslated row for a package in a language.
-	 * Returns counts; uses TranslationMemory so already-translated-elsewhere
-	 * strings are filled instantly without an AI call.
-	 */
-	public function translate_all_in_package( $request ) {
-		// Bulk AI string translation (with TM + pack generation) is Pro; manual
-		// per-string editing stays free.
-		if ( $err = $this->require_pro( 'ai_bulk' ) ) {
-			return $err;
-		}
-		$pkg = $this->resolve_package( (string) $request['slug'] );
-		if ( is_wp_error( $pkg ) ) {
-			return $pkg;
-		}
-		$lang = strtolower( (string) $request['lang'] );
-		if ( ! Context::is_active( $lang ) ) {
-			return $this->fail( 'gtrans_invalid_lang', __( 'Language is not active.', 'gemtranslate' ), 422 );
-		}
-
-		$body         = $request->get_json_params() ?: $request->get_params();
-		$status_value = (string) ( $body['status'] ?? 'draft' );
-
-		// Find every untranslated row for this domain.
-		$listing = StringTranslator::list_strings( [
-			'domain'   => $pkg['text_domain'],
-			'lang'     => $lang,
-			'status'   => 'untranslated',
-			'page'     => 1,
-			'per_page' => 10000,
-		] );
-		$rows = $listing['rows'] ?? [];
-		if ( empty( $rows ) ) {
-			return $this->ok( [ 'translated' => 0, 'total' => 0, 'from_memory' => 0, 'from_ai' => 0 ] );
-		}
-
-		$source_lang = Context::default_code();
-		$translator  = TranslatorFactory::default_translator();
-		$from_memory = 0;
-		$from_ai     = 0;
-		$translated  = 0;
-
-		// First pass: TranslationMemory.
-		$ai_queue = [];
-		foreach ( $rows as $row ) {
-			$source = (string) $row['source'];
-			$cached = TranslationMemory::get( $source, $source_lang, $lang );
-			if ( null !== $cached && '' !== $cached ) {
-				if ( StringTranslator::save_translation( (int) $row['string_id'], $lang, $cached, $status_value ) ) {
-					$from_memory++;
-					$translated++;
-				}
-			} elseif ( $translator ) {
-				$ai_queue[ (int) $row['string_id'] ] = $source;
-			}
-		}
-
-		// Second pass: AI in batches.
-		if ( $translator && ! empty( $ai_queue ) ) {
-			$ids   = array_keys( $ai_queue );
-			$texts = array_values( $ai_queue );
-			foreach ( array_chunk( $texts, 25, true ) as $chunk_offset => $chunk ) {
-				$result = $translator->translate( $chunk, $source_lang, $lang, [ 'preserve_html' => false ] );
-				if ( is_wp_error( $result ) ) {
-					return $result;
-				}
-				foreach ( $chunk as $rel_i => $text ) {
-					$abs_i = $chunk_offset * 25 + $rel_i;
-					$value = $result['translations'][ $rel_i ] ?? '';
-					if ( '' === $value || ! isset( $ids[ $abs_i ] ) ) {
-						continue;
-					}
-					if ( StringTranslator::save_translation( $ids[ $abs_i ], $lang, $value, $status_value ) ) {
-						$from_ai++;
-						$translated++;
-						TranslationMemory::set( $text, $value, $source_lang, $lang, $result['provider'] ?? '' );
-					}
-				}
-			}
-		}
-
-		return $this->ok( [
-			'translated'  => $translated,
-			'total'       => count( $rows ),
-			'from_memory' => $from_memory,
-			'from_ai'     => $from_ai,
-		] );
-	}
-
 	public function export_package( $request ) {
 		$pkg = $this->resolve_package( (string) $request['slug'] );
 		if ( is_wp_error( $pkg ) ) {
@@ -435,54 +324,17 @@ class Strings extends Controller {
 			return $this->fail( 'gtrans_no_locale', __( 'Language has no locale configured.', 'gemtranslate' ), 422 );
 		}
 
-		$body          = $request->get_json_params() ?: $request->get_params();
-		$exclude       = (string) ( $body['exclude_status'] ?? '' );
-		$ai_fill       = isset( $body['ai_fill'] ) ? (bool) $body['ai_fill'] : false;
+		$body    = $request->get_json_params() ?: $request->get_params();
+		$exclude = (string) ( $body['exclude_status'] ?? '' );
 
 		$result = PackGenerator::generate( $lang, $locale, [
 			'domain'         => $pkg['text_domain'],
-			'ai_fill'        => $ai_fill,
 			'exclude_status' => $exclude,
 		] );
 		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
 		return $this->ok( $result );
-	}
-
-	public function memory_suggestions( $request ) {
-		if ( $err = $this->require_pro( 'translation_memory' ) ) {
-			return $err;
-		}
-		$lang = strtolower( (string) $request['lang'] );
-		if ( ! Context::is_active( $lang ) ) {
-			return $this->fail( 'gtrans_invalid_lang', __( 'Language is not active.', 'gemtranslate' ), 422 );
-		}
-		$body       = $request->get_json_params() ?: $request->get_params();
-		$string_ids = array_map( 'intval', (array) ( $body['string_ids'] ?? [] ) );
-		if ( empty( $string_ids ) ) {
-			return $this->ok( new \stdClass() );
-		}
-
-		// Fetch source text for each id, then probe TM.
-		global $wpdb;
-		$table = \GemTranslate\Helper::table( 'strings' );
-		$placeholders = implode( ',', array_fill( 0, count( $string_ids ), '%d' ) );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$rows = $wpdb->get_results(
-			$wpdb->prepare( "SELECT string_id, source FROM $table WHERE string_id IN ($placeholders)", $string_ids ),
-			ARRAY_A
-		) ?: [];
-
-		$source_lang = Context::default_code();
-		$out = [];
-		foreach ( $rows as $r ) {
-			$hit = TranslationMemory::get( (string) $r['source'], $source_lang, $lang );
-			if ( null !== $hit && '' !== $hit ) {
-				$out[ (string) (int) $r['string_id'] ] = (string) $hit;
-			}
-		}
-		return $this->ok( $out ?: new \stdClass() );
 	}
 
 	// =====================================================================

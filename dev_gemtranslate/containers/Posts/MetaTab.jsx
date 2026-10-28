@@ -7,13 +7,11 @@ import Toast from '../../components/Toast';
 import { Field, TextInput, TextArea } from '../../components/Input';
 import { FormSkeleton } from '../../components/Skeleton';
 import { usePostMetaFields, useSavePostMeta } from '../../hooks/usePostMeta';
-import { useTranslateWithAI } from '../../hooks/useAI';
 import { formatErrorMessage } from '../../lib/format';
 
-export default function MetaTab({ postId, sourceLang, targetLang }) {
+export default function MetaTab({ postId, targetLang }) {
 	const data = usePostMetaFields(postId, targetLang);
 	const save = useSavePostMeta();
-	const ai = useTranslateWithAI();
 	const [drafts, setDrafts] = useState({});
 	const [toast, setToast] = useState(null);
 
@@ -49,22 +47,6 @@ export default function MetaTab({ postId, sourceLang, targetLang }) {
 		}
 	};
 
-	const aiFill = async (key, source) => {
-		if (!source) return;
-		try {
-			const res = await ai.mutateAsync({
-				text: source,
-				source_lang: sourceLang,
-				target_lang: targetLang,
-				preserve_html: false,
-				use_memory: true,
-			});
-			set(key, res.translations);
-		} catch (err) {
-			setToast({ tone: 'error', message: formatErrorMessage(err) });
-		}
-	};
-
 	return (
 		<>
 			<Card title={__('Custom fields & ACF', 'gemtranslate')}>
@@ -78,20 +60,13 @@ export default function MetaTab({ postId, sourceLang, targetLang }) {
 									<TextInput value={f.source} readOnly />
 								)}
 							</Field>
-							<div className="gtrans-flex gtrans-items-end gtrans-gap-2">
-								<div className="gtrans-flex-1">
-									<Field label={__('Translation', 'gemtranslate')}>
-										{f.source.length > 120 ? (
-											<TextArea rows={3} value={drafts[f.key] ?? ''} onChange={(e) => set(f.key, e.target.value)} />
-										) : (
-											<TextInput value={drafts[f.key] ?? ''} onChange={(e) => set(f.key, e.target.value)} />
-										)}
-									</Field>
-								</div>
-								<Button variant="ghost" size="sm" onClick={() => aiFill(f.key, f.source)}>
-									{__('AI', 'gemtranslate')}
-								</Button>
-							</div>
+							<Field label={__('Translation', 'gemtranslate')}>
+								{f.source.length > 120 ? (
+									<TextArea rows={3} value={drafts[f.key] ?? ''} onChange={(e) => set(f.key, e.target.value)} />
+								) : (
+									<TextInput value={drafts[f.key] ?? ''} onChange={(e) => set(f.key, e.target.value)} />
+								)}
+							</Field>
 						</div>
 					))}
 					<div className="gtrans-mt-2 gtrans-flex gtrans-justify-end">

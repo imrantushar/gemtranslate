@@ -280,15 +280,3 @@ body.toplevel_page_gemtranslate #wpfooter {
 	line-height: 1.4;
 	cursor: default;
 }
-/* Glossary term highlight in the source pane. */
-#gemtranslate-admin-root .gtrans-gloss {
-	border-bottom: 2px solid var(--gtrans-warning);
-	background: var(--gtrans-warning-light);
-	border-radius: 2px;
-	padding: 0 1px;
-	cursor: help;
-}
-#gemtranslate-admin-root .gtrans-gloss-dnt {
-	border-bottom-color: var(--gtrans-warn-muted);
-	background: rgba(87, 94, 108, 0.12);
-}

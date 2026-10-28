@@ -26,8 +26,6 @@ export const NAV = [
 	{ to: '/strings', label: () => __('Strings', 'gemtranslate'), icon: 'type' },
 	{ to: '/menus', label: () => __('Menus', 'gemtranslate'), icon: 'menu' },
 	{ to: '/seo', label: () => __('SEO', 'gemtranslate'), icon: 'search', pro: 'seo_advanced' },
-	{ to: '/ai', label: () => __('AI Translation', 'gemtranslate'), icon: 'sparkles' },
-	{ to: '/glossary', label: () => __('Glossary', 'gemtranslate'), icon: 'book', pro: 'glossary' },
 	{
 		to: '/jobs',
 		label: () => __('Jobs', 'gemtranslate'),
