@@ -412,6 +412,9 @@ input:where([type='file']):focus{
 #gemtranslate-admin-root .gtrans-bottom-7{
 	bottom: 1.75rem;
 }
+#gemtranslate-admin-root .gtrans-left-0{
+	right: 0px;
+}
 #gemtranslate-admin-root .gtrans-left-3{
 	right: 0.75rem;
 }
@@ -424,9 +427,6 @@ input:where([type='file']):focus{
 #gemtranslate-admin-root .gtrans-right-1\.5{
 	left: 0.375rem;
 }
-#gemtranslate-admin-root .gtrans-right-3{
-	left: 0.75rem;
-}
 #gemtranslate-admin-root .gtrans-right-6{
 	left: 1.5rem;
 }
@@ -436,8 +436,8 @@ input:where([type='file']):focus{
 #gemtranslate-admin-root .gtrans-top-1\/2{
 	top: 50%;
 }
-#gemtranslate-admin-root .gtrans-top-\[14px\]{
-	top: 14px;
+#gemtranslate-admin-root .gtrans-top-full{
+	top: 100%;
 }
 #gemtranslate-admin-root .gtrans-z-10{
 	z-index: 10;
@@ -518,9 +518,6 @@ input:where([type='file']):focus{
 }
 #gemtranslate-admin-root .gtrans-ml-2{
 	margin-right: 0.5rem;
-}
-#gemtranslate-admin-root .gtrans-ml-5{
-	margin-right: 1.25rem;
 }
 #gemtranslate-admin-root .gtrans-ml-auto{
 	margin-right: auto;
@@ -673,9 +670,6 @@ input:where([type='file']):focus{
 #gemtranslate-admin-root .gtrans-w-14{
 	width: 3.5rem;
 }
-#gemtranslate-admin-root .gtrans-w-16{
-	width: 4rem;
-}
 #gemtranslate-admin-root .gtrans-w-2{
 	width: 0.5rem;
 }
@@ -708,9 +702,6 @@ input:where([type='file']):focus{
 }
 #gemtranslate-admin-root .gtrans-w-56{
 	width: 14rem;
-}
-#gemtranslate-admin-root .gtrans-w-60{
-	width: 15rem;
 }
 #gemtranslate-admin-root .gtrans-w-7{
 	width: 1.75rem;
@@ -824,6 +815,10 @@ input:where([type='file']):focus{
 	--tw-translate-x: 18px;
 	transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
+#gemtranslate-admin-root .gtrans--rotate-90{
+	--tw-rotate: -90deg;
+	transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
 #gemtranslate-admin-root .gtrans-rotate-90{
 	--tw-rotate: 90deg;
 	transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
@@ -907,9 +902,6 @@ input:where([type='file']):focus{
 }
 #gemtranslate-admin-root .gtrans-justify-between{
 	justify-content: space-between;
-}
-#gemtranslate-admin-root .gtrans-gap-0\.5{
-	gap: 0.125rem;
 }
 #gemtranslate-admin-root .gtrans-gap-1{
 	gap: 0.25rem;
@@ -1041,12 +1033,6 @@ input:where([type='file']):focus{
 }
 #gemtranslate-admin-root .gtrans-border-b-2{
 	border-bottom-width: 2px;
-}
-#gemtranslate-admin-root .gtrans-border-l{
-	border-right-width: 1px;
-}
-#gemtranslate-admin-root .gtrans-border-r{
-	border-left-width: 1px;
 }
 #gemtranslate-admin-root .gtrans-border-t{
 	border-top-width: 1px;
@@ -1203,6 +1189,9 @@ input:where([type='file']):focus{
 #gemtranslate-admin-root .gtrans-p-0{
 	padding: 0px;
 }
+#gemtranslate-admin-root .gtrans-p-1{
+	padding: 0.25rem;
+}
 #gemtranslate-admin-root .gtrans-p-1\.5{
 	padding: 0.375rem;
 }
@@ -1220,10 +1209,6 @@ input:where([type='file']):focus{
 }
 #gemtranslate-admin-root .gtrans-p-6{
 	padding: 1.5rem;
-}
-#gemtranslate-admin-root .gtrans-px-0{
-	padding-right: 0px;
-	padding-left: 0px;
 }
 #gemtranslate-admin-root .gtrans-px-1{
 	padding-right: 0.25rem;
@@ -1725,11 +1710,6 @@ body.toplevel_page_gemtranslate #wpfooter {
 	text-decoration: none !important;
 }
 
-/* Parent of an expanded submenu: highlight the child, not the parent row. */
-#gemtranslate-admin-root nav a.gtrans-nav-parent[aria-current="page"] {
-	background-color: transparent !important;
-}
-
 /* Keep inactive nav links from inheriting WP admin link colours. */
 #gemtranslate-admin-root nav a:not([aria-current="page"]),
 #gemtranslate-admin-root nav a:not([aria-current="page"]):visited {
@@ -1911,16 +1891,6 @@ body.toplevel_page_gemtranslate #wpfooter {
 	cursor: default;
 }
 
-/* Sidebar stays in view while the page scrolls: pinned under the wp-admin bar
-   and the topbar, filling the remaining viewport height. */
-#gemtranslate-admin-root .gtrans-sidebar {
-	position: sticky;
-	top: calc(var(--wp-admin--admin-bar--height, 32px) + var(--gtrans-topbar-h));
-	align-self: flex-start;
-	height: calc(100vh - var(--wp-admin--admin-bar--height, 32px) - var(--gtrans-topbar-h));
-	overflow-y: auto;
-}
-
 /* A page's title, filters and column headings stay put while a long list scrolls
    underneath. The negative margins cover main's 24px padding so rows never show
    above or beside the pinned block. */
@@ -1970,6 +1940,9 @@ body.toplevel_page_gemtranslate #wpfooter {
 }
 #gemtranslate-admin-root .hover\:gtrans-bg-secondary:hover{
 	background-color: var(--gtrans-secondary-color);
+}
+#gemtranslate-admin-root .hover\:gtrans-bg-surface:hover{
+	background-color: var(--gtrans-background);
 }
 #gemtranslate-admin-root .hover\:gtrans-text-danger:hover{
 	color: var(--gtrans-error);
