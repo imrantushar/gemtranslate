@@ -1,16 +1,14 @@
 import { __, sprintf } from '@wordpress/i18n';
 import clsx from 'clsx';
 
-import Button from '../../components/Button';
-
 /**
- * Translator-mode picker. Two cards side by side:
- *   • Strings only  — translate text, layout follows source
+ * Compact layout-mode control: a two-option segmented switch.
+ *   • Strings only  — translate text, layout follows the source
  *   • Custom layout — design a separate page in any editor
  *
- * The active card is highlighted; the inactive card shows a CTA to switch.
- * For string_only mode we just need a confirm; for custom_layout we create
- * a shadow WP post (handled by the parent's onPromote callback).
+ * The inactive option asks for confirmation before switching (custom layout
+ * creates a shadow WP post, handled by the parent's onPromote callback). Context
+ * for the active mode sits in the tooltips and a short hint beside the switch.
  */
 export default function ModeSwitcher({
 	mode,
@@ -23,118 +21,74 @@ export default function ModeSwitcher({
 	isDemoting,
 }) {
 	const variantLabel = country ? `${language} · ${country}` : language;
+	const busy = isPromoting || isDemoting;
+
+	const pick = (next) => {
+		if (next === mode || busy) return;
+		if (next === 'custom_layout') {
+			// eslint-disable-next-line no-alert
+			if (!window.confirm(sprintf(
+				/* translators: %s: variant label e.g. "Spanish · MX". */
+				__('Create a custom-layout copy of this page for %s? It opens in your normal WordPress editor.', 'gemtranslate'),
+				variantLabel
+			))) return;
+			onPromote();
+		} else {
+			// eslint-disable-next-line no-alert
+			if (!window.confirm(__('Discard the custom layout and revert to string-only translations? Stored strings are preserved.', 'gemtranslate'))) return;
+			onDemote();
+		}
+	};
+
+	const options = [
+		{
+			value: 'string_only',
+			label: __('Strings only', 'gemtranslate'),
+			hint: __('Translate text. Block layout, wrappers and inline tags follow the source automatically — best for most pages.', 'gemtranslate'),
+		},
+		{
+			value: 'custom_layout',
+			label: __('Custom layout', 'gemtranslate'),
+			hint: __('Design a fully separate page in your editor (Gutenberg, Elementor, Beaver, Divi, Bricks) — best for country-specific landing pages.', 'gemtranslate'),
+		},
+	];
 
 	return (
-		<div className="gtrans-mb-4 gtrans-grid gtrans-grid-cols-1 md:gtrans-grid-cols-2 gtrans-gap-3">
-			<ModeCard
-				active={mode === 'string_only'}
-				icon="📝"
-				title={__('Strings only', 'gemtranslate')}
-				summary={__('Translate text. Block layout, wrappers, and inline tags follow the source automatically.', 'gemtranslate')}
-				details={__('Best for most pages — when source design changes, translations stay bound.', 'gemtranslate')}
-				switchButton={
-					mode === 'custom_layout' ? (
-						<Button
+		<div className="gtrans-ml-auto gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-3">
+			<div className="gtrans-inline-flex" role="group" aria-label={__('Layout mode', 'gemtranslate')}>
+				{options.map((o, i) => {
+					const active = mode === o.value;
+					return (
+						<button
+							key={o.value}
 							type="button"
-							variant="secondary"
-							size="sm"
-							loading={isDemoting}
-							onClick={() => {
-								// eslint-disable-next-line no-alert
-								if (!window.confirm(__('Discard the custom layout and revert to string-only translations? Stored strings are preserved.', 'gemtranslate'))) return;
-								onDemote();
-							}}
+							title={o.hint}
+							aria-pressed={active}
+							disabled={busy}
+							onClick={() => pick(o.value)}
+							className={clsx(
+								'gtrans-bare gtrans-cursor-pointer gtrans-border gtrans-px-3 gtrans-py-1.5 gtrans-text-sm',
+								i === 0 ? 'gtrans-rounded-l-md' : '-gtrans-ml-px gtrans-rounded-r-md',
+								active
+									? 'gtrans-border-primary gtrans-bg-primary gtrans-text-white'
+									: 'gtrans-border-line gtrans-bg-surface gtrans-text-label hover:gtrans-bg-body',
+								busy && 'gtrans-cursor-wait gtrans-opacity-70'
+							)}
 						>
-							{__('↩ Revert to strings', 'gemtranslate')}
-						</Button>
-					) : null
-				}
-			/>
-			<ModeCard
-				active={mode === 'custom_layout'}
-				icon="🎨"
-				title={__('Custom layout', 'gemtranslate')}
-				summary={__('Design a fully separate page in your editor. Works with Gutenberg, Elementor, Beaver, Divi, Bricks.', 'gemtranslate')}
-				details={
-					mode === 'custom_layout' && variantRow?.shadow_post_id
-						? sprintf(
-								/* translators: 1: shadow post id, 2: variant label e.g. "es · MX". */
-								__('Shadow post #%1$s · %2$s', 'gemtranslate'),
-								variantRow.shadow_post_id,
-								variantLabel
-						  )
-						: __('Best for country-specific landing pages and homepages with different imagery.', 'gemtranslate')
-				}
-				switchButton={
-					mode === 'custom_layout' ? (
-						variantRow?.shadow_edit_url ? (
-							<a
-								href={variantRow.shadow_edit_url}
-								target="_blank"
-								rel="noopener noreferrer"
-								className="gtrans-inline-flex gtrans-items-center gtrans-gap-1 gtrans-rounded-md gtrans-bg-primary gtrans-px-3 gtrans-py-1.5 gtrans-text-xs gtrans-font-medium gtrans-text-white gtrans-no-underline hover:gtrans-bg-primary-hover"
-							>
-								{__('Open in editor →', 'gemtranslate')}
-							</a>
-						) : null
-					) : (
-						<Button
-							type="button"
-							variant="primary"
-							size="sm"
-							loading={isPromoting}
-							onClick={() => {
-								// eslint-disable-next-line no-alert
-								if (!window.confirm(sprintf(
-									/* translators: %s: variant label e.g. "Spanish · MX". */
-									__('Create a custom-layout copy of this page for %s? It opens in your normal WordPress editor.', 'gemtranslate'),
-									variantLabel
-								))) return;
-								onPromote();
-							}}
-						>
-							{__('Switch to custom layout →', 'gemtranslate')}
-						</Button>
-					)
-				}
-			/>
-		</div>
-	);
-}
-
-function ModeCard({ active, icon, title, summary, details, switchButton }) {
-	return (
-		<div
-			className={clsx(
-				'gtrans-rounded-lg gtrans-border gtrans-p-4 gtrans-transition-colors',
-				active
-					? 'gtrans-border-primary gtrans-bg-primary/5 gtrans-shadow-sm'
-					: 'gtrans-border-line gtrans-bg-surface'
-			)}
-		>
-			<div className="gtrans-flex gtrans-items-start gtrans-justify-between gtrans-gap-2">
-				<div className="gtrans-flex gtrans-items-center gtrans-gap-2">
-					<span className="gtrans-text-lg" aria-hidden="true">{icon}</span>
-					<h3 className="gtrans-m-0 gtrans-text-sm gtrans-font-semibold gtrans-text-ink">
-						{title}
-					</h3>
-				</div>
-				{active && (
-					<span className="gtrans-rounded-full gtrans-bg-emerald-100 gtrans-px-2 gtrans-py-0.5 gtrans-text-[10px] gtrans-font-semibold gtrans-uppercase gtrans-tracking-wide gtrans-text-emerald-800">
-						{__('Active', 'gemtranslate')}
-					</span>
-				)}
+							{o.label}
+						</button>
+					);
+				})}
 			</div>
-			<p className="gtrans-mt-2 gtrans-mb-1 gtrans-text-xs gtrans-leading-relaxed gtrans-text-label">
-				{summary}
-			</p>
-			<p className="gtrans-mb-3 gtrans-text-xs gtrans-text-muted">
-				{details}
-			</p>
-			{switchButton && (
-				<div className="gtrans-mt-3 gtrans-flex gtrans-justify-end">
-					{switchButton}
-				</div>
+			{mode === 'custom_layout' && variantRow?.shadow_edit_url && (
+				<a
+					href={variantRow.shadow_edit_url}
+					target="_blank"
+					rel="noopener noreferrer"
+					className="gtrans-text-sm gtrans-text-primary gtrans-no-underline hover:gtrans-underline"
+				>
+					{__('Open in editor →', 'gemtranslate')}
+				</a>
 			)}
 		</div>
 	);

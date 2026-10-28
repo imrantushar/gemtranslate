@@ -3,6 +3,7 @@ import { __, sprintf } from '@wordpress/i18n';
 
 import Card from '../../components/Card';
 import Button from '../../components/Button';
+import TopbarActions from '../../components/TopbarActions';
 import Toast from '../../components/Toast';
 import { FormSkeleton } from '../../components/Skeleton';
 import TokenField from '../../components/TokenField';
@@ -157,37 +158,36 @@ export default function AdvancedEditor({ postId, targetLang, country = '' }) {
 
 	return (
 		<>
-			{/* ---- Sticky progress + actions ---- */}
-			<div className="gtrans-sticky gtrans-top-0 gtrans-z-10 gtrans-mb-4 gtrans-rounded-lg gtrans-border gtrans-border-line gtrans-bg-surface gtrans-p-4 gtrans-shadow-sm">
-				<div className="gtrans-mb-2 gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-justify-between gtrans-gap-3">
-					<div className="gtrans-text-sm gtrans-font-medium gtrans-text-ink">
-						{sprintf(
-							/* translators: 1: confirmed count, 2: total, 3: percent. */
-							__('%1$d of %2$d segments complete (%3$d%%)', 'gemtranslate'),
-							confirmedSegs,
-							totalSegs,
-							pct
-						)}
-						<span className="gtrans-ml-2 gtrans-text-xs gtrans-font-normal gtrans-text-muted">
-							{sprintf(
-								/* translators: %d: translated segment count. */
-								__('· %d translated', 'gemtranslate'),
-								translatedSegs
-							)}
-						</span>
-					</div>
-					<div className="gtrans-flex gtrans-gap-2">
-						<Button size="sm" onClick={saveAll} loading={save.isPending}>
-							{__('Save translations', 'gemtranslate')}
-						</Button>
-					</div>
-				</div>
-				<div className="gtrans-h-2 gtrans-w-full gtrans-overflow-hidden gtrans-rounded-full gtrans-bg-body">
+			{/* Save lives in the global header so it stays reachable while scrolling. */}
+			<TopbarActions>
+				<Button onClick={saveAll} loading={save.isPending}>
+					{__('Save translations', 'gemtranslate')}
+				</Button>
+			</TopbarActions>
+
+			<div className="gtrans-mb-4 gtrans-flex gtrans-items-center gtrans-gap-4">
+				<div className="gtrans-h-1.5 gtrans-w-48 gtrans-flex-shrink-0 gtrans-overflow-hidden gtrans-rounded-full gtrans-bg-line">
 					<div
 						className="gtrans-h-full gtrans-rounded-full gtrans-bg-green-500 gtrans-transition-all"
 						style={{ width: `${pct}%` }}
 					/>
 				</div>
+				<span className="gtrans-text-sm gtrans-text-ink">
+					{sprintf(
+						/* translators: 1: confirmed count, 2: total, 3: percent. */
+						__('%1$d of %2$d segments complete (%3$d%%)', 'gemtranslate'),
+						confirmedSegs,
+						totalSegs,
+						pct
+					)}
+				</span>
+				<span className="gtrans-text-xs gtrans-text-muted">
+					{sprintf(
+						/* translators: %d: translated segment count. */
+						__('%d translated', 'gemtranslate'),
+						translatedSegs
+					)}
+				</span>
 			</div>
 
 			<div className="gtrans-flex gtrans-flex-col gtrans-gap-5">
