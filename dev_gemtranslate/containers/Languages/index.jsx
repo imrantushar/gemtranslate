@@ -4,6 +4,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
+import OptionMenu from '../../components/OptionMenu';
 import SearchBox from '../../components/SearchBox';
 import StatusTabs from '../../components/StatusTabs';
 
@@ -153,20 +154,25 @@ export default function LanguagesPage() {
 										{lang.is_rtl && <StatusPill>{__('RTL', 'gemtranslate')}</StatusPill>}
 									</Table.Cell>
 									<Table.Cell className="gtrans-text-right">
-										<div className="gtrans-flex gtrans-justify-end gtrans-gap-2">
-											{!lang.is_default && (
-												<Button variant="ghost" size="sm" onClick={() => onMakeDefault(lang)}>
-													{__('Make default', 'gemtranslate')}
-												</Button>
-											)}
-											<Button variant="secondary" size="sm" onClick={() => openEdit(lang)}>
-												{__('Edit', 'gemtranslate')}
-											</Button>
-											{!lang.is_default && (
-												<Button variant="ghost" size="sm" onClick={() => onDelete(lang)}>
-													{__('Delete', 'gemtranslate')}
-												</Button>
-											)}
+										<div className="gtrans-flex gtrans-justify-end">
+											<OptionMenu
+												label={sprintf(/* translators: %s: language name. */ __('Actions for %s', 'gemtranslate'), lang.name)}
+												options={[
+													{ label: __('Edit', 'gemtranslate'), icon: 'edit', onClick: () => openEdit(lang) },
+													!lang.is_default && {
+														label: __('Make default', 'gemtranslate'),
+														icon: 'star',
+														hasBorder: true,
+														onClick: () => onMakeDefault(lang),
+													},
+													!lang.is_default && {
+														label: __('Delete', 'gemtranslate'),
+														icon: 'trash',
+														danger: true,
+														onClick: () => onDelete(lang),
+													},
+												]}
+											/>
 										</div>
 									</Table.Cell>
 								</Table.Row>

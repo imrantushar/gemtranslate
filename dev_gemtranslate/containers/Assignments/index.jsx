@@ -7,6 +7,7 @@ import Card from '../../components/Card';
 import Modal from '../../components/Modal';
 import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
+import OptionMenu from '../../components/OptionMenu';
 import StatusTabs from '../../components/StatusTabs';
 
 import Toast from '../../components/Toast';
@@ -204,25 +205,25 @@ export default function AssignmentsPage() {
 													{__('Complete', 'gemtranslate')}
 												</Button>
 											)}
-											{canManage && r.status !== 'cancelled' && r.status !== 'completed' && (
-												<Button
-													size="sm"
-													variant="ghost"
-													onClick={() =>
-														act(() => update.mutateAsync({ id: r.id, status: 'cancelled' }))
-													}
-												>
-													{__('Cancel', 'gemtranslate')}
-												</Button>
-											)}
 											{canManage && (
-												<Button
-													size="sm"
-													variant="ghost"
-													onClick={() => act(() => remove.mutateAsync(r.id))}
-												>
-													{__('Delete', 'gemtranslate')}
-												</Button>
+												<OptionMenu
+													label={__('Assignment actions', 'gemtranslate')}
+													options={[
+														r.status !== 'cancelled' &&
+															r.status !== 'completed' && {
+																label: __('Cancel', 'gemtranslate'),
+																icon: 'x',
+																hasBorder: true,
+																onClick: () => act(() => update.mutateAsync({ id: r.id, status: 'cancelled' })),
+															},
+														{
+															label: __('Delete', 'gemtranslate'),
+															icon: 'trash',
+															danger: true,
+															onClick: () => act(() => remove.mutateAsync(r.id)),
+														},
+													]}
+												/>
 											)}
 										</div>
 									</Table.Cell>
