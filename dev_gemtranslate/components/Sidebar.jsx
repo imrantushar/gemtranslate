@@ -126,7 +126,7 @@ export default function Sidebar({ collapsed = false, onToggle }) {
 	return (
 		<aside
 			className={clsx(
-				'gtrans-relative gtrans-flex-shrink-0 gtrans-border-r gtrans-border-edge gtrans-bg-surface gtrans-py-4 gtrans-transition-all gtrans-duration-200',
+				'gtrans-sidebar gtrans-relative gtrans-flex-shrink-0 gtrans-border-r gtrans-border-edge gtrans-bg-surface gtrans-py-4 gtrans-transition-all gtrans-duration-200',
 				collapsed ? 'gtrans-w-16 gtrans-px-2' : 'gtrans-w-60 gtrans-px-3'
 			)}
 		>

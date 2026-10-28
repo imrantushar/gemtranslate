@@ -280,3 +280,13 @@ body.toplevel_page_gemtranslate #wpfooter {
 	line-height: 1.4;
 	cursor: default;
 }
+
+/* Sidebar stays in view while the page scrolls: pinned under the wp-admin bar
+   and the topbar, filling the remaining viewport height. */
+#gemtranslate-admin-root .gtrans-sidebar {
+	position: sticky;
+	top: calc(var(--wp-admin--admin-bar--height, 32px) + 56px);
+	align-self: flex-start;
+	height: calc(100vh - var(--wp-admin--admin-bar--height, 32px) - 56px);
+	overflow-y: auto;
+}
