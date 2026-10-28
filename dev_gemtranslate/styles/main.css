@@ -110,11 +110,6 @@ body.toplevel_page_gemtranslate #wpfooter {
 	text-decoration: none !important;
 }
 
-/* Parent of an expanded submenu: highlight the child, not the parent row. */
-#gemtranslate-admin-root nav a.gtrans-nav-parent[aria-current="page"] {
-	background-color: transparent !important;
-}
-
 /* Keep inactive nav links from inheriting WP admin link colours. */
 #gemtranslate-admin-root nav a:not([aria-current="page"]),
 #gemtranslate-admin-root nav a:not([aria-current="page"]):visited {
@@ -293,16 +288,6 @@ body.toplevel_page_gemtranslate #wpfooter {
 #gemtranslate-admin-root .gtrans-tok {
 	line-height: 1.4;
 	cursor: default;
-}
-
-/* Sidebar stays in view while the page scrolls: pinned under the wp-admin bar
-   and the topbar, filling the remaining viewport height. */
-#gemtranslate-admin-root .gtrans-sidebar {
-	position: sticky;
-	top: calc(var(--wp-admin--admin-bar--height, 32px) + var(--gtrans-topbar-h));
-	align-self: flex-start;
-	height: calc(100vh - var(--wp-admin--admin-bar--height, 32px) - var(--gtrans-topbar-h));
-	overflow-y: auto;
 }
 
 /* A page's title, filters and column headings stay put while a long list scrolls

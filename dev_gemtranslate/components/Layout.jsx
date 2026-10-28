@@ -1,42 +1,40 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
-import Sidebar from './Sidebar';
 import Topbar from './Topbar';
-import { canManage } from '../lib/currentUser';
+import { NAV } from './nav';
 
-const STORAGE_KEY = 'gtrans_menu_collapsed';
+/**
+ * Mirror the current route onto the wp-admin sidebar's GemTranslate submenu,
+ * which links to `admin.php?page=gemtranslate#/route` (see AdminMenu).
+ */
+function useSyncAdminMenu() {
+	const { pathname } = useLocation();
 
-function readCollapsed() {
-	try {
-		return window.localStorage.getItem(STORAGE_KEY) === '1';
-	} catch (e) {
-		return false;
-	}
+	useEffect(() => {
+		const items = document.querySelectorAll('#toplevel_page_gemtranslate .wp-submenu li');
+		if (!items.length) return;
+
+		const routes = NAV.map((n) => n.to).sort((a, b) => b.length - a.length);
+		const match = routes.find((to) => pathname === to || pathname.startsWith(`${to}/`));
+
+		items.forEach((li) => {
+			const href = li.querySelector('a')?.getAttribute('href') || '';
+			const hash = href.includes('#') ? href.split('#')[1] : '/dashboard';
+			li.classList.toggle('current', hash === (match || '/dashboard'));
+		});
+	}, [pathname]);
 }
 
 export default function Layout({ children }) {
-	const [collapsed, setCollapsed] = useState(readCollapsed);
-
-	const toggle = () =>
-		setCollapsed((prev) => {
-			try {
-				window.localStorage.setItem(STORAGE_KEY, prev ? '0' : '1');
-			} catch (e) {
-				// Storage unavailable — the toggle still works for this session.
-			}
-			return !prev;
-		});
+	useSyncAdminMenu();
 
 	return (
 		<div className="gtrans-app">
-			<Topbar collapsed={collapsed} onToggle={toggle} />
-			<div className="gtrans-flex gtrans-min-w-0 gtrans-flex-1">
-				{/* Translators only have the assignments screen, so no menu for them. */}
-				{canManage && <Sidebar collapsed={collapsed} onToggle={toggle} />}
-				<main className="gtrans-min-w-0 gtrans-flex-1 gtrans-overflow-x-clip gtrans-bg-body gtrans-p-6">
-					{children}
-				</main>
-			</div>
+			<Topbar />
+			<main className="gtrans-min-w-0 gtrans-flex-1 gtrans-overflow-x-clip gtrans-bg-body gtrans-p-6">
+				{children}
+			</main>
 		</div>
 	);
 }

@@ -24,6 +24,53 @@ class AdminMenu {
 			'dashicons-translation',
 			58
 		);
+
+		$this->register_submenus();
+	}
+
+	/**
+	 * Mirror the in-app header menu in the wp-admin sidebar. The React app
+	 * routes on the URL hash, so each entry links to `admin.php?page=gemtranslate#/route`
+	 * (WordPress passes a full URL slug straight through as the link).
+	 */
+	private function register_submenus() {
+		$page = self::PAGE_SLUG;
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			// Translators only have the assignments screen.
+			add_submenu_page(
+				$page,
+				__( 'My assignments', 'gemtranslate' ),
+				__( 'My assignments', 'gemtranslate' ),
+				'gtrans_translate_content',
+				$page,
+				[ $this, 'render_page' ]
+			);
+			return;
+		}
+
+		$items = [
+			[ '',              __( 'Dashboard', 'gemtranslate' ) ],
+			[ '/languages',    __( 'Languages', 'gemtranslate' ) ],
+			[ '/posts',        __( 'Posts & Pages', 'gemtranslate' ) ],
+			[ '/terms',        __( 'Taxonomies', 'gemtranslate' ) ],
+			[ '/strings',      __( 'Strings', 'gemtranslate' ) ],
+			[ '/menus',        __( 'Menus', 'gemtranslate' ) ],
+			[ '/translators',  __( 'Translators', 'gemtranslate' ) ],
+			[ '/migration',    __( 'Migration', 'gemtranslate' ) ],
+			[ '/io',           __( 'Import & Export', 'gemtranslate' ) ],
+			[ '/settings',     __( 'Settings', 'gemtranslate' ) ],
+		];
+
+		foreach ( $items as $item ) {
+			list( $route, $label ) = $item;
+			// The first entry reuses the parent slug so WordPress renames it from "GemTranslate".
+			$slug = '' === $route
+				? $page
+				: admin_url( 'admin.php?page=' . $page ) . '#' . $route;
+
+			add_submenu_page( $page, $label, $label, 'manage_options', $slug, '' === $route ? [ $this, 'render_page' ] : '' );
+		}
 	}
 
 	public function render_page() {

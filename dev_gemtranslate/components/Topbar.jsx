@@ -2,21 +2,21 @@ import { useLocation } from 'react-router-dom';
 import { __ } from '@wordpress/i18n';
 
 import Icon from './Icon';
-import MenuToggle from './MenuToggle';
+import HeaderNav from './HeaderNav';
 import { TOPBAR_ACTIONS_ID } from './TopbarActions';
-import { NAV } from './Sidebar';
+import { NAV } from './nav';
 import { useThemeMode } from '../lib/theme';
 import { canManage } from '../lib/currentUser';
 
-export default function Topbar({ collapsed, onToggle }) {
+export default function Topbar() {
 	const { pathname } = useLocation();
 	const { isDark, toggle: toggleTheme } = useThemeMode();
 	const themeLabel = isDark ? __('Switch to light mode', 'gemtranslate') : __('Switch to dark mode', 'gemtranslate');
 	const current = NAV.find((item) => pathname === item.to || pathname.startsWith(`${item.to}/`));
 
 	return (
-		<header className="gtrans-topbar gtrans-flex gtrans-h-[72px] gtrans-flex-shrink-0 gtrans-items-center gtrans-justify-between gtrans-border-b gtrans-border-edge gtrans-bg-surface gtrans-px-5">
-			<div className="gtrans-flex gtrans-items-center gtrans-gap-3">
+		<header className="gtrans-topbar gtrans-flex gtrans-h-[72px] gtrans-flex-shrink-0 gtrans-items-center gtrans-justify-between gtrans-gap-4 gtrans-border-b gtrans-border-edge gtrans-bg-surface gtrans-px-5">
+			<div className="gtrans-flex gtrans-flex-shrink-0 gtrans-items-center gtrans-gap-3">
 				<span className="gtrans-flex gtrans-h-[34px] gtrans-w-[34px] gtrans-flex-shrink-0 gtrans-items-center gtrans-justify-center gtrans-rounded-lg gtrans-bg-primary gtrans-text-white" aria-hidden="true">
 					<span className="dashicons dashicons-translation" style={{ width: 20, height: 20, fontSize: 20 }} />
 				</span>
@@ -31,10 +31,15 @@ export default function Topbar({ collapsed, onToggle }) {
 					</span>
 				)}
 
-				{canManage && collapsed && <MenuToggle collapsed={collapsed} onToggle={onToggle} />}
 			</div>
 
-			<div className="gtrans-flex gtrans-items-center gtrans-gap-3">
+			{canManage && (
+				<div className="gtrans-flex gtrans-min-w-0 gtrans-flex-1 gtrans-justify-center">
+					<HeaderNav />
+				</div>
+			)}
+
+			<div className="gtrans-flex gtrans-flex-shrink-0 gtrans-items-center gtrans-gap-3">
 				{/* Pages portal their primary actions here (see <TopbarActions>). */}
 				<div id={TOPBAR_ACTIONS_ID} className="gtrans-flex gtrans-items-center gtrans-gap-2" />
 				<span className="gtrans-rounded-full gtrans-border gtrans-border-line gtrans-px-2 gtrans-py-0.5 gtrans-text-xs gtrans-text-muted">
