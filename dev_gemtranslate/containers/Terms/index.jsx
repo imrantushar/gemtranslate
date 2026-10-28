@@ -4,6 +4,7 @@ import { __, sprintf } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
+import Modal from '../../components/Modal';
 import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
 import SearchBox from '../../components/SearchBox';
@@ -15,6 +16,11 @@ import { PageSkeleton, TableSkeleton } from '../../components/Skeleton';
 import { useTerms, useTermTranslations, useSaveTermTranslation } from '../../hooks/useTerms';
 import { useLanguages } from '../../hooks/useLanguages';
 import { formatErrorMessage } from '../../lib/format';
+
+// The select menu is portalled to <body>; lift it above the modal overlay.
+const modalSelectStyles = {
+	menuPortal: (base) => ({ ...base, zIndex: 100001 }),
+};
 
 export default function TermsPage() {
 	const langs = useLanguages();
@@ -54,7 +60,7 @@ export default function TermsPage() {
 	}, [detail.data, selectedLang]);
 
 	const submit = async (e) => {
-		e.preventDefault();
+		e?.preventDefault();
 		try {
 			await save.mutateAsync({ termId: selectedTerm, lang: selectedLang, payload: form });
 			setToast({ tone: 'success', message: __('Term translation saved.', 'gemtranslate') });
@@ -134,50 +140,70 @@ export default function TermsPage() {
 				)}
 			</Card>
 
-			{selectedTerm && detail.data && (
-				<div className="gtrans-grid gtrans-grid-cols-1 lg:gtrans-grid-cols-2 gtrans-gap-6">
-					<Card title={sprintf(/* translators: %s: lang code. */ __('Source — %s', 'gemtranslate'), defaultLang?.code || '')}>
-						<div className="gtrans-flex gtrans-flex-col gtrans-gap-3">
-							<Field label={__('Name', 'gemtranslate')}>
-								<TextInput value={detail.data.term.name} readOnly />
-							</Field>
-							<Field label={__('Slug', 'gemtranslate')}>
-								<TextInput value={detail.data.term.slug} readOnly />
-							</Field>
-							<Field label={__('Description', 'gemtranslate')}>
-								<TextArea rows={5} value={detail.data.term.description || ''} readOnly />
-							</Field>
-						</div>
-					</Card>
+			{selectedTerm && (
+				<Modal
+					open
+					onClose={() => setSelectedTerm(null)}
+					size="lg"
+					title={
+						detail.data
+							? sprintf(/* translators: %s: term name. */ __('Translate “%s”', 'gemtranslate'), detail.data.term.name)
+							: __('Translate term', 'gemtranslate')
+					}
+					footer={
+						<>
+							<Button variant="secondary" onClick={() => setSelectedTerm(null)}>
+								{__('Close', 'gemtranslate')}
+							</Button>
+							<Button loading={save.isPending} disabled={!detail.data} onClick={submit}>
+								{__('Save translation', 'gemtranslate')}
+							</Button>
+						</>
+					}
+				>
+					{!detail.data ? (
+						<p className="gtrans-m-0 gtrans-text-sm gtrans-text-muted">{__('Loading…', 'gemtranslate')}</p>
+					) : (
+						<form onSubmit={submit} className="gtrans-grid gtrans-grid-cols-1 gtrans-gap-6 md:gtrans-grid-cols-2">
+							<div className="gtrans-flex gtrans-flex-col gtrans-gap-3">
+								<h4 className="gtrans-m-0 gtrans-flex gtrans-h-9 gtrans-items-center gtrans-text-sm gtrans-font-semibold gtrans-text-ink">
+									{sprintf(/* translators: %s: lang code. */ __('Source — %s', 'gemtranslate'), defaultLang?.code || '')}
+								</h4>
+								<Field label={__('Name', 'gemtranslate')}>
+									<TextInput value={detail.data.term.name} readOnly />
+								</Field>
+								<Field label={__('Slug', 'gemtranslate')}>
+									<TextInput value={detail.data.term.slug} readOnly />
+								</Field>
+								<Field label={__('Description', 'gemtranslate')}>
+									<TextArea rows={5} value={detail.data.term.description || ''} readOnly />
+								</Field>
+							</div>
 
-					<Card
-						title={sprintf(/* translators: %s: lang code. */ __('Translation — %s', 'gemtranslate'), selectedLang)}
-						action={
-							<Select value={selectedLang} onChange={(e) => setSelectedLang(e.target.value)}>
-								{nonDefault.map((l) => (
-									<option key={l.code} value={l.code}>{l.name}</option>
-								))}
-							</Select>
-						}
-					>
-						<form onSubmit={submit} className="gtrans-flex gtrans-flex-col gtrans-gap-3">
-							<Field label={__('Name', 'gemtranslate')}>
-								<TextInput value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
-							</Field>
-							<Field label={__('Slug', 'gemtranslate')}>
-								<TextInput value={form.slug} onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))} />
-							</Field>
-							<Field label={__('Description', 'gemtranslate')}>
-								<TextArea rows={5} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
-							</Field>
-							<div className="gtrans-mt-2 gtrans-flex gtrans-justify-end">
-								<Button type="submit" loading={save.isPending}>
-									{__('Save translation', 'gemtranslate')}
-								</Button>
+							<div className="gtrans-flex gtrans-flex-col gtrans-gap-3">
+								<div className="gtrans-flex gtrans-h-9 gtrans-items-center gtrans-justify-between gtrans-gap-3">
+									<h4 className="gtrans-m-0 gtrans-whitespace-nowrap gtrans-text-sm gtrans-font-semibold gtrans-text-ink">
+										{sprintf(/* translators: %s: lang code. */ __('Translation — %s', 'gemtranslate'), selectedLang)}
+									</h4>
+									<Select styles={modalSelectStyles} className="gtrans-w-40" value={selectedLang} onChange={(e) => setSelectedLang(e.target.value)}>
+										{nonDefault.map((l) => (
+											<option key={l.code} value={l.code}>{l.name}</option>
+										))}
+									</Select>
+								</div>
+								<Field label={__('Name', 'gemtranslate')}>
+									<TextInput value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
+								</Field>
+								<Field label={__('Slug', 'gemtranslate')}>
+									<TextInput value={form.slug} onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))} />
+								</Field>
+								<Field label={__('Description', 'gemtranslate')}>
+									<TextArea rows={5} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
+								</Field>
 							</div>
 						</form>
-					</Card>
-				</div>
+					)}
+				</Modal>
 			)}
 
 			<Toast message={toast?.message} tone={toast?.tone} onClear={() => setToast(null)} />
