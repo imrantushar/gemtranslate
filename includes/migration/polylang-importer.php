@@ -40,7 +40,7 @@ class PolylangImporter {
 			$lang_terms = get_terms( [ 'taxonomy' => 'language', 'hide_empty' => false ] );
 			if ( ! is_wp_error( $lang_terms ) ) {
 				foreach ( $lang_terms as $t ) {
-					$desc   = maybe_unserialize( $t->description );
+					$desc   = self::decode( $t->description );
 					$locale = is_array( $desc ) ? ( $desc['locale'] ?? '' ) : '';
 					$code   = strtolower( $t->slug );
 					if ( $registry->get( $code ) ) {
@@ -64,7 +64,7 @@ class PolylangImporter {
 			$tx_terms = get_terms( [ 'taxonomy' => 'post_translations', 'hide_empty' => false ] );
 			if ( ! is_wp_error( $tx_terms ) ) {
 				foreach ( $tx_terms as $t ) {
-					$map = maybe_unserialize( $t->description );
+					$map = self::decode( $t->description );
 					if ( ! is_array( $map ) || empty( $map ) ) {
 						continue;
 					}
@@ -107,5 +107,20 @@ class PolylangImporter {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Polylang keeps language and translation maps as serialized arrays in term
+	 * descriptions. Decode them without allowing object instantiation, so a
+	 * tampered row cannot trigger a gadget chain.
+	 *
+	 * @param string $value
+	 * @return mixed
+	 */
+	private static function decode( $value ) {
+		if ( ! is_serialized( $value ) ) {
+			return $value;
+		}
+		return unserialize( trim( $value ), [ 'allowed_classes' => false ] ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions
 	}
 }

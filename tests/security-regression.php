@@ -210,6 +210,49 @@ try {
 	$check( 'S6 page marked uncacheable (DONOTCACHEPAGE)', defined( 'DONOTCACHEPAGE' ) && DONOTCACHEPAGE );
 	if ( null === $orig_geo ) { unset( $opt['geo_enabled'] ); } else { $opt['geo_enabled'] = $orig_geo; }
 	update_option( GTRANS_SETTINGS_NAME, wp_json_encode( $opt ) );
+
+	// ---------- S7: public geo endpoints ----------
+	$geo = new \GemTranslate\API\Geo();
+	$det = $geo->detect( new WP_REST_Request( 'GET', '/gemtranslate/v1/geo/detect' ) )->get_data();
+	$check( 'S7 detect() does not expose detector sources', ! isset( $det['data']['sources'] ) );
+	$rl = new ReflectionMethod( $geo, 'rate_limited' );
+	$rl->setAccessible( true );
+	$_SERVER['REMOTE_ADDR'] = '198.51.100.23';
+	$limited_at = 0;
+	for ( $i = 1; $i <= 30; $i++ ) {
+		if ( $rl->invoke( $geo ) ) {
+			$limited_at = $i;
+			break;
+		}
+	}
+	$check( 'S7 cookie writes rate-limited after ' . \GemTranslate\API\Geo::COOKIE_RATE_LIMIT . ' (limited at call ' . $limited_at . ')', \GemTranslate\API\Geo::COOKIE_RATE_LIMIT + 1 === $limited_at );
+	delete_transient( 'gtrans_geo_rl_' . md5( '198.51.100.23' ) );
+	$_SERVER['REMOTE_ADDR'] = $srv['REMOTE_ADDR'] ?? '';
+	$opt0 = json_decode( get_option( GTRANS_SETTINGS_NAME, '{}' ), true );
+	$off  = $geo->set_cookie( new WP_REST_Request( 'POST', '/gemtranslate/v1/geo/cookie' ) );
+	$check( 'S7 cookie endpoint refuses when geo disabled', ! empty( $opt0['geo_enabled'] ) || is_wp_error( $off ) );
+
+	// ---------- S8: import / export hardening ----------
+	$unit = '<unit id="string:1"><segment><source>Hi</source><target>Hola</target></segment></unit>';
+	$ok   = '<?xml version="1.0"?><xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" version="2.1" srcLang="en" trgLang="es"><file id="f">' . $unit . '</file></xliff>';
+	$check( 'S8 xliff: valid document parsed', 1 === count( \GemTranslate\Io\Xliff::parse( $ok ) ) );
+	$xxe  = '<?xml version="1.0"?><!DOCTYPE x [<!ENTITY e SYSTEM "file:///etc/passwd">]><xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" version="2.1"><file id="f"><unit id="string:1"><segment><source>&e;</source><target>&e;</target></segment></unit></file></xliff>';
+	$check( 'S8 xliff: DOCTYPE/entity document refused', array() === \GemTranslate\Io\Xliff::parse( $xxe ) );
+	$check( 'S8 xliff: oversized input refused', array() === \GemTranslate\Io\Xliff::parse( str_repeat( 'a', \GemTranslate\Io\Xliff::MAX_BYTES + 1 ) ) );
+	$csv  = \GemTranslate\Io\Csv::build( [
+		[ 'id' => 'string:1', 'source' => '=HYPERLINK("http://x","y")', 'target' => '-10% off', 'note' => '@SUM(1)' ],
+		[ 'id' => 'string:2', 'source' => 'plain', 'target' => "'quoted", 'note' => '' ],
+	] );
+	$check( 'S8 csv: formula cells neutralised in export', false !== strpos( $csv, "'=HYPERLINK" ) && false !== strpos( $csv, "'@SUM" ) && false !== strpos( $csv, "'-10% off" ) );
+	$back = \GemTranslate\Io\Csv::parse( $csv );
+	$check( 'S8 csv: round trip restores original text', '=HYPERLINK("http://x","y")' === $back[0]['source'] && '-10% off' === $back[0]['target'] && "'quoted" === $back[1]['target'] );
+	$dec = new ReflectionMethod( \GemTranslate\Migration\PolylangImporter::class, 'decode' );
+	$dec->setAccessible( true );
+	$arr = $dec->invoke( null, 'a:1:{s:2:"es";i:5;}' );
+	$obj = $dec->invoke( null, 'O:8:"stdClass":1:{s:1:"a";i:1;}' );
+	$check( 'S8 polylang decode: array map decoded', array( 'es' => 5 ) === $arr );
+	$check( 'S8 polylang decode: objects are not instantiated', ! ( $obj instanceof stdClass ) );
+
 } catch ( \Throwable $e ) {
 	$results[] = [ 'EXCEPTION ' . $e->getMessage() . ' @ ' . basename( $e->getFile() ) . ':' . $e->getLine(), false ];
 } finally {

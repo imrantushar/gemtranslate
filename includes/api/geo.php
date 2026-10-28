@@ -49,17 +49,28 @@ class Geo extends Controller {
 
 	public function detect( $request ) {
 		$iso = CountryContext::current();
+		// Detector configuration is not exposed: it tells an attacker which
+		// signals (headers, MaxMind, cookie) decide the visitor's content.
 		return $this->ok(
 			[
 				'country'        => $iso,
 				'enabled'        => CountryContext::enabled(),
-				'sources'        => CountryContext::sources(),
 				'language_match' => '' !== $iso ? $this->match_language( $iso ) : '',
 			]
 		);
 	}
 
+	/** Cookie writes allowed per client per window. */
+	const COOKIE_RATE_LIMIT  = 20;
+	const COOKIE_RATE_WINDOW = MINUTE_IN_SECONDS;
+
 	public function set_cookie( $request ) {
+		if ( ! CountryContext::enabled() ) {
+			return $this->fail( 'gtrans_geo_disabled', __( 'Country detection is not enabled.', 'gemtranslate' ), 404 );
+		}
+		if ( $this->rate_limited() ) {
+			return $this->fail( 'gtrans_rate_limited', __( 'Too many requests. Try again in a minute.', 'gemtranslate' ), 429 );
+		}
 		$body    = $request->get_json_params() ?: $request->get_params();
 		$country = strtoupper( (string) ( $body['country'] ?? '' ) );
 		if ( ! preg_match( '/^[A-Z]{2}$/', $country ) ) {
@@ -70,6 +81,22 @@ class Geo extends Controller {
 			return $this->fail( 'gtrans_cookie_failed', __( 'Could not set country cookie.', 'gemtranslate' ), 500 );
 		}
 		return $this->ok( [ 'country' => $country ] );
+	}
+
+	/**
+	 * Fixed-window counter per client IP. The endpoint is public by design (it
+	 * backs the country picker for anonymous visitors), so it must not be an
+	 * unlimited write path.
+	 */
+	private function rate_limited() {
+		$ip  = \GemTranslate\Geo\TrustedProxy::client_ip();
+		$key = 'gtrans_geo_rl_' . md5( '' !== $ip ? $ip : 'unknown' );
+		$n   = (int) get_transient( $key );
+		if ( $n >= self::COOKIE_RATE_LIMIT ) {
+			return true;
+		}
+		set_transient( $key, $n + 1, self::COOKIE_RATE_WINDOW );
+		return false;
 	}
 
 	private function match_language( $country ) {

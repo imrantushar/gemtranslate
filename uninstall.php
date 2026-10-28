@@ -13,41 +13,26 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
-$settings_json = get_option( 'gtrans_settings', '{}' );
-$settings      = json_decode( $settings_json );
-$remove_data   = isset( $settings->remove_data_on_uninstall ) ? (bool) $settings->remove_data_on_uninstall : false;
+require_once __DIR__ . '/includes/uninstaller.php';
 
-if ( ! $remove_data ) {
-	return;
-}
+/**
+ * Honour the "Remove all data on uninstall" setting of a single site.
+ */
+$gtrans_uninstall_site = static function () {
+	$settings    = json_decode( (string) get_option( 'gtrans_settings', '{}' ) );
+	$remove_data = isset( $settings->remove_data_on_uninstall ) ? (bool) $settings->remove_data_on_uninstall : false;
+	if ( $remove_data ) {
+		\GemTranslate\Uninstaller::remove_current_site();
+	}
+};
 
-global $wpdb;
-$prefix = $wpdb->prefix . 'gtrans_';
-$tables = [
-	'languages',
-	'translation_groups',
-	'post_translations',
-	'term_translations',
-	'menu_translations',
-	'strings',
-	'string_translations',
-	'seo_meta',
-	'slugs',
-	'jobs',
-	'translation_memory',
-	'glossary',
-];
-foreach ( $tables as $name ) {
-	$wpdb->query( "DROP TABLE IF EXISTS {$prefix}{$name}" );
-}
-
-$options = [
-	'gtrans_version',
-	'gtrans_db_version',
-	'gtrans_settings',
-	'gtrans_first_install_time',
-	'gtrans_required_rewrite_flush',
-];
-foreach ( $options as $option ) {
-	delete_option( $option );
+if ( is_multisite() ) {
+	// The setting is per site, so decide site by site.
+	foreach ( get_sites( [ 'fields' => 'ids', 'number' => 0 ] ) as $gtrans_blog_id ) {
+		switch_to_blog( (int) $gtrans_blog_id );
+		$gtrans_uninstall_site();
+		restore_current_blog();
+	}
+} else {
+	$gtrans_uninstall_site();
 }

@@ -67,15 +67,6 @@ class Multisite {
 	}
 
 	private static function drop_tables_for_current_site() {
-		global $wpdb;
-		$prefix = $wpdb->prefix . 'gtrans_';
-		$tables = [
-			'languages', 'translation_groups', 'post_translations', 'term_translations',
-			'menu_translations', 'strings', 'string_translations', 'seo_meta', 'slugs',
-			'jobs', 'translation_memory', 'glossary', 'post_meta_translations',
-		];
-		foreach ( $tables as $t ) {
-			$wpdb->query( "DROP TABLE IF EXISTS {$prefix}{$t}" );
-		}
+		\GemTranslate\Uninstaller::drop_tables();
 	}
 }
