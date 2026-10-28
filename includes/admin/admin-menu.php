@@ -18,7 +18,7 @@ class AdminMenu {
 		add_menu_page(
 			__( 'GemTranslate', 'gemtranslate' ),
 			__( 'GemTranslate', 'gemtranslate' ),
-			'manage_options',
+			'gtrans_translate_content',
 			self::PAGE_SLUG,
 			[ $this, 'render_page' ],
 			'dashicons-translation',

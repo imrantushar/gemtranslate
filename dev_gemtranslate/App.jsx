@@ -21,6 +21,7 @@ import ImportExportPage from './containers/ImportExport';
 import SettingsPage from './containers/Settings';
 import Onboarding from './containers/Onboarding';
 import { useSettings } from './hooks/useSettings';
+import { canManage } from './lib/currentUser';
 
 function FirstRunGate() {
 	const settings = useSettings();
@@ -41,7 +42,25 @@ function FirstRunGate() {
 	return null;
 }
 
+function TranslatorRoutes() {
+	return (
+		<Routes>
+			<Route path="/assignments" element={<AssignmentsPage />} />
+			<Route path="/posts/:id" element={<TranslationEditor />} />
+			<Route path="*" element={<Navigate to="/assignments" replace />} />
+		</Routes>
+	);
+}
+
 export default function App() {
+	if (!canManage) {
+		return (
+			<Layout>
+				<TranslatorRoutes />
+			</Layout>
+		);
+	}
+
 	return (
 		<Layout>
 			<FirstRunGate />

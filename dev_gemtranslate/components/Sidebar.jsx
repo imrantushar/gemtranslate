@@ -9,8 +9,9 @@ import { ProBadge } from './ProGate';
 import Icon from './Icon';
 import MenuToggle from './MenuToggle';
 import { usePostTypes } from '../hooks/usePostTypes';
+import { canManage } from '../lib/currentUser';
 
-export const NAV = [
+const MANAGER_NAV = [
 	{ to: '/dashboard', label: () => __('Dashboard', 'gemtranslate'), icon: 'dashboard' },
 	{ to: '/languages', label: () => __('Languages', 'gemtranslate'), icon: 'globe' },
 	{ to: '/posts', label: () => __('Posts & Pages', 'gemtranslate'), icon: 'file', children: 'postTypes' },
@@ -35,6 +36,12 @@ export const NAV = [
 	{ to: '/settings', label: () => __('Settings', 'gemtranslate'), icon: 'settings', children: 'settings' },
 ];
 
+// Translators only get their assigned work, not the site-wide admin screens.
+const TRANSLATOR_NAV = [
+	{ to: '/assignments', label: () => __('My assignments', 'gemtranslate'), icon: 'clipboard', badge: 'assignments' },
+];
+
+export const NAV = canManage ? MANAGER_NAV : TRANSLATOR_NAV;
 
 // Submenu entries for the expandable items. Post types come from the API;
 // taxonomies are fixed, with the WooCommerce ones shown only when "product"
@@ -134,7 +141,7 @@ export default function Sidebar({ collapsed = false, onToggle }) {
 				<MenuToggle
 					collapsed={collapsed}
 					onToggle={onToggle}
-					className="gtrans-absolute gtrans-right-3 gtrans-top-[18px] gtrans-z-10"
+					className="gtrans-absolute gtrans-right-3 gtrans-top-[14px] gtrans-z-10"
 				/>
 			)}
 
