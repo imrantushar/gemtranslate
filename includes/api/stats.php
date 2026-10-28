@@ -5,7 +5,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use GemTranslate\AI\TranslationMemory;
 use GemTranslate\Helper;
 use GemTranslate\Language\Context;
 
@@ -63,7 +62,6 @@ class Stats extends Controller {
 				'term_translations' => $term_translations,
 				'strings_total'     => $strings_total,
 				'strings_translated' => $strings_translated,
-				'tm'                => class_exists( TranslationMemory::class ) ? TranslationMemory::stats() : [ 'entries' => 0, 'hits' => 0 ],
 				'per_language'      => $per_lang,
 			]
 		);

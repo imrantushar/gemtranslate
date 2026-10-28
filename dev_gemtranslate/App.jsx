@@ -7,7 +7,6 @@ import Dashboard from './containers/Dashboard';
 import Languages from './containers/Languages';
 import Posts from './containers/Posts';
 import TranslationEditor from './containers/Posts/TranslationEditor';
-import ReviewPage from './containers/Review';
 import AssignmentsPage from './containers/Assignments';
 import ProGate from './components/ProGate';
 import PackageList from './containers/Strings/PackageList';
@@ -16,7 +15,6 @@ import StringsLegacy from './containers/Strings/StringsLegacy';
 import Terms from './containers/Terms';
 import Menus from './containers/Menus';
 import SeoPage from './containers/SEO';
-import JobsPage from './containers/Jobs';
 import TranslatorsPage from './containers/Translators';
 import MigrationPage from './containers/Migration';
 import ImportExportPage from './containers/ImportExport';
@@ -54,22 +52,6 @@ export default function App() {
 				<Route path="/languages" element={<Languages />} />
 				<Route path="/posts" element={<Posts />} />
 				<Route path="/posts/:id" element={<TranslationEditor />} />
-				<Route
-					path="/review"
-					element={
-						<ProGate
-							feature="translate_everything"
-							header={__('Review queue', 'gemtranslate')}
-							title={__('Automatic translation & review queue', 'gemtranslate')}
-							description={__(
-								'Auto-translate content on publish and review it before it goes live — with GemTranslate Pro.',
-								'gemtranslate'
-							)}
-						>
-							<ReviewPage />
-						</ProGate>
-					}
-				/>
 				<Route path="/terms" element={<Terms />} />
 				<Route path="/strings" element={<PackageList />} />
 				<Route path="/strings/legacy" element={<StringsLegacy />} />
@@ -88,22 +70,6 @@ export default function App() {
 							)}
 						>
 							<SeoPage />
-						</ProGate>
-					}
-				/>
-				<Route
-					path="/jobs"
-					element={
-						<ProGate
-							feature="ai_bulk"
-							header={__('Jobs', 'gemtranslate')}
-							title={__('Bulk & background translation', 'gemtranslate')}
-							description={__(
-								'Queue bulk AI translations and run them in the background — with GemTranslate Pro.',
-								'gemtranslate'
-							)}
-						>
-							<JobsPage />
 						</ProGate>
 					}
 				/>

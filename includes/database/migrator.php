@@ -28,8 +28,7 @@ class Migrator {
 		self::ensure_country_code_column( $prefix );
 		self::ensure_post_translations_pk( $prefix );
 
-		// Free-tier tables. Pro tables (jobs, translation_memory, glossary,
-		// seo_meta, post_meta_translations, post_translation_revisions) are
+		// Free-tier tables. Pro tables (seo_meta, post_meta_translations, post_translation_revisions) are
 		// created by gemtranslate-pro's own migrator.
 		CreateLanguagesTable::up( $prefix, $charset_collate );
 		CreateTranslationGroupsTable::up( $prefix, $charset_collate );

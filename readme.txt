@@ -12,7 +12,7 @@ AI-first multilingual platform for WordPress. Fast, modern, and developer-friend
 
 == Description ==
 
-GemTranslate is a performance-minded multilingual plugin for WordPress with a fully React-based admin, REST-driven architecture, and optional AI translation (OpenAI / DeepL / Google) via BYOK.
+GemTranslate is a performance-minded multilingual plugin for WordPress with a fully React-based admin, REST-driven architecture.
 
 Designed to never slow down your site:
 * Translations stored in custom tables, not duplicated in wp_posts.

@@ -12,7 +12,6 @@ class Translation {
 		Translation\MenuTranslator::init();
 		Translation\StringTranslator::init();
 		Translation\ShadowPostSync::init();
-		// MetaTranslator (custom fields/ACF) and AutoTranslate (Translate
-		// Everything) are Pro — registered by gemtranslate-pro on `gtrans_init`.
+		// MetaTranslator (custom fields/ACF) is Pro — registered by gemtranslate-pro on `gtrans_init`.
 	}
 }

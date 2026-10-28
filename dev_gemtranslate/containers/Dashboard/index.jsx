@@ -109,7 +109,7 @@ export default function Dashboard() {
 				}
 			/>
 
-			<div className="gtrans-grid gtrans-gap-4 gtrans-grid-cols-2 md:gtrans-grid-cols-4">
+			<div className="gtrans-grid gtrans-gap-4 gtrans-grid-cols-2 md:gtrans-grid-cols-3">
 				<Stat
 					icon="globe"
 					label={__('Active languages', 'gemtranslate')}
@@ -136,12 +136,6 @@ export default function Dashboard() {
 					value={stringsTranslated}
 					total={stringsTotal}
 					progress={stringsPct}
-				/>
-				<Stat
-					icon="database"
-					label={__('Translation memory', 'gemtranslate')}
-					value={data.tm?.entries ?? 0}
-					hint={`${data.tm?.hits ?? 0} ${__('cache hits', 'gemtranslate')}`}
 				/>
 			</div>
 

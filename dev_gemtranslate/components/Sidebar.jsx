@@ -3,8 +3,6 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import { __ } from '@wordpress/i18n';
 import clsx from 'clsx';
 
-import { useJobCounts } from '../hooks/useJobs';
-import { useReviewCount } from '../hooks/useReview';
 import { useAssignmentCounts } from '../hooks/useAssignments';
 import { hasFeature } from '../hooks/useFeatures';
 import { ProBadge } from './ProGate';
@@ -15,24 +13,10 @@ export const NAV = [
 	{ to: '/dashboard', label: () => __('Dashboard', 'gemtranslate'), icon: 'dashboard' },
 	{ to: '/languages', label: () => __('Languages', 'gemtranslate'), icon: 'globe' },
 	{ to: '/posts', label: () => __('Posts & Pages', 'gemtranslate'), icon: 'file', children: 'postTypes' },
-	{
-		to: '/review',
-		label: () => __('Review', 'gemtranslate'),
-		icon: 'check',
-		badge: 'review',
-		pro: 'translate_everything',
-	},
 	{ to: '/terms', label: () => __('Taxonomies', 'gemtranslate'), icon: 'tag', children: 'taxonomies' },
 	{ to: '/strings', label: () => __('Strings', 'gemtranslate'), icon: 'type' },
 	{ to: '/menus', label: () => __('Menus', 'gemtranslate'), icon: 'menu' },
 	{ to: '/seo', label: () => __('SEO', 'gemtranslate'), icon: 'search', pro: 'seo_advanced' },
-	{
-		to: '/jobs',
-		label: () => __('Jobs', 'gemtranslate'),
-		icon: 'clock',
-		badge: 'jobs',
-		pro: 'ai_bulk',
-	},
 	{
 		to: '/translators',
 		label: () => __('Translators', 'gemtranslate'),
@@ -80,7 +64,6 @@ function useSubmenus() {
 
 	const settings = [
 		{ key: 'general', label: __('General', 'gemtranslate') },
-		{ key: 'translate', label: __('Automatic translation', 'gemtranslate') },
 		{ key: 'switcher', label: __('Language switcher', 'gemtranslate') },
 		{ key: 'geo', label: __('Country detection', 'gemtranslate') },
 		{ key: 'floating', label: __('Floating switcher', 'gemtranslate') },
@@ -133,10 +116,6 @@ function SubMenu({ items, openAssignments }) {
 }
 
 export default function Sidebar({ collapsed = false }) {
-	const counts = useJobCounts();
-	const liveJobs = (counts.data?.pending ?? 0) + (counts.data?.running ?? 0);
-	const reviewCount = useReviewCount();
-	const pendingReview = reviewCount.data ?? 0;
 	const assignmentCounts = useAssignmentCounts();
 	const openAssignments = assignmentCounts.data?.open ?? 0;
 	const submenus = useSubmenus();
@@ -181,16 +160,6 @@ export default function Sidebar({ collapsed = false }) {
 						) : (
 							<>
 						<span className="gtrans-flex-1">{item.label()}</span>
-						{item.badge === 'jobs' && liveJobs > 0 && (
-							<span className="gtrans-rounded-full gtrans-bg-primary-light gtrans-px-2 gtrans-py-0.5 gtrans-text-11 gtrans-font-medium gtrans-text-primary">
-								{liveJobs}
-							</span>
-						)}
-						{item.badge === 'review' && pendingReview > 0 && (
-							<span className="gtrans-rounded-full gtrans-bg-warning-light gtrans-px-2 gtrans-py-0.5 gtrans-text-11 gtrans-font-medium gtrans-text-warning">
-								{pendingReview}
-							</span>
-						)}
 						{item.badge === 'assignments' && openAssignments > 0 && (
 							<span className="gtrans-rounded-full gtrans-bg-primary-light gtrans-px-2 gtrans-py-0.5 gtrans-text-11 gtrans-font-medium gtrans-text-primary">
 								{openAssignments}

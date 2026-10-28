@@ -31,7 +31,6 @@ function GemTranslateSidebar() {
 	const postId = useSelect((s) => s('core/editor').getCurrentPostId(), []);
 	const [languages, setLanguages] = useState([]);
 	const [statuses, setStatuses] = useState({});
-	const [busy, setBusy] = useState({});
 	const [error, setError] = useState(null);
 
 	const refresh = useCallback(async () => {
@@ -52,25 +51,6 @@ function GemTranslateSidebar() {
 
 	useEffect(() => { refresh(); }, [refresh]);
 
-	const queueTranslate = async (langCode) => {
-		setBusy((b) => ({ ...b, [langCode]: true }));
-		try {
-			await api('jobs', {
-				method: 'POST',
-				body: JSON.stringify({
-					post_id: postId,
-					target_lang: langCode,
-					options: { use_memory: true, preserve_html: true, overwrite: false },
-				}),
-			});
-			setStatuses((s) => ({ ...s, [langCode]: 'queued' }));
-		} catch (err) {
-			setError(err.message);
-		} finally {
-			setBusy((b) => ({ ...b, [langCode]: false }));
-		}
-	};
-
 	const nonDefault = languages.filter((l) => !l.is_default);
 
 	return (
@@ -88,7 +68,6 @@ function GemTranslateSidebar() {
 						<tbody>
 							{nonDefault.map((l) => {
 								const status = statuses[l.code];
-								const isBusy = busy[l.code];
 								return (
 									<tr key={l.code}>
 										<td style={{ paddingBottom: 6 }}>
@@ -102,14 +81,6 @@ function GemTranslateSidebar() {
 										</td>
 										<td style={{ paddingBottom: 6, textAlign: 'right' }}>
 											<div style={{ display: 'flex', gap: 4, justifyContent: 'flex-end' }}>
-												<Button
-													size="small"
-													variant="secondary"
-													isBusy={isBusy}
-													onClick={() => queueTranslate(l.code)}
-												>
-													{__('AI', 'gemtranslate')}
-												</Button>
 												<Button
 													size="small"
 													href={`${config.adminUrl}admin.php?page=gemtranslate#/posts/${postId}`}
@@ -129,9 +100,6 @@ function GemTranslateSidebar() {
 					<Button variant="link" onClick={refresh}>
 						{__('Refresh', 'gemtranslate')}
 					</Button>
-				</p>
-				<p style={{ fontSize: 11, color: '#6b7280' }}>
-					{__('AI queues a background job. Progress is visible in GemTranslate → Jobs.', 'gemtranslate')}
 				</p>
 			</PanelBody>
 		</PluginSidebar>

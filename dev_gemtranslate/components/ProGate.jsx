@@ -80,7 +80,7 @@ export function ProUpgradeTooltip({ name, description, children }) {
 }
 
 /**
- * Compact promo card for a Pro section inside a page (e.g. Settings, AI).
+ * Compact promo card for a Pro section inside a page (e.g. Settings).
  */
 export function UpsellCard({ title, description }) {
 	return (

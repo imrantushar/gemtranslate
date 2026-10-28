@@ -1,21 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
-import { Checkbox, Field, TextInput } from '../../components/Input';
+import { Field, TextInput } from '../../components/Input';
 import { Select } from '../../components/ui/Select';
 import { SettingRow } from '../../components/Switch';
 import { PageSkeleton } from '../../components/Skeleton';
 import { useSettings, useSaveSettings } from '../../hooks/useSettings';
 import { useLanguages } from '../../hooks/useLanguages';
-import { usePostTypes } from '../../hooks/usePostTypes';
-import { useBackfillAuto } from '../../hooks/useReview';
-import { hasFeature } from '../../hooks/useFeatures';
-import { UpsellCard } from '../../components/ProGate';
 import { formatErrorMessage } from '../../lib/format';
 
 // ---------------------------------------------------------------------------
@@ -124,15 +120,12 @@ function SwitcherPreview({ values, languages }) {
 export default function SettingsPage() {
 	const settings = useSettings();
 	const languages = useLanguages();
-	const postTypes = usePostTypes();
-	const backfillAuto = useBackfillAuto();
 	const save = useSaveSettings();
 	// Section is chosen from the sidebar submenu (?tab=switcher).
 	const [params] = useSearchParams();
 	const tab = params.get('tab') || 'general';
 	const [values, setValues] = useState(null);
 	const [toast, setToast] = useState(null);
-	const [backfill, setBackfill] = useState(null);
 
 	useEffect(() => {
 		if (settings.data && !values) setValues(settings.data);
@@ -142,49 +135,6 @@ export default function SettingsPage() {
 		return <PageSkeleton />;
 
 	const set = (key, value) => setValues((v) => ({ ...v, [key]: value }));
-
-	const toggleInArray = (key, item) =>
-		setValues((v) => {
-			const arr = Array.isArray(v[key]) ? v[key] : [];
-			const next = arr.includes(item) ? arr.filter((x) => x !== item) : [...arr, item];
-			return { ...v, [key]: next };
-		});
-
-	const runBackfill = async () => {
-		setBackfill({ running: true, queued: 0, total: 0 });
-		try {
-			// Persist current settings so the backfill honours them.
-			await save.mutateAsync(values);
-			let offset = 0;
-			let queued = 0;
-			let total = 0;
-			// Bounded loop — offset advances each call; server flags `done`.
-			for (let i = 0; i < 1000; i++) {
-				// eslint-disable-next-line no-await-in-loop
-				const res = await backfillAuto.mutateAsync({ offset, limit: 200 });
-				queued += res.queued || 0;
-				offset = res.offset || 0;
-				total = res.total || 0;
-				setBackfill({ running: !res.done, queued, total });
-				if (res.done) break;
-			}
-			setToast({
-				tone: 'success',
-				message: sprintf(
-					/* translators: %d: number of translation jobs queued. */
-					__('%d translation jobs queued. Watch progress on the Jobs page.', 'gemtranslate'),
-					queued
-				),
-			});
-		} catch (err) {
-			setToast({ tone: 'error', message: formatErrorMessage(err) });
-		} finally {
-			setBackfill((b) => ({ ...(b || {}), running: false }));
-		}
-	};
-
-	const activeTargets = (languages.data || []).filter((l) => !l.is_default && l.active);
-	const publicTypes = postTypes.data || [];
 
 	const submit = async () => {
 		try {
@@ -209,155 +159,6 @@ export default function SettingsPage() {
 					</Button>
 				}
 			/>
-
-			{tab === 'translate' && (
-				<>
-			{/* ---- Translate Everything (automatic translation) ---- */}
-			{!hasFeature('translate_everything') ? (
-				<div className="gtrans-mb-4">
-					<UpsellCard
-						title={__('Automatic translation & review queue', 'gemtranslate')}
-						description={__(
-							'Auto-translate content on publish and review it before it goes live — with GemTranslate Pro.',
-							'gemtranslate'
-						)}
-					/>
-				</div>
-			) : (
-				<div className="gtrans-mb-4">
-					<Card title={__('Automatic translation (Translate Everything)', 'gemtranslate')}>
-						<SettingRow
-	label={__(
-								'Automatically translate content when it is published or updated',
-								'gemtranslate'
-							)}
-	description={__(
-								'Uses your configured AI provider. Only source-language content is translated; existing translations are never overwritten unless you enable re-translation below.',
-								'gemtranslate'
-							)}
-	checked={!!values.auto_translate}
-	onChange={(v) => set('auto_translate', v)}
-/>
-
-						{!!values.auto_translate && (
-							<div className="gtrans-mt-4 gtrans-flex gtrans-flex-col gtrans-gap-4">
-								<Field label={__('When a translation is produced', 'gemtranslate')}>
-									<Select
-										value={values.auto_translate_strategy ?? 'review'}
-										onChange={(e) => set('auto_translate_strategy', e.target.value)}
-									>
-										<option value="review">
-											{__('Hold for review (hidden until approved)', 'gemtranslate')}
-										</option>
-										<option value="publish">
-											{__('Publish immediately (go live right away)', 'gemtranslate')}
-										</option>
-									</Select>
-								</Field>
-
-								<div>
-									<div className="gtrans-mb-1.5 gtrans-text-sm gtrans-font-medium gtrans-text-label">
-										{__('Post types to translate', 'gemtranslate')}
-									</div>
-									<div className="gtrans-flex gtrans-flex-wrap gtrans-gap-3">
-										{(publicTypes.length
-											? publicTypes
-											: [
-													{ name: 'post', label: 'Posts' },
-													{ name: 'page', label: 'Pages' },
-											  ]
-										).map((t) => (
-											<Checkbox
-												key={t.name}
-												label={t.label}
-												checked={(values.auto_translate_post_types || []).includes(t.name)}
-												onChange={() => toggleInArray('auto_translate_post_types', t.name)}
-											/>
-										))}
-									</div>
-								</div>
-
-								<div>
-									<div className="gtrans-mb-1.5 gtrans-text-sm gtrans-font-medium gtrans-text-label">
-										{__('Target languages', 'gemtranslate')}
-									</div>
-									{activeTargets.length === 0 ? (
-										<p className="gtrans-m-0 gtrans-text-xs gtrans-text-muted">
-											{__('Add at least one active non-default language first.', 'gemtranslate')}
-										</p>
-									) : (
-										<>
-											<div className="gtrans-flex gtrans-flex-wrap gtrans-gap-3">
-												{activeTargets.map((l) => (
-													<Checkbox
-														key={l.code}
-														label={l.name}
-														checked={
-															(values.auto_translate_languages || []).length === 0 ||
-															(values.auto_translate_languages || []).includes(l.code)
-														}
-														onChange={() => toggleInArray('auto_translate_languages', l.code)}
-													/>
-												))}
-											</div>
-											<p className="gtrans-mt-1 gtrans-mb-0 gtrans-text-xs gtrans-text-muted">
-												{__(
-													'Leave all checked to translate into every active language.',
-													'gemtranslate'
-												)}
-											</p>
-										</>
-									)}
-								</div>
-
-								<SettingRow
-	label={__(
-										'Re-translate when the source changes (may overwrite AI translations)',
-										'gemtranslate'
-									)}
-	checked={!!values.auto_retranslate_on_update}
-	onChange={(v) => set('auto_retranslate_on_update', v)}
-/>
-
-								<div className="gtrans-rounded-md gtrans-border gtrans-border-line gtrans-bg-body gtrans-p-3">
-									<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-justify-between gtrans-gap-3">
-										<div>
-											<div className="gtrans-text-sm gtrans-font-medium gtrans-text-ink">
-												{__('Translate existing content now', 'gemtranslate')}
-											</div>
-											<div className="gtrans-text-xs gtrans-text-muted">
-												{__(
-													'Queues jobs for all already-published content using the settings above.',
-													'gemtranslate'
-												)}
-											</div>
-										</div>
-										<Button
-											variant="secondary"
-											size="sm"
-											onClick={runBackfill}
-											loading={backfill?.running}
-										>
-											{__('Backfill translations', 'gemtranslate')}
-										</Button>
-									</div>
-									{backfill && (backfill.running || backfill.queued > 0) && (
-										<div className="gtrans-mt-2 gtrans-text-xs gtrans-text-muted">
-											{sprintf(
-												/* translators: %d: jobs queued so far. */
-												__('%d jobs queued so far…', 'gemtranslate'),
-												backfill.queued
-											)}
-										</div>
-									)}
-								</div>
-							</div>
-						)}
-					</Card>
-				</div>
-			)}
-				</>
-			)}
 
 			{tab === 'general' && (
 			<div className="gtrans-flex gtrans-flex-col gtrans-gap-4">

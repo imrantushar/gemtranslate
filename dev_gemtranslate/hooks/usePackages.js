@@ -21,11 +21,10 @@ export function useScanPackage() {
 
 export function useExportPackage() {
 	return useMutation({
-		mutationFn: async ({ slug, lang, exclude_status = '', ai_fill = false }) =>
+		mutationFn: async ({ slug, lang, exclude_status = '' }) =>
 			unwrap(
 				await api.post(`strings/packages/${slug}/${lang}/export`, {
 					exclude_status,
-					ai_fill,
 				})
 			),
 	});

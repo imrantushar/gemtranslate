@@ -46,6 +46,10 @@ const statusLabel = (s) =>
 		cancelled: __('Cancelled', 'gemtranslate'),
 	})[s] || s;
 
+const modalSelectStyles = {
+	menuPortal: (base) => ({ ...base, zIndex: 100001 }),
+};
+
 export default function AssignmentsPage() {
 	const [scope, setScope] = useState(canManage ? 'all' : 'mine');
 	const [status, setStatus] = useState('');
@@ -300,6 +304,7 @@ function NewAssignment({ open, onClose, onToast }) {
 			<div className="gtrans-grid gtrans-gap-3 md:gtrans-grid-cols-2">
 				<Field label={__('Post type', 'gemtranslate')}>
 					<Select
+						styles={modalSelectStyles}
 						value={postType}
 						onChange={(e) => {
 							setPostType(e.target.value);
@@ -328,7 +333,7 @@ function NewAssignment({ open, onClose, onToast }) {
 					/>
 				</Field>
 				<Field label={__('Content', 'gemtranslate')}>
-					<Select value={postId} onChange={(e) => setPostId(e.target.value)}>
+					<Select styles={modalSelectStyles} value={postId} onChange={(e) => setPostId(e.target.value)}>
 						<option value="">{__('— Pick content —', 'gemtranslate')}</option>
 						{postRows.map((p) => (
 							<option key={p.id} value={p.id}>
@@ -338,7 +343,7 @@ function NewAssignment({ open, onClose, onToast }) {
 					</Select>
 				</Field>
 				<Field label={__('Language', 'gemtranslate')}>
-					<Select value={lang} onChange={(e) => setLang(e.target.value)}>
+					<Select styles={modalSelectStyles} value={lang} onChange={(e) => setLang(e.target.value)}>
 						<option value="">{__('— Pick language —', 'gemtranslate')}</option>
 						{nonDefault.map((l) => (
 							<option key={l.code} value={l.code}>
@@ -348,7 +353,11 @@ function NewAssignment({ open, onClose, onToast }) {
 					</Select>
 				</Field>
 				<Field label={__('Contributor', 'gemtranslate')}>
-					<Select value={translatorId} onChange={(e) => setTranslatorId(e.target.value)}>
+					<Select
+						styles={modalSelectStyles}
+						value={translatorId}
+						onChange={(e) => setTranslatorId(e.target.value)}
+					>
 						<option value="">{__('— Pick contributor —', 'gemtranslate')}</option>
 						{(translators.data || []).map((t) => (
 							<option key={t.id} value={t.id}>

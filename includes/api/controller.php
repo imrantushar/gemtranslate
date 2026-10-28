@@ -18,7 +18,7 @@ abstract class Controller {
 	const CAP_TRANSLATE = 'gtrans_translate_content';
 
 	/**
-	 * Admin-only permission. Used for managing languages, AI provider
+	 * Admin-only permission. Used for managing languages,
 	 * credentials, plugin settings — anything where leaking creds or
 	 * destabilising the site matters.
 	 */

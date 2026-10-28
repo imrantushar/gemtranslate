@@ -9,19 +9,6 @@ export const UPGRADE_URL = 'https://gemtranslate.com/pro';
 
 export function getProFeature(key) {
 	const all = {
-		translate_everything: {
-			title: __('Automatic translation & review queue', 'gemtranslate'),
-			description: __(
-				'Translate content the moment it is published, then approve it before it goes live. Spend your time reviewing, not copying and pasting.',
-				'gemtranslate'
-			),
-			items: [
-				{ icon: 'sparkles', title: __('Translate on publish', 'gemtranslate'), desc: __('New and updated posts are translated automatically into every active language.', 'gemtranslate') },
-				{ icon: 'check', title: __('Review queue', 'gemtranslate'), desc: __('Hold machine translations back until an editor approves, edits or discards them.', 'gemtranslate') },
-				{ icon: 'clock', title: __('Backfill existing content', 'gemtranslate'), desc: __('Queue translations for everything already published, in the background.', 'gemtranslate') },
-				{ icon: 'globe', title: __('Per-language control', 'gemtranslate'), desc: __('Choose post types and target languages, and decide when to re-translate changes.', 'gemtranslate') },
-			],
-		},
 		seo_advanced: {
 			title: __('Advanced multilingual SEO', 'gemtranslate'),
 			description: __(
@@ -32,18 +19,6 @@ export function getProFeature(key) {
 				{ icon: 'search', title: __('Translated meta', 'gemtranslate'), desc: __('Per-language SEO titles, descriptions and Open Graph tags.', 'gemtranslate') },
 				{ icon: 'swap', title: __('Yoast & Rank Math bridges', 'gemtranslate'), desc: __('Keep your SEO plugin and your translations in sync automatically.', 'gemtranslate') },
 				{ icon: 'globe', title: __('hreflang & sitemaps', 'gemtranslate'), desc: __('Language alternates and per-language sitemap entries for search engines.', 'gemtranslate') },
-			],
-		},
-		ai_bulk: {
-			title: __('Bulk & background translation', 'gemtranslate'),
-			description: __(
-				'Translate hundreds of posts at once. Jobs run in the background so you can keep working.',
-				'gemtranslate'
-			),
-			items: [
-				{ icon: 'sparkles', title: __('Bulk AI translate', 'gemtranslate'), desc: __('Select many posts and translate them in one click.', 'gemtranslate') },
-				{ icon: 'clock', title: __('Background queue', 'gemtranslate'), desc: __('Async jobs with live progress, retries and failure details.', 'gemtranslate') },
-				{ icon: 'database', title: __('Translation memory', 'gemtranslate'), desc: __('Reuse earlier translations to cut cost and keep wording consistent.', 'gemtranslate') },
 			],
 		},
 		translators: {

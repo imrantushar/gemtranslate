@@ -49,8 +49,6 @@ if ( ! function_exists( 'gtrans_feature_flags' ) ) {
 	 */
 	function gtrans_feature_flags() {
 		$defaults = [
-			'ai_bulk'             => false, // Bulk AI translation.
-			'translate_everything' => false, // Auto-translate on publish + review queue.
 			'woocommerce'         => false,
 			'seo_advanced'        => false, // Yoast/RankMath bridges + per-translation meta.
 			'country_variants'    => false,
@@ -58,7 +56,6 @@ if ( ! function_exists( 'gtrans_feature_flags' ) ) {
 			'revisions'           => false,
 			'translators'         => false, // Translator management.
 			'import_export'       => false, // XLIFF / CSV.
-			'self_translation'    => false, // AI-translate the plugin admin.
 			'email_locale'        => false, // Transactional email locale switch.
 		];
 		return (array) apply_filters( 'gtrans_feature_flags', $defaults );
