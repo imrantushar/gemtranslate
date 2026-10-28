@@ -277,6 +277,11 @@ body.toplevel_page_gemtranslate #wpfooter {
 }
 
 /* ---- Advanced editor: token-aware contentEditable field ---- */
+/* Preflight is off, so a w-full field with padding + border would otherwise be
+   content-box and spill past its column by the padding width. */
+#gemtranslate-admin-root .gtrans-tokenfield {
+	box-sizing: border-box;
+}
 #gemtranslate-admin-root .gtrans-tokenfield:empty::before {
 	content: attr(data-placeholder);
 	color: var(--gtrans-placeholder);

@@ -3,6 +3,7 @@ import { __, sprintf } from '@wordpress/i18n';
 
 import Card from '../../components/Card';
 import Button from '../../components/Button';
+import Icon from '../../components/Icon';
 import TopbarActions from '../../components/TopbarActions';
 import Toast from '../../components/Toast';
 import { FormSkeleton } from '../../components/Skeleton';
@@ -273,37 +274,68 @@ function SegmentRow({
 	const empty = draft.trim() === '';
 
 	return (
-		<div className="gtrans-grid gtrans-grid-cols-1 lg:gtrans-grid-cols-[1fr_1fr_auto] gtrans-gap-3 gtrans-p-4">
-			{/* Source */}
-			<div className="gtrans-rounded-md gtrans-bg-body gtrans-p-2.5 gtrans-text-sm gtrans-leading-relaxed gtrans-text-label">
-				{renderSource(seg.core, tokens)}
+		<div className="gtrans-grid gtrans-grid-cols-1 gtrans-gap-x-4 gtrans-gap-y-1 gtrans-px-4 gtrans-py-3 lg:gtrans-grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)]">
+			{/* Column heads: the boxes below start on the same line. */}
+			<div className="gtrans-hidden lg:gtrans-block" aria-hidden="true" />
+			<div className="gtrans-flex gtrans-h-8 gtrans-items-center gtrans-text-xs gtrans-font-medium gtrans-text-muted">
+				{__('Source', 'gemtranslate')}
+			</div>
+			<div className="gtrans-flex gtrans-h-8 gtrans-flex-wrap gtrans-items-center gtrans-gap-1">
+				<span className="gtrans-mr-1 gtrans-text-xs gtrans-font-medium gtrans-text-muted">
+					{__('Translation', 'gemtranslate')}
+				</span>
+				{toolbar.map((a) => (
+					<button
+						key={`${a.type}-${a.open}`}
+						type="button"
+						title={a.label}
+						onClick={() => insertRef.current && insertRef.current(a)}
+						className="gtrans-bare gtrans-cursor-pointer gtrans-rounded gtrans-border gtrans-border-line gtrans-bg-surface gtrans-px-2 gtrans-py-1 gtrans-text-xs gtrans-font-semibold gtrans-text-muted hover:gtrans-bg-body"
+					>
+						{a.glyph}
+					</button>
+				))}
 			</div>
 
-			{/* Translation */}
-			<div>
-				<div className="gtrans-mb-1.5 gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-1">
-					{toolbar.map((a) => (
-						<button
-							key={`${a.type}-${a.open}`}
-							type="button"
-							title={a.label}
-							onClick={() => insertRef.current && insertRef.current(a)}
-							className="gtrans-bare gtrans-rounded gtrans-border gtrans-border-line gtrans-bg-surface gtrans-px-1.5 gtrans-py-0.5 gtrans-text-xs gtrans-font-semibold gtrans-text-muted hover:gtrans-bg-body"
-						>
-							{a.glyph}
-						</button>
-					))}
-					<span className="gtrans-mx-1 gtrans-h-4 gtrans-w-px gtrans-bg-line" />
-					<button
-						type="button"
-						title={__('Copy source', 'gemtranslate')}
-						onClick={() => onChange(seg.core)}
-						className="gtrans-bare gtrans-rounded gtrans-border gtrans-border-line gtrans-bg-surface gtrans-px-1.5 gtrans-py-0.5 gtrans-text-xs gtrans-text-muted hover:gtrans-bg-body"
-					>
-						⧉
-					</button>
-				</div>
+			{/* Mark complete: a checkbox in the gutter, level with the boxes. */}
+			<label
+				title={
+					empty
+						? __('Translate this segment first', 'gemtranslate')
+						: confirmed
+							? __('Marked complete', 'gemtranslate')
+							: __('Mark complete', 'gemtranslate')
+				}
+				className={`gtrans-flex gtrans-items-start gtrans-gap-2 gtrans-pt-2.5 gtrans-text-xs gtrans-text-muted ${
+					empty ? 'gtrans-cursor-not-allowed gtrans-opacity-50' : 'gtrans-cursor-pointer'
+				}`}
+			>
+				<input
+					type="checkbox"
+					checked={confirmed}
+					disabled={empty}
+					onChange={onToggleConfirm}
+					aria-label={__('Mark complete', 'gemtranslate')}
+					className="gtrans-m-0 gtrans-h-4 gtrans-w-4 gtrans-accent-green-500"
+				/>
+				<span className="lg:gtrans-hidden">{__('Mark complete', 'gemtranslate')}</span>
+			</label>
 
+			{/* Source: same box metrics as the field so the text lines up. */}
+			<div className="gtrans-relative gtrans-min-h-[2.5rem] gtrans-rounded-md gtrans-border gtrans-border-solid gtrans-border-transparent gtrans-bg-body gtrans-py-2 gtrans-pl-3 gtrans-pr-11 gtrans-text-sm gtrans-leading-relaxed gtrans-text-label">
+				{renderSource(seg.core, tokens)}
+				<button
+					type="button"
+					title={__('Copy source into the translation', 'gemtranslate')}
+					aria-label={__('Copy source into the translation', 'gemtranslate')}
+					onClick={() => onChange(seg.core)}
+					className="gtrans-bare gtrans-absolute gtrans-right-1.5 gtrans-top-1.5 gtrans-inline-flex gtrans-h-7 gtrans-w-7 gtrans-cursor-pointer gtrans-items-center gtrans-justify-center gtrans-rounded gtrans-border gtrans-border-solid gtrans-border-line gtrans-bg-surface gtrans-p-0 gtrans-text-description hover:gtrans-border-primary hover:gtrans-text-primary"
+				>
+					<Icon name="copy" size={14} />
+				</button>
+			</div>
+
+			<div>
 				<TokenField
 					value={draft}
 					tokens={tokens}
@@ -325,29 +357,6 @@ function SegmentRow({
 						)}
 					</div>
 				)}
-			</div>
-
-			{/* Complete toggle */}
-			<div className="gtrans-flex gtrans-items-start gtrans-justify-end lg:gtrans-pt-6">
-				<label
-					title={
-						empty
-							? __('Translate this segment first', 'gemtranslate')
-							: __('Mark complete', 'gemtranslate')
-					}
-					className={`gtrans-inline-flex gtrans-cursor-pointer gtrans-items-center gtrans-gap-1 gtrans-rounded gtrans-px-2 gtrans-py-1 gtrans-text-xs ${
-						confirmed ? 'gtrans-bg-green-50 gtrans-text-green-700' : 'gtrans-text-muted'
-					} ${empty ? 'gtrans-cursor-not-allowed gtrans-opacity-50' : ''}`}
-				>
-					<input
-						type="checkbox"
-						checked={confirmed}
-						disabled={empty}
-						onChange={onToggleConfirm}
-						className="gtrans-h-3.5 gtrans-w-3.5"
-					/>
-					{confirmed ? __('Done', 'gemtranslate') : __('Mark', 'gemtranslate')}
-				</label>
 			</div>
 		</div>
 	);
