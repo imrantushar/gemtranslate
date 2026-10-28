@@ -86,6 +86,13 @@ class BlockParser {
 			}
 
 			$inner_html = isset( $block['innerHTML'] ) ? trim( $block['innerHTML'] ) : '';
+			// A container whose own markup is split around inner blocks (e.g. a
+			// quote with a <cite>) cannot be rewritten as one string without
+			// duplicating the markup, so its wrapper text is left untouched.
+			if ( ! empty( $block['innerBlocks'] ) && is_array( $block['innerContent'] ?? null )
+				&& count( array_filter( $block['innerContent'], 'is_string' ) ) > 1 ) {
+				$inner_html = '';
+			}
 			if ( '' !== $inner_html ) {
 				$out[] = [
 					'path'  => $path . '.innerHTML',
@@ -93,6 +100,18 @@ class BlockParser {
 					'attr'  => '',
 					'block' => $name,
 					'value' => $block['innerHTML'],
+				];
+			}
+
+			// core/image keeps `alt` on the <img> in the saved markup, not in the
+			// block comment attributes.
+			if ( 'core/image' === $name && '' !== self::img_alt( $block['innerHTML'] ?? '' ) ) {
+				$out[] = [
+					'path'  => $path . '.html.alt',
+					'kind'  => 'attr',
+					'attr'  => 'alt',
+					'block' => $name,
+					'value' => self::img_alt( $block['innerHTML'] ),
 				];
 			}
 
@@ -139,9 +158,31 @@ class BlockParser {
 				}
 			}
 
+			$alt_path = $path . '.html.alt';
+			if ( 'core/image' === $name && isset( $translations[ $alt_path ] ) ) {
+				$set_alt = function ( $html ) use ( $translations, $alt_path ) {
+					return preg_replace_callback(
+						'/(<img\b[^>]*?\balt=)(["\'])(.*?)\2/is',
+						function ( $m ) use ( $translations, $alt_path ) {
+							return $m[1] . '"' . esc_attr( $translations[ $alt_path ] ) . '"';
+						},
+						(string) $html,
+						1
+					);
+				};
+				$block['innerHTML'] = $set_alt( $block['innerHTML'] ?? '' );
+				if ( isset( $block['innerContent'] ) && is_array( $block['innerContent'] ) ) {
+					foreach ( $block['innerContent'] as $k => $piece ) {
+						if ( is_string( $piece ) ) {
+							$block['innerContent'][ $k ] = $set_alt( $piece );
+						}
+					}
+				}
+			}
+
 			$attrs = self::ATTR_FIELDS[ $name ] ?? [];
 			foreach ( $attrs as $a ) {
-				$attr_path = $path . '.attrs.' . $a;
+				$attr_path =$path . '.attrs.' . $a;
 				if ( isset( $translations[ $attr_path ] ) ) {
 					$block['attrs'][ $a ] = $translations[ $attr_path ];
 				}
@@ -151,6 +192,13 @@ class BlockParser {
 				self::write( $block['innerBlocks'], $path, $translations );
 			}
 		}
+	}
+
+	private static function img_alt( $html ) {
+		if ( preg_match( '/<img\b[^>]*?\balt=(["\'])(.*?)\1/is', (string) $html, $m ) ) {
+			return html_entity_decode( $m[2], ENT_QUOTES );
+		}
+		return '';
 	}
 
 	private static function serialize_blocks( $blocks ) {

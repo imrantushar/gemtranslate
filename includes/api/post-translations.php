@@ -7,6 +7,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use GemTranslate\Language\Context;
 use GemTranslate\Translation\BlockParser;
+use GemTranslate\Translation\BlockUnits;
+use GemTranslate\Translation\ElementorTranslator;
 use GemTranslate\Translation\MetaTranslator;
 use GemTranslate\Translation\PostFieldTranslator;
 use GemTranslate\Translation\ShadowPostSync;
@@ -74,6 +76,24 @@ class PostTranslations extends Controller {
 				[
 					'methods'             => 'PUT',
 					'callback'            => [ $this, 'save_fields' ],
+					'permission_callback' => [ $this, 'permissions_translate' ],
+				],
+			]
+		);
+
+		// Block-wise units (Gutenberg blocks / Elementor widget settings).
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>\d+)/units/(?P<lang>[a-z0-9\-]{2,10})',
+			[
+				[
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'get_units' ],
+					'permission_callback' => [ $this, 'permissions_translate' ],
+				],
+				[
+					'methods'             => 'PUT',
+					'callback'            => [ $this, 'save_units' ],
 					'permission_callback' => [ $this, 'permissions_translate' ],
 				],
 			]
@@ -502,6 +522,52 @@ class PostTranslations extends Controller {
 		return $this->get_fields( $request );
 	}
 
+	public function get_units( $request ) {
+		$post = get_post( (int) $request['id'] );
+		if ( ! $post ) {
+			return $this->fail( 'gtrans_not_found', __( 'Post not found.', 'gemtranslate' ), 404 );
+		}
+		return $this->ok( BlockUnits::enumerate( $post, strtolower( $request['lang'] ) ) );
+	}
+
+	public function save_units( $request ) {
+		$post_id = (int) $request['id'];
+		$lang    = strtolower( $request['lang'] );
+		if ( ! Context::is_active( $lang ) ) {
+			return $this->fail( 'gtrans_invalid_lang', __( 'Language is not active.', 'gemtranslate' ), 422 );
+		}
+		$post = get_post( $post_id );
+		if ( ! $post ) {
+			return $this->fail( 'gtrans_not_found', __( 'Post not found.', 'gemtranslate' ), 404 );
+		}
+
+		$body    = $request->get_json_params() ?: $request->get_params();
+		$rows    = (array) ( $body['units'] ?? [] );
+		$country = $this->country_param( $request );
+
+		if ( class_exists( TranslationHistory::class ) && ! empty( $rows ) ) {
+			TranslationHistory::snapshot_string_fields( $post_id, $lang, $country );
+		}
+
+		// Resolve every id against the live source so the storage key can't be
+		// forged or drift from what the render path derives.
+		$sources = [];
+		foreach ( BlockUnits::enumerate( $post, $lang )['units'] as $u ) {
+			$sources[ $u['id'] ] = $u['source'];
+		}
+		foreach ( $rows as $r ) {
+			$id = (string) ( $r['id'] ?? '' );
+			if ( '' === $id || ! isset( $sources[ $id ] ) ) {
+				continue;
+			}
+			TranslationLoader::save_string_translation( $post_id, $lang, $id, $sources[ $id ], (string) ( $r['value'] ?? '' ), $country );
+		}
+		PostFieldTranslator::flush_memo();
+		ElementorTranslator::flush_memo();
+
+		return $this->get_units( $request );
+	}
+
 	/**
 	 * Post-meta key holding the set of confirmed segment hashes for a
 	 * (language, country) pair. Country-default uses the bare lang suffix.
@@ -836,6 +902,7 @@ class PostTranslations extends Controller {
 		if ( $full ) {
 			$out['content'] = (string) $post->post_content;
 			$out['excerpt'] = (string) $post->post_excerpt;
+			$out['builder'] = $post instanceof \WP_Post ? BlockUnits::detect_builder( $post ) : BlockUnits::BUILDER_CLASSIC;
 		}
 		return $out;
 	}

@@ -18,6 +18,7 @@ import SeoTab from './SeoTab';
 import MetaTab from './MetaTab';
 import FieldsTab from './FieldsTab';
 import AdvancedEditor from './AdvancedEditor';
+import BlockwiseEditor from './BlockwiseEditor';
 import HistoryTab from './HistoryTab';
 import ModeSwitcher from './ModeSwitcher';
 import { hasFeature } from '../../hooks/useFeatures';
@@ -31,7 +32,7 @@ export default function TranslationEditor() {
 	const [selectedLang, setSelectedLang] = useState('');
 	const [country, setCountry] = useState('');
 	const [tab, setTab] = useState('content');
-	const [contentMode, setContentMode] = useState('advanced');
+	const [contentMode, setContentMode] = useState(null);
 	const [toast, setToast] = useState(null);
 	const variants = usePostVariants(id, selectedLang);
 
@@ -54,6 +55,8 @@ export default function TranslationEditor() {
 
 	const { post, translations, default_lang: defaultLang } = data.data;
 	const targetLangs = translations || [];
+	// Elementor pages have no useful post_content, so open block-wise by default.
+	const activeContentMode = contentMode || (post.builder === 'elementor' ? 'blocks' : 'advanced');
 	const targetRow = targetLangs.find((l) => l.language.code === selectedLang);
 
 	const addCountry = async () => {
@@ -261,24 +264,24 @@ export default function TranslationEditor() {
 								{tab === 'content' && mode === 'string_only' && (
 									<div className="gtrans-flex gtrans-items-center gtrans-gap-1 gtrans-text-xs">
 										<span className="gtrans-mr-1 gtrans-text-muted">{__('Editor:', 'gemtranslate')}</span>
-										<button
-											type="button"
-											onClick={() => setContentMode('advanced')}
-											className={`gtrans-bare gtrans-cursor-pointer gtrans-rounded-l-md gtrans-border gtrans-border-line gtrans-px-3 gtrans-py-1 ${
-												contentMode === 'advanced' ? 'gtrans-bg-primary gtrans-text-white' : 'gtrans-bg-surface gtrans-text-label'
-											}`}
-										>
-											{__('Advanced', 'gemtranslate')}
-										</button>
-										<button
-											type="button"
-											onClick={() => setContentMode('simple')}
-											className={`gtrans-bare gtrans-cursor-pointer -gtrans-ml-px gtrans-rounded-r-md gtrans-border gtrans-border-line gtrans-px-3 gtrans-py-1 ${
-												contentMode === 'simple' ? 'gtrans-bg-primary gtrans-text-white' : 'gtrans-bg-surface gtrans-text-label'
-											}`}
-										>
-											{__('Simple', 'gemtranslate')}
-										</button>
+										{[
+											{ key: 'advanced', label: __('Advanced', 'gemtranslate') },
+											{ key: 'blocks', label: __('Blocks', 'gemtranslate') },
+											{ key: 'simple', label: __('Simple', 'gemtranslate') },
+										].map((o, i, all) => (
+											<button
+												key={o.key}
+												type="button"
+												onClick={() => setContentMode(o.key)}
+												className={`gtrans-bare gtrans-cursor-pointer gtrans-border gtrans-border-line gtrans-px-3 gtrans-py-1 ${
+													i === 0 ? 'gtrans-rounded-l-md' : '-gtrans-ml-px'
+												} ${i === all.length - 1 ? 'gtrans-rounded-r-md' : ''} ${
+													activeContentMode === o.key ? 'gtrans-bg-primary gtrans-text-white' : 'gtrans-bg-surface gtrans-text-label'
+												}`}
+											>
+												{o.label}
+											</button>
+										))}
 									</div>
 								)}
 							</div>
@@ -300,7 +303,13 @@ export default function TranslationEditor() {
 						<HistoryTab postId={post.id} targetLang={selectedLang} />
 					) : mode === 'string_only' ? (
 						<>
-							{contentMode === 'advanced' ? (
+							{activeContentMode === 'blocks' ? (
+								<BlockwiseEditor
+									postId={post.id}
+									targetLang={selectedLang}
+									country={country}
+								/>
+							) : activeContentMode === 'advanced' ? (
 								<AdvancedEditor
 									postId={post.id}
 									sourceLang={defaultLang}

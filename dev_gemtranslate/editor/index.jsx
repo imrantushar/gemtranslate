@@ -57,6 +57,15 @@ function GemTranslateSidebar() {
 		<PluginSidebar name="gemtranslate-sidebar" title={__('GemTranslate', 'gemtranslate')} icon="translation">
 			<PanelBody title={__('Translation status', 'gemtranslate')} initialOpen={true}>
 				{error && <p style={{ color: '#dc2626' }}>{error}</p>}
+				<p style={{ marginTop: 0 }}>
+					<Button
+						variant="primary"
+						href={`${config.adminUrl}admin.php?page=gemtranslate#/posts/${postId}`}
+						target="_blank"
+					>
+						{__('Translate block by block', 'gemtranslate')}
+					</Button>
+				</p>
 				{languages.length === 0 ? (
 					<p>
 						<Spinner /> {__('Loading languages…', 'gemtranslate')}

@@ -125,3 +125,29 @@ export function useDemoteToStrings() {
 		},
 	});
 }
+
+export function usePostUnits(postId, lang, country = '') {
+	return useQuery({
+		queryKey: ['posts', pid(postId), 'units', lang, country],
+		queryFn: async () =>
+			unwrap(await api.get(`posts/${postId}/units/${lang}`, { params: countryQuery(country) })),
+		enabled: !!postId && !!lang,
+	});
+}
+
+export function useSavePostUnits() {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: async ({ postId, lang, country = '', units }) =>
+			unwrap(
+				await api.put(
+					`posts/${postId}/units/${lang}`,
+					{ units },
+					{ params: countryQuery(country) }
+				)
+			),
+		onSuccess: (_d, vars) => {
+			qc.invalidateQueries({ queryKey: ['posts', pid(vars.postId)] });
+		},
+	});
+}
