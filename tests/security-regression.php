@@ -118,6 +118,7 @@ try {
 	$ir = new WP_REST_Request( 'GET', '/gemtranslate/v1/posts' );
 	$ir->set_param( 'post_type', 'post' );
 	$ir->set_param( 'status', 'any' );
+	$ir->set_param( 'per_page', 100 );
 	$idx  = $ctl->index( $ir );
 	$ids  = wp_list_pluck( $idx->get_data()['data'] ?? [], 'id' );
 	$check( 'S4 translator index: no draft/private', ! in_array( $draft, $ids, true ) && ! in_array( $priv, $ids, true ) && in_array( $pub, $ids, true ) );
@@ -131,6 +132,7 @@ try {
 	$ir = new WP_REST_Request( 'GET', '/gemtranslate/v1/posts' );
 	$ir->set_param( 'post_type', 'post' );
 	$ir->set_param( 'status', 'any' );
+	$ir->set_param( 'per_page', 100 );
 	$ids = wp_list_pluck( $ctl->index( $ir )->get_data()['data'] ?? [], 'id' );
 	$check( 'S4 admin index: sees draft', in_array( $draft, $ids, true ) );
 
@@ -253,6 +255,105 @@ try {
 	$check( 'S8 polylang decode: array map decoded', array( 'es' => 5 ) === $arr );
 	$check( 'S8 polylang decode: objects are not instantiated', ! ( $obj instanceof stdClass ) );
 
+
+	// ---------- Pro: revisions, SEO, import/export, custom fields ----------
+	if ( class_exists( '\\GemTranslate\\API\\Revisions' ) ) {
+		\GemTranslate\Admin\LanguageScope::set_for_user( $tid, [] ); // Unrestricted again; scope was tested above.
+		wp_set_current_user( $admin_id );
+		$pubp  = wp_insert_post( [ 'post_type' => 'post', 'post_status' => 'publish', 'post_title' => 'TMP pro public' ] );
+		$privp = wp_insert_post( [ 'post_type' => 'post', 'post_status' => 'draft', 'post_title' => 'TMP pro draft' ] );
+		array_push( $posts, $pubp, $privp );
+		foreach ( [ $pubp, $privp ] as $pid ) {
+			TranslationLoader::save_translation( $pid, 'es', [ 'title' => 'v1 ' . $pid, 'content' => 'one', 'translation_mode' => 'custom_layout' ] );
+			TranslationLoader::save_translation( $pid, 'es', [ 'title' => 'v2 ' . $pid, 'content' => 'two', 'translation_mode' => 'custom_layout' ] );
+		}
+		global $wpdb;
+		$rt   = \GemTranslate\Helper::table( 'post_translation_revisions' );
+		$rev_pub  = (int) $wpdb->get_var( $wpdb->prepare( "SELECT revision_id FROM $rt WHERE post_id=%d ORDER BY revision_id DESC LIMIT 1", $pubp ) );
+		$rev_priv = (int) $wpdb->get_var( $wpdb->prepare( "SELECT revision_id FROM $rt WHERE post_id=%d ORDER BY revision_id DESC LIMIT 1", $privp ) );
+		$check( 'Pro setup: revisions exist', $rev_pub > 0 && $rev_priv > 0 );
+		$rv = new \GemTranslate\API\Revisions();
+		$req = function ( $post_id, $rev ) {
+			$r = new WP_REST_Request( 'GET', "/gemtranslate/v1/posts/$post_id/translations/es/revisions/$rev" );
+			$r->set_param( 'id', $post_id );
+			$r->set_param( 'lang', 'es' );
+			$r->set_param( 'revision_id', $rev );
+			return $r;
+		};
+		wp_set_current_user( $tid );
+		$check( 'Pro revisions: translator denied on a draft post', is_wp_error( $rv->permissions_translate_post( $req( $privp, $rev_priv ) ) ) );
+		$check( 'Pro revisions: translator allowed on a published post', true === $rv->permissions_translate_post( $req( $pubp, $rev_pub ) ) );
+		$cross = $rv->show( $req( $pubp, $rev_priv ) );
+		$check( 'Pro revisions: another post\'s revision not readable via an allowed post', $cross instanceof WP_Error );
+		$own = $rv->show( $req( $pubp, $rev_pub ) );
+		$check( 'Pro revisions: own revision readable', $own instanceof WP_REST_Response );
+		$dr = $req( $pubp, $rev_pub );
+		$dr->set_param( 'a', $rev_pub );
+		$dr->set_param( 'b', $rev_priv );
+		$check( 'Pro revisions: diff against another post\'s revision refused', $rv->diff( $dr ) instanceof WP_Error );
+		$rr = $req( $pubp, $rev_priv );
+		$check( 'Pro revisions: revert from another post\'s revision refused', $rv->revert( $rr ) instanceof WP_Error );
+
+		// SEO.
+		$seo = new \GemTranslate\API\SEO();
+		$sr  = new WP_REST_Request( 'PUT', "/gemtranslate/v1/seo/posts/$privp/es" );
+		$sr->set_param( 'post_id', $privp );
+		$sr->set_param( 'lang', 'es' );
+		$check( 'Pro seo: translator denied on a draft post', is_wp_error( $seo->permissions_translate_post( $sr ) ) );
+		wp_set_current_user( $admin_id );
+		$sr2 = new WP_REST_Request( 'PUT', "/gemtranslate/v1/seo/posts/$pubp/es" );
+		$sr2->set_header( 'content-type', 'application/json' );
+		$sr2->set_body( wp_json_encode( [ 'meta_title' => 'T<script>x</script>', 'meta_desc' => "a\nb<b>", 'canonical_override' => 'javascript:alert(1)' ] ) );
+		// Set the route params after the body: parsing the JSON body replaces earlier JSON-order params.
+		$sr2->set_param( 'post_id', $pubp );
+		$sr2->set_param( 'lang', 'es' );
+		$sv = $seo->save( $sr2 );
+		if ( is_wp_error( $sv ) ) {
+			$results[] = [ 'Pro seo save error: ' . $sv->get_error_code() . ' ' . $sv->get_error_message(), false ];
+			$sv = new WP_REST_Response( [ 'data' => [] ] );
+		}
+		$saved = $sv->get_data()['data'] ?? [];
+		$check( 'Pro seo: tags stripped, javascript: canonical dropped', false === strpos( $saved['meta_title'] ?? 'x<', '<' ) && false === strpos( $saved['meta_desc'] ?? '<', '<' ) && '' === ( $saved['canonical_override'] ?? 'x' ) );
+		$wpdb->query( $wpdb->prepare( 'DELETE FROM ' . \GemTranslate\Helper::table( 'seo_meta' ) . ' WHERE group_id = %d', TranslationLoader::group_id_for_post( $pubp ) ) );
+
+		// Import / export.
+		$io = new \GemTranslate\API\IO();
+		wp_set_current_user( $tid );
+		$ex = new WP_REST_Request( 'GET', '/gemtranslate/v1/export/posts' );
+		$ex->set_param( 'lang', 'es' );
+		$ex->set_param( 'format', 'csv' );
+		$ex->set_param( 'post_type', 'post' );
+		$prot = wp_insert_post( [ 'post_type' => 'post', 'post_status' => 'publish', 'post_title' => 'TMP pro protected', 'post_content' => 'topsecret', 'post_password' => 'pw' ] );
+		$posts[] = $prot;
+		$body = $io->export_posts( $ex )->get_data();
+		$check( 'Pro export: protected post not exported to a translator', is_string( $body ) && false === strpos( $body, 'topsecret' ) && false !== strpos( $body, 'post:' . $pubp . ':' ) );
+		$ex->set_param( 'post_type', 'shop_order' );
+		$check( 'Pro export: non-public post type refused', $io->export_posts( $ex ) instanceof WP_Error );
+		$imp = new WP_REST_Request( 'POST', '/gemtranslate/v1/import/posts' );
+		$imp->set_param( 'lang', 'es' );
+		$imp->set_param( 'format', 'csv' );
+		$imp->set_param( 'body', "id,source,target\npost:$privp:title,x,HACKED\npost:$pubp:title,x,allowed title\n" );
+		$out = $io->import_posts( $imp )->get_data();
+		$title_priv = $wpdb->get_var( $wpdb->prepare( 'SELECT title FROM ' . \GemTranslate\Helper::table( 'post_translations' ) . " WHERE post_id=%d AND language_code='es' AND country_code=''", $privp ) );
+		$title_pub  = $wpdb->get_var( $wpdb->prepare( 'SELECT title FROM ' . \GemTranslate\Helper::table( 'post_translations' ) . " WHERE post_id=%d AND language_code='es' AND country_code=''", $pubp ) );
+		$check( 'Pro import: draft post untouched, published post saved', 'v2 ' . $privp === $title_priv && 'allowed title' === $title_pub );
+
+		// Custom fields.
+		\GemTranslate\Translation\MetaTranslator::save( $pubp, 'es', 'subtitle', '<p>ok</p><script>alert(1)</script>' );
+		wp_set_current_user( $tid );
+		\GemTranslate\Translation\MetaTranslator::save( $pubp, 'es', 'subtitle', '<p>ok</p><script>alert(1)</script>' );
+		$mt = $wpdb->get_var( $wpdb->prepare( 'SELECT meta_value FROM ' . \GemTranslate\Helper::table( 'post_meta_translations' ) . " WHERE post_id=%d AND meta_key='subtitle'", $pubp ) );
+		$check( 'Pro meta: translator script stripped from custom field', false === stripos( (string) $mt, '<script' ) && false !== strpos( (string) $mt, '<p>ok</p>' ) );
+		\GemTranslate\Translation\MetaTranslator::save( $pubp, 'es', 'repeater', maybe_serialize( [ 'a' => [ 'x' => '<img src=x onerror=alert(1)>' ] ] ) );
+		$mr = $wpdb->get_var( $wpdb->prepare( 'SELECT meta_value FROM ' . \GemTranslate\Helper::table( 'post_meta_translations' ) . " WHERE post_id=%d AND meta_key='repeater'", $pubp ) );
+		$check( 'Pro meta: nested serialized value sanitised', false === stripos( (string) $mr, 'onerror' ) && is_array( maybe_unserialize( $mr ) ) );
+		$wpdb->delete( \GemTranslate\Helper::table( 'post_meta_translations' ), [ 'post_id' => $pubp ] );
+		$wpdb->query( $wpdb->prepare( 'DELETE FROM ' . $rt . ' WHERE post_id IN (%d,%d)', $pubp, $privp ) );
+	} else {
+		$results[] = [ 'Pro checks skipped (GemTranslate Pro not active)', true ];
+	}
+	wp_set_current_user( $admin_id );
+
 } catch ( \Throwable $e ) {
 	$results[] = [ 'EXCEPTION ' . $e->getMessage() . ' @ ' . basename( $e->getFile() ) . ':' . $e->getLine(), false ];
 } finally {
@@ -266,6 +367,11 @@ try {
 		}
 	}
 	global $wpdb;
+	// Pro keeps revisions of translations; deleting a translation snapshots it first.
+	$rev_table = \GemTranslate\Helper::table( 'post_translation_revisions' );
+	if ( $posts && $wpdb->get_var( "SHOW TABLES LIKE '$rev_table'" ) ) {
+		$wpdb->query( "DELETE FROM $rev_table WHERE post_id IN (" . implode( ',', array_map( 'intval', $posts ) ) . ')' );
+	}
 	foreach ( $strings as $sid ) {
 		$wpdb->delete( \GemTranslate\Helper::table( 'string_translations' ), [ 'string_id' => $sid ] );
 		$wpdb->delete( \GemTranslate\Helper::table( 'strings' ), [ 'string_id' => $sid ] );

@@ -19,20 +19,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Uninstaller {
 
 	/**
-	 * Current and retired tables. Retired ones may exist on sites that ran an
-	 * earlier build, so each is dropped with IF EXISTS.
+	 * Free, Pro and retired tables. Pro and retired ones may be absent, so each
+	 * is dropped with IF EXISTS.
 	 */
 	const TABLES = [
 		'languages', 'translation_groups', 'post_translations', 'term_translations',
 		'menu_translations', 'strings', 'string_translations', 'slugs',
+		// GemTranslate Pro.
+		'seo_meta', 'post_meta_translations', 'post_translation_revisions', 'assignments',
 		// Retired.
-		'seo_meta', 'jobs', 'translation_memory', 'glossary',
-		'post_meta_translations', 'post_translation_revisions',
+		'jobs', 'translation_memory', 'glossary',
 	];
 
 	const OPTIONS = [
 		'gtrans_settings', 'gtrans_version', 'gtrans_db_version', 'gtrans_first_install_time',
 		'gtrans_required_rewrite_flush', 'gtrans_caps_granted', 'gtrans_audit_summaries',
+		'pro_db_version', // GemTranslate Pro schema version.
 	];
 
 	const POST_META = [
