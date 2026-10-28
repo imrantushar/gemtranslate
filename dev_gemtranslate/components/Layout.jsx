@@ -30,7 +30,7 @@ export default function Layout({ children }) {
 		<div className="gtrans-app">
 			<Topbar collapsed={collapsed} onToggle={toggle} />
 			<div className="gtrans-flex gtrans-min-w-0 gtrans-flex-1">
-				<Sidebar collapsed={collapsed} />
+				<Sidebar collapsed={collapsed} onToggle={toggle} />
 				<main className="gtrans-min-w-0 gtrans-flex-1 gtrans-overflow-x-auto gtrans-bg-body gtrans-p-6">
 					{children}
 				</main>

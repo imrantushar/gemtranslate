@@ -7,6 +7,7 @@ import { useAssignmentCounts } from '../hooks/useAssignments';
 import { hasFeature } from '../hooks/useFeatures';
 import { ProBadge } from './ProGate';
 import Icon from './Icon';
+import MenuToggle from './MenuToggle';
 import { usePostTypes } from '../hooks/usePostTypes';
 
 export const NAV = [
@@ -115,7 +116,7 @@ function SubMenu({ items, openAssignments }) {
 	);
 }
 
-export default function Sidebar({ collapsed = false }) {
+export default function Sidebar({ collapsed = false, onToggle }) {
 	const assignmentCounts = useAssignmentCounts();
 	const openAssignments = assignmentCounts.data?.open ?? 0;
 	const submenus = useSubmenus();
@@ -125,10 +126,18 @@ export default function Sidebar({ collapsed = false }) {
 	return (
 		<aside
 			className={clsx(
-				'gtrans-flex-shrink-0 gtrans-border-r gtrans-border-edge gtrans-bg-surface gtrans-py-4 gtrans-transition-all gtrans-duration-200',
+				'gtrans-relative gtrans-flex-shrink-0 gtrans-border-r gtrans-border-edge gtrans-bg-surface gtrans-py-4 gtrans-transition-all gtrans-duration-200',
 				collapsed ? 'gtrans-w-16 gtrans-px-2' : 'gtrans-w-60 gtrans-px-3'
 			)}
 		>
+			{!collapsed && (
+				<MenuToggle
+					collapsed={collapsed}
+					onToggle={onToggle}
+					className="gtrans-absolute gtrans-right-3 gtrans-top-[18px] gtrans-z-10"
+				/>
+			)}
+
 			<nav className="gtrans-flex gtrans-flex-col gtrans-gap-1">
 				{NAV.map((item) => {
 					const kids = item.children && !collapsed ? submenus[item.children] : null;

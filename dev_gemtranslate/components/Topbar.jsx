@@ -2,6 +2,7 @@ import { useLocation } from 'react-router-dom';
 import { __ } from '@wordpress/i18n';
 
 import Icon from './Icon';
+import MenuToggle from './MenuToggle';
 import { NAV } from './Sidebar';
 import { useThemeMode } from '../lib/theme';
 
@@ -14,18 +15,8 @@ export default function Topbar({ collapsed, onToggle }) {
 	return (
 		<header className="gtrans-topbar gtrans-flex gtrans-h-14 gtrans-flex-shrink-0 gtrans-items-center gtrans-justify-between gtrans-border-b gtrans-border-edge gtrans-bg-surface gtrans-px-4">
 			<div className="gtrans-flex gtrans-items-center gtrans-gap-3">
-				<button
-					type="button"
-					onClick={onToggle}
-					aria-label={collapsed ? __('Expand menu', 'gemtranslate') : __('Collapse menu', 'gemtranslate')}
-					aria-expanded={!collapsed}
-					className="gtrans-bare gtrans-flex gtrans-h-8 gtrans-w-8 gtrans-cursor-pointer gtrans-items-center gtrans-justify-center gtrans-rounded gtrans-border-0 gtrans-bg-transparent gtrans-p-0 gtrans-text-muted hover:gtrans-bg-body hover:gtrans-text-ink"
-				>
-					<Icon name="panel" size={18} />
-				</button>
-
 				<span className="gtrans-flex gtrans-h-8 gtrans-w-8 gtrans-flex-shrink-0 gtrans-items-center gtrans-justify-center gtrans-rounded-lg gtrans-bg-primary gtrans-text-white" aria-hidden="true">
-					<Icon name="globe" />
+					<span className="dashicons dashicons-translation" style={{ width: 20, height: 20, fontSize: 20 }} />
 				</span>
 				<span className="gtrans-text-base gtrans-font-semibold gtrans-text-ink">
 					gem<span className="gtrans-text-primary">Translate</span>
@@ -37,6 +28,8 @@ export default function Topbar({ collapsed, onToggle }) {
 						<span className="gtrans-text-sm gtrans-font-semibold gtrans-text-label">{current.label()}</span>
 					</span>
 				)}
+
+				{collapsed && <MenuToggle collapsed={collapsed} onToggle={onToggle} />}
 			</div>
 
 			<div className="gtrans-flex gtrans-items-center gtrans-gap-3">
