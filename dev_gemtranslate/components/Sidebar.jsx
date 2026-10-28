@@ -3,7 +3,6 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import { __ } from '@wordpress/i18n';
 import clsx from 'clsx';
 
-import LanguagePicker from './LanguagePicker';
 import { useJobCounts } from '../hooks/useJobs';
 import { useReviewCount } from '../hooks/useReview';
 import { useAssignmentCounts } from '../hooks/useAssignments';
@@ -146,9 +145,7 @@ export default function Sidebar({ collapsed = false }) {
 				collapsed ? 'gtrans-w-16 gtrans-px-2' : 'gtrans-w-60 gtrans-px-3'
 			)}
 		>
-			{!collapsed && <LanguagePicker />}
-
-			<nav className={clsx('gtrans-flex gtrans-flex-col gtrans-gap-1', !collapsed && 'gtrans-mt-4')}>
+			<nav className="gtrans-flex gtrans-flex-col gtrans-gap-1">
 				{NAV.map((item) => {
 					const kids = item.children && !collapsed ? submenus[item.children] : null;
 					const isOpen = kids ? open[item.to] ?? pathname.startsWith(item.to) : false;

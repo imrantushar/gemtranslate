@@ -64,7 +64,13 @@ export default function HistoryTab({ postId, targetLang }) {
 										</>
 									)}
 								</div>
-								<div className="gtrans-mt-1 gtrans-text-xs">{truncate(rev.title_preview || __('(no title)', 'gemtranslate'), 80)}</div>
+								<div className="gtrans-mt-1 gtrans-text-xs">
+									{rev.title_preview
+										? truncate(rev.title_preview, 80)
+										: rev.note === 'string_fields'
+											? __('Strings only — field translations', 'gemtranslate')
+											: __('(no title)', 'gemtranslate')}
+								</div>
 								<div className="gtrans-mt-1 gtrans-text-xs gtrans-text-muted">
 									{sprintf(/* translators: %d: byte length. */ __('%d chars', 'gemtranslate'), rev.content_size)}
 								</div>

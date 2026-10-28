@@ -11,6 +11,7 @@ use GemTranslate\Translation\MetaTranslator;
 use GemTranslate\Translation\PostFieldTranslator;
 use GemTranslate\Translation\ShadowPostSync;
 use GemTranslate\Translation\TranslationLoader;
+use GemTranslate\Translation\TranslationHistory;
 
 class PostTranslations extends Controller {
 
@@ -511,6 +512,15 @@ class PostTranslations extends Controller {
 		$rows    = (array) ( $body['fields'] ?? [] );
 		$country = $this->country_param( $request );
 		$saved   = 0;
+
+		// Revision history is a Pro feature. "Strings only" mode (the default
+		// editor) has no single title/content blob to snapshot the way the
+		// Custom layout save path does — the translated values live per-string
+		// in wp_gtrans_string_translations — so snapshot the current field map
+		// here before this batch overwrites it.
+		if ( class_exists( TranslationHistory::class ) && ! empty( $rows ) ) {
+			TranslationHistory::snapshot_string_fields( $post_id, $lang, $country );
+		}
 
 		foreach ( $rows as $r ) {
 			$path        = (string) ( $r['path'] ?? '' );

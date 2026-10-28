@@ -1331,9 +1331,6 @@ input:where([type='file']):focus{
 #gemtranslate-admin-root .gtrans-leading-relaxed{
 	line-height: 1.625;
 }
-#gemtranslate-admin-root .gtrans-leading-snug{
-	line-height: 1.375;
-}
 #gemtranslate-admin-root .gtrans-leading-tight{
 	line-height: 1.25;
 }
