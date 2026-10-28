@@ -6,7 +6,7 @@ import Card from '../../components/Card';
 import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
-import { Field, TextInput } from '../../components/Input';
+import { TextInput } from '../../components/Input';
 import { Select } from '../../components/ui/Select';
 import { PageSkeleton, TableSkeleton } from '../../components/Skeleton';
 import { api, unwrap } from '../../lib/api';
@@ -81,24 +81,35 @@ export default function MenusPage() {
 			<PageHeader
 				title={__('Menus', 'gemtranslate')}
 				description={__('Translate WordPress nav menu items per language.', 'gemtranslate')}
+				actions={
+					<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-justify-end gtrans-gap-3">
+						<label className="gtrans-flex gtrans-items-center gtrans-gap-2 gtrans-text-xs gtrans-text-muted">
+							{__('Menu', 'gemtranslate')}
+							<Select
+								className="gtrans-min-w-[180px]"
+								value={selectedMenu}
+								onChange={(e) => setSelectedMenu(e.target.value)}
+							>
+								{(menus.data || []).map((m) => (
+									<option key={m.id} value={m.id}>{m.name}</option>
+								))}
+							</Select>
+						</label>
+						<label className="gtrans-flex gtrans-items-center gtrans-gap-2 gtrans-text-xs gtrans-text-muted">
+							{__('Language', 'gemtranslate')}
+							<Select
+								className="gtrans-min-w-[160px]"
+								value={selectedLang}
+								onChange={(e) => setSelectedLang(e.target.value)}
+							>
+								{nonDefault.map((l) => (
+									<option key={l.code} value={l.code}>{l.name}</option>
+								))}
+							</Select>
+						</label>
+					</div>
+				}
 			/>
-
-			<div className="gtrans-mb-4 gtrans-flex gtrans-flex-wrap gtrans-gap-3">
-				<Field label={__('Menu', 'gemtranslate')}>
-					<Select value={selectedMenu} onChange={(e) => setSelectedMenu(e.target.value)}>
-						{(menus.data || []).map((m) => (
-							<option key={m.id} value={m.id}>{m.name}</option>
-						))}
-					</Select>
-				</Field>
-				<Field label={__('Target language', 'gemtranslate')}>
-					<Select value={selectedLang} onChange={(e) => setSelectedLang(e.target.value)}>
-						{nonDefault.map((l) => (
-							<option key={l.code} value={l.code}>{l.name}</option>
-						))}
-					</Select>
-				</Field>
-			</div>
 
 			<Card table>
 				{items.isLoading ? (
