@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
@@ -10,6 +10,7 @@ import { Select } from '../../components/ui/Select';
 import SearchBox from '../../components/SearchBox';
 import StatusTabs from '../../components/StatusTabs';
 import Toast from '../../components/Toast';
+import TopbarActions from '../../components/TopbarActions';
 import { TextArea, TextInput } from '../../components/Input';
 import { PageSkeleton } from '../../components/Skeleton';
 import { useStrings } from '../../hooks/useStrings';
@@ -23,6 +24,13 @@ import { useLanguages } from '../../hooks/useLanguages';
 import { formatErrorMessage } from '../../lib/format';
 
 const PAGE_SIZE = 50;
+
+// "C:\\...\\plugins\\foo\\includes\\a.php:12" -> "includes/a.php:12"
+const shortRef = (ref) => {
+	const norm = String(ref || '').replace(/\\/g, '/');
+	const m = norm.match(/(?:plugins|themes)\/[^/]+\/(.*)$/);
+	return m ? m[1] : norm;
+};
 
 export default function PackageEditor() {
 	const { slug, lang } = useParams();
@@ -63,6 +71,7 @@ export default function PackageEditor() {
 				if (next[row.string_id]) return; // preserve dirty edits across page changes
 				next[row.string_id] = {
 					value: row.translation || '',
+					original: row.translation || '',
 					dirty: false,
 					status: row.translation_status || '',
 				};
@@ -70,6 +79,22 @@ export default function PackageEditor() {
 			return next;
 		});
 	}, [strings.data]);
+
+	const saveRef = useRef(null);
+	useEffect(() => {
+		const onKey = (e) => {
+			if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+				e.preventDefault();
+				saveRef.current?.();
+			}
+		};
+		window.addEventListener('keydown', onKey);
+		return () => window.removeEventListener('keydown', onKey);
+	}, []);
+
+	useEffect(() => {
+		window.scrollTo({ top: 0 });
+	}, [page]);
 
 	if (packages.isLoading || strings.isLoading || languages.isLoading) {
 		return <PageSkeleton />;
@@ -101,7 +126,7 @@ export default function PackageEditor() {
 	const onChange = (id, value) => {
 		setDrafts((d) => ({
 			...d,
-			[id]: { ...(d[id] || {}), value, dirty: true },
+			[id]: { ...(d[id] || {}), value, dirty: value !== (d[id]?.original ?? '') },
 		}));
 	};
 
@@ -120,7 +145,9 @@ export default function PackageEditor() {
 			setDrafts((d) => {
 				const next = { ...d };
 				translations.forEach((t) => {
-					if (next[t.string_id]) next[t.string_id] = { ...next[t.string_id], dirty: false, status: 'translated' };
+					if (next[t.string_id]) {
+						next[t.string_id] = { ...next[t.string_id], original: t.value, dirty: false, status: 'translated' };
+					}
 				});
 				return next;
 			});
@@ -136,6 +163,20 @@ export default function PackageEditor() {
 			setToast({ tone: 'error', message: formatErrorMessage(err) });
 		}
 	};
+
+	saveRef.current = onSaveAll;
+
+	const onDiscard = () => {
+		setDrafts((d) => {
+			const next = {};
+			Object.entries(d).forEach(([id, v]) => {
+				next[id] = v.dirty ? { ...v, value: v.original ?? '', dirty: false } : v;
+			});
+			return next;
+		});
+	};
+
+	const progressPct = stats.total ? Math.round((doneCount / stats.total) * 100) : 0;
 
 	const onRescan = async () => {
 		try {
@@ -183,14 +224,26 @@ export default function PackageEditor() {
 			<PageHeader
 				title={`${pkg.name} · ${langRow?.name || lang}`}
 				description={
-					<span>
-						<code>{pkg.text_domain}</code> ·{' '}
-						{sprintf(
-							/* translators: 1: done count, 2: total. */
-							__('%1$d / %2$d translated', 'gemtranslate'),
-							doneCount,
-							stats.total || 0
-						)}
+					<span className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-3">
+						<code>{pkg.text_domain}</code>
+						<span className="gtrans-flex gtrans-items-center gtrans-gap-2">
+							<span
+								className="gtrans-block gtrans-h-1.5 gtrans-w-40 gtrans-overflow-hidden gtrans-rounded-full gtrans-bg-body"
+								role="progressbar"
+								aria-valuenow={progressPct}
+								aria-valuemin={0}
+								aria-valuemax={100}
+							>
+								<span className="gtrans-block gtrans-h-full gtrans-bg-primary" style={{ width: progressPct + '%' }} />
+							</span>
+							{sprintf(
+								/* translators: 1: done count, 2: total, 3: percent. */
+								__('%1$d / %2$d translated (%3$d%%)', 'gemtranslate'),
+								doneCount,
+								stats.total || 0,
+								progressPct
+							)}
+						</span>
 					</span>
 				}
 				actions={
@@ -203,24 +256,52 @@ export default function PackageEditor() {
 				}
 			/>
 
+			<TopbarActions>
+				<Button size="sm" variant="ghost" loading={scan.isPending} onClick={onRescan}>
+					{__('Re-scan', 'gemtranslate')}
+				</Button>
+				<ExportMenu
+					onExport={onExport}
+					loading={exportPack.isPending}
+					pkg={pkg}
+					lang={lang}
+					wpOrgProjectUrl={wpOrgProjectUrl}
+				/>
+				<Button
+					size="sm"
+					loading={bulkSave.isPending}
+					disabled={dirtyCount === 0}
+					title={__('Ctrl/Cmd + S', 'gemtranslate')}
+					onClick={onSaveAll}
+				>
+					{dirtyCount > 0
+						? sprintf(
+								/* translators: %d: dirty count. */
+								__('Save all (%d)', 'gemtranslate'),
+								dirtyCount
+						  )
+						: __('Save all', 'gemtranslate')}
+				</Button>
+			</TopbarActions>
+
 			<Card table>
 				{/* ---- Toolbar ---- */}
-				<Table.Toolbar variant="tabs">
-					<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-3">
-					<div className="gtrans-flex gtrans-items-center gtrans-gap-1 gtrans-text-xs">
-						<span className="gtrans-mr-1 gtrans-text-muted">{__('Language:', 'gemtranslate')}</span>
-						<Select
-							className="gtrans-min-w-[200px]"
-							value={lang}
-							onChange={(e) => navigate(`/strings/${slug}/${e.target.value}`)}
-						>
-							{targetLangs.map((l) => (
-								<option key={l.code} value={l.code}>
-									{l.name} ({l.code})
-								</option>
-							))}
-						</Select>
-					</div>
+				<div className="gtrans-sticky-toolbar gtrans--mx-6 gtrans--mt-6 gtrans-mb-4 gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-x-4 gtrans-gap-y-2 gtrans-border-b gtrans-border-line gtrans-px-6 gtrans-py-2">
+					<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-x-4 gtrans-gap-y-1">
+						<div className="gtrans-flex gtrans-items-center gtrans-gap-2 gtrans-text-xs">
+							<span className="gtrans-text-muted">{__('Language:', 'gemtranslate')}</span>
+							<Select
+								className="gtrans-min-w-[180px]"
+								value={lang}
+								onChange={(e) => navigate(`/strings/${slug}/${e.target.value}`)}
+							>
+								{targetLangs.map((l) => (
+									<option key={l.code} value={l.code}>
+										{l.name} ({l.code})
+									</option>
+								))}
+							</Select>
+						</div>
 
 						<StatusTabs
 							value={statusFilter}
@@ -235,8 +316,10 @@ export default function PackageEditor() {
 							]}
 						/>
 					</div>
-					<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-3 gtrans-py-2">
+
+					<div className="gtrans-ml-auto gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-justify-end gtrans-gap-2">
 						<SearchBox
+							className="gtrans-w-52"
 							value={search}
 							placeholder={__('Search…', 'gemtranslate')}
 							onSearch={(keyword) => {
@@ -244,34 +327,8 @@ export default function PackageEditor() {
 								setSearch(keyword);
 							}}
 						/>
-					<span className="gtrans-flex gtrans-items-center gtrans-gap-2">
-						<Button size="sm" variant="ghost" loading={scan.isPending} onClick={onRescan}>
-							{__('Re-scan', 'gemtranslate')}
-						</Button>
-						<ExportMenu
-							onExport={onExport}
-							loading={exportPack.isPending}
-							pkg={pkg}
-							lang={lang}
-							wpOrgProjectUrl={wpOrgProjectUrl}
-						/>
-						<Button
-							size="sm"
-							loading={bulkSave.isPending}
-							disabled={dirtyCount === 0}
-							onClick={onSaveAll}
-						>
-							{dirtyCount > 0
-								? sprintf(
-										/* translators: %d: dirty count. */
-										__('Save all (%d)', 'gemtranslate'),
-										dirtyCount
-								  )
-								: __('Save all', 'gemtranslate')}
-						</Button>
-					</span>
 					</div>
-				</Table.Toolbar>
+				</div>
 
 				{/* ---- Rows ---- */}
 				{rows.length === 0 ? (
@@ -326,6 +383,26 @@ export default function PackageEditor() {
 				)}
 			</Card>
 
+			{dirtyCount > 0 && (
+				<div className="gtrans-sticky gtrans-bottom-4 gtrans-z-30 gtrans-mt-4 gtrans-flex gtrans-items-center gtrans-justify-between gtrans-gap-3 gtrans-rounded-lg gtrans-border gtrans-border-edge gtrans-bg-surface gtrans-px-4 gtrans-py-3 gtrans-shadow-gtrans">
+					<span className="gtrans-text-sm gtrans-text-ink">
+						{sprintf(
+							/* translators: %d: number of unsaved translations. */
+							_n('%d unsaved change', '%d unsaved changes', dirtyCount, 'gemtranslate'),
+							dirtyCount
+						)}
+					</span>
+					<span className="gtrans-flex gtrans-items-center gtrans-gap-2">
+						<Button size="sm" variant="ghost" onClick={onDiscard}>
+							{__('Discard', 'gemtranslate')}
+						</Button>
+						<Button size="sm" loading={bulkSave.isPending} onClick={onSaveAll}>
+							{__('Save all', 'gemtranslate')}
+						</Button>
+					</span>
+				</div>
+			)}
+
 			<Toast message={toast?.message} tone={toast?.tone} onClear={() => setToast(null)} />
 		</>
 	);
@@ -336,31 +413,46 @@ function StringRow({ row, draft, wpOrgProjectUrl, onChange }) {
 	const dirty = draft?.dirty;
 	const status = draft?.status || row.translation_status || '';
 	const fromWpOrg = status === 'wp_org';
+	const empty = value.trim() === '';
 
 	return (
-		<Table.Row
-			className={`gtrans-align-top ${dirty ? 'gtrans-bg-warning-light' : ''}`}
-		>
-			<Table.Cell>
-				<div className="gtrans-text-ink">{row.source}</div>
-				{row.file_ref && (
-					<div className="gtrans-mt-1 gtrans-text-xs gtrans-text-muted">
-						<code>{row.file_ref}</code>
-					</div>
-				)}
-				{row.context && (
-					<div className="gtrans-mt-1 gtrans-text-xs gtrans-text-muted">
-						{__('Context', 'gemtranslate')}: <code>{row.context}</code>
+		<Table.Row className={`gtrans-align-top ${dirty ? 'gtrans-bg-warning-light' : ''}`}>
+			<Table.Cell className="gtrans-w-1/2 gtrans-align-top">
+				<div className="gtrans-whitespace-pre-wrap gtrans-break-words gtrans-text-sm gtrans-leading-relaxed gtrans-text-ink">
+					{row.source}
+				</div>
+				{(row.file_ref || row.context) && (
+					<div className="gtrans-mt-1.5 gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-x-3 gtrans-gap-y-1 gtrans-text-11 gtrans-text-muted">
+						{row.file_ref && (
+							<span title={row.file_ref} className="gtrans-font-mono">
+								{shortRef(row.file_ref)}
+							</span>
+						)}
+						{row.context && (
+							<span>
+								{__('Context', 'gemtranslate')}: <code>{row.context}</code>
+							</span>
+						)}
 					</div>
 				)}
 			</Table.Cell>
-			<Table.Cell>
+			<Table.Cell className="gtrans-align-top">
 				<TextArea
-					rows={Math.min(6, Math.max(2, Math.ceil((row.source?.length || 0) / 80)))}
+					rows={Math.min(6, Math.max(1, Math.ceil((row.source?.length || 0) / 60)))}
 					value={value}
+					placeholder={empty ? __('Type the translation…', 'gemtranslate') : ''}
 					onChange={(e) => onChange(row.string_id, e.target.value)}
 				/>
 				<div className="gtrans-mt-1 gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-2 gtrans-text-xs">
+					{empty && (
+						<button
+							type="button"
+							onClick={() => onChange(row.string_id, row.source || '')}
+							className="gtrans-bare gtrans-cursor-pointer gtrans-border-0 gtrans-bg-transparent gtrans-p-0 gtrans-text-11 gtrans-text-primary hover:gtrans-underline"
+						>
+							{__('Copy source', 'gemtranslate')}
+						</button>
+					)}
 					{fromWpOrg && (
 						<span className="gtrans-rounded gtrans-bg-emerald-100 gtrans-px-1.5 gtrans-py-0.5 gtrans-text-emerald-800">
 							🌐 {__('From translate.wordpress.org', 'gemtranslate')}
@@ -386,7 +478,7 @@ function StringRow({ row, draft, wpOrgProjectUrl, onChange }) {
 							href={`${wpOrgProjectUrl}?filters[term]=${encodeURIComponent(row.source)}`}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="gtrans-text-[11px] gtrans-text-muted gtrans-no-underline hover:gtrans-text-primary"
+							className="gtrans-text-11 gtrans-text-muted gtrans-no-underline hover:gtrans-text-primary"
 						>
 							{__('Suggest on WP.org →', 'gemtranslate')}
 						</a>

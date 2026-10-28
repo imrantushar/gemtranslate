@@ -3,6 +3,7 @@ import { __ } from '@wordpress/i18n';
 
 import Icon from './Icon';
 import MenuToggle from './MenuToggle';
+import { TOPBAR_ACTIONS_ID } from './TopbarActions';
 import { NAV } from './Sidebar';
 import { useThemeMode } from '../lib/theme';
 
@@ -33,6 +34,8 @@ export default function Topbar({ collapsed, onToggle }) {
 			</div>
 
 			<div className="gtrans-flex gtrans-items-center gtrans-gap-3">
+				{/* Pages portal their primary actions here (see <TopbarActions>). */}
+				<div id={TOPBAR_ACTIONS_ID} className="gtrans-flex gtrans-items-center gtrans-gap-2" />
 				<span className="gtrans-rounded-full gtrans-border gtrans-border-line gtrans-px-2 gtrans-py-0.5 gtrans-text-2xs gtrans-text-muted">
 					v{window.gtrans?.version || '1.0.0'}
 				</span>
