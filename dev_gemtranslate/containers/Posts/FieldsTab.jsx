@@ -9,6 +9,7 @@ import { FormSkeleton } from '../../components/Skeleton';
 import { usePostFields, useSavePostFields } from '../../hooks/usePostFields';
 import { formatErrorMessage } from '../../lib/format';
 import { PageAiButton } from './PageAiModal';
+import ImageRow, { hasText } from './ImageRow';
 
 /**
  * String-only editor. Each row shows the translator-facing TOKENISED text:
@@ -55,6 +56,7 @@ export default function FieldsTab({ postId, pageTitle = '', slug = '', sourceLan
 	};
 
 	const labelFor = (f) => {
+		if (f.kind === 'image') return __('Image', 'gemtranslate');
 		if (f.path === 'title') return __('Title', 'gemtranslate');
 		if (f.path === 'excerpt') return __('Excerpt', 'gemtranslate');
 		if (f.path === 'body') return __('Body (classic)', 'gemtranslate');
@@ -72,7 +74,7 @@ export default function FieldsTab({ postId, pageTitle = '', slug = '', sourceLan
 				</p>
 				<div className="gtrans-mb-3 gtrans-flex gtrans-justify-end">
 						<PageAiButton
-							items={(data.data.fields || []).filter((f) => f.kind !== 'image').map((f) => ({ key: f.path, source: f.source, context: labelFor(f) }))}
+							items={(data.data.fields || []).filter((f) => f.kind !== 'image' && hasText(f.source)).map((f) => ({ key: f.path, source: f.source, context: labelFor(f) }))}
 							drafts={drafts}
 							pageTitle={pageTitle}
 							slug={slug}
@@ -83,7 +85,20 @@ export default function FieldsTab({ postId, pageTitle = '', slug = '', sourceLan
 						/>
 					</div>
 					<form onSubmit={submit} className="gtrans-flex gtrans-flex-col gtrans-gap-4">
-					{(data.data.fields || []).filter((f) => f.kind !== 'image').map((f) => (
+					{(data.data.fields || [])
+						.filter((f) => f.kind === 'image' || hasText(f.source))
+						.map((f) =>
+							f.kind === 'image' ? (
+								<ImageRow
+									key={f.path}
+									label={labelFor(f)}
+									type={f.block}
+									source={f.source}
+									draft={drafts[f.path] ?? ''}
+									onChange={(v) => set(f.path, v)}
+									onNotify={setToast}
+								/>
+							) : (
 						<FieldRow
 							key={f.path}
 							field={f}
@@ -91,7 +106,8 @@ export default function FieldsTab({ postId, pageTitle = '', slug = '', sourceLan
 							draft={drafts[f.path] ?? ''}
 							onChange={(v) => set(f.path, v)}
 						/>
-					))}
+							)
+						)}
 					<div className="gtrans-mt-2 gtrans-flex gtrans-justify-end">
 						<Button type="submit" loading={save.isPending}>{__('Save translations', 'gemtranslate')}</Button>
 					</div>

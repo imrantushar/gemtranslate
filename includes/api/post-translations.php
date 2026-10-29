@@ -520,6 +520,10 @@ class PostTranslations extends Controller {
 			$path        = (string) ( $r['path'] ?? '' );
 			$translation = (string) ( $r['value'] ?? '' );
 			$source      = (string) ( $r['source'] ?? '' );
+			// An image path (`….html.src`) stores a replacement URL, not text.
+			if ( '.html.src' === substr( $path, -9 ) ) {
+				$translation = esc_url_raw( $translation );
+			}
 			if ( '' === $path ) {
 				continue;
 			}

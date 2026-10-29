@@ -18,6 +18,7 @@ import { splitSentences, joinSegments, segmentHash } from '../../lib/segment';
 import { buildToolbar, describeToken, countTokens } from '../../lib/tokens';
 import { formatErrorMessage } from '../../lib/format';
 import { PageAiButton } from './PageAiModal';
+import ImageRow, { hasText } from './ImageRow';
 
 /**
  * WPML-style Advanced translation editor. Sentence-segmented, side-by-side,
@@ -41,8 +42,12 @@ export default function AdvancedEditor({ postId, pageTitle = '', slug = '', sour
 	const fields = useMemo(() => {
 		const raw = data.data?.fields || [];
 		return raw
-			.filter((f) => f.kind !== 'image' && String(f.source || '').trim() !== '')
+			.filter((f) => String(f.source || '').trim() !== '' && (f.kind === 'image' || hasText(f.source)))
 			.map((f) => {
+				// An image has no sentences: its draft is a single replacement URL.
+				if (f.kind === 'image') {
+					return { ...f, isImage: true, segs: [], initial: [String(f.translation || '')], collapsed: false };
+				}
 				const segs = splitSentences(f.source);
 				let collapsed = false;
 				let initial = segs.map(() => '');
@@ -138,7 +143,7 @@ export default function AdvancedEditor({ postId, pageTitle = '', slug = '', sour
 		const payload = fields.map((f) => ({
 			path: f.path,
 			source: f.source,
-			value: joinSegments(f.segs, drafts[f.path] || []),
+			value: f.isImage ? (drafts[f.path]?.[0] ?? '') : joinSegments(f.segs, drafts[f.path] || []),
 		}));
 		try {
 			await save.mutateAsync({
@@ -228,7 +233,18 @@ export default function AdvancedEditor({ postId, pageTitle = '', slug = '', sour
 			</div>
 
 			<div className="gtrans-flex gtrans-flex-col gtrans-gap-5">
-				{fields.map((f) => (
+				{fields.map((f) =>
+					f.isImage ? (
+						<ImageRow
+							key={f.path}
+							label={__('Image', 'gemtranslate')}
+							type={f.block}
+							source={f.source}
+							draft={drafts[f.path]?.[0] ?? ''}
+							onChange={(v) => setSeg(f.path, 0, v)}
+							onNotify={setToast}
+						/>
+					) : (
 					<FieldGroup
 						key={f.path}
 						field={f}
@@ -237,7 +253,8 @@ export default function AdvancedEditor({ postId, pageTitle = '', slug = '', sour
 						onChangeSeg={setSeg}
 						onToggleConfirm={toggleConfirm}
 					/>
-				))}
+					)
+				)}
 			</div>
 
 			<Toast message={toast?.message} tone={toast?.tone} onClear={() => setToast(null)} />
