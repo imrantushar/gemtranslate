@@ -6,13 +6,14 @@ import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
+import Pagination from '../../components/Pagination';
 import Toast from '../../components/Toast';
 import { TextInput } from '../../components/Input';
 import { Select } from '../../components/ui/Select';
 import { PageSkeleton, TableSkeleton } from '../../components/Skeleton';
 import { api, unwrap } from '../../lib/api';
 import { useGetMenuItemsQuery, useSaveMenuItemMutation } from '../../lib/gtransApi';
-import { setMenuPage } from '../../lib/store';
+import { setMenuPage, setMenuPerPage } from '../../lib/store';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguages } from '../../hooks/useLanguages';
 import { formatErrorMessage } from '../../lib/format';
@@ -24,8 +25,6 @@ function useMenus() {
 	});
 }
 
-const PAGE_SIZE = 50;
-
 export default function MenusPage() {
 	const langs = useLanguages();
 	const nonDefault = (langs.data || []).filter((l) => !l.is_default && l.active);
@@ -33,12 +32,11 @@ export default function MenusPage() {
 	const [selectedMenu, setSelectedMenu] = useState('');
 	const [selectedLang, setSelectedLang] = useState('');
 	const dispatch = useDispatch();
-	const page = useSelector((state) => state.menuItemsList.page);
-	const items = useGetMenuItemsQuery({ menuId: selectedMenu, page, per_page: PAGE_SIZE }, { skip: !selectedMenu });
+	const { page, perPage } = useSelector((state) => state.menuItemsList);
+	const items = useGetMenuItemsQuery({ menuId: selectedMenu, page, per_page: perPage }, { skip: !selectedMenu });
 	const [saveItem, saveState] = useSaveMenuItemMutation();
 	const rows = items.data?.rows || [];
 	const total = items.data?.meta?.total || 0;
-	const totalPages = items.data?.meta?.total_pages || 1;
 	const currentPage = items.data?.meta?.page || page;
 	const [drafts, setDrafts] = useState({});
 	const [toast, setToast] = useState(null);
@@ -159,27 +157,14 @@ export default function MenusPage() {
 					</Table.Root>
 				)}
 
-				{total > PAGE_SIZE && (
-					<div className="gtrans-flex gtrans-items-center gtrans-justify-between gtrans-mt-3 gtrans-text-sm">
-						<span className="gtrans-text-muted">
-							{sprintf(
-								/* translators: 1: current page, 2: total pages, 3: total rows. */
-								__('Page %1$d of %2$d · %3$d total', 'gemtranslate'),
-								currentPage,
-								totalPages,
-								total
-							)}
-						</span>
-						<div className="gtrans-flex gtrans-gap-2">
-							<Button variant="ghost" size="sm" disabled={currentPage <= 1} onClick={() => dispatch(setMenuPage(currentPage - 1))}>
-								{__('Previous', 'gemtranslate')}
-							</Button>
-							<Button variant="ghost" size="sm" disabled={currentPage >= totalPages} onClick={() => dispatch(setMenuPage(currentPage + 1))}>
-								{__('Next', 'gemtranslate')}
-							</Button>
-						</div>
-					</div>
-				)}
+				<Pagination
+					total={total}
+					shown={rows.length}
+					page={currentPage}
+					perPage={perPage}
+					onPage={(p) => dispatch(setMenuPage(p))}
+					onPerPage={(n) => dispatch(setMenuPerPage(n))}
+				/>
 			</Card>
 
 			<Toast message={toast?.message} tone={toast?.tone} onClear={() => setToast(null)} />
