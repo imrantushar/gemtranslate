@@ -117,6 +117,24 @@ function SwitcherPreview({ values, languages }) {
 	);
 }
 
+/**
+ * One settings group: title and short description on the left, the controls
+ * in a card on the right. Stacks on narrow screens.
+ */
+function Section({ title, description, children }) {
+	return (
+		<div className="gtrans-grid gtrans-gap-4 lg:gtrans-grid-cols-[280px_1fr] lg:gtrans-gap-8">
+			<div>
+				<h2 className="gtrans-section-title gtrans-m-0">{title}</h2>
+				{description && (
+					<p className="gtrans-mb-0 gtrans-mt-1 gtrans-text-xs gtrans-text-muted">{description}</p>
+				)}
+			</div>
+			<Card>{children}</Card>
+		</div>
+	);
+}
+
 export default function SettingsPage() {
 	const settings = useSettings();
 	const languages = useLanguages();
@@ -161,8 +179,11 @@ export default function SettingsPage() {
 			/>
 
 			{tab === 'general' && (
-			<div className="gtrans-flex gtrans-flex-col gtrans-gap-4">
-				<Card title={__('Visitor experience', 'gemtranslate')}>
+			<div className="gtrans-mt-6 gtrans-flex gtrans-flex-col gtrans-gap-6">
+				<Section
+						title={__('Visitor experience', 'gemtranslate')}
+						description={__('How visitors are greeted and how emails are localised.', 'gemtranslate')}
+					>
 					<SettingRow
 	label={__('Auto-redirect first visit by browser language', 'gemtranslate')}
 	description={__(
@@ -181,9 +202,12 @@ export default function SettingsPage() {
 	checked={!!values.translate_emails}
 	onChange={(v) => set('translate_emails', v)}
 />
-				</Card>
+				</Section>
 
-				<Card title={__('URL strategy', 'gemtranslate')}>
+				<Section
+						title={__('URL strategy', 'gemtranslate')}
+						description={__('How translated pages are addressed.', 'gemtranslate')}
+					>
 					<Field label={__('Pattern', 'gemtranslate')}>
 						<Select
 							value={values.url_strategy}
@@ -201,22 +225,28 @@ export default function SettingsPage() {
 							'gemtranslate'
 						)}
 					</p>
-				</Card>
+				</Section>
 
-				<Card title={__('Display', 'gemtranslate')}>
+				<Section
+						title={__('Display', 'gemtranslate')}
+						description={__('What the language switcher shows by default.', 'gemtranslate')}
+					>
 					<SettingRow
 	label={__('Show switcher for default language', 'gemtranslate')}
 	checked={!!values.show_switcher_for_default}
 	onChange={(v) => set('show_switcher_for_default', v)}
 />
-				</Card>
+				</Section>
 
 			</div>
 			)}
 
 			{tab === 'advanced' && (
-			<div className="gtrans-flex gtrans-flex-col gtrans-gap-4">
-				<Card title={__('Performance', 'gemtranslate')}>
+			<div className="gtrans-mt-6 gtrans-flex gtrans-flex-col gtrans-gap-6">
+				<Section
+						title={__('Performance', 'gemtranslate')}
+						description={__('Caching and diagnostics.', 'gemtranslate')}
+					>
 					<SettingRow
 	label={__('Use object cache (recommended)', 'gemtranslate')}
 	checked={!!values.object_cache_enabled}
@@ -227,9 +257,12 @@ export default function SettingsPage() {
 	checked={!!values.debug_log_enabled}
 	onChange={(v) => set('debug_log_enabled', v)}
 />
-				</Card>
+				</Section>
 
-				<Card title={__('Danger zone', 'gemtranslate')}>
+				<Section
+						title={__('Danger zone', 'gemtranslate')}
+						description={__('Actions that remove data.', 'gemtranslate')}
+					>
 					<SettingRow
 	label={__('Delete all data on uninstall', 'gemtranslate')}
 	description={__(
@@ -239,13 +272,16 @@ export default function SettingsPage() {
 	checked={!!values.remove_data_on_uninstall}
 	onChange={(v) => set('remove_data_on_uninstall', v)}
 />
-				</Card>
+				</Section>
 			</div>
 			)}
 
 			{tab === 'switcher' && (
-			<div className="gtrans-mt-4 gtrans-grid gtrans-gap-4 md:gtrans-grid-cols-2">
-				<Card title={__('Language switcher appearance', 'gemtranslate')}>
+			<div className="gtrans-mt-6 gtrans-flex gtrans-flex-col gtrans-gap-6">
+				<Section
+						title={__('Language switcher appearance', 'gemtranslate')}
+						description={__('Defaults for the shortcode, widget and block.', 'gemtranslate')}
+					>
 					<div className="gtrans-flex gtrans-flex-col gtrans-gap-3">
 						<Field label={__('Display style', 'gemtranslate')}>
 							<Select
@@ -292,9 +328,12 @@ export default function SettingsPage() {
 	onChange={(v) => set('switcher_show_if_single', v)}
 />
 					</div>
-				</Card>
+				</Section>
 
-				<Card title={__('Live preview', 'gemtranslate')}>
+				<Section
+						title={__('Live preview', 'gemtranslate')}
+						description={__('See the switcher with the current settings.', 'gemtranslate')}
+					>
 					<p className="gtrans-mb-3 gtrans-text-xs gtrans-text-muted">
 						{__(
 							'Shows how the switcher looks with the current settings. The bold item is the default language.',
@@ -319,13 +358,16 @@ export default function SettingsPage() {
 							)}
 						</p>
 					</div>
-				</Card>
+				</Section>
 			</div>
 			)}
 
 			{tab === 'geo' && (
-			<div className="gtrans-mt-4">
-				<Card title={__('Country detection', 'gemtranslate')}>
+			<div className="gtrans-mt-6 gtrans-flex gtrans-flex-col gtrans-gap-6">
+				<Section
+						title={__('Country detection', 'gemtranslate')}
+						description={__('Pick country variants and the default language by visitor location.', 'gemtranslate')}
+					>
 					<div className="gtrans-flex gtrans-flex-col gtrans-gap-3">
 						<SettingRow
 	label={__('Detect visitor country', 'gemtranslate')}
@@ -410,13 +452,16 @@ export default function SettingsPage() {
 							</>
 						)}
 					</div>
-				</Card>
+				</Section>
 			</div>
 			)}
 
 			{tab === 'floating' && (
-			<div className="gtrans-mt-4">
-				<Card title={__('Floating language switcher', 'gemtranslate')}>
+			<div className="gtrans-mt-6 gtrans-flex gtrans-flex-col gtrans-gap-6">
+				<Section
+						title={__('Floating language switcher', 'gemtranslate')}
+						description={__('A fixed language button on every page.', 'gemtranslate')}
+					>
 					<div className="gtrans-flex gtrans-flex-col gtrans-gap-3">
 						<SettingRow
 	label={__('Show floating switcher on every page', 'gemtranslate')}
@@ -442,7 +487,7 @@ export default function SettingsPage() {
 							</Field>
 						)}
 					</div>
-				</Card>
+				</Section>
 			</div>
 			)}
 

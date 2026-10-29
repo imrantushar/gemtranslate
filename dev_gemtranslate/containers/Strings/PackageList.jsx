@@ -21,6 +21,8 @@ import { formatErrorMessage } from '../../lib/format';
  * translation-progress strip per active language. Click a row to drill into
  * its dedicated editor.
  */
+const PAGE_SIZE = 20;
+
 export default function PackageList() {
 	const navigate = useNavigate();
 	const packages = usePackages();
@@ -28,6 +30,7 @@ export default function PackageList() {
 	const scan = useScanPackage();
 	const [filter, setFilter] = useState('');
 	const [typeFilter, setTypeFilter] = useState('all'); // all | plugin | theme
+	const [page, setPage] = useState(1);
 	const [toast, setToast] = useState(null);
 	const [scanningSlug, setScanningSlug] = useState('');
 	const audit = useAuditPackage();
@@ -53,6 +56,11 @@ export default function PackageList() {
 			r.slug.toLowerCase().includes(q)
 		);
 	});
+
+	const total = rows.length;
+	const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+	const currentPage = Math.min(page, totalPages);
+	const pagedRows = rows.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
 	const onScan = async (row) => {
 		setScanningSlug(row.slug);
@@ -144,7 +152,10 @@ export default function PackageList() {
 				<Table.Toolbar variant="tabs">
 					<StatusTabs
 						value={typeFilter}
-						onChange={setTypeFilter}
+						onChange={(key) => {
+							setTypeFilter(key);
+							setPage(1);
+						}}
 						tabs={[
 							{ value: 'all', label: __('All', 'gemtranslate'), count: packages.data?.rows?.length || 0 },
 							{ value: 'plugin', label: __('Plugins', 'gemtranslate') },
@@ -154,7 +165,10 @@ export default function PackageList() {
 					<SearchBox
 						value={filter}
 						placeholder={__('Search plugins & themes…', 'gemtranslate')}
-						onSearch={setFilter}
+						onSearch={(keyword) => {
+							setFilter(keyword);
+							setPage(1);
+						}}
 					/>
 				</Table.Toolbar>
 
@@ -169,7 +183,7 @@ export default function PackageList() {
 						</Table.Row>
 					</Table.Header>
 					<Table.Body>
-						{rows.map((row) => (
+						{pagedRows.map((row) => (
 							<PackageRow
 								key={`${row.type}-${row.slug}`}
 								row={row}
@@ -194,6 +208,28 @@ export default function PackageList() {
 						)}
 					</Table.Body>
 				</Table.Root>
+
+				{total > PAGE_SIZE && (
+					<div className="gtrans-flex gtrans-items-center gtrans-justify-between gtrans-mt-3 gtrans-text-sm">
+						<span className="gtrans-text-muted">
+							{sprintf(
+								/* translators: 1: current page, 2: total pages, 3: total rows. */
+								__('Page %1$d of %2$d · %3$d total', 'gemtranslate'),
+								currentPage,
+								totalPages,
+								total
+							)}
+						</span>
+						<div className="gtrans-flex gtrans-gap-2">
+							<Button variant="ghost" size="sm" disabled={currentPage <= 1} onClick={() => setPage(currentPage - 1)}>
+								{__('Previous', 'gemtranslate')}
+							</Button>
+							<Button variant="ghost" size="sm" disabled={currentPage >= totalPages} onClick={() => setPage(currentPage + 1)}>
+								{__('Next', 'gemtranslate')}
+							</Button>
+						</div>
+					</div>
+				)}
 			</Card>
 
 			{auditView && (

@@ -2194,8 +2194,14 @@ body.toplevel_page_gemtranslate #wpfooter {
 	#gemtranslate-admin-root .lg\:gtrans-grid-cols-2{
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
+	#gemtranslate-admin-root .lg\:gtrans-grid-cols-\[280px_1fr\]{
+		grid-template-columns: 280px 1fr;
+	}
 	#gemtranslate-admin-root .lg\:gtrans-grid-cols-\[auto_minmax\(0\2c 1fr\)_minmax\(0\2c 1fr\)\]{
 		grid-template-columns: auto minmax(0,1fr) minmax(0,1fr);
+	}
+	#gemtranslate-admin-root .lg\:gtrans-gap-8{
+		gap: 2rem;
 	}
 }
 @media (min-width: 1280px){
