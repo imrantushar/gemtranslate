@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
 import Modal from '../../components/Modal';
@@ -97,18 +97,11 @@ export default function PageAiModal({
 	const [report, setReport] = useState(null);
 	const [applied, setApplied] = useState(null);
 
-	// Stable numeric id per item for the life of the modal, so a CSV copied
-	// earlier still matches after other batches were applied.
-	const ids = useRef({ byKey: new Map(), byId: new Map(), next: 1 });
-	const idOf = (item) => {
-		const reg = ids.current;
-		if (!reg.byKey.has(item.key)) {
-			reg.byKey.set(item.key, reg.next);
-			reg.byId.set(reg.next, item);
-			reg.next++;
-		}
-		return reg.byKey.get(item.key);
-	};
+	// A row's id is its 1-based position on the page, so it never depends on
+	// what the modal did earlier: a CSV copied before closing the modal, or
+	// before other batches were applied, still matches when it is pasted back.
+	const idOf = (item) => items.indexOf(item) + 1;
+	const itemById = (id) => items[id - 1];
 
 	const todo = useMemo(
 		() => items.filter((it) => (drafts[it.key] ?? '').trim() === '' && it.source.trim() !== ''),
@@ -180,7 +173,7 @@ export default function PageAiModal({
 		};
 
 		rows.forEach((row) => {
-			const item = ids.current.byId.get(row.id);
+			const item = itemById(row.id);
 			if (!item) return note('unknown_id', row, row.source);
 			if (!row.target) return note('empty', row, item.source);
 			if (!overwrite && (drafts[item.key] ?? '').trim() !== '') return note('already_translated', row, item.source);
