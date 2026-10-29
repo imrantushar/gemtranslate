@@ -5,6 +5,7 @@ import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
+import Pagination from '../../components/Pagination';
 import SearchBox from '../../components/SearchBox';
 import Toast from '../../components/Toast';
 import StatusPill from '../../components/StatusPill';
@@ -174,25 +175,14 @@ export default function StringsLegacy() {
 					</Table.Root>
 				)}
 
-				{strings.data?.meta?.total > strings.data?.meta?.per_page && (
-					<div className="gtrans-flex gtrans-justify-between gtrans-mt-3 gtrans-text-sm">
-						<span className="gtrans-text-muted">
-							{sprintf(
-								/* translators: %d: total count. */
-								__('%d total', 'gemtranslate'),
-								strings.data?.meta?.total
-							)}
-						</span>
-						<div className="gtrans-flex gtrans-gap-2">
-							<Button variant="ghost" size="sm" disabled={filters.page <= 1} onClick={() => setFilters((f) => ({ ...f, page: f.page - 1 }))}>
-								{__('Previous', 'gemtranslate')}
-							</Button>
-							<Button variant="ghost" size="sm" onClick={() => setFilters((f) => ({ ...f, page: f.page + 1 }))}>
-								{__('Next', 'gemtranslate')}
-							</Button>
-						</div>
-					</div>
-				)}
+				<Pagination
+					total={strings.data?.meta?.total || 0}
+					shown={strings.data?.rows?.length || 0}
+					page={filters.page}
+					perPage={filters.per_page}
+					onPage={(page) => setFilters((f) => ({ ...f, page }))}
+					onPerPage={(per_page) => setFilters((f) => ({ ...f, per_page, page: 1 }))}
+				/>
 			</Card>
 
 			<Toast message={toast?.message} tone={toast?.tone} onClear={() => setToast(null)} />
