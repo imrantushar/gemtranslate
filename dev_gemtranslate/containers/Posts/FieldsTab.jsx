@@ -8,6 +8,7 @@ import { Field, TextArea, TextInput } from '../../components/Input';
 import { FormSkeleton } from '../../components/Skeleton';
 import { usePostFields, useSavePostFields } from '../../hooks/usePostFields';
 import { formatErrorMessage } from '../../lib/format';
+import { PageAiButton } from './PageAiModal';
 
 /**
  * String-only editor. Each row shows the translator-facing TOKENISED text:
@@ -20,7 +21,7 @@ import { formatErrorMessage } from '../../lib/format';
  * recomputed from live source on every render, so attribute/whitespace drift
  * doesn't break translation bindings.
  */
-export default function FieldsTab({ postId, sourceLang, targetLang, country = '' }) {
+export default function FieldsTab({ postId, pageTitle = '', slug = '', sourceLang, targetLang, country = '' }) {
 	const data = usePostFields(postId, targetLang, country);
 	const save = useSavePostFields();
 	const [drafts, setDrafts] = useState({});
@@ -69,7 +70,19 @@ export default function FieldsTab({ postId, sourceLang, targetLang, country = ''
 						'gemtranslate'
 					)}
 				</p>
-				<form onSubmit={submit} className="gtrans-flex gtrans-flex-col gtrans-gap-4">
+				<div className="gtrans-mb-3 gtrans-flex gtrans-justify-end">
+						<PageAiButton
+							items={(data.data.fields || []).map((f) => ({ key: f.path, source: f.source, context: labelFor(f) }))}
+							drafts={drafts}
+							pageTitle={pageTitle}
+							slug={slug}
+							sourceLang={sourceLang}
+							targetLang={targetLang}
+							onApply={(map) => setDrafts((d) => ({ ...d, ...map }))}
+							onNotify={setToast}
+						/>
+					</div>
+					<form onSubmit={submit} className="gtrans-flex gtrans-flex-col gtrans-gap-4">
 					{(data.data.fields || []).map((f) => (
 						<FieldRow
 							key={f.path}

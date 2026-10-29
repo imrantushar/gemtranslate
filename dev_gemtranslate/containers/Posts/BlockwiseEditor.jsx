@@ -9,6 +9,7 @@ import { TextArea } from '../../components/Input';
 import { FormSkeleton } from '../../components/Skeleton';
 import { usePostUnits, useSavePostUnits } from '../../hooks/usePostFields';
 import { formatErrorMessage } from '../../lib/format';
+import { PageAiButton } from './PageAiModal';
 
 const countPlaceholders = (s) => (String(s || '').match(/\{\d+\}/g) || []).length;
 
@@ -19,7 +20,7 @@ const countPlaceholders = (s) => (String(s || '').match(/\{\d+\}/g) || []).lengt
  * behind `{N}` placeholders exactly like the other string editors, so only
  * text can be edited and the layout always follows the source.
  */
-export default function BlockwiseEditor({ postId, targetLang, country = '' }) {
+export default function BlockwiseEditor({ postId, pageTitle = '', slug = '', sourceLang, targetLang, country = '' }) {
 	const data = usePostUnits(postId, targetLang, country);
 	const save = useSavePostUnits();
 	const [drafts, setDrafts] = useState({});
@@ -130,6 +131,16 @@ export default function BlockwiseEditor({ postId, targetLang, country = '' }) {
 						))}
 					</div>
 					<div className="gtrans-ml-auto gtrans-flex gtrans-items-center gtrans-gap-2">
+						<PageAiButton
+							items={units.map((u) => ({ key: u.id, source: u.source, context: u.label }))}
+							drafts={drafts}
+							pageTitle={pageTitle}
+							slug={slug}
+							sourceLang={sourceLang}
+							targetLang={targetLang}
+							onApply={(map) => setDrafts((d) => ({ ...d, ...map }))}
+							onNotify={setToast}
+						/>
 						<Button type="button" variant="secondary" size="sm" onClick={copyAllEmpty}>
 							{__('Copy source to empty', 'gemtranslate')}
 						</Button>

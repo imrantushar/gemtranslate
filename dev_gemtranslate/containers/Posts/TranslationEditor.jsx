@@ -306,6 +306,9 @@ export default function TranslationEditor() {
 							{activeContentMode === 'blocks' ? (
 								<BlockwiseEditor
 									postId={post.id}
+									pageTitle={post.title}
+									slug={post.slug}
+									sourceLang={defaultLang}
 									targetLang={selectedLang}
 									country={country}
 								/>
@@ -319,6 +322,8 @@ export default function TranslationEditor() {
 							) : (
 								<FieldsTab
 									postId={post.id}
+									pageTitle={post.title}
+									slug={post.slug}
 									sourceLang={defaultLang}
 									targetLang={selectedLang}
 									country={country}
