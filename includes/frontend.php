@@ -11,5 +11,6 @@ class Frontend {
 		Frontend\LanguageSwitcherBlock::init();
 		Frontend\LanguageSwitcherWidget::init();
 		Frontend\FloatingSwitcher::init();
+		Frontend\Shortcodes::init();
 	}
 }

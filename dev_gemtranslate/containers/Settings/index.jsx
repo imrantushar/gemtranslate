@@ -135,6 +135,20 @@ const TABS = () => [
 		description: __('Defaults for the shortcode, widget and block, with a live preview.', 'gemtranslate'),
 	},
 	{
+		key: 'footer',
+		icon: 'panel',
+		label: __('Footer switcher', 'gemtranslate'),
+		hint: __('Bottom-of-page switcher', 'gemtranslate'),
+		description: __('Appearance of the footer switcher and the [gemtranslate_language_selector_footer] shortcode.', 'gemtranslate'),
+	},
+	{
+		key: 'shortcodes',
+		icon: 'clipboard',
+		label: __('Shortcodes', 'gemtranslate'),
+		hint: __('Paste-ready snippets', 'gemtranslate'),
+		description: __('Every shortcode GemTranslate provides, with its attributes and an example.', 'gemtranslate'),
+	},
+	{
 		key: 'floating',
 		icon: 'panel',
 		label: __('Floating switcher', 'gemtranslate'),
@@ -154,6 +168,55 @@ const TABS = () => [
 		label: __('Advanced', 'gemtranslate'),
 		hint: __('Performance and data', 'gemtranslate'),
 		description: __('Caching, diagnostics and what happens to your data on uninstall.', 'gemtranslate'),
+	},
+];
+
+/** Every shortcode the plugin registers. Keep in sync with includes/frontend/*.php. */
+const SHORTCODES = () => [
+	{
+		tag: 'gemtranslate_language_selector_widget',
+		example: '[gemtranslate_language_selector_widget]',
+		description: __(
+			'A drop-down language switcher. Takes no attributes. PHP: do_action( \'gemtranslate_add_language_selector\' ).',
+			'gemtranslate'
+		),
+		attrs: '',
+	},
+	{
+		tag: 'gemtranslate_language_selector_footer',
+		example: '[gemtranslate_language_selector_footer]',
+		description: __(
+			'A horizontal language switcher that follows the Footer switcher tab. Works even when "Show in footer" is off. Takes no attributes. PHP: do_action( \'gemtranslate_footer_language_selector\' ).',
+			'gemtranslate'
+		),
+		attrs: '',
+	},
+	{
+		tag: 'gemtranslate_language_form_field',
+		example: '[gemtranslate_language_form_field]',
+		description: __(
+			'Put inside a custom search form so results come back in the visitor’s language. Takes no attributes. PHP: do_action( \'gemtranslate_add_language_form_field\' ).',
+			'gemtranslate'
+		),
+		attrs: '',
+	},
+	{
+		tag: 'gemtranslate_string',
+		example: '[gemtranslate_string context="my-domain" name="my-name"]My string[/gemtranslate_string]',
+		description: __(
+			'Registers a fixed piece of text so it can be translated under Strings (Advanced flat view). The string appears there once a page showing it has been visited. Also available as [gemtranslate-string].',
+			'gemtranslate'
+		),
+		attrs: 'context (the string domain), name (the string name)',
+	},
+	{
+		tag: 'gemtranslate_language_switcher',
+		example: '[gemtranslate_language_switcher type="footer" flags=1 native=1 translated=1]',
+		description: __(
+			'The customisable switcher. Use type to pick which settings it follows.',
+			'gemtranslate'
+		),
+		attrs: 'type (custom | footer | widget | post_translations, default custom), flags, link_current, native, translated, template (inline | dropdown)',
 	},
 ];
 
@@ -317,7 +380,75 @@ export default function SettingsPage() {
 						</>
 					)}
 
-					{tab === 'floating' && (
+					{tab === 'footer' && (
+						<>
+							<SettingRow
+								label={__('Show language switcher in footer', 'gemtranslate')}
+								description={__(
+									'Adds the switcher at the bottom of every page. The shortcode and PHP action work even when this is off.',
+									'gemtranslate'
+								)}
+								checked={!!values.footer_switcher_enabled}
+								onChange={(v) => set('footer_switcher_enabled', v)}
+							/>
+							<Block>
+								<Field label={__('Display style', 'gemtranslate')}>
+									<Select
+										value={values.footer_switcher_display ?? 'inline'}
+										onChange={(e) => set('footer_switcher_display', e.target.value)}
+									>
+										<option value="inline">{__('Inline list', 'gemtranslate')}</option>
+										<option value="dropdown">{__('Dropdown', 'gemtranslate')}</option>
+									</Select>
+								</Field>
+							</Block>
+							<SettingRow
+								label={__('Show flag emoji', 'gemtranslate')}
+								checked={values.footer_switcher_show_flag !== false}
+								onChange={(v) => set('footer_switcher_show_flag', v)}
+							/>
+							<SettingRow
+								label={__('Show language name (English)', 'gemtranslate')}
+								checked={values.footer_switcher_show_name !== false}
+								onChange={(v) => set('footer_switcher_show_name', v)}
+							/>
+							<SettingRow
+								label={__('Show native name', 'gemtranslate')}
+								checked={!!values.footer_switcher_show_native}
+								onChange={(v) => set('footer_switcher_show_native', v)}
+							/>
+							<SettingRow
+								label={__('Show language code (en, fr…)', 'gemtranslate')}
+								checked={!!values.footer_switcher_show_code}
+								onChange={(v) => set('footer_switcher_show_code', v)}
+							/>
+							<SettingRow
+								label={__('Hide current language from the list', 'gemtranslate')}
+								checked={!!values.footer_switcher_hide_current}
+								onChange={(v) => set('footer_switcher_hide_current', v)}
+							/>
+						</>
+					)}
+
+					{tab === 'shortcodes' &&
+							SHORTCODES().map((sc) => (
+								<Block key={sc.tag}>
+									<p className="gtrans-mb-1 gtrans-mt-0 gtrans-text-sm gtrans-font-semibold gtrans-text-ink">
+										{`[${sc.tag}]`}
+									</p>
+									<p className="gtrans-mb-2 gtrans-mt-0 gtrans-text-xs gtrans-text-muted">{sc.description}</p>
+									<code className="gtrans-block gtrans-select-all gtrans-rounded gtrans-bg-body gtrans-px-3 gtrans-py-2 gtrans-text-xs gtrans-text-ink">
+										{sc.example}
+									</code>
+									{sc.attrs && (
+										<p className="gtrans-mb-0 gtrans-mt-2 gtrans-text-xs gtrans-text-muted">
+											{__('Attributes:', 'gemtranslate')} {sc.attrs}
+										</p>
+									)}
+								</Block>
+							))}
+
+						{tab === 'floating' && (
 						<>
 							<SettingRow
 								label={__('Show floating switcher on every page', 'gemtranslate')}

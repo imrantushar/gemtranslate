@@ -27,6 +27,14 @@ class Settings extends Controller {
 		'switcher_show_code',
 		'switcher_hide_current',
 		'switcher_show_if_single',
+		// Footer switcher.
+		'footer_switcher_enabled',
+		'footer_switcher_display',
+		'footer_switcher_show_flag',
+		'footer_switcher_show_name',
+		'footer_switcher_show_native',
+		'footer_switcher_show_code',
+		'footer_switcher_hide_current',
 		// Floating switcher.
 		'float_switcher_enabled',
 		'float_switcher_position',
@@ -164,6 +172,14 @@ class Settings extends Controller {
 			'switcher_show_code'        => false,
 			'switcher_hide_current'     => false,
 			'switcher_show_if_single'   => false,
+			// Footer switcher.
+			'footer_switcher_enabled'      => false,
+			'footer_switcher_display'      => 'inline',
+			'footer_switcher_show_flag'    => true,
+			'footer_switcher_show_name'    => true,
+			'footer_switcher_show_native'  => false,
+			'footer_switcher_show_code'    => false,
+			'footer_switcher_hide_current' => false,
 			// Floating switcher.
 			'float_switcher_enabled'    => false,
 			'float_switcher_position'   => 'bottom-right',
