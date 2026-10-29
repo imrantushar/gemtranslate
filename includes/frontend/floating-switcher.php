@@ -53,7 +53,11 @@ class FloatingSwitcher {
 		if ( $enabled && count( $languages ) > 1 ) {
 			$current_lang  = $languages[ $current ] ?? reset( $languages );
 			$trigger_label = $this->build_label( $current_lang, $show_flag, $show_name, $show_native );
+			$show_default = ! isset( $g->show_switcher_for_default ) || (bool) $g->show_switcher_for_default;
 			foreach ( $languages as $row ) {
+				if ( ! $show_default && Context::default_code() === $row['code'] ) {
+					continue;
+				}
 				$is_current  = ( $row['code'] === $current );
 				$url         = $rewriter->current_url_for_language( $row['code'] );
 				$label       = $this->build_label( $row, $show_flag, $show_name, $show_native );
