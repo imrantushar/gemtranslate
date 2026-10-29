@@ -41,7 +41,7 @@ export default function AdvancedEditor({ postId, pageTitle = '', slug = '', sour
 	const fields = useMemo(() => {
 		const raw = data.data?.fields || [];
 		return raw
-			.filter((f) => String(f.source || '').trim() !== '')
+			.filter((f) => f.kind !== 'image' && String(f.source || '').trim() !== '')
 			.map((f) => {
 				const segs = splitSentences(f.source);
 				let collapsed = false;

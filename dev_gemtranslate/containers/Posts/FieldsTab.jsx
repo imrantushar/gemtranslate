@@ -72,7 +72,7 @@ export default function FieldsTab({ postId, pageTitle = '', slug = '', sourceLan
 				</p>
 				<div className="gtrans-mb-3 gtrans-flex gtrans-justify-end">
 						<PageAiButton
-							items={(data.data.fields || []).map((f) => ({ key: f.path, source: f.source, context: labelFor(f) }))}
+							items={(data.data.fields || []).filter((f) => f.kind !== 'image').map((f) => ({ key: f.path, source: f.source, context: labelFor(f) }))}
 							drafts={drafts}
 							pageTitle={pageTitle}
 							slug={slug}
@@ -83,7 +83,7 @@ export default function FieldsTab({ postId, pageTitle = '', slug = '', sourceLan
 						/>
 					</div>
 					<form onSubmit={submit} className="gtrans-flex gtrans-flex-col gtrans-gap-4">
-					{(data.data.fields || []).map((f) => (
+					{(data.data.fields || []).filter((f) => f.kind !== 'image').map((f) => (
 						<FieldRow
 							key={f.path}
 							field={f}

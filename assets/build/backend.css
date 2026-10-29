@@ -684,6 +684,9 @@ input:where([type='file']):focus{
 #gemtranslate-admin-root .gtrans-h-px{
 	height: 1px;
 }
+#gemtranslate-admin-root .gtrans-max-h-48{
+	max-height: 12rem;
+}
 #gemtranslate-admin-root .gtrans-max-h-72{
 	max-height: 18rem;
 }
@@ -692,6 +695,9 @@ input:where([type='file']):focus{
 }
 #gemtranslate-admin-root .gtrans-min-h-0{
 	min-height: 0px;
+}
+#gemtranslate-admin-root .gtrans-min-h-\[120px\]{
+	min-height: 120px;
 }
 #gemtranslate-admin-root .gtrans-min-h-\[2\.5rem\]{
 	min-height: 2.5rem;
@@ -1136,6 +1142,9 @@ input:where([type='file']):focus{
 #gemtranslate-admin-root .gtrans-border-solid{
 	border-style: solid;
 }
+#gemtranslate-admin-root .gtrans-border-dashed{
+	border-style: dashed;
+}
 #gemtranslate-admin-root .gtrans-border-none{
 	border-style: none;
 }
@@ -1281,6 +1290,10 @@ input:where([type='file']):focus{
 #gemtranslate-admin-root .gtrans-bg-white{
 	--tw-bg-opacity: 1;
 	background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
+}
+#gemtranslate-admin-root .gtrans-object-contain{
+	-o-object-fit: contain;
+	   object-fit: contain;
 }
 #gemtranslate-admin-root .gtrans-p-0{
 	padding: 0px;

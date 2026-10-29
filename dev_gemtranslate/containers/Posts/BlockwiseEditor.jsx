@@ -10,6 +10,7 @@ import { FormSkeleton } from '../../components/Skeleton';
 import { usePostUnits, useSavePostUnits } from '../../hooks/usePostFields';
 import { formatErrorMessage } from '../../lib/format';
 import { PageAiButton } from './PageAiModal';
+import { pickImage } from '../../lib/media';
 
 const countPlaceholders = (s) => (String(s || '').match(/\{\d+\}/g) || []).length;
 
@@ -61,7 +62,7 @@ export default function BlockwiseEditor({ postId, pageTitle = '', slug = '', sou
 	const copyAllEmpty = () => {
 		setDrafts((d) => {
 			const next = { ...d };
-			units.forEach((u) => { if (!(next[u.id] ?? '').trim()) next[u.id] = u.source; });
+			units.forEach((u) => { if (u.kind !== 'image' && !(next[u.id] ?? '').trim()) next[u.id] = u.source; });
 			return next;
 		});
 	};
@@ -132,7 +133,7 @@ export default function BlockwiseEditor({ postId, pageTitle = '', slug = '', sou
 					</div>
 					<div className="gtrans-ml-auto gtrans-flex gtrans-items-center gtrans-gap-2">
 						<PageAiButton
-							items={units.map((u) => ({ key: u.id, source: u.source, context: u.label }))}
+							items={units.filter((u) => u.kind !== 'image').map((u) => ({ key: u.id, source: u.source, context: u.label }))}
 							drafts={drafts}
 							pageTitle={pageTitle}
 							slug={slug}
@@ -154,6 +155,7 @@ export default function BlockwiseEditor({ postId, pageTitle = '', slug = '', sou
 					{shown.map((u) => (
 						<UnitRow
 							key={u.id}
+							onNotify={setToast}
 							unit={u}
 							draft={drafts[u.id] ?? ''}
 							onChange={(v) => set(u.id, v)}
@@ -169,7 +171,10 @@ export default function BlockwiseEditor({ postId, pageTitle = '', slug = '', sou
 	);
 }
 
-function UnitRow({ unit, draft, onChange }) {
+function UnitRow({ unit, draft, onChange, onNotify }) {
+	if (unit.kind === 'image') {
+		return <ImageRow unit={unit} draft={draft} onChange={onChange} onNotify={onNotify} />;
+	}
 	const filled = draft.trim() !== '';
 	const mismatch = filled && countPlaceholders(draft) !== countPlaceholders(unit.source);
 	const single = unit.kind === 'attr' || (unit.type.startsWith('post:') && unit.id !== 'body') || (unit.kind === 'setting' && unit.source.length < 80);
@@ -228,6 +233,87 @@ function UnitRow({ unit, draft, onChange }) {
 					)}
 				</div>
 			)}
+		</div>
+	);
+}
+
+/**
+ * One image on the page. The source image is shown for reference; the
+ * translation is a replacement image for this language, picked from the media
+ * library. An empty choice means the page keeps showing the source image.
+ */
+function ImageRow({ unit, draft, onChange, onNotify }) {
+	const filled = draft.trim() !== '';
+
+	const choose = async () => {
+		const url = await pickImage();
+		if (url) onChange(url);
+		else if (!window.wp?.media) {
+			onNotify?.({ tone: 'error', message: __('The media library is not available on this screen.', 'gemtranslate') });
+		}
+	};
+
+	return (
+		<div className="gtrans-rounded-md gtrans-border gtrans-border-line gtrans-p-3">
+			<div className="gtrans-mb-2 gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-2 gtrans-text-xs">
+				<code title={unit.type}>{unit.label}</code>
+				{unit.count > 1 && (
+					<span className="gtrans-text-muted">
+						{sprintf(
+							/* translators: %d: number of places the same image is used. */
+							__('used %d×', 'gemtranslate'),
+							unit.count
+						)}
+					</span>
+				)}
+				<span
+					className={clsx(
+						'gtrans-ml-auto gtrans-rounded gtrans-px-2 gtrans-py-0.5',
+						filled ? 'gtrans-bg-emerald-100 gtrans-text-emerald-800' : 'gtrans-bg-body gtrans-text-muted'
+					)}
+				>
+					{filled ? __('Custom image', 'gemtranslate') : __('Same as source', 'gemtranslate')}
+				</span>
+			</div>
+			<div className="gtrans-grid gtrans-grid-cols-1 lg:gtrans-grid-cols-2 gtrans-gap-3">
+				<ImageBox url={unit.source} label={__('Source image', 'gemtranslate')} />
+				<div className="gtrans-flex gtrans-flex-col gtrans-gap-2">
+					<ImageBox url={draft} label={__('Image for this language', 'gemtranslate')} empty={__('No replacement. The source image is shown.', 'gemtranslate')} />
+					<div className="gtrans-flex gtrans-flex-wrap gtrans-gap-2">
+						<button
+							type="button"
+							onClick={choose}
+							className="gtrans-bare gtrans-cursor-pointer gtrans-rounded-md gtrans-border gtrans-border-line gtrans-bg-surface gtrans-px-3 gtrans-py-1.5 gtrans-text-xs gtrans-text-label hover:gtrans-bg-body"
+						>
+							{filled ? __('Change image', 'gemtranslate') : __('Choose image', 'gemtranslate')}
+						</button>
+						{filled && (
+							<button
+								type="button"
+								onClick={() => onChange('')}
+								className="gtrans-bare gtrans-cursor-pointer gtrans-rounded-md gtrans-border gtrans-border-line gtrans-bg-surface gtrans-px-3 gtrans-py-1.5 gtrans-text-xs gtrans-text-label hover:gtrans-bg-body"
+							>
+								{__('Use source image', 'gemtranslate')}
+							</button>
+						)}
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+}
+
+function ImageBox({ url, label, empty }) {
+	return (
+		<div>
+			<div className="gtrans-mb-1 gtrans-text-xs gtrans-text-muted">{label}</div>
+			<div className="gtrans-flex gtrans-min-h-[120px] gtrans-items-center gtrans-justify-center gtrans-rounded-md gtrans-border gtrans-border-dashed gtrans-border-line gtrans-bg-body gtrans-p-2">
+				{url ? (
+					<img src={url} alt="" className="gtrans-max-h-48 gtrans-max-w-full gtrans-rounded gtrans-object-contain" />
+				) : (
+					<span className="gtrans-px-2 gtrans-text-center gtrans-text-xs gtrans-text-muted">{empty}</span>
+				)}
+			</div>
 		</div>
 	);
 }
