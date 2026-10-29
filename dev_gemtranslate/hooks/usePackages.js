@@ -1,21 +1,24 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, getMeta, unwrap } from '../lib/api';
+import { gtransApi, useGetPackagesQuery } from '../lib/gtransApi';
+import { store } from '../lib/store';
 
-export function usePackages() {
-	return useQuery({
-		queryKey: ['strings', 'packages'],
-		queryFn: async () => {
-			const res = await api.get('strings/packages');
-			return { rows: unwrap(res) || [], meta: getMeta(res) };
-		},
-	});
+/** Refetch both the react-query string caches and the RTK Query package list. */
+function invalidateStrings(qc) {
+	store.dispatch(gtransApi.util.invalidateTags(['Packages']));
+	return qc.invalidateQueries({ queryKey: ['strings'] });
+}
+
+/** Server-paginated plugins & themes: params = { page, per_page, search, type, slug }. */
+export function usePackages(params = {}) {
+	return useGetPackagesQuery(params);
 }
 
 export function useScanPackage() {
 	const qc = useQueryClient();
 	return useMutation({
 		mutationFn: async ({ slug }) => unwrap(await api.post(`strings/packages/${slug}/scan`)),
-		onSuccess: () => qc.invalidateQueries({ queryKey: ['strings'] }),
+		onSuccess: () => invalidateStrings(qc),
 	});
 }
 
@@ -44,7 +47,7 @@ export function useAuditPackage() {
 				offset = res.next_offset;
 			}
 		},
-		onSuccess: () => qc.invalidateQueries({ queryKey: ['strings'] }),
+		onSuccess: () => invalidateStrings(qc),
 	});
 }
 
@@ -55,7 +58,7 @@ export function useCsvImport() {
 		mutationFn: async ({ slug, lang, csv, overwrite = false, commit = false }) =>
 			unwrap(await api.post(`strings/packages/${slug}/${lang}/csv-import`, { csv, overwrite, commit })),
 		onSuccess: (data) => {
-			if (data?.committed) qc.invalidateQueries({ queryKey: ['strings'] });
+			if (data?.committed) invalidateStrings(qc);
 		},
 	});
 }
@@ -84,6 +87,6 @@ export function useBulkSaveStrings() {
 	return useMutation({
 		mutationFn: async ({ translations }) =>
 			unwrap(await api.patch('strings/bulk', { translations })),
-		onSuccess: () => qc.invalidateQueries({ queryKey: ['strings'] }),
+		onSuccess: () => invalidateStrings(qc),
 	});
 }

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
@@ -13,6 +14,7 @@ import { TextInput } from '../../components/Input';
 import { PageSkeleton } from '../../components/Skeleton';
 import { usePackages, useScanPackage, useAuditPackage } from '../../hooks/usePackages';
 import AuditModal, { auditIssueCount } from './AuditModal';
+import { setPage, setSearch, setType } from '../../lib/store';
 import { useLanguages } from '../../hooks/useLanguages';
 import { formatErrorMessage } from '../../lib/format';
 
@@ -25,12 +27,11 @@ const PAGE_SIZE = 20;
 
 export default function PackageList() {
 	const navigate = useNavigate();
-	const packages = usePackages();
+	const dispatch = useDispatch();
+	const { page, search: filter, type: typeFilter } = useSelector((state) => state.packagesList);
+	const packages = usePackages({ page, per_page: PAGE_SIZE, search: filter, type: typeFilter });
 	const languages = useLanguages();
 	const scan = useScanPackage();
-	const [filter, setFilter] = useState('');
-	const [typeFilter, setTypeFilter] = useState('all'); // all | plugin | theme
-	const [page, setPage] = useState(1);
 	const [toast, setToast] = useState(null);
 	const [scanningSlug, setScanningSlug] = useState('');
 	const audit = useAuditPackage();
@@ -46,21 +47,12 @@ export default function PackageList() {
 	const defaultLang = (languages.data || []).find((l) => l.is_default);
 	const firstTargetLang = langCodes[0];
 
-	const rows = (packages.data?.rows || []).filter((r) => {
-		if (typeFilter !== 'all' && r.type !== typeFilter) return false;
-		if (!filter) return true;
-		const q = filter.toLowerCase();
-		return (
-			r.name.toLowerCase().includes(q) ||
-			r.text_domain.toLowerCase().includes(q) ||
-			r.slug.toLowerCase().includes(q)
-		);
-	});
-
-	const total = rows.length;
-	const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-	const currentPage = Math.min(page, totalPages);
-	const pagedRows = rows.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+	const rows = packages.data?.rows || [];
+	const meta = packages.data?.meta || {};
+	const counts = meta.counts || {};
+	const total = meta.total || 0;
+	const totalPages = meta.total_pages || 1;
+	const currentPage = meta.page || page;
 
 	const onScan = async (row) => {
 		setScanningSlug(row.slug);
@@ -152,23 +144,17 @@ export default function PackageList() {
 				<Table.Toolbar variant="tabs">
 					<StatusTabs
 						value={typeFilter}
-						onChange={(key) => {
-							setTypeFilter(key);
-							setPage(1);
-						}}
+						onChange={(key) => dispatch(setType(key))}
 						tabs={[
-							{ value: 'all', label: __('All', 'gemtranslate'), count: packages.data?.rows?.length || 0 },
-							{ value: 'plugin', label: __('Plugins', 'gemtranslate') },
-							{ value: 'theme', label: __('Themes', 'gemtranslate') },
+							{ value: 'all', label: __('All', 'gemtranslate'), count: counts.all || 0 },
+							{ value: 'plugin', label: __('Plugins', 'gemtranslate'), count: counts.plugin || 0 },
+							{ value: 'theme', label: __('Themes', 'gemtranslate'), count: counts.theme || 0 },
 						]}
 					/>
 					<SearchBox
 						value={filter}
 						placeholder={__('Search plugins & themes…', 'gemtranslate')}
-						onSearch={(keyword) => {
-							setFilter(keyword);
-							setPage(1);
-						}}
+						onSearch={(keyword) => dispatch(setSearch(keyword))}
 					/>
 				</Table.Toolbar>
 
@@ -183,7 +169,7 @@ export default function PackageList() {
 						</Table.Row>
 					</Table.Header>
 					<Table.Body>
-						{pagedRows.map((row) => (
+						{rows.map((row) => (
 							<PackageRow
 								key={`${row.type}-${row.slug}`}
 								row={row}
@@ -221,10 +207,10 @@ export default function PackageList() {
 							)}
 						</span>
 						<div className="gtrans-flex gtrans-gap-2">
-							<Button variant="ghost" size="sm" disabled={currentPage <= 1} onClick={() => setPage(currentPage - 1)}>
+							<Button variant="ghost" size="sm" disabled={currentPage <= 1} onClick={() => dispatch(setPage(currentPage - 1))}>
 								{__('Previous', 'gemtranslate')}
 							</Button>
-							<Button variant="ghost" size="sm" disabled={currentPage >= totalPages} onClick={() => setPage(currentPage + 1)}>
+							<Button variant="ghost" size="sm" disabled={currentPage >= totalPages} onClick={() => dispatch(setPage(currentPage + 1))}>
 								{__('Next', 'gemtranslate')}
 							</Button>
 						</div>

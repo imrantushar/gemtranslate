@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { __, sprintf } from '@wordpress/i18n';
 
 import PageHeader from '../../components/PageHeader';
@@ -10,7 +11,9 @@ import { TextInput } from '../../components/Input';
 import { Select } from '../../components/ui/Select';
 import { PageSkeleton, TableSkeleton } from '../../components/Skeleton';
 import { api, unwrap } from '../../lib/api';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useGetMenuItemsQuery, useSaveMenuItemMutation } from '../../lib/gtransApi';
+import { setMenuPage } from '../../lib/store';
+import { useQuery } from '@tanstack/react-query';
 import { useLanguages } from '../../hooks/useLanguages';
 import { formatErrorMessage } from '../../lib/format';
 
@@ -21,23 +24,7 @@ function useMenus() {
 	});
 }
 
-function useMenuItems(menuId) {
-	return useQuery({
-		queryKey: ['menus', menuId, 'items'],
-		queryFn: async () => unwrap(await api.get(`menus/${menuId}/items`)) || [],
-		enabled: !!menuId,
-	});
-}
-
-function useSaveMenuItem() {
-	const qc = useQueryClient();
-	return useMutation({
-		mutationFn: async ({ itemId, lang, payload }) =>
-			unwrap(await api.put(`menus/items/${itemId}/translations/${lang}`, payload)),
-		onSuccess: (_data, { menuId }) =>
-			qc.invalidateQueries({ queryKey: ['menus', menuId, 'items'] }),
-	});
-}
+const PAGE_SIZE = 50;
 
 export default function MenusPage() {
 	const langs = useLanguages();
@@ -45,8 +32,14 @@ export default function MenusPage() {
 	const menus = useMenus();
 	const [selectedMenu, setSelectedMenu] = useState('');
 	const [selectedLang, setSelectedLang] = useState('');
-	const items = useMenuItems(selectedMenu);
-	const save = useSaveMenuItem();
+	const dispatch = useDispatch();
+	const page = useSelector((state) => state.menuItemsList.page);
+	const items = useGetMenuItemsQuery({ menuId: selectedMenu, page, per_page: PAGE_SIZE }, { skip: !selectedMenu });
+	const [saveItem, saveState] = useSaveMenuItemMutation();
+	const rows = items.data?.rows || [];
+	const total = items.data?.meta?.total || 0;
+	const totalPages = items.data?.meta?.total_pages || 1;
+	const currentPage = items.data?.meta?.page || page;
 	const [drafts, setDrafts] = useState({});
 	const [toast, setToast] = useState(null);
 
@@ -60,15 +53,14 @@ export default function MenusPage() {
 	const onSave = async (item) => {
 		const draft = drafts[item.id] || {};
 		try {
-			await save.mutateAsync({
+			await saveItem({
 				itemId: item.id,
-				menuId: selectedMenu,
 				lang: selectedLang,
 				payload: {
 					title: draft.title ?? item.translations?.[selectedLang]?.title ?? '',
 					url_override: draft.url_override ?? item.translations?.[selectedLang]?.url_override ?? '',
 				},
-			});
+			}).unwrap();
 			setDrafts((d) => { const n = { ...d }; delete n[item.id]; return n; });
 			setToast({ tone: 'success', message: __('Menu item saved.', 'gemtranslate') });
 		} catch (err) {
@@ -88,7 +80,10 @@ export default function MenusPage() {
 							<Select
 								className="gtrans-min-w-[180px]"
 								value={selectedMenu}
-								onChange={(e) => setSelectedMenu(e.target.value)}
+								onChange={(e) => {
+									setSelectedMenu(e.target.value);
+									dispatch(setMenuPage(1));
+								}}
 							>
 								{(menus.data || []).map((m) => (
 									<option key={m.id} value={m.id}>{m.name}</option>
@@ -114,7 +109,7 @@ export default function MenusPage() {
 			<Card table>
 				{items.isLoading ? (
 					<TableSkeleton />
-				) : (items.data || []).length === 0 ? (
+				) : rows.length === 0 ? (
 					<Table.Empty columns={[__('Original', 'gemtranslate'), __('Translation', 'gemtranslate'), __('URL override', 'gemtranslate'), '']}>
 						{__('No menu items.', 'gemtranslate')}
 					</Table.Empty>
@@ -131,7 +126,7 @@ export default function MenusPage() {
 							</Table.Row>
 						</Table.Header>
 						<Table.Body>
-							{(items.data || []).map((item) => {
+							{rows.map((item) => {
 								const tr = item.translations?.[selectedLang] || {};
 								const draft = drafts[item.id] || {};
 								return (
@@ -153,7 +148,7 @@ export default function MenusPage() {
 											/>
 										</Table.Cell>
 										<Table.Cell className="gtrans-text-right">
-											<Button size="sm" onClick={() => onSave(item)} loading={save.isPending}>
+											<Button size="sm" onClick={() => onSave(item)} loading={saveState.isLoading}>
 												{__('Save', 'gemtranslate')}
 											</Button>
 										</Table.Cell>
@@ -162,6 +157,28 @@ export default function MenusPage() {
 							})}
 						</Table.Body>
 					</Table.Root>
+				)}
+
+				{total > PAGE_SIZE && (
+					<div className="gtrans-flex gtrans-items-center gtrans-justify-between gtrans-mt-3 gtrans-text-sm">
+						<span className="gtrans-text-muted">
+							{sprintf(
+								/* translators: 1: current page, 2: total pages, 3: total rows. */
+								__('Page %1$d of %2$d · %3$d total', 'gemtranslate'),
+								currentPage,
+								totalPages,
+								total
+							)}
+						</span>
+						<div className="gtrans-flex gtrans-gap-2">
+							<Button variant="ghost" size="sm" disabled={currentPage <= 1} onClick={() => dispatch(setMenuPage(currentPage - 1))}>
+								{__('Previous', 'gemtranslate')}
+							</Button>
+							<Button variant="ghost" size="sm" disabled={currentPage >= totalPages} onClick={() => dispatch(setMenuPage(currentPage + 1))}>
+								{__('Next', 'gemtranslate')}
+							</Button>
+						</div>
+					</div>
 				)}
 			</Card>
 

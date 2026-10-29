@@ -94,6 +94,13 @@ class Strings extends Controller {
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'list_packages' ],
 				'permission_callback' => [ $this, 'permissions_translate' ],
+				'args'                => [
+					'page'     => [ 'type' => 'integer', 'default' => 1 ],
+					'per_page' => [ 'type' => 'integer', 'default' => 20 ],
+					'search'   => [ 'type' => 'string', 'default' => '' ],
+					'type'     => [ 'type' => 'string', 'default' => '' ],
+					'slug'     => [ 'type' => 'string', 'default' => '' ],
+				],
 			]
 		);
 
@@ -259,17 +266,7 @@ class Strings extends Controller {
 		$summaries = get_option( self::AUDIT_SUMMARIES_OPTION, [] );
 		$summaries = is_array( $summaries ) ? $summaries : [];
 
-		$packages = [];
-		foreach ( $this->collect_plugins() as $pkg ) {
-			$pkg['per_lang'] = StringTranslator::translation_progress( $pkg['text_domain'], $lang_codes );
-			$pkg['audit']    = $summaries[ $pkg['slug'] ] ?? null;
-			$packages[]     = $pkg;
-		}
-		foreach ( $this->collect_themes() as $pkg ) {
-			$pkg['per_lang'] = StringTranslator::translation_progress( $pkg['text_domain'], $lang_codes );
-			$pkg['audit']    = $summaries[ $pkg['slug'] ] ?? null;
-			$packages[]     = $pkg;
-		}
+		$packages = array_merge( $this->collect_plugins(), $this->collect_themes() );
 
 		usort( $packages, function ( $a, $b ) {
 			// Group: themes after plugins; alphabetical within each.
@@ -280,7 +277,53 @@ class Strings extends Controller {
 			return strcasecmp( $a['name'], $b['name'] );
 		} );
 
-		return $this->ok( $packages, [ 'languages' => $lang_codes ] );
+		$counts = [ 'all' => count( $packages ), 'plugin' => 0, 'theme' => 0 ];
+		foreach ( $packages as $pkg ) {
+			$counts[ $pkg['type'] ] = ( $counts[ $pkg['type'] ] ?? 0 ) + 1;
+		}
+
+		$type     = (string) $request->get_param( 'type' );
+		$search   = strtolower( trim( (string) $request->get_param( 'search' ) ) );
+		$slug     = (string) $request->get_param( 'slug' );
+		$packages = array_values( array_filter( $packages, function ( $pkg ) use ( $type, $search, $slug ) {
+			if ( '' !== $slug && $pkg['slug'] !== $slug ) {
+				return false;
+			}
+			if ( '' !== $type && 'all' !== $type && $pkg['type'] !== $type ) {
+				return false;
+			}
+			if ( '' === $search ) {
+				return true;
+			}
+			return false !== strpos( strtolower( $pkg['name'] ), $search )
+				|| false !== strpos( strtolower( $pkg['text_domain'] ), $search )
+				|| false !== strpos( strtolower( $pkg['slug'] ), $search );
+		} ) );
+
+		$per_page    = max( 1, min( 100, (int) $request->get_param( 'per_page' ) ) );
+		$total       = count( $packages );
+		$total_pages = max( 1, (int) ceil( $total / $per_page ) );
+		$page        = min( max( 1, (int) $request->get_param( 'page' ) ), $total_pages );
+		$packages    = array_slice( $packages, ( $page - 1 ) * $per_page, $per_page );
+
+		// Per-language progress is the expensive part: only compute it for the returned page.
+		foreach ( $packages as &$pkg ) {
+			$pkg['per_lang'] = StringTranslator::translation_progress( $pkg['text_domain'], $lang_codes );
+			$pkg['audit']    = $summaries[ $pkg['slug'] ] ?? null;
+		}
+		unset( $pkg );
+
+		return $this->ok(
+			$packages,
+			[
+				'languages'   => $lang_codes,
+				'total'       => $total,
+				'total_pages' => $total_pages,
+				'page'        => $page,
+				'per_page'    => $per_page,
+				'counts'      => $counts,
+			]
+		);
 	}
 
 	private function collect_plugins() {

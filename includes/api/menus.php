@@ -35,6 +35,10 @@ class Menus extends Controller {
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'items' ],
 				'permission_callback' => [ $this, 'permissions_translate' ],
+				'args'                => [
+					'page'     => [ 'type' => 'integer', 'default' => 1 ],
+					'per_page' => [ 'type' => 'integer', 'default' => 50 ],
+				],
 			]
 		);
 
@@ -70,8 +74,13 @@ class Menus extends Controller {
 			return $this->fail( 'gtrans_not_found', __( 'Menu not found.', 'gemtranslate' ), 404 );
 		}
 
-		$default = Context::default_code();
-		$rows    = [];
+		$default     = Context::default_code();
+		$rows        = [];
+		$per_page    = max( 1, min( 200, (int) $request->get_param( 'per_page' ) ) );
+		$total       = count( $items );
+		$total_pages = max( 1, (int) ceil( $total / $per_page ) );
+		$page        = min( max( 1, (int) $request->get_param( 'page' ) ), $total_pages );
+		$items       = array_slice( $items, ( $page - 1 ) * $per_page, $per_page );
 		foreach ( $items as $item ) {
 			$translations = MenuTranslator::all_for_item( $item->ID );
 			$by_lang      = [];
@@ -86,7 +95,16 @@ class Menus extends Controller {
 				'translations' => $by_lang,
 			];
 		}
-		return $this->ok( $rows, [ 'default_lang' => $default ] );
+		return $this->ok(
+			$rows,
+			[
+				'default_lang' => $default,
+				'total'        => $total,
+				'total_pages'  => $total_pages,
+				'page'         => $page,
+				'per_page'     => $per_page,
+			]
+		);
 	}
 
 	public function save_item( $request ) {

@@ -2191,6 +2191,9 @@ body.toplevel_page_gemtranslate #wpfooter {
 	#gemtranslate-admin-root .lg\:gtrans-hidden{
 		display: none;
 	}
+	#gemtranslate-admin-root .lg\:gtrans-w-full{
+		width: 100%;
+	}
 	#gemtranslate-admin-root .lg\:gtrans-grid-cols-2{
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
@@ -2200,8 +2203,8 @@ body.toplevel_page_gemtranslate #wpfooter {
 	#gemtranslate-admin-root .lg\:gtrans-grid-cols-\[auto_minmax\(0\2c 1fr\)_minmax\(0\2c 1fr\)\]{
 		grid-template-columns: auto minmax(0,1fr) minmax(0,1fr);
 	}
-	#gemtranslate-admin-root .lg\:gtrans-gap-8{
-		gap: 2rem;
+	#gemtranslate-admin-root .lg\:gtrans-flex-col{
+		flex-direction: column;
 	}
 }
 @media (min-width: 1280px){

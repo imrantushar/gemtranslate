@@ -36,7 +36,7 @@ const shortRef = (ref) => {
 export default function PackageEditor() {
 	const { slug, lang } = useParams();
 	const navigate = useNavigate();
-	const packages = usePackages();
+	const packages = usePackages({ slug });
 	const languages = useLanguages();
 	const scan = useScanPackage();
 	const bulkSave = useBulkSaveStrings();
@@ -49,7 +49,7 @@ export default function PackageEditor() {
 	const [toast, setToast] = useState(null);
 	const [aiOpen, setAiOpen] = useState(false);
 
-	const pkg =(packages.data?.rows || []).find((p) => p.slug === slug) || null;
+	const pkg = (packages.data?.rows || []).find((p) => p.slug === slug) || null;
 	const targetLangs = (languages.data || []).filter((l) => !l.is_default);
 	const langRow = (languages.data || []).find((l) => l.code === lang);
 
