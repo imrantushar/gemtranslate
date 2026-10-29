@@ -565,15 +565,24 @@ class PostTranslations extends Controller {
 		// Resolve every id against the live source so the storage key can't be
 		// forged or drift from what the render path derives.
 		$sources = [];
+		$images  = [];
 		foreach ( BlockUnits::enumerate( $post, $lang )['units'] as $u ) {
 			$sources[ $u['id'] ] = $u['source'];
+			if ( 'image' === $u['kind'] ) {
+				$images[ $u['id'] ] = true;
+			}
 		}
 		foreach ( $rows as $r ) {
 			$id = (string) ( $r['id'] ?? '' );
 			if ( '' === $id || ! isset( $sources[ $id ] ) ) {
 				continue;
 			}
-			TranslationLoader::save_string_translation( $post_id, $lang, $id, $sources[ $id ], (string) ( $r['value'] ?? '' ), $country );
+			$value = (string) ( $r['value'] ?? '' );
+			// An image unit stores a replacement URL, not text.
+			if ( isset( $images[ $id ] ) ) {
+				$value = esc_url_raw( $value );
+			}
+			TranslationLoader::save_string_translation( $post_id, $lang, $id, $sources[ $id ], $value, $country );
 		}
 		PostFieldTranslator::flush_memo();
 		ElementorTranslator::flush_memo();

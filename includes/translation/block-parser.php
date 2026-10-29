@@ -40,6 +40,13 @@ class BlockParser {
 	];
 
 	/**
+	 * Blocks whose saved markup holds one translatable image (`<img src>`). The
+	 * source URL is the storage key and the per-language replacement URL is the
+	 * "translation", so a page can show a different image for each language.
+	 */
+	const IMAGE_BLOCKS = [ 'core/image', 'core/media-text', 'core/cover' ];
+
+	/**
 	 * Detect whether content uses block markup.
 	 */
 	public static function is_block_content( $content ) {
@@ -115,6 +122,16 @@ class BlockParser {
 				];
 			}
 
+			if ( in_array( $name, self::IMAGE_BLOCKS, true ) && '' !== self::img_src( $block['innerHTML'] ?? '' ) ) {
+				$out[] = [
+					'path'  => $path . '.html.src',
+					'kind'  => 'image',
+					'attr'  => 'src',
+					'block' => $name,
+					'value' => self::img_src( $block['innerHTML'] ),
+				];
+			}
+
 			$attrs = self::ATTR_FIELDS[ $name ] ?? [];
 			foreach ( $attrs as $a ) {
 				if ( isset( $block['attrs'][ $a ] ) && '' !== trim( (string) $block['attrs'][ $a ] ) ) {
@@ -180,6 +197,11 @@ class BlockParser {
 				}
 			}
 
+			$src_path = $path . '.html.src';
+			if ( in_array( $name, self::IMAGE_BLOCKS, true ) && ! empty( $translations[ $src_path ] ) ) {
+				self::swap_image( $block, (string) $translations[ $src_path ] );
+			}
+
 			$attrs = self::ATTR_FIELDS[ $name ] ?? [];
 			foreach ( $attrs as $a ) {
 				$attr_path =$path . '.attrs.' . $a;
@@ -192,6 +214,53 @@ class BlockParser {
 				self::write( $block['innerBlocks'], $path, $translations );
 			}
 		}
+	}
+
+	/**
+	 * Point a block's image at another URL. The old `srcset`/`sizes` and the
+	 * `wp-image-N` class describe the original attachment, so they are dropped
+	 * rather than left contradicting the new `src`.
+	 */
+	private static function swap_image( array &$block, $url ) {
+		$new = esc_url( $url );
+		if ( '' === $new ) {
+			return;
+		}
+		$old  = self::img_src( $block['innerHTML'] ?? '' );
+		$swap = function ( $html ) use ( $new ) {
+			return preg_replace_callback(
+				'/<img\b[^>]*>/is',
+				function ( $m ) use ( $new ) {
+					$tag = preg_replace( '/\s(?:srcset|sizes)=(["\']).*?\1/is', '', $m[0] );
+					$tag = preg_replace( '/(\sclass=(["\'])[^"\']*?)\s*\bwp-image-\d+\b/i', '$1', $tag );
+					$tag = str_replace( ' class=""', '', $tag );
+					return preg_replace( '/(\ssrc=)(["\']).*?\2/is', '$1"' . addcslashes( $new, '\\$' ) . '"', $tag, 1 );
+				},
+				(string) $html,
+				1
+			);
+		};
+		$block['innerHTML'] = $swap( $block['innerHTML'] ?? '' );
+		if ( isset( $block['innerContent'] ) && is_array( $block['innerContent'] ) ) {
+			foreach ( $block['innerContent'] as $k => $piece ) {
+				if ( is_string( $piece ) && false !== stripos( $piece, '<img' ) ) {
+					$block['innerContent'][ $k ] = $swap( $piece );
+				}
+			}
+		}
+		// Keep the block comment's own copy of the URL in step with the markup.
+		foreach ( [ 'url', 'mediaUrl' ] as $a ) {
+			if ( isset( $block['attrs'][ $a ] ) && $block['attrs'][ $a ] === $old ) {
+				$block['attrs'][ $a ] = $url;
+			}
+		}
+	}
+
+	private static function img_src( $html ) {
+		if ( preg_match( '/<img\b[^>]*?\bsrc=(["\'])(.*?)\1/is', (string) $html, $m ) ) {
+			return html_entity_decode( $m[2], ENT_QUOTES );
+		}
+		return '';
 	}
 
 	private static function img_alt( $html ) {

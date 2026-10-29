@@ -74,7 +74,14 @@ class BlockUnits {
 
 		if ( self::BUILDER_ELEMENTOR === $builder ) {
 			foreach ( ElementorTranslator::extract( ElementorTranslator::get_tree( $post->ID ) ) as $f ) {
-				$add( $f['id'], 'setting', $f['widget'], self::elementor_label( $f['widget'], $f['setting'] ), $f['value'] );
+				$is_image = ElementorTranslator::is_image_setting( $f['setting'] );
+				$add(
+					$f['id'],
+					$is_image ? 'image' : 'setting',
+					$f['widget'],
+					$is_image ? ucwords( str_replace( [ '-', '_' ], ' ', $f['widget'] ) ) . ' · ' . __( 'image', 'gemtranslate' ) : self::elementor_label( $f['widget'], $f['setting'] ),
+					$f['value']
+				);
 			}
 		} elseif ( self::BUILDER_GUTENBERG === $builder ) {
 			foreach ( BlockParser::extract( (string) $post->post_content ) as $f ) {

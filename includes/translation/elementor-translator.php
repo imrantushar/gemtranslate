@@ -42,20 +42,20 @@ class ElementorTranslator {
 			'heading'          => [ 'title' ],
 			'text-editor'      => [ 'editor' ],
 			'button'           => [ 'text' ],
-			'image'            => [ 'caption' ],
-			'image-box'        => [ 'title_text', 'description_text' ],
+			'image'            => [ 'caption', 'image.url' ],
+			'image-box'        => [ 'title_text', 'description_text', 'image.url' ],
 			'icon-box'         => [ 'title_text', 'description_text' ],
 			'icon-list'        => [ 'icon_list.*.text' ],
 			'accordion'        => [ 'tabs.*.tab_title', 'tabs.*.tab_content' ],
 			'toggle'           => [ 'tabs.*.tab_title', 'tabs.*.tab_content' ],
 			'tabs'             => [ 'tabs.*.tab_title', 'tabs.*.tab_content' ],
-			'testimonial'      => [ 'testimonial_content', 'testimonial_name', 'testimonial_job' ],
+			'testimonial'      => [ 'testimonial_content', 'testimonial_name', 'testimonial_job', 'testimonial_image.url' ],
 			'counter'          => [ 'title', 'prefix', 'suffix' ],
 			'progress'         => [ 'title', 'inner_text' ],
 			'alert'            => [ 'alert_title', 'alert_description' ],
 			'star-rating'      => [ 'title' ],
 			'blockquote'       => [ 'blockquote_content', 'author_name', 'tweet_button_label' ],
-			'call-to-action'   => [ 'title', 'description', 'button', 'ribbon_title' ],
+			'call-to-action'   => [ 'title', 'description', 'button', 'ribbon_title', 'bg_image.url' ],
 			'flip-box'         => [ 'title_text_a', 'description_text_a', 'title_text_b', 'description_text_b', 'button_text' ],
 			'price-table'      => [ 'heading', 'sub_heading', 'button_text', 'footer_additional_info', 'features_list.*.item_text' ],
 			'price-list'       => [ 'price_list.*.title', 'price_list.*.item_description' ],
@@ -68,6 +68,14 @@ class ElementorTranslator {
 		 * @param array<string,string[]> $map widgetType => setting paths.
 		 */
 		return (array) apply_filters( 'gtrans_elementor_translatable_settings', $map );
+	}
+
+	/**
+	 * True for a setting path that holds an image URL (`image.url`,
+	 * `bg_image.url`, …), which is swapped per language rather than translated.
+	 */
+	public static function is_image_setting( $setting ) {
+		return (bool) preg_match( '/image[a-z_]*\.url$/i', (string) $setting );
 	}
 
 	/**
@@ -187,6 +195,11 @@ class ElementorTranslator {
 			$replacement = $cb( $element, $next, $node[ $seg ] );
 			if ( null !== $replacement ) {
 				$node[ $seg ] = $replacement;
+				// Elementor prefers the attachment id over the url when both are set, so
+				// a swapped image url must not keep pointing at the original attachment.
+				if ( 'url' === $seg && self::is_image_setting( $next ) && array_key_exists( 'id', $node ) ) {
+					$node['id'] = '';
+				}
 			}
 		}
 	}

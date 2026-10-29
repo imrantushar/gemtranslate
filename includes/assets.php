@@ -67,6 +67,9 @@ class Assets {
 			return;
 		}
 
+		// The media library picker used to choose a per-language replacement image.
+		wp_enqueue_media();
+
 		// Full-bleed app shell like GemCRM's: suppress WP's own admin notices
 		// (plugin review nudges, "just reset your DB" banners, …) on our screen
 		// instead of letting them stack above the React app.
