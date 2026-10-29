@@ -315,6 +315,8 @@ export default function TranslationEditor() {
 							) : activeContentMode === 'advanced' ? (
 								<AdvancedEditor
 									postId={post.id}
+									pageTitle={post.title}
+									slug={post.slug}
 									sourceLang={defaultLang}
 									targetLang={selectedLang}
 									country={country}

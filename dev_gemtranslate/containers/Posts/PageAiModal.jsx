@@ -30,6 +30,14 @@ const ISSUE_LABELS = {
 	unchanged: () => __('Applied, but identical to the source — check these', 'gemtranslate'),
 };
 
+// A translation that still equals its source (a "Copy source" fill) has not been
+// translated yet, unless the text is too short to be real words ("OK", "FAQ").
+const isTranslated = (item, draft) => {
+	const d = String(draft ?? '').trim();
+	if (d === '') return false;
+	return !(d === item.source.trim() && /\p{L}{4,}/u.test(item.source));
+};
+
 const clip = (s) => {
 	const t = String(s || '').replace(/\s+/g, ' ').trim();
 	return t.length > 100 ? `${t.slice(0, 97)}…` : t;
@@ -104,7 +112,7 @@ export default function PageAiModal({
 	const itemById = (id) => items[id - 1];
 
 	const todo = useMemo(
-		() => items.filter((it) => (drafts[it.key] ?? '').trim() === '' && it.source.trim() !== ''),
+		() => items.filter((it) => !isTranslated(it, drafts[it.key]) && it.source.trim() !== ''),
 		[items, drafts]
 	);
 	const allHandedOut = handedOut >= todo.length;
@@ -176,7 +184,7 @@ export default function PageAiModal({
 			const item = itemById(row.id);
 			if (!item) return note('unknown_id', row, row.source);
 			if (!row.target) return note('empty', row, item.source);
-			if (!overwrite && (drafts[item.key] ?? '').trim() !== '') return note('already_translated', row, item.source);
+			if (!overwrite && isTranslated(item, drafts[item.key])) return note('already_translated', row, item.source);
 			const lost = lostTokens(item.source, row.target);
 			if (lost.length) return note('placeholder_mismatch', row, item.source, lost.join(' '));
 			if (row.target === item.source && /\p{L}{4,}/u.test(item.source)) note('unchanged', row, item.source);

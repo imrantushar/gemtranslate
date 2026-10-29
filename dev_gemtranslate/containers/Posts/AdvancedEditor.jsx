@@ -17,6 +17,7 @@ import {
 import { splitSentences, joinSegments, segmentHash } from '../../lib/segment';
 import { buildToolbar, describeToken, countTokens } from '../../lib/tokens';
 import { formatErrorMessage } from '../../lib/format';
+import { PageAiButton } from './PageAiModal';
 
 /**
  * WPML-style Advanced translation editor. Sentence-segmented, side-by-side,
@@ -27,7 +28,7 @@ import { formatErrorMessage } from '../../lib/format';
  * re-joined into the one tokenised whole-field string the storage/render
  * contract expects (see lib/segment.js).
  */
-export default function AdvancedEditor({ postId, targetLang, country = '' }) {
+export default function AdvancedEditor({ postId, pageTitle = '', slug = '', sourceLang, targetLang, country = '' }) {
 	const data = usePostFields(postId, targetLang, country);
 	const confirmedQ = useConfirmedSegments(postId, targetLang, country);
 	const save = useSavePostFields();
@@ -155,6 +156,29 @@ export default function AdvancedEditor({ postId, targetLang, country = '' }) {
 		}
 	};
 
+	// One AI row per sentence segment, in page order. Row key = "path#index".
+	const aiItems = fields.flatMap((f) =>
+		f.segs.map((seg, i) => ({ key: `${f.path}#${i}`, source: seg.core, context: labelFor(f) }))
+	);
+	const aiDrafts = {};
+	fields.forEach((f) => {
+		(drafts[f.path] || []).forEach((v, i) => {
+			aiDrafts[`${f.path}#${i}`] = v;
+		});
+	});
+	const applyAi = (map) =>
+		setDrafts((d) => {
+			const next = { ...d };
+			Object.entries(map).forEach(([key, value]) => {
+				const at = key.lastIndexOf('#');
+				const path = key.slice(0, at);
+				const arr = (next[path] || []).slice();
+				arr[Number(key.slice(at + 1))] = value;
+				next[path] = arr;
+			});
+			return next;
+		});
+
 	const pct = totalSegs ? Math.round((confirmedSegs / totalSegs) * 100) : 0;
 
 	return (
@@ -189,6 +213,18 @@ export default function AdvancedEditor({ postId, targetLang, country = '' }) {
 						translatedSegs
 					)}
 				</span>
+				<div className="gtrans-ml-auto">
+					<PageAiButton
+						items={aiItems}
+						drafts={aiDrafts}
+						pageTitle={pageTitle}
+						slug={slug}
+						sourceLang={sourceLang}
+						targetLang={targetLang}
+						onApply={applyAi}
+						onNotify={setToast}
+					/>
+				</div>
 			</div>
 
 			<div className="gtrans-flex gtrans-flex-col gtrans-gap-5">
