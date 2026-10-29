@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { __ } from '@wordpress/i18n';
 
-import Icon from '../../components/Icon';
+import SidebarLayout, { SidebarNav, Panel } from '../../components/SidebarLayout';
 import TopbarActions from '../../components/TopbarActions';
 import Button from '../../components/Button';
 import Toast from '../../components/Toast';
@@ -157,50 +157,6 @@ const TABS = () => [
 	},
 ];
 
-/** Left navigation: icon, label and a one-line hint per screen. */
-function SettingsNav({ tabs, active, onSelect }) {
-	return (
-		<nav
-			aria-label={__('Settings sections', 'gemtranslate')}
-			className="gtrans-flex gtrans-gap-1 gtrans-overflow-x-auto lg:gtrans-flex-col"
-		>
-			{tabs.map((t) => {
-				const on = t.key === active;
-				return (
-					<button
-						key={t.key}
-						type="button"
-						onClick={() => onSelect(t.key)}
-						aria-current={on ? 'page' : undefined}
-						className={`gtrans-bare gtrans-flex gtrans-flex-shrink-0 lg:gtrans-w-full gtrans-cursor-pointer gtrans-items-center gtrans-gap-3 gtrans-rounded-lg gtrans-border-0 gtrans-px-3 gtrans-py-2.5 gtrans-text-left ${
-							on ? 'gtrans-bg-navactive gtrans-text-primary' : 'gtrans-bg-transparent gtrans-text-description hover:gtrans-bg-body'
-						}`}
-					>
-						<Icon name={t.icon} size={18} />
-						<span className="gtrans-min-w-0">
-							<span className={`gtrans-block gtrans-text-sm gtrans-font-semibold ${on ? '' : 'gtrans-text-ink'}`}>{t.label}</span>
-							<span className="gtrans-block gtrans-text-xs">{t.hint}</span>
-						</span>
-					</button>
-				);
-			})}
-		</nav>
-	);
-}
-
-/** Right panel: heading, description, a rule, then rows separated by hairlines. */
-function Panel({ title, description, children }) {
-	return (
-		<section className="gtrans-rounded-lg gtrans-border gtrans-border-edge gtrans-bg-surface gtrans-p-6 gtrans-shadow-gtrans">
-			<h2 className="gtrans-m-0 gtrans-text-xl gtrans-font-semibold gtrans-text-heading">{title}</h2>
-			<p className="gtrans-mb-0 gtrans-mt-1 gtrans-text-sm gtrans-text-description">{description}</p>
-			<div className="gtrans-mt-5 gtrans-divide-y gtrans-divide-solid gtrans-divide-divider gtrans-border-0 gtrans-border-t gtrans-border-solid gtrans-border-divider">
-				{children}
-			</div>
-		</section>
-	);
-}
-
 /** A non-switch row (field, preview, code sample) with the same rhythm as the switch rows. */
 function Block({ children }) {
 	return <div className="gtrans-py-4">{children}</div>;
@@ -242,12 +198,8 @@ export default function SettingsPage() {
 				</Button>
 			</TopbarActions>
 
-			<div className="gtrans-grid gtrans-items-start gtrans-gap-6 lg:gtrans-grid-cols-[280px_1fr]">
-				<div className="gtrans-rounded-lg gtrans-border gtrans-border-edge gtrans-bg-surface gtrans-p-3 gtrans-shadow-gtrans">
-					<SettingsNav tabs={tabs} active={tab} onSelect={(key) => setParams({ tab: key })} />
-				</div>
-
-				<Panel title={current.label} description={current.description}>
+			<SidebarLayout nav={<SidebarNav items={tabs} active={tab} onSelect={(key) => setParams({ tab: key })} />}>
+				<Panel divided title={current.label} description={current.description}>
 					{tab === 'general' && (
 						<>
 							<SettingRow
@@ -501,7 +453,7 @@ export default function SettingsPage() {
 						</>
 					)}
 				</Panel>
-			</div>
+			</SidebarLayout>
 
 			<Toast message={toast?.message} tone={toast?.tone} onClear={() => setToast(null)} />
 		</>

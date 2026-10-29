@@ -2,14 +2,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { __, sprintf } from '@wordpress/i18n';
 
-import PageHeader from '../../components/PageHeader';
-import Card from '../../components/Card';
+import SidebarLayout, { SidebarNav, Panel } from '../../components/SidebarLayout';
+import { useSubmenus } from '../../components/nav';
 import StatusPill from '../../components/StatusPill';
 import SearchBox from '../../components/SearchBox';
 import StatusTabs from '../../components/StatusTabs';
 import { Table } from '../../components/ui/Table';
 import { TableSkeleton } from '../../components/Skeleton';
 import Button from '../../components/Button';
+import Pagination from '../../components/Pagination';
 import { usePosts } from '../../hooks/usePosts';
 import { useLanguages } from '../../hooks/useLanguages';
 import { truncate } from '../../lib/format';
@@ -25,7 +26,8 @@ const STATUS_TONE = {
 export default function PostsPage() {
 	const [filters, setFilters] = useState({ page: 1, per_page: 20, search: '', status: 'any' });
 	// Post type is chosen from the sidebar submenu (?type=page).
-	const [params] = useSearchParams();
+	const [params, setParams] = useSearchParams();
+	const { postTypes } = useSubmenus();
 	const postType = params.get('type') || 'post';
 	const query = useMemo(() => ({ ...filters, post_type: postType }), [filters, postType]);
 	const posts = usePosts(query);
@@ -40,12 +42,20 @@ export default function PostsPage() {
 
 	return (
 		<>
-			<PageHeader
-				title={__('Posts & Pages', 'gemtranslate')}
+			<SidebarLayout
+				nav={
+					<SidebarNav
+						label={__('Content types', 'gemtranslate')}
+						items={postTypes}
+						active={postType}
+						onSelect={(key) => setParams({ type: key })}
+					/>
+				}
+			>
+			<Panel
+				title={postTypes.find((t) => t.key === postType)?.label || __('Posts & Pages', 'gemtranslate')}
 				description={__('Pick a post to translate it into your active languages.', 'gemtranslate')}
-			/>
-
-			<Card table>
+			>
 				<Table.Toolbar variant="tabs">
 					<StatusTabs
 						value={filters.status}
@@ -123,46 +133,17 @@ export default function PostsPage() {
 				)}
 
 				{!posts.isLoading && (posts.data?.rows || []).length > 0 && (
-					<Table.Footer>
-						<span className="gtrans-text-muted">
-							{sprintf(
-								/* translators: 1: rows shown, 2: total rows. */
-								__('Showing result %1$d out of %2$d', 'gemtranslate'),
-								posts.data.rows.length,
-								posts.data.meta?.total ?? posts.data.rows.length
-							)}
-						</span>
-						{posts.data.meta?.total_pages > 1 && (
-							<div className="gtrans-flex gtrans-items-center gtrans-gap-3">
-								<span className="gtrans-text-muted">
-									{sprintf(
-										/* translators: 1: current page, 2: total pages. */
-										__('Page %1$d of %2$d', 'gemtranslate'),
-										filters.page,
-										posts.data.meta.total_pages
-									)}
-								</span>
-								<Button
-									variant="secondary"
-									size="sm"
-									disabled={filters.page <= 1}
-									onClick={() => setFilters((f) => ({ ...f, page: f.page - 1 }))}
-								>
-									{__('Previous', 'gemtranslate')}
-								</Button>
-								<Button
-									variant="secondary"
-									size="sm"
-									disabled={filters.page >= posts.data.meta.total_pages}
-									onClick={() => setFilters((f) => ({ ...f, page: f.page + 1 }))}
-								>
-									{__('Next', 'gemtranslate')}
-								</Button>
-							</div>
-						)}
-					</Table.Footer>
+					<Pagination
+						total={posts.data.meta?.total ?? posts.data.rows.length}
+						shown={posts.data.rows.length}
+						page={filters.page}
+						perPage={filters.per_page}
+						onPage={(page) => setFilters((f) => ({ ...f, page }))}
+						onPerPage={(per_page) => setFilters((f) => ({ ...f, per_page, page: 1 }))}
+					/>
 				)}
-			</Card>
+			</Panel>
+			</SidebarLayout>
 		</>
 	);
 }

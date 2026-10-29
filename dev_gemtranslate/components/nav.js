@@ -39,6 +39,19 @@ const TRANSLATOR_NAV = [
 
 export const NAV = canManage ? MANAGER_NAV : TRANSLATOR_NAV;
 
+// One-line hints shown under each entry in the sidebar layouts.
+const POST_TYPE_HINTS = () => ({
+	post: __('Blog posts', 'gemtranslate'),
+	page: __('Static pages', 'gemtranslate'),
+	product: __('Shop products', 'gemtranslate'),
+});
+const TAXONOMY_HINTS = () => ({
+	category: __('Group your posts', 'gemtranslate'),
+	post_tag: __('Label your posts', 'gemtranslate'),
+	product_cat: __('Group your products', 'gemtranslate'),
+	product_tag: __('Label your products', 'gemtranslate'),
+});
+
 // Submenu entries for the expandable items. Post types come from the API;
 // taxonomies are fixed, with the WooCommerce ones shown only when "product"
 // is a registered type.
@@ -53,7 +66,7 @@ export function useSubmenus() {
 					{ key: 'post', label: __('Posts', 'gemtranslate') },
 					{ key: 'page', label: __('Pages', 'gemtranslate') },
 				]
-	).map((c) => ({ ...c, to: `/posts?type=${c.key}`, param: 'type', isDefault: c.key === 'post' }));
+	).map((c) => ({ ...c, to: `/posts?type=${c.key}`, param: 'type', isDefault: c.key === 'post', icon: 'file', hint: POST_TYPE_HINTS()[c.key] || __('Translate content', 'gemtranslate') }));
 
 	const taxonomies = [
 		{ key: 'category', label: __('Categories', 'gemtranslate') },
@@ -64,7 +77,7 @@ export function useSubmenus() {
 					{ key: 'product_tag', label: __('Product tags', 'gemtranslate') },
 				]
 			: []),
-	].map((c) => ({ ...c, to: `/terms?tax=${c.key}`, param: 'tax', isDefault: c.key === 'category' }));
+	].map((c) => ({ ...c, to: `/terms?tax=${c.key}`, param: 'tax', isDefault: c.key === 'category', icon: 'tag', hint: TAXONOMY_HINTS()[c.key] || __('Translate terms', 'gemtranslate') }));
 
 	const settings = [
 		{ key: 'general', label: __('General', 'gemtranslate') },

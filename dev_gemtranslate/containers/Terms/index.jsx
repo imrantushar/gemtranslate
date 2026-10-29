@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { __, sprintf } from '@wordpress/i18n';
 
-import PageHeader from '../../components/PageHeader';
-import Card from '../../components/Card';
+import SidebarLayout, { SidebarNav, Panel } from '../../components/SidebarLayout';
+import { useSubmenus } from '../../components/nav';
 import Modal from '../../components/Modal';
 import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
@@ -28,7 +28,8 @@ export default function TermsPage() {
 	const defaultLang = (langs.data || []).find((l) => l.is_default);
 
 	// Taxonomy is chosen from the sidebar submenu (?tax=post_tag).
-	const [params] = useSearchParams();
+	const [params, setParams] = useSearchParams();
+	const { taxonomies } = useSubmenus();
 	const taxonomy = params.get('tax') || 'category';
 	const [filters, setFilters] = useState({ search: '', per_page: 100 });
 	const [selectedTerm, setSelectedTerm] = useState(null);
@@ -73,8 +74,18 @@ export default function TermsPage() {
 
 	return (
 		<>
-			<PageHeader
-				title={__('Taxonomies', 'gemtranslate')}
+			<SidebarLayout
+				nav={
+					<SidebarNav
+						label={__('Taxonomies', 'gemtranslate')}
+						items={taxonomies}
+						active={taxonomy}
+						onSelect={(key) => setParams({ tax: key })}
+					/>
+				}
+			>
+			<Panel
+				title={taxonomies.find((t) => t.key === taxonomy)?.label || __('Taxonomies', 'gemtranslate')}
 				description={__('Translate categories, tags, and other taxonomy terms.', 'gemtranslate')}
 				actions={
 					<SearchBox
@@ -83,10 +94,7 @@ export default function TermsPage() {
 						onSearch={(search) => setFilters((f) => ({ ...f, search }))}
 					/>
 				}
-			/>
-
-			<Card table className="gtrans-mb-6">
-
+			>
 				{terms.isLoading ? (
 					<TableSkeleton />
 				) : (terms.data?.rows || []).length === 0 ? (
@@ -138,7 +146,8 @@ export default function TermsPage() {
 					</Table.Footer>
 					</>
 				)}
-			</Card>
+			</Panel>
+			</SidebarLayout>
 
 			{selectedTerm && (
 				<Modal
