@@ -60,13 +60,22 @@ export default function App() {
 		);
 	}
 
+	// Setup is a focused full-screen flow, so it renders outside the app Layout.
+	return (
+		<Routes>
+			<Route path="/onboarding" element={<><FirstRunGate /><Onboarding /></>} />
+			<Route path="*" element={<ManagerApp />} />
+		</Routes>
+	);
+}
+
+function ManagerApp() {
 	return (
 		<Layout>
 			<FirstRunGate />
 			<Routes>
 				<Route path="/" element={<Navigate to="/dashboard" replace />} />
 				<Route path="/dashboard" element={<Dashboard />} />
-				<Route path="/onboarding" element={<Onboarding />} />
 				<Route path="/languages" element={<Languages />} />
 				<Route path="/posts" element={<Posts />} />
 				<Route path="/posts/:id" element={<TranslationEditor />} />

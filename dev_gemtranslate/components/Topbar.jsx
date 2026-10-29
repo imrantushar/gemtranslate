@@ -20,9 +20,6 @@ export default function Topbar() {
 				<span className="gtrans-flex gtrans-h-[34px] gtrans-w-[34px] gtrans-flex-shrink-0 gtrans-items-center gtrans-justify-center gtrans-rounded-lg gtrans-bg-primary gtrans-text-white" aria-hidden="true">
 					<span className="dashicons dashicons-translation" style={{ width: 20, height: 20, fontSize: 20 }} />
 				</span>
-				<span className="gtrans-text-lg gtrans-font-semibold gtrans-text-ink">
-					gem<span className="gtrans-text-primary">Translate</span>
-				</span>
 
 				{current && (
 					<span className="gtrans-flex gtrans-items-center gtrans-gap-2 gtrans-text-muted">
@@ -42,9 +39,6 @@ export default function Topbar() {
 			<div className="gtrans-flex gtrans-flex-shrink-0 gtrans-items-center gtrans-gap-3">
 				{/* Pages portal their primary actions here (see <TopbarActions>). */}
 				<div id={TOPBAR_ACTIONS_ID} className="gtrans-flex gtrans-items-center gtrans-gap-2" />
-				<span className="gtrans-rounded-full gtrans-border gtrans-border-line gtrans-px-2 gtrans-py-0.5 gtrans-text-xs gtrans-text-muted">
-					v{window.gtrans?.version || '1.0.0'}
-				</span>
 				<button
 					type="button"
 					onClick={toggleTheme}

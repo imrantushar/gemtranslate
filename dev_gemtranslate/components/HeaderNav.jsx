@@ -11,6 +11,9 @@ import { hasFeature } from '../hooks/useFeatures';
 
 const ITEM =
 	'gtrans-bare gtrans-flex gtrans-items-center gtrans-gap-2 gtrans-whitespace-nowrap gtrans-rounded-md gtrans-border gtrans-border-solid gtrans-px-3 gtrans-py-2 gtrans-text-sm gtrans-font-medium gtrans-no-underline gtrans-transition-colors';
+// Visible header items by viewport width (min-width -> count); the rest go under "More".
+const BREAKPOINTS = [[1920, 7], [1680, 6], [1440, 5], [0, 4]];
+const countFor = (w) => BREAKPOINTS.find(([min]) => w >= min)[1];
 const ON = 'gtrans-border-primary gtrans-bg-primary-light gtrans-text-primary';
 const OFF = 'gtrans-border-transparent gtrans-bg-transparent gtrans-text-label hover:gtrans-bg-surface';
 
@@ -71,8 +74,18 @@ export default function HeaderNav() {
 		};
 	}, []);
 
-	const primary = NAV.filter((i) => !MORE_PATHS.includes(i.to));
-	const more = NAV.filter((i) => MORE_PATHS.includes(i.to));
+	const allPrimary = NAV.filter((i) => !MORE_PATHS.includes(i.to));
+	const baseMore = NAV.filter((i) => MORE_PATHS.includes(i.to));
+
+	const [visible, setVisible] = useState(() => countFor(window.innerWidth));
+	useEffect(() => {
+		const onResize = () => setVisible(countFor(window.innerWidth));
+		window.addEventListener('resize', onResize);
+		return () => window.removeEventListener('resize', onResize);
+	}, []);
+
+	const primary = allPrimary.slice(0, visible);
+	const more = [...allPrimary.slice(visible), ...baseMore];
 	const params = new URLSearchParams(search);
 
 	const childActive = (child) => {
@@ -146,7 +159,7 @@ export default function HeaderNav() {
 		<nav
 			ref={wrap}
 			aria-label={__('GemTranslate', 'gemtranslate')}
-			className="gtrans-flex gtrans-items-center gtrans-gap-1 gtrans-rounded-lg gtrans-bg-body gtrans-p-1"
+			className="gtrans-relative gtrans-flex gtrans-max-w-full gtrans-items-center gtrans-gap-1 gtrans-rounded-lg gtrans-bg-body gtrans-p-1"
 		>
 			{primary.map(renderItem)}
 			{more.length > 0 && (

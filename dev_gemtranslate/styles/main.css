@@ -304,3 +304,30 @@ body.toplevel_page_gemtranslate #wpfooter {
 #gemtranslate-admin-root .gtrans-sticky-head--gap {
 	padding-bottom: 12px;
 }
+
+/* Setup welcome marquee: two rows of capability cards drifting in opposite
+   directions. Keyframes + mask-image can't be expressed as utilities. */
+#gemtranslate-admin-root .gtrans-marquee-row {
+	overflow: hidden;
+	-webkit-mask-image: linear-gradient(to right, transparent 0, #000 64px, #000 calc(100% - 64px), transparent 100%);
+	mask-image: linear-gradient(to right, transparent 0, #000 64px, #000 calc(100% - 64px), transparent 100%);
+}
+#gemtranslate-admin-root .gtrans-marquee-track {
+	display: flex;
+	width: max-content;
+	gap: 12px;
+	animation: gtrans-marquee 36s linear infinite;
+}
+#gemtranslate-admin-root .gtrans-marquee-row--reverse .gtrans-marquee-track {
+	animation-direction: reverse;
+}
+#gemtranslate-admin-root .gtrans-marquee-row:hover .gtrans-marquee-track {
+	animation-play-state: paused;
+}
+@keyframes gtrans-marquee {
+	from { transform: translateX(0); }
+	to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+	#gemtranslate-admin-root .gtrans-marquee-track { animation: none; }
+}
