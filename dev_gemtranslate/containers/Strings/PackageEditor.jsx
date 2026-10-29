@@ -6,6 +6,7 @@ import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
+import Pagination from '../../components/Pagination';
 import { Select } from '../../components/ui/Select';
 import SearchBox from '../../components/SearchBox';
 import StatusTabs from '../../components/StatusTabs';
@@ -24,8 +25,6 @@ import { useLanguages } from '../../hooks/useLanguages';
 import { formatErrorMessage } from '../../lib/format';
 import AiTranslateModal from './AiTranslateModal';
 
-const PAGE_SIZE = 50;
-
 // "C:\\...\\plugins\\foo\\includes\\a.php:12" -> "includes/a.php:12"
 const shortRef = (ref) => {
 	const norm = String(ref || '').replace(/\\/g, '/');
@@ -43,6 +42,7 @@ export default function PackageEditor() {
 	const exportPack = useExportPackage();
 
 	const [page, setPage] = useState(1);
+	const [perPage, setPerPage] = useState(50);
 	const [search, setSearch] = useState('');
 	const [statusFilter, setStatusFilter] = useState('all'); // all | untranslated | translated
 	const [drafts, setDrafts] = useState({}); // string_id -> {value, dirty}
@@ -58,7 +58,7 @@ export default function PackageEditor() {
 		domain: pkg?.text_domain || '',
 		lang,
 		page,
-		per_page: PAGE_SIZE,
+		per_page: perPage,
 		search,
 		status: apiStatus,
 	});
@@ -120,7 +120,6 @@ export default function PackageEditor() {
 	const rows = strings.data?.rows || [];
 	const total = strings.data?.meta?.total || 0;
 	const dirtyCount = Object.values(drafts).filter((d) => d.dirty).length;
-	const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
 	const stats = pkg.per_lang?.[lang] || { total: pkg.string_count, translated: 0, wp_org: 0, draft: 0, missing: pkg.string_count };
 	const doneCount = stats.translated + stats.wp_org + stats.draft;
@@ -358,27 +357,17 @@ export default function PackageEditor() {
 				)}
 
 				{/* ---- Pagination ---- */}
-				{total > PAGE_SIZE && (
-					<div className="gtrans-flex gtrans-items-center gtrans-justify-between gtrans-mt-3 gtrans-text-sm">
-						<span className="gtrans-text-muted">
-							{sprintf(
-								/* translators: 1: current page, 2: total pages, 3: total rows. */
-								__('Page %1$d of %2$d · %3$d total', 'gemtranslate'),
-								page,
-								totalPages,
-								total
-							)}
-						</span>
-						<div className="gtrans-flex gtrans-gap-2">
-							<Button variant="ghost" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
-								{__('Previous', 'gemtranslate')}
-							</Button>
-							<Button variant="ghost" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
-								{__('Next', 'gemtranslate')}
-							</Button>
-						</div>
-					</div>
-				)}
+				<Pagination
+					total={total}
+					shown={rows.length}
+					page={page}
+					perPage={perPage}
+					onPage={setPage}
+					onPerPage={(n) => {
+						setPerPage(n);
+						setPage(1);
+					}}
+				/>
 			</Card>
 
 			{dirtyCount > 0 && (
