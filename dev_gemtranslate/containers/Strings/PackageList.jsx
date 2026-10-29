@@ -7,6 +7,7 @@ import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import { Table } from '../../components/ui/Table';
 import Button from '../../components/Button';
+import Pagination from '../../components/Pagination';
 import SearchBox from '../../components/SearchBox';
 import StatusTabs from '../../components/StatusTabs';
 import Toast from '../../components/Toast';
@@ -14,7 +15,7 @@ import { TextInput } from '../../components/Input';
 import { PageSkeleton } from '../../components/Skeleton';
 import { usePackages, useScanPackage, useAuditPackage } from '../../hooks/usePackages';
 import AuditModal, { auditIssueCount } from './AuditModal';
-import { setPage, setSearch, setType } from '../../lib/store';
+import { setPage, setPerPage, setSearch, setType } from '../../lib/store';
 import { useLanguages } from '../../hooks/useLanguages';
 import { formatErrorMessage } from '../../lib/format';
 
@@ -23,13 +24,11 @@ import { formatErrorMessage } from '../../lib/format';
  * translation-progress strip per active language. Click a row to drill into
  * its dedicated editor.
  */
-const PAGE_SIZE = 20;
-
 export default function PackageList() {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
-	const { page, search: filter, type: typeFilter } = useSelector((state) => state.packagesList);
-	const packages = usePackages({ page, per_page: PAGE_SIZE, search: filter, type: typeFilter });
+	const { page, perPage, search: filter, type: typeFilter } = useSelector((state) => state.packagesList);
+	const packages = usePackages({ page, per_page: perPage, search: filter, type: typeFilter });
 	const languages = useLanguages();
 	const scan = useScanPackage();
 	const [toast, setToast] = useState(null);
@@ -51,7 +50,6 @@ export default function PackageList() {
 	const meta = packages.data?.meta || {};
 	const counts = meta.counts || {};
 	const total = meta.total || 0;
-	const totalPages = meta.total_pages || 1;
 	const currentPage = meta.page || page;
 
 	const onScan = async (row) => {
@@ -195,27 +193,14 @@ export default function PackageList() {
 					</Table.Body>
 				</Table.Root>
 
-				{total > PAGE_SIZE && (
-					<div className="gtrans-flex gtrans-items-center gtrans-justify-between gtrans-mt-3 gtrans-text-sm">
-						<span className="gtrans-text-muted">
-							{sprintf(
-								/* translators: 1: current page, 2: total pages, 3: total rows. */
-								__('Page %1$d of %2$d · %3$d total', 'gemtranslate'),
-								currentPage,
-								totalPages,
-								total
-							)}
-						</span>
-						<div className="gtrans-flex gtrans-gap-2">
-							<Button variant="ghost" size="sm" disabled={currentPage <= 1} onClick={() => dispatch(setPage(currentPage - 1))}>
-								{__('Previous', 'gemtranslate')}
-							</Button>
-							<Button variant="ghost" size="sm" disabled={currentPage >= totalPages} onClick={() => dispatch(setPage(currentPage + 1))}>
-								{__('Next', 'gemtranslate')}
-							</Button>
-						</div>
-					</div>
-				)}
+				<Pagination
+					total={total}
+					shown={rows.length}
+					page={currentPage}
+					perPage={perPage}
+					onPage={(p) => dispatch(setPage(p))}
+					onPerPage={(n) => dispatch(setPerPage(n))}
+				/>
 			</Card>
 
 			{auditView && (
