@@ -774,6 +774,9 @@ input:where([type='file']):focus{
 #gemtranslate-admin-root .gtrans-w-9{
 	width: 2.25rem;
 }
+#gemtranslate-admin-root .gtrans-w-\[110px\]{
+	width: 110px;
+}
 #gemtranslate-admin-root .gtrans-w-\[220px\]{
 	width: 220px;
 }
@@ -816,6 +819,9 @@ input:where([type='file']):focus{
 }
 #gemtranslate-admin-root .gtrans-min-w-\[200px\]{
 	min-width: 200px;
+}
+#gemtranslate-admin-root .gtrans-min-w-\[34px\]{
+	min-width: 34px;
 }
 #gemtranslate-admin-root .gtrans-max-w-2xl{
 	max-width: 42rem;
@@ -1439,6 +1445,9 @@ input:where([type='file']):focus{
 }
 #gemtranslate-admin-root .gtrans-pt-3{
 	padding-top: 0.75rem;
+}
+#gemtranslate-admin-root .gtrans-pt-4{
+	padding-top: 1rem;
 }
 #gemtranslate-admin-root .gtrans-text-left{
 	text-align: right;
@@ -2105,6 +2114,9 @@ body.toplevel_page_gemtranslate #wpfooter {
 }
 #gemtranslate-admin-root .hover\:gtrans-bg-danger-light:hover{
 	background-color: var(--gtrans-error-light);
+}
+#gemtranslate-admin-root .hover\:gtrans-bg-primary:hover{
+	background-color: var(--gtrans-primary-color);
 }
 #gemtranslate-admin-root .hover\:gtrans-bg-secondary:hover{
 	background-color: var(--gtrans-secondary-color);
