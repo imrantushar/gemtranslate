@@ -122,7 +122,12 @@ class BlockUnits {
 		if ( $label === $block ) {
 			$label = ucwords( str_replace( [ '-', '_' ], ' ', substr( strrchr( '/' . $block, '/' ), 1 ) ) );
 		}
-		return 'attr' === $kind ? $label . ' · ' . $attr : $label;
+		if ( 'attr' !== $kind ) {
+			return $label;
+		}
+		// "dayLabel" / "not_found_text" => "day label" / "not found text"
+		$words = strtolower( trim( preg_replace( '/(?<=[a-z])(?=[A-Z])|[_-]/', ' ', (string) $attr ) ) );
+		return $label . ' · ' . $words;
 	}
 
 	public static function elementor_label( $widget, $setting ) {

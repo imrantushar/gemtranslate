@@ -37,6 +37,70 @@ class BlockParser {
 		'core/media-text'   => [ 'mediaAlt' ],
 		'core/embed'        => [ 'caption' ],
 		'core/file'         => [ 'fileName' ],
+
+		// aBlocks (https://ablocks.pro). Most aBlocks are static, so their text also
+		// lives in the saved markup and is picked up through `innerHTML`. These are
+		// the attributes rendered from the block comment (labels, placeholders,
+		// dynamic output) that do not reliably reach the saved HTML.
+		'ablocks/button'                         => [ 'text' ],
+		'ablocks/paypal-button'                  => [ 'text' ],
+		'ablocks/stripe-button'                  => [ 'text' ],
+		'ablocks/text-path'                      => [ 'text' ],
+		'ablocks/heading'                        => [ 'startingText', 'animatedText', 'endingText' ],
+		'ablocks/info-box'                       => [ 'badgeText', 'btnText' ],
+		'ablocks/image'                          => [ 'caption', 'imgAltText', 'imgTitle' ],
+		'ablocks/featured-image'                 => [ 'imgAltText', 'imgTitle' ],
+		'ablocks/image-scroll'                   => [ 'imgAltText', 'imgTitle' ],
+		'ablocks/atomic-image'                   => [ 'alt' ],
+		'ablocks/image-comparison'               => [ 'beforeImageLabel', 'afterImageLabel' ],
+		'ablocks/countdown'                      => [ 'dayLabel', 'hourLabel', 'minuteLabel', 'secondLabel' ],
+		'ablocks/counter'                        => [ 'counterTitle' ],
+		'ablocks/coupon'                         => [ 'couponBtnText', 'couponBtnAfterCopyText' ],
+		'ablocks/divider'                        => [ 'elementText' ],
+		'ablocks/toggle'                         => [ 'leftLabel', 'rightLabel' ],
+		'ablocks/breadcrumb'                     => [ 'beforeBreadcrumbText' ],
+		'ablocks/single-accordion'               => [ 'accordionTitle' ],
+		'ablocks/content-timeline-child'         => [ 'text_date' ],
+		'ablocks/interactive-circle-infographic' => [ 'itemTitle', 'itemText' ],
+		'ablocks/table-of-content'               => [ 'tocTableTitle' ],
+		'ablocks/taxonomy-listing'               => [ 'buttonText', 'countPrefixText' ],
+		'ablocks/news-ticker'                    => [ 'stickyLabel', 'customText' ],
+		'ablocks/scroll-to-top'                  => [ 'buttonText' ],
+		'ablocks/search'                         => [ 'buttonText', 'placeholder' ],
+		'ablocks/menu-item'                      => [ 'label' ],
+		'ablocks/logout'                         => [ 'logOutLabel', 'logInLabel' ],
+		'ablocks/price-menu-item'                => [ 'title' ],
+		'ablocks/filterable-cards'               => [ 'searchNotFoundText', 'searchPlaceHolder', 'loadMoreButtonText', 'noMoreItemsText' ],
+		'ablocks/loop-load-more'                 => [ 'loadMoreButtonText', 'noMoreItemsText' ],
+		'ablocks/form-builder'                   => [ 'buttonText', 'forgetPasswordLabel', 'loginLabel', 'registerLabel', 'homeLabel' ],
+		'ablocks/form-multi-step'                => [ 'submitButtonText' ],
+		'ablocks/form-input'                     => [ 'label', 'helperText', 'placeholder' ],
+		'ablocks/form-password'                  => [ 'label', 'helperText', 'placeholder' ],
+		'ablocks/form-textarea'                  => [ 'label', 'helperText', 'placeholder' ],
+		'ablocks/form-checkbox'                  => [ 'label', 'helperText', 'placeholder' ],
+		'ablocks/form-radio'                     => [ 'label', 'helperText' ],
+		'ablocks/form-select'                    => [ 'label', 'helperText' ],
+		'ablocks/ecm-bookmark-button'            => [ 'bookmark_text', 'bookmarked_text' ],
+		'ablocks/ecm-bookmark-count'             => [ 'label_single', 'label_plural' ],
+		'ablocks/ecm-claim-badge'                => [ 'text' ],
+		'ablocks/ecm-claim-button'               => [ 'text' ],
+		'ablocks/ecm-claim-count'                => [ 'label_single', 'label_plural' ],
+		'ablocks/ecm-upvote'                     => [ 'text' ],
+		'ablocks/ecm-upvote-count'               => [ 'label_single', 'label_plural' ],
+		'ablocks/ecm-bookmark-list'              => [ 'not_found_text' ],
+		'ablocks/ecm-claim-list'                 => [ 'not_found_text' ],
+		'ablocks/ecm-reaction-list'              => [ 'not_found_text' ],
+		'ablocks/ecm-upvote-list'                => [ 'not_found_text' ],
+		'ablocks/academy-course-search'          => [ 'placeholder' ],
+		'ablocks/academy-login-form'             => [ 'form_title', 'username_label', 'username_placeholder', 'password_label', 'password_placeholder', 'remember_label', 'login_button_label', 'reset_password_label' ],
+		'ablocks/academy-password-reset-form'    => [ 'form_title', 'username_label', 'reset_button_label', 'login_button_label' ],
+		'ablocks/storeengine-login-form'         => [ 'form_title', 'username_label', 'username_placeholder', 'password_label', 'password_placeholder', 'remember_label', 'login_button_label', 'reset_password_label' ],
+		'ablocks/storeengine-cart-button'        => [ 'label' ],
+		'ablocks/storeengine-coupon-form'        => [ 'input_placeholder', 'buttonTitle' ],
+		'ablocks/storeengine-funnel-accept'      => [ 'label' ],
+		'ablocks/storeengine-funnel-continue'    => [ 'label' ],
+		'ablocks/storeengine-funnel-decline'     => [ 'label' ],
+		'ablocks/storeengine-funnel-offer'       => [ 'offerTitle' ],
 	];
 
 	/**
@@ -44,7 +108,23 @@ class BlockParser {
 	 * source URL is the storage key and the per-language replacement URL is the
 	 * "translation", so a page can show a different image for each language.
 	 */
-	const IMAGE_BLOCKS = [ 'core/image', 'core/media-text', 'core/cover' ];
+	const IMAGE_BLOCKS = [ 'core/image', 'core/media-text', 'core/cover', 'ablocks/image', 'ablocks/atomic-image', 'ablocks/featured-image', 'ablocks/image-scroll' ];
+
+	/**
+	 * Image blocks whose `<img alt>` lives in the saved markup and is translated.
+	 */
+	const ALT_BLOCKS = [ 'core/image', 'ablocks/image', 'ablocks/atomic-image', 'ablocks/featured-image', 'ablocks/image-scroll' ];
+
+	/**
+	 * Attribute fields translated for a block. Filterable so third-party and
+	 * custom blocks can opt in via `gemtranslate_block_attr_fields`.
+	 *
+	 * @return string[]
+	 */
+	public static function attr_fields( $block_name ) {
+		$fields = self::ATTR_FIELDS[ $block_name ] ?? [];
+		return (array) apply_filters( 'gemtranslate_block_attr_fields', $fields, $block_name );
+	}
 
 	/**
 	 * Detect whether content uses block markup.
@@ -112,7 +192,7 @@ class BlockParser {
 
 			// core/image keeps `alt` on the <img> in the saved markup, not in the
 			// block comment attributes.
-			if ( 'core/image' === $name && '' !== self::img_alt( $block['innerHTML'] ?? '' ) ) {
+			if ( in_array( $name, self::ALT_BLOCKS, true ) && '' !== self::img_alt( $block['innerHTML'] ?? '' ) ) {
 				$out[] = [
 					'path'  => $path . '.html.alt',
 					'kind'  => 'attr',
@@ -132,9 +212,9 @@ class BlockParser {
 				];
 			}
 
-			$attrs = self::ATTR_FIELDS[ $name ] ?? [];
+			$attrs = self::attr_fields( $name );
 			foreach ( $attrs as $a ) {
-				if ( isset( $block['attrs'][ $a ] ) && '' !== trim( (string) $block['attrs'][ $a ] ) ) {
+				if ( isset( $block['attrs'][ $a ] ) && is_string( $block['attrs'][ $a ] ) && '' !== trim( $block['attrs'][ $a ] ) ) {
 					$out[] = [
 						'path'  => $path . '.attrs.' . $a,
 						'kind'  => 'attr',
@@ -176,7 +256,7 @@ class BlockParser {
 			}
 
 			$alt_path = $path . '.html.alt';
-			if ( 'core/image' === $name && isset( $translations[ $alt_path ] ) ) {
+			if ( in_array( $name, self::ALT_BLOCKS, true ) && isset( $translations[ $alt_path ] ) ) {
 				$set_alt = function ( $html ) use ( $translations, $alt_path ) {
 					return preg_replace_callback(
 						'/(<img\b[^>]*?\balt=)(["\'])(.*?)\2/is',
@@ -202,9 +282,9 @@ class BlockParser {
 				self::swap_image( $block, (string) $translations[ $src_path ] );
 			}
 
-			$attrs = self::ATTR_FIELDS[ $name ] ?? [];
+			$attrs = self::attr_fields( $name );
 			foreach ( $attrs as $a ) {
-				$attr_path =$path . '.attrs.' . $a;
+				$attr_path = $path . '.attrs.' . $a;
 				if ( isset( $translations[ $attr_path ] ) ) {
 					$block['attrs'][ $a ] = $translations[ $attr_path ];
 				}
@@ -234,22 +314,30 @@ class BlockParser {
 					$tag = preg_replace( '/\s(?:srcset|sizes)=(["\']).*?\1/is', '', $m[0] );
 					$tag = preg_replace( '/(\sclass=(["\'])[^"\']*?)\s*\bwp-image-\d+\b/i', '$1', $tag );
 					$tag = str_replace( ' class=""', '', $tag );
+					if ( ! preg_match( '/\ssrc=/i', $tag ) ) {
+						return preg_replace( '/<img\b/i', '<img src="' . addcslashes( $new, '\\$' ) . '"', $tag, 1 );
+					}
 					return preg_replace( '/(\ssrc=)(["\']).*?\2/is', '$1"' . addcslashes( $new, '\\$' ) . '"', $tag, 1 );
 				},
 				(string) $html,
 				1
 			);
 		};
-		$block['innerHTML'] = $swap( $block['innerHTML'] ?? '' );
+		// aBlocks wrap the <img> in a <picture> whose <source srcset> repeat the
+		// URL for tablet/mobile, so any remaining copy of the old URL follows too.
+		$follow = function ( $html ) use ( $old, $new ) {
+			return '' === $old ? $html : str_replace( [ $old, esc_url( $old ) ], $new, (string) $html );
+		};
+		$block['innerHTML'] = $follow( $swap( $block['innerHTML'] ?? '' ) );
 		if ( isset( $block['innerContent'] ) && is_array( $block['innerContent'] ) ) {
 			foreach ( $block['innerContent'] as $k => $piece ) {
 				if ( is_string( $piece ) && false !== stripos( $piece, '<img' ) ) {
-					$block['innerContent'][ $k ] = $swap( $piece );
+					$block['innerContent'][ $k ] = $follow( $swap( $piece ) );
 				}
 			}
 		}
 		// Keep the block comment's own copy of the URL in step with the markup.
-		foreach ( [ 'url', 'mediaUrl' ] as $a ) {
+		foreach ( [ 'url', 'mediaUrl', 'src', 'imgUrl', 'imgUrlTablet', 'imgUrlMobile' ] as $a ) {
 			if ( isset( $block['attrs'][ $a ] ) && $block['attrs'][ $a ] === $old ) {
 				$block['attrs'][ $a ] = $url;
 			}
@@ -258,6 +346,10 @@ class BlockParser {
 
 	private static function img_src( $html ) {
 		if ( preg_match( '/<img\b[^>]*?\bsrc=(["\'])(.*?)\1/is', (string) $html, $m ) ) {
+			return html_entity_decode( $m[2], ENT_QUOTES );
+		}
+		// aBlocks images can carry only a `srcset`; use its first candidate.
+		if ( preg_match( '/<img\b[^>]*?\bsrcset=(["\'])\s*([^\s,"\']+)/is', (string) $html, $m ) ) {
 			return html_entity_decode( $m[2], ENT_QUOTES );
 		}
 		return '';
