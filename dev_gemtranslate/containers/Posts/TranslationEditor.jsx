@@ -203,9 +203,9 @@ export default function TranslationEditor() {
 								variantRow={variantRow}
 								isPromoting={promote.isPending}
 								isDemoting={demote.isPending}
-								onPromote={async () => {
+								onPromote={async (startFrom) => {
 									try {
-										await promote.mutateAsync({ postId: post.id, lang: selectedLang, country });
+										await promote.mutateAsync({ postId: post.id, lang: selectedLang, country, startFrom });
 										setTab('content');
 										setToast({
 											tone: 'success',

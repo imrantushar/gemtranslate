@@ -1,5 +1,26 @@
-import { __, sprintf } from '@wordpress/i18n';
+import { useState } from 'react';
+import { __ } from '@wordpress/i18n';
 import clsx from 'clsx';
+import Modal from '../../components/Modal';
+
+/** Starting points offered when a page is switched to a custom layout. */
+const START_OPTIONS = [
+	{
+		value: 'translated',
+		label: __('Source with my translations', 'gemtranslate'),
+		hint: __('Copy the source page and apply the strings already translated for this language.', 'gemtranslate'),
+	},
+	{
+		value: 'source',
+		label: __('Copy of the source page', 'gemtranslate'),
+		hint: __('An exact copy of the main-language page, untranslated.', 'gemtranslate'),
+	},
+	{
+		value: 'blank',
+		label: __('Blank page', 'gemtranslate'),
+		hint: __('Start with empty content and build the page from scratch. The title is kept.', 'gemtranslate'),
+	},
+];
 
 /**
  * Compact layout-mode control: a two-option segmented switch.
@@ -22,17 +43,13 @@ export default function ModeSwitcher({
 }) {
 	const variantLabel = country ? `${language} · ${country}` : language;
 	const busy = isPromoting || isDemoting;
+	const [chooserOpen, setChooserOpen] = useState(false);
+	const [startFrom, setStartFrom] = useState('translated');
 
 	const pick = (next) => {
 		if (next === mode || busy) return;
 		if (next === 'custom_layout') {
-			// eslint-disable-next-line no-alert
-			if (!window.confirm(sprintf(
-				/* translators: %s: variant label e.g. "Spanish · MX". */
-				__('Create a custom-layout copy of this page for %s? It opens in your normal WordPress editor.', 'gemtranslate'),
-				variantLabel
-			))) return;
-			onPromote();
+			setChooserOpen(true);
 		} else {
 			// eslint-disable-next-line no-alert
 			if (!window.confirm(__('Discard the custom layout and revert to string-only translations? Stored strings are preserved.', 'gemtranslate'))) return;
@@ -90,6 +107,63 @@ export default function ModeSwitcher({
 					{__('Open in editor →', 'gemtranslate')}
 				</a>
 			)}
+			<Modal
+				open={chooserOpen}
+				size="sm"
+				title={__('Create custom layout', 'gemtranslate')}
+				subtitle={variantLabel}
+				onClose={() => setChooserOpen(false)}
+				footer={(
+					<>
+						<button
+							type="button"
+							onClick={() => setChooserOpen(false)}
+							className="gtrans-bare gtrans-cursor-pointer gtrans-rounded-md gtrans-border gtrans-border-line gtrans-bg-surface gtrans-px-4 gtrans-py-2 gtrans-text-sm gtrans-text-label hover:gtrans-bg-body"
+						>
+							{__('Cancel', 'gemtranslate')}
+						</button>
+						<button
+							type="button"
+							onClick={() => {
+								setChooserOpen(false);
+								onPromote(startFrom);
+							}}
+							className="gtrans-bare gtrans-cursor-pointer gtrans-rounded-md gtrans-border gtrans-border-primary gtrans-bg-primary gtrans-px-4 gtrans-py-2 gtrans-text-sm gtrans-text-white"
+						>
+							{__('Create and edit', 'gemtranslate')}
+						</button>
+					</>
+				)}
+			>
+				<p className="gtrans-m-0 gtrans-mb-4 gtrans-text-sm gtrans-text-muted">
+					{__('Where should the new page start from? It opens in your normal WordPress editor.', 'gemtranslate')}
+				</p>
+				<div className="gtrans-flex gtrans-flex-col gtrans-gap-2" role="radiogroup">
+					{START_OPTIONS.map((o) => (
+						<label
+							key={o.value}
+							className={clsx(
+								'gtrans-flex gtrans-cursor-pointer gtrans-items-start gtrans-gap-3 gtrans-rounded-md gtrans-border gtrans-p-3',
+								startFrom === o.value ? 'gtrans-border-primary' : 'gtrans-border-line'
+							)}
+						>
+							<input
+								type="radio"
+								name="gtrans-start-from"
+								value={o.value}
+								checked={startFrom === o.value}
+								onChange={() => setStartFrom(o.value)}
+								className="gtrans-mt-1"
+								style={{ appearance: 'auto', accentColor: 'var(--gtrans-primary-color)' }}
+							/>
+							<span>
+								<span className="gtrans-block gtrans-text-sm gtrans-font-medium gtrans-text-ink">{o.label}</span>
+								<span className="gtrans-block gtrans-text-xs gtrans-text-muted">{o.hint}</span>
+							</span>
+						</label>
+					))}
+				</div>
+			</Modal>
 		</div>
 	);
 }

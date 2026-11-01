@@ -95,11 +95,11 @@ export function useCreateVariant() {
 export function usePromoteToLayout() {
 	const qc = useQueryClient();
 	return useMutation({
-		mutationFn: async ({ postId, lang, country = '' }) =>
+		mutationFn: async ({ postId, lang, country = '', startFrom = 'translated' }) =>
 			unwrap(
 				await api.post(
 					`posts/${postId}/translations/${lang}/promote-to-layout`,
-					{},
+					{ start_from: startFrom },
 					{ params: countryQuery(country) }
 				)
 			),

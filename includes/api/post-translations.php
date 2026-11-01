@@ -677,10 +677,29 @@ class PostTranslations extends Controller {
 		if ( ! $post ) {
 			return $this->fail( 'gtrans_not_found', __( 'Post not found.', 'gemtranslate' ), 404 );
 		}
-		// Snapshot current rendered string-only output as the starting custom layout.
-		$rebuilt = PostFieldTranslator::rebuild_content( $post_id, (string) $post->post_content, $lang );
-		$title   = PostFieldTranslator::translated_title( $post_id, (string) $post->post_title, $lang );
-		$excerpt = PostFieldTranslator::translated_excerpt( $post_id, (string) $post->post_excerpt, $lang );
+		// What the new custom layout starts from:
+		//   translated — the source with stored translations applied (default)
+		//   source     — an untouched copy of the source page
+		//   blank      — no content; the title is kept (WordPress refuses a post
+		//                with an empty title, content and excerpt)
+		$body       = $request->get_json_params() ?: [];
+		$start_from = sanitize_key( (string) ( $body['start_from'] ?? $request->get_param( 'start_from' ) ?? 'translated' ) );
+		if ( ! in_array( $start_from, [ 'translated', 'source', 'blank' ], true ) ) {
+			$start_from = 'translated';
+		}
+
+		$title = PostFieldTranslator::translated_title( $post_id, (string) $post->post_title, $lang );
+		if ( 'source' === $start_from ) {
+			$rebuilt = (string) $post->post_content;
+			$title   = (string) $post->post_title;
+			$excerpt = (string) $post->post_excerpt;
+		} elseif ( 'blank' === $start_from ) {
+			$rebuilt = '';
+			$excerpt = '';
+		} else {
+			$rebuilt = PostFieldTranslator::rebuild_content( $post_id, (string) $post->post_content, $lang );
+			$excerpt = PostFieldTranslator::translated_excerpt( $post_id, (string) $post->post_excerpt, $lang );
+		}
 
 		// Create (or reuse) the shadow WP post that the admin will edit in
 		// Gutenberg / page builder. ensure_for() also writes the row.

@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { __ } from '@wordpress/i18n';
 import clsx from 'clsx';
 
@@ -31,7 +32,13 @@ export default function Modal({ open, title, subtitle, onClose, children, footer
 
 	if (!open) return null;
 
-	return (
+	// Render at the app root rather than where the modal is declared: a parent
+	// with its own stacking context (e.g. the sticky editor header) would
+	// otherwise keep the overlay underneath the top navigation. The root keeps
+	// the Tailwind `important` scope, so document.body would lose the styles.
+	const mountNode = document.getElementById('gemtranslate-admin-root') || document.body;
+
+	return createPortal(
 		<div
 			className="gtrans-fixed gtrans-inset-0 gtrans-flex gtrans-justify-center gtrans-overflow-y-auto gtrans-p-4"
 			style={{ zIndex: 100000, background: 'rgba(35, 40, 45, 0.62)' }}
@@ -71,6 +78,7 @@ export default function Modal({ open, title, subtitle, onClose, children, footer
 					</footer>
 				)}
 			</div>
-		</div>
+		</div>,
+		mountNode
 	);
 }
