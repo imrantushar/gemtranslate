@@ -43,8 +43,26 @@ class Localizer {
 		if ( ! is_admin() ) {
 			return $locale;
 		}
+		if ( self::is_site_language_field() ) {
+			// Other plugins can switch the global locale to the user's language
+			// before this point, so read the stored site locale directly.
+			return (string) get_option( 'WPLANG', '' ) ?: 'en_US';
+		}
 		$mapped = self::current_user_locale();
 		return $mapped ?: $locale;
+	}
+
+	/**
+	 * True while Settings → General renders its body. The Site Language
+	 * dropdown preselects `get_locale()`, so overriding the locale there would
+	 * show the user's admin language instead of the stored site language, and
+	 * saving the page would then overwrite WPLANG with the wrong value.
+	 * Admin strings are already loaded by `in_admin_header`, so the page
+	 * itself stays in the user's language.
+	 */
+	private static function is_site_language_field() {
+		global $pagenow;
+		return 'options-general.php' === $pagenow && did_action( 'in_admin_header' ) > 0;
 	}
 
 	/**
