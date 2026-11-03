@@ -38,6 +38,11 @@ class BlockParser {
 		'core/embed'        => [ 'caption' ],
 		'core/file'         => [ 'fileName' ],
 
+		// Site-wide layout blocks (headers, footers, navigation).
+		'core/navigation-link'    => [ 'label' ],
+		'core/navigation-submenu' => [ 'label' ],
+		'core/search'             => [ 'label', 'placeholder', 'buttonText' ],
+
 		// aBlocks (https://ablocks.pro). Most aBlocks are static, so their text also
 		// lives in the saved markup and is picked up through `innerHTML`. These are
 		// the attributes rendered from the block comment (labels, placeholders,
@@ -164,7 +169,33 @@ class BlockParser {
 		return self::serialize_blocks( $blocks );
 	}
 
-	private static function walk( array &$blocks, $prefix, array &$out ) {
+	/**
+	 * Translatable fields of ONE parsed block, without descending into its
+	 * inner blocks (they are rendered, and translated, on their own). Paths are
+	 * relative to the block, e.g. `0.innerHTML`, `0.attrs.label`.
+	 *
+	 * @return array<array{path:string,kind:string,attr:string,block:string,value:string}>
+	 */
+	public static function extract_block( array $block ) {
+		$out    = [];
+		$blocks = [ $block ];
+		self::walk( $blocks, '', $out, false );
+		return $out;
+	}
+
+	/**
+	 * Apply translations from {@see extract_block()} to one parsed block.
+	 */
+	public static function apply_block( array $block, array $translations ) {
+		if ( empty( $translations ) ) {
+			return $block;
+		}
+		$blocks = [ $block ];
+		self::write( $blocks, '', $translations, false );
+		return $blocks[0];
+	}
+
+	private static function walk( array &$blocks, $prefix, array &$out, $recurse = true ) {
 		foreach ( $blocks as $i => &$block ) {
 			$path = $prefix === '' ? (string) $i : $prefix . '.' . $i;
 			$name = $block['blockName'] ?? null;
@@ -225,13 +256,13 @@ class BlockParser {
 				}
 			}
 
-			if ( ! empty( $block['innerBlocks'] ) ) {
+			if ( $recurse && ! empty( $block['innerBlocks'] ) ) {
 				self::walk( $block['innerBlocks'], $path, $out );
 			}
 		}
 	}
 
-	private static function write( array &$blocks, $prefix, array $translations ) {
+	private static function write( array &$blocks, $prefix, array $translations, $recurse = true ) {
 		foreach ( $blocks as $i => &$block ) {
 			$path = $prefix === '' ? (string) $i : $prefix . '.' . $i;
 			$name = $block['blockName'] ?? null;
@@ -290,7 +321,7 @@ class BlockParser {
 				}
 			}
 
-			if ( ! empty( $block['innerBlocks'] ) ) {
+			if ( $recurse && ! empty( $block['innerBlocks'] ) ) {
 				self::write( $block['innerBlocks'], $path, $translations );
 			}
 		}

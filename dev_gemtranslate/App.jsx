@@ -14,6 +14,7 @@ import PackageEditor from './containers/Strings/PackageEditor';
 import StringsLegacy from './containers/Strings/StringsLegacy';
 import Terms from './containers/Terms';
 import Menus from './containers/Menus';
+import LayoutPage from './containers/Layout';
 import TranslatorsPage from './containers/Translators';
 import MigrationPage from './containers/Migration';
 import ImportExportPage from './containers/ImportExport';
@@ -84,6 +85,7 @@ function ManagerApp() {
 				<Route path="/strings/legacy" element={<StringsLegacy />} />
 				<Route path="/strings/:slug/:lang" element={<PackageEditor />} />
 				<Route path="/menus" element={<Menus />} />
+				<Route path="/layout" element={<LayoutPage />} />
 				<Route
 					path="/translators"
 					element={

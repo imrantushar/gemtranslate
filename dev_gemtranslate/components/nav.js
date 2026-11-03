@@ -15,6 +15,7 @@ const MANAGER_NAV = [
 	{ to: '/terms', label: () => __('Taxonomies', 'gemtranslate'), icon: 'tag', children: 'taxonomies' },
 	{ to: '/strings', label: () => __('Strings', 'gemtranslate'), icon: 'type' },
 	{ to: '/menus', label: () => __('Menus', 'gemtranslate'), icon: 'menu' },
+	{ to: '/layout', label: () => __('Header & Footer', 'gemtranslate'), icon: 'panel' },
 	{
 		to: '/translators',
 		label: () => __('Translators', 'gemtranslate'),

@@ -12,6 +12,7 @@ class API {
 		API\TermTranslations::init();
 		API\Menus::init();
 		API\Strings::init();
+		API\Layout::init();
 		API\Migration::init();
 		API\Settings::init();
 		API\Stats::init();

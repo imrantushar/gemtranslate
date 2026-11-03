@@ -56,6 +56,7 @@ class AdminMenu {
 			[ '/terms',        __( 'Taxonomies', 'gemtranslate' ) ],
 			[ '/strings',      __( 'Strings', 'gemtranslate' ) ],
 			[ '/menus',        __( 'Menus', 'gemtranslate' ) ],
+			[ '/layout',       __( 'Header & Footer', 'gemtranslate' ) ],
 			[ '/translators',  __( 'Translators', 'gemtranslate' ) ],
 			[ '/migration',    __( 'Migration', 'gemtranslate' ) ],
 			[ '/io',           __( 'Import & Export', 'gemtranslate' ) ],
