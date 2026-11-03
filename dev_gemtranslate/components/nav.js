@@ -15,7 +15,7 @@ const MANAGER_NAV = [
 	{ to: '/terms', label: () => __('Taxonomies', 'gemtranslate'), icon: 'tag', children: 'taxonomies' },
 	{ to: '/strings', label: () => __('Strings', 'gemtranslate'), icon: 'type' },
 	{ to: '/menus', label: () => __('Menus', 'gemtranslate'), icon: 'menu' },
-	{ to: '/layout', label: () => __('Header & Footer', 'gemtranslate'), icon: 'panel' },
+	{ to: '/patterns', label: () => __('Patterns', 'gemtranslate'), icon: 'panel', children: 'patterns' },
 	{
 		to: '/translators',
 		label: () => __('Translators', 'gemtranslate'),
@@ -80,6 +80,12 @@ export function useSubmenus() {
 			: []),
 	].map((c) => ({ ...c, to: `/terms?tax=${c.key}`, param: 'tax', isDefault: c.key === 'category', icon: 'tag', hint: TAXONOMY_HINTS()[c.key] || __('Translate terms', 'gemtranslate') }));
 
+	const patterns = [
+		{ key: 'template_part', label: __('Header & footer', 'gemtranslate'), hint: __('Template parts', 'gemtranslate'), icon: 'panel' },
+		{ key: 'pattern', label: __('Patterns', 'gemtranslate'), hint: __('Synced patterns', 'gemtranslate'), icon: 'file' },
+		{ key: 'navigation', label: __('Navigation', 'gemtranslate'), hint: __('Menus built with blocks', 'gemtranslate'), icon: 'menu' },
+	].map((c) => ({ ...c, to: `/patterns?type=${c.key}`, param: 'type', isDefault: c.key === 'template_part' }));
+
 	const settings = [
 		{ key: 'general', label: __('General', 'gemtranslate') },
 		{ key: 'switcher', label: __('Language switcher', 'gemtranslate') },
@@ -92,7 +98,7 @@ export function useSubmenus() {
 		{ key: 'contributor', label: __('Contributor', 'gemtranslate'), to: '/assignments', badge: 'assignments' },
 	];
 
-	return { postTypes: posts, taxonomies, settings, translators };
+	return { postTypes: posts, taxonomies, patterns, settings, translators };
 }
 
 // Items shown directly in the header; everything else lives under "More".

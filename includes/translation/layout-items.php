@@ -66,22 +66,36 @@ class LayoutItems {
 
 	/**
 	 * Items that have translatable text, with how much of it is translated into
-	 * $language. Items with no text of their own (a header that only holds a
+	 * each language. Items with no text of their own (a header that only holds a
 	 * page-list menu) are left out.
 	 *
+	 * @param string[] $languages Language codes to report progress for.
 	 * @return array<int,array<string,mixed>>
 	 */
-	public static function with_progress( $language, $country = '' ) {
+	public static function overview( array $languages ) {
+		$maps = [];
+		foreach ( $languages as $code ) {
+			$maps[ $code ] = LayoutTranslator::load_map( $code );
+		}
+
 		$out = [];
 		foreach ( self::all() as $item ) {
-			$units = self::units( $item['id'], $language, $country ) ?? [];
-			if ( ! $units ) {
+			$sources = self::sources( $item['id'] );
+			if ( ! $sources ) {
 				continue;
 			}
-			$item['total'] = count( $units );
-			$item['done']  = count( array_filter( $units, static function ( $u ) {
-				return '' !== trim( (string) $u['translation'] );
-			} ) );
+			$item['total']    = count( $sources );
+			$item['progress'] = [];
+			foreach ( $maps as $code => $map ) {
+				$item['progress'][ $code ] = count(
+					array_filter(
+						$sources,
+						static function ( $u ) use ( $map ) {
+							return '' !== trim( (string) ( $map[ $u['source'] ] ?? '' ) );
+						}
+					)
+				);
+			}
 			$out[] = $item;
 		}
 		return $out;
@@ -111,24 +125,20 @@ class LayoutItems {
 	}
 
 	/**
-	 * Translation units of an item for one language: one row per distinct
-	 * source text, in the same shape the post editors use.
+	 * Distinct translatable texts of an item, language-independent: one row per
+	 * tokenised source text.
 	 *
-	 * @return array<int,array<string,mixed>>|null Null when the item is unknown.
+	 * @return array<int,array{source:string,label:string,tokens:array}>|null Null when the item is unknown.
 	 */
-	public static function units( $id, $language, $country = '' ) {
+	public static function sources( $id ) {
 		$content = self::content( $id );
 		if ( null === $content ) {
 			return null;
 		}
 		$content = self::expand_patterns( $content );
-		// For a country, `translation` is the country's own text and `fallback`
-		// is what its visitors get today from the language.
-		$map      = LayoutTranslator::load_map( $language, $country, true );
-		$fallback = '' !== (string) $country ? LayoutTranslator::load_map( $language ) : [];
 
-		$units = [];
-		$seen  = [];
+		$out  = [];
+		$seen = [];
 		foreach ( BlockParser::extract( $content ) as $f ) {
 			if ( 'image' === $f['kind'] ) {
 				continue;
@@ -145,12 +155,37 @@ class LayoutItems {
 			foreach ( $parsed['tokens'] as $n => $value ) {
 				$tokens[ (string) $n ] = $value;
 			}
-			$units[] = [
-				'source'      => $text,
-				'translation' => $map[ $text ] ?? '',
-				'fallback'    => $fallback[ $text ] ?? '',
-				'label'       => BlockUnits::block_label( $f['block'], $f['kind'], $f['attr'] ),
-				'tokens'      => $tokens,
+			$out[] = [
+				'source' => $text,
+				'label'  => BlockUnits::block_label( $f['block'], $f['kind'], $f['attr'] ),
+				'tokens' => $tokens,
+			];
+		}
+		return $out;
+	}
+
+	/**
+	 * Translation units of an item for one language (and optional country):
+	 * the item's texts paired with their translations.
+	 *
+	 * For a country, `translation` is the country's own text and `fallback` is
+	 * what its visitors get today from the language.
+	 *
+	 * @return array<int,array<string,mixed>>|null Null when the item is unknown.
+	 */
+	public static function units( $id, $language, $country = '' ) {
+		$sources = self::sources( $id );
+		if ( null === $sources ) {
+			return null;
+		}
+		$map      = LayoutTranslator::load_map( $language, $country, true );
+		$fallback = '' !== (string) $country ? LayoutTranslator::load_map( $language ) : [];
+
+		$units = [];
+		foreach ( $sources as $src ) {
+			$units[] = $src + [
+				'translation' => $map[ $src['source'] ] ?? '',
+				'fallback'    => $fallback[ $src['source'] ] ?? '',
 			];
 		}
 		return $units;

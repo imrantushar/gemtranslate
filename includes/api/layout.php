@@ -9,6 +9,7 @@ use GemTranslate\Language\Context;
 use GemTranslate\Language\CountryContext;
 use GemTranslate\Translation\LayoutItems;
 use GemTranslate\Translation\LayoutTranslator;
+use GemTranslate\Translation\LayoutVariants;
 
 /**
  * Site-wide layout translation: template parts, synced patterns, navigation.
@@ -35,6 +36,25 @@ class Layout extends Controller {
 
 		register_rest_route(
 			$this->namespace,
+			'/' . $this->rest_base . '/variants',
+			[
+				[
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'variants' ],
+					'permission_callback' => [ $this, 'permissions_translate' ],
+					'args'                => [ 'part' => [ 'type' => 'string', 'required' => true ] ],
+				],
+				[
+					'methods'             => 'PUT',
+					'callback'            => [ $this, 'save_variants' ],
+					// Changes what every visitor from a country sees: admins only.
+					'permission_callback' => [ $this, 'permissions_check' ],
+				],
+			]
+		);
+
+		register_rest_route(
+			$this->namespace,
 			'/' . $this->rest_base . '/units/(?P<lang>[a-z0-9\-]{2,10})',
 			[
 				'methods'             => \WP_REST_Server::READABLE,
@@ -55,15 +75,52 @@ class Layout extends Controller {
 		);
 	}
 
-	public function items( $request ) {
-		$lang = strtolower( (string) $request->get_param( 'lang' ) );
-		$active  = '' !== $lang && Context::is_active( $lang );
-		$country = CountryContext::normalize( $request->get_param( 'country' ) );
+	public function variants( $request ) {
+		$part = (string) $request->get_param( 'part' );
+		if ( 0 !== strpos( $part, LayoutItems::TYPE_TEMPLATE_PART . ':' ) ) {
+			return $this->fail( 'gtrans_bad_request', __( 'Only template parts can have country layouts.', 'gemtranslate' ), 422 );
+		}
+		$id      = substr( $part, strlen( LayoutItems::TYPE_TEMPLATE_PART ) + 1 );
+		$choices = [];
+		foreach ( LayoutItems::all() as $item ) {
+			if ( LayoutItems::TYPE_TEMPLATE_PART === $item['type'] && $item['id'] !== $part ) {
+				$choices[] = [
+					'id'    => substr( $item['id'], strlen( LayoutItems::TYPE_TEMPLATE_PART ) + 1 ),
+					'title' => $item['title'],
+				];
+			}
+		}
+		return $this->ok( LayoutVariants::for_part( $id ), [ 'choices' => $choices ] );
+	}
+
+	public function save_variants( $request ) {
+		$body = $request->get_json_params() ?: $request->get_params();
+		$part = (string) ( $body['part'] ?? '' );
+		if ( 0 !== strpos( $part, LayoutItems::TYPE_TEMPLATE_PART . ':' ) ) {
+			return $this->fail( 'gtrans_bad_request', __( 'Only template parts can have country layouts.', 'gemtranslate' ), 422 );
+		}
+		$id    = substr( $part, strlen( LayoutItems::TYPE_TEMPLATE_PART ) + 1 );
+		$rules = LayoutVariants::save( $id, is_array( $body['rules'] ?? null ) ? $body['rules'] : [] );
+		return $this->ok( $rules );
+	}
+
+	public function items() {
+		$codes = [];
+		foreach ( Context::active_languages() as $code => $lang ) {
+			if ( Context::default_code() !== $code ) {
+				$codes[] = $code;
+			}
+		}
+		$countries = [];
+		foreach ( $codes as $code ) {
+			$countries[ $code ] = LayoutTranslator::countries_for( $code );
+		}
 		return $this->ok(
-			$active ? LayoutItems::with_progress( $lang, $country ) : LayoutItems::all(),
+			LayoutItems::is_supported() ? LayoutItems::overview( $codes ) : [],
 			[
 				'supported' => LayoutItems::is_supported(),
-				'countries' => $active ? LayoutTranslator::countries_for( $lang ) : [],
+				'languages' => $codes,
+				'countries' => $countries,
 			]
 		);
 	}
