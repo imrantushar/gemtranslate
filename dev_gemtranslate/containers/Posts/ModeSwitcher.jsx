@@ -40,11 +40,15 @@ export default function ModeSwitcher({
 	onDemote,
 	isPromoting,
 	isDemoting,
+	startOptions = START_OPTIONS,
+	customHint,
+	chooserText,
+	demoteConfirm,
 }) {
 	const variantLabel = country ? `${language} · ${country}` : language;
 	const busy = isPromoting || isDemoting;
 	const [chooserOpen, setChooserOpen] = useState(false);
-	const [startFrom, setStartFrom] = useState('translated');
+	const [startFrom, setStartFrom] = useState(startOptions[0].value);
 
 	const pick = (next) => {
 		if (next === mode || busy) return;
@@ -52,7 +56,7 @@ export default function ModeSwitcher({
 			setChooserOpen(true);
 		} else {
 			// eslint-disable-next-line no-alert
-			if (!window.confirm(__('Discard the custom layout and revert to string-only translations? Stored strings are preserved.', 'gemtranslate'))) return;
+			if (!window.confirm(demoteConfirm || __('Discard the custom layout and revert to string-only translations? Stored strings are preserved.', 'gemtranslate'))) return;
 			onDemote();
 		}
 	};
@@ -66,7 +70,7 @@ export default function ModeSwitcher({
 		{
 			value: 'custom_layout',
 			label: __('Custom layout', 'gemtranslate'),
-			hint: __('Design a fully separate page in your editor (Gutenberg, Elementor, Beaver, Divi, Bricks) — best for country-specific landing pages.', 'gemtranslate'),
+			hint: customHint || __('Design a fully separate page in your editor (Gutenberg, Elementor, Beaver, Divi, Bricks) — best for country-specific landing pages.', 'gemtranslate'),
 		},
 	];
 
@@ -136,10 +140,10 @@ export default function ModeSwitcher({
 				)}
 			>
 				<p className="gtrans-m-0 gtrans-mb-4 gtrans-text-sm gtrans-text-muted">
-					{__('Where should the new page start from? It opens in your normal WordPress editor.', 'gemtranslate')}
+					{chooserText || __('Where should the new page start from? It opens in your normal WordPress editor.', 'gemtranslate')}
 				</p>
 				<div className="gtrans-flex gtrans-flex-col gtrans-gap-2" role="radiogroup">
-					{START_OPTIONS.map((o) => (
+					{startOptions.map((o) => (
 						<label
 							key={o.value}
 							className={clsx(

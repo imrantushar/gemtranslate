@@ -55,6 +55,23 @@ class Layout extends Controller {
 
 		register_rest_route(
 			$this->namespace,
+			'/' . $this->rest_base . '/custom',
+			[
+				[
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => [ $this, 'create_custom' ],
+					'permission_callback' => [ $this, 'permissions_check' ],
+				],
+				[
+					'methods'             => \WP_REST_Server::DELETABLE,
+					'callback'            => [ $this, 'remove_custom' ],
+					'permission_callback' => [ $this, 'permissions_check' ],
+				],
+			]
+		);
+
+		register_rest_route(
+			$this->namespace,
 			'/' . $this->rest_base . '/units/(?P<lang>[a-z0-9\-]{2,10})',
 			[
 				'methods'             => \WP_REST_Server::READABLE,
@@ -102,6 +119,38 @@ class Layout extends Controller {
 		$id    = substr( $part, strlen( LayoutItems::TYPE_TEMPLATE_PART ) + 1 );
 		$rules = LayoutVariants::save( $id, is_array( $body['rules'] ?? null ) ? $body['rules'] : [] );
 		return $this->ok( $rules );
+	}
+
+	/** Give one language (and optional country) its own copy of a template part. */
+	public function create_custom( $request ) {
+		$body = $request->get_json_params() ?: $request->get_params();
+		$part = (string) ( $body['part'] ?? '' );
+		if ( 0 !== strpos( $part, LayoutItems::TYPE_TEMPLATE_PART . ':' ) ) {
+			return $this->fail( 'gtrans_bad_request', __( 'Only template parts can have a custom layout.', 'gemtranslate' ), 422 );
+		}
+		$id   = substr( $part, strlen( LayoutItems::TYPE_TEMPLATE_PART ) + 1 );
+		$rule = LayoutVariants::create_custom(
+			$id,
+			(string) ( $body['lang'] ?? '' ),
+			(string) ( $body['country'] ?? '' ),
+			'blank' === ( $body['start'] ?? '' ) ? 'blank' : 'copy'
+		);
+		if ( is_wp_error( $rule ) ) {
+			$status = (int) ( $rule->get_error_data()['status'] ?? 500 );
+			return $this->fail( $rule->get_error_code(), $rule->get_error_message(), $status );
+		}
+		return $this->ok( LayoutVariants::for_part( $id ) );
+	}
+
+	/** Back to the shared layout. The copy stays in the Site Editor. */
+	public function remove_custom( $request ) {
+		$body = $request->get_json_params() ?: $request->get_params();
+		$part = (string) ( $body['part'] ?? '' );
+		if ( 0 !== strpos( $part, LayoutItems::TYPE_TEMPLATE_PART . ':' ) ) {
+			return $this->fail( 'gtrans_bad_request', __( 'Only template parts can have a custom layout.', 'gemtranslate' ), 422 );
+		}
+		$id = substr( $part, strlen( LayoutItems::TYPE_TEMPLATE_PART ) + 1 );
+		return $this->ok( LayoutVariants::remove_custom( $id, (string) ( $body['lang'] ?? '' ), (string) ( $body['country'] ?? '' ) ) );
 	}
 
 	public function items() {

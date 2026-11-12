@@ -11,10 +11,81 @@ import SearchBox from '../../components/SearchBox';
 import { TextArea } from '../../components/Input';
 import { FormSkeleton, PageSkeleton } from '../../components/Skeleton';
 import { PageAiButton } from '../Posts/PageAiModal';
-import { usePatternItems, usePatternUnits, useSavePatternTranslations } from '../../hooks/usePatterns';
+import {
+	useCreateCustomPart,
+	usePatternItems,
+	usePatternUnits,
+	usePatternVariants,
+	useRemoveCustomPart,
+	useSavePatternTranslations,
+} from '../../hooks/usePatterns';
 import { useLanguages } from '../../hooks/useLanguages';
 import { formatErrorMessage } from '../../lib/format';
+import { canManage } from '../../lib/currentUser';
+import ModeSwitcher from '../Posts/ModeSwitcher';
 import CountryLayouts from './CountryLayouts';
+
+const START_OPTIONS = [
+	{
+		value: 'copy',
+		label: __('Copy of the original', 'gemtranslate'),
+		hint: __('Start from the original blocks. Texts you translated here still apply on the site.', 'gemtranslate'),
+	},
+	{
+		value: 'blank',
+		label: __('Blank', 'gemtranslate'),
+		hint: __('Start with an empty template part and build it from scratch.', 'gemtranslate'),
+	},
+];
+
+/**
+ * Strings only / Custom layout for one language (and country). A custom layout
+ * is its own template part, shown instead of the original to that audience and
+ * built in the Site Editor.
+ */
+function CustomLayoutSwitch({ item, lang, country, languageName, onNotify }) {
+	const variants = usePatternVariants(item.id);
+	const create = useCreateCustomPart();
+	const remove = useRemoveCustomPart();
+
+	if (!canManage || !variants.data) return null;
+
+	const rule = (variants.data.rules || []).find((r) => r.lang === lang && r.country === country);
+	const editUrl = rule
+		? `${window.gtrans?.adminUrl || '/wp-admin/'}site-editor.php?postType=wp_template_part&postId=${encodeURIComponent(rule.use)}&canvas=edit`
+		: '';
+
+	const run = async (promise, message) => {
+		try {
+			await promise;
+			onNotify({ tone: 'success', message });
+		} catch (err) {
+			onNotify({ tone: 'error', message: formatErrorMessage(err) });
+		}
+	};
+
+	return (
+		<ModeSwitcher
+			mode={rule ? 'custom_layout' : 'string_only'}
+			language={languageName}
+			country={country}
+			variantRow={{ shadow_edit_url: editUrl }}
+			startOptions={START_OPTIONS}
+			customHint={__('Build a separate template part for this language in the Site Editor. Visitors in this language see it instead of the original.', 'gemtranslate')}
+			chooserText={__('Where should the new template part start from? It opens in the Site Editor.', 'gemtranslate')}
+			demoteConfirm={__('Show the original template part again? The custom copy stays in the Site Editor.', 'gemtranslate')}
+			isPromoting={create.isPending}
+			isDemoting={remove.isPending}
+			onPromote={(start) =>
+				run(
+					create.mutateAsync({ part: item.id, lang, country, start }),
+					__('Custom layout created. Use “Open in editor” to design it.', 'gemtranslate')
+				)
+			}
+			onDemote={() => run(remove.mutateAsync({ part: item.id, lang, country }), __('Back to the original layout.', 'gemtranslate'))}
+		/>
+	);
+}
 
 const countPlaceholders = (s) => (String(s || '').match(/\{\d+\}/g) || []).length;
 
@@ -160,6 +231,15 @@ export default function PatternEditor() {
 							>
 								{__('+ Add', 'gemtranslate')}
 							</button>
+							{item.type === 'template_part' && (
+								<CustomLayoutSwitch
+									item={item}
+									lang={lang}
+									country={country}
+									languageName={targetLangs.find((l) => l.code === lang)?.name || lang}
+									onNotify={setToast}
+								/>
+							)}
 						</div>
 					</div>
 

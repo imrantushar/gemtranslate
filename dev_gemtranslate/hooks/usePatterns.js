@@ -42,6 +42,30 @@ export function usePatternVariants(part) {
 	});
 }
 
+/** Give a language (and optional country) its own copy of a template part. */
+export function useCreateCustomPart() {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: async ({ part, lang, country = '', start = 'copy' }) =>
+			unwrap(await api.post('layout/custom', { part, lang, country, start })),
+		onSuccess: () => {
+			qc.invalidateQueries({ queryKey: ['patterns'] });
+		},
+	});
+}
+
+/** Go back to the shared layout; the copy stays in the Site Editor. */
+export function useRemoveCustomPart() {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: async ({ part, lang, country = '' }) =>
+			unwrap(await api.delete('layout/custom', { data: { part, lang, country } })),
+		onSuccess: () => {
+			qc.invalidateQueries({ queryKey: ['patterns'] });
+		},
+	});
+}
+
 export function useSavePatternVariants() {
 	const qc = useQueryClient();
 	return useMutation({

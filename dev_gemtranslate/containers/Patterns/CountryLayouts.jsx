@@ -43,7 +43,7 @@ export default function CountryLayouts({ part, title, languages, onNotify }) {
 		try {
 			const stored = await save.mutateAsync({
 				part,
-				rules: rules.filter((r) => r.country && r.use),
+				rules: rules.filter((r) => (r.country || r.lang) && r.use),
 			});
 			onNotify({
 				tone: 'success',
@@ -90,7 +90,7 @@ export default function CountryLayouts({ part, title, languages, onNotify }) {
 								className="gtrans-uppercase"
 								maxLength={2}
 								value={rule.country}
-								placeholder="CA"
+								placeholder={__('Any', 'gemtranslate')}
 								aria-label={__('Country code', 'gemtranslate')}
 								onChange={(e) => change(i, { country: e.target.value.toUpperCase() })}
 							/>
