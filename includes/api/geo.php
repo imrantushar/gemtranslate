@@ -38,6 +38,15 @@ class Geo extends Controller {
 		);
 		register_rest_route(
 			$this->namespace,
+			'/' . $this->rest_base . '/diagnose',
+			[
+				'methods'             => \WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'diagnose' ],
+				'permission_callback' => [ $this, 'permissions_check' ],
+			]
+		);
+		register_rest_route(
+			$this->namespace,
 			'/' . $this->rest_base . '/cookie',
 			[
 				'methods'             => \WP_REST_Server::CREATABLE,
@@ -56,6 +65,72 @@ class Geo extends Controller {
 				'country'        => $iso,
 				'enabled'        => CountryContext::enabled(),
 				'language_match' => '' !== $iso ? $this->match_language( $iso ) : '',
+			]
+		);
+	}
+
+	/**
+	 * Admin-only: why is (or isn't) the visitor's country being detected?
+	 * Reports what the origin actually sees and what each detector answers,
+	 * plus the language ↔ country mapping the auto-redirect depends on.
+	 */
+	public function diagnose( $request ) {
+		$settings = CountryContext::settings();
+		$peer     = (string) ( $_SERVER['REMOTE_ADDR'] ?? '' );
+		$cf       = strtoupper( trim( (string) ( $_SERVER['HTTP_CF_IPCOUNTRY'] ?? '' ) ) );
+		$db_path  = (string) ( $settings['geo_maxmind_db_path'] ?? '' );
+
+		$detectors = [];
+		foreach ( CountryContext::sources() as $key ) {
+			$detector = CountryContext::detector_for( $key );
+			$detectors[ $key ] = $detector ? CountryContext::normalize( $detector->detect() ) : null;
+		}
+
+		$languages = [];
+		foreach ( Context::active_languages() as $code => $row ) {
+			$raw = $row['country_codes'] ?? '';
+			if ( is_string( $raw ) ) {
+				$decoded = json_decode( $raw, true );
+				$raw     = is_array( $decoded ) ? $decoded : [];
+			}
+			$languages[ $code ] = array_values( (array) $raw );
+		}
+
+		$hints = [];
+		if ( ! CountryContext::enabled() ) {
+			$hints[] = 'Country detection is disabled (geo_enabled).';
+		}
+		if ( '' === $cf ) {
+			$hints[] = 'No CF-IPCountry header reached PHP. Not behind Cloudflare, or IP Geolocation is off in Cloudflare → Network.';
+		} elseif ( ! \GemTranslate\Geo\TrustedProxy::is_trusted_peer() ) {
+			$hints[] = 'CF-IPCountry is present but REMOTE_ADDR (' . $peer . ') is not a trusted proxy, so it is ignored. If the server rewrites REMOTE_ADDR to the visitor IP, enable "Trust proxy headers"; otherwise add the proxy to geo_trusted_proxies.';
+		}
+		if ( '' === $db_path ) {
+			$hints[] = 'MaxMind database path is not set.';
+		} elseif ( ! is_readable( $db_path ) ) {
+			$hints[] = 'MaxMind database file is not readable at the configured path.';
+		} elseif ( ! class_exists( '\\GeoIp2\\Database\\Reader' ) && ! class_exists( '\\MaxMind\\Db\\Reader' ) ) {
+			$hints[] = 'MaxMind reader library (geoip2/geoip2 or maxmind-db/reader) is not installed.';
+		}
+		if ( ! array_filter( $languages ) ) {
+			$hints[] = 'No language has country codes, so the country → language redirect can never match.';
+		}
+
+		return $this->ok(
+			[
+				'enabled'          => CountryContext::enabled(),
+				'country'          => CountryContext::current(),
+				'sources'          => CountryContext::sources(),
+				'detectors'        => $detectors,
+				'remote_addr'      => $peer,
+				'peer_trusted'     => \GemTranslate\Geo\TrustedProxy::is_trusted_peer(),
+				'trust_headers'    => ! empty( $settings['geo_trust_proxy_headers'] ),
+				'cf_ipcountry'     => $cf,
+				'cf_connecting_ip' => (string) ( $_SERVER['HTTP_CF_CONNECTING_IP'] ?? '' ),
+				'client_ip'        => \GemTranslate\Geo\TrustedProxy::client_ip(),
+				'maxmind_path_set' => '' !== $db_path,
+				'languages'        => $languages,
+				'hints'            => $hints,
 			]
 		);
 	}

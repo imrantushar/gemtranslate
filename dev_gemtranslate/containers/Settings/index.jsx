@@ -531,6 +531,15 @@ export default function SettingsPage() {
 										</Field>
 									</Block>
 									<SettingRow
+										label={__('Trust proxy headers (Cloudflare / real-IP servers)', 'gemtranslate')}
+										description={__(
+											"Turn on if the site is behind Cloudflare but the country is not detected: many servers rewrite the connecting address to the visitor's IP, so the Cloudflare country header is ignored. Only enable when the server cannot be reached directly, bypassing the proxy.",
+											'gemtranslate'
+										)}
+										checked={!!values.geo_trust_proxy_headers}
+										onChange={(v) => set('geo_trust_proxy_headers', v)}
+									/>
+									<SettingRow
 										label={__("Auto-redirect first visit to country's default language", 'gemtranslate')}
 										checked={!!values.geo_auto_redirect_country}
 										onChange={(v) => set('geo_auto_redirect_country', v)}

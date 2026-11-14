@@ -59,7 +59,7 @@ class FloatingSwitcher {
 					continue;
 				}
 				$is_current  = ( $row['code'] === $current );
-				$url         = $rewriter->current_url_for_language( $row['code'] );
+				$url         = $rewriter->switcher_url_for_language( $row['code'] );
 				$label       = $this->build_label( $row, $show_flag, $show_name, $show_native );
 				$items_html .= sprintf(
 					'<li class="%s"><a href="%s" hreflang="%s" lang="%s"%s>%s</a></li>',

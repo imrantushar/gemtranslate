@@ -19,6 +19,10 @@ use GemTranslate\Language\CountryContext;
  * the `geo_trusted_proxies` setting (array or comma/newline-separated CIDRs)
  * and the `gtrans_trusted_proxies` filter. Sites behind another reverse proxy
  * or load balancer add that proxy's address or CIDR there.
+ *
+ * When the server rewrites REMOTE_ADDR to the visitor's IP (real-IP module),
+ * no range can match; the `geo_trust_proxy_headers` setting then trusts the
+ * headers outright. Only enable it when the origin cannot be reached directly.
  */
 class TrustedProxy {
 
@@ -38,6 +42,13 @@ class TrustedProxy {
 	 * Is the connecting peer a proxy whose forwarded headers we trust?
 	 */
 	public static function is_trusted_peer() {
+		// The web server (LiteSpeed/nginx/Apache real-IP module) often rewrites
+		// REMOTE_ADDR to the visitor's IP, so the peer is never a proxy range
+		// even though the site really is behind Cloudflare. The admin can state
+		// that the origin is only reachable through the proxy.
+		if ( ! empty( CountryContext::settings()['geo_trust_proxy_headers'] ) ) {
+			return true;
+		}
 		$peer = (string) ( $_SERVER['REMOTE_ADDR'] ?? '' );
 		if ( '' === $peer || ! filter_var( $peer, FILTER_VALIDATE_IP ) ) {
 			return false;

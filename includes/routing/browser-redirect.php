@@ -21,7 +21,12 @@ class BrowserRedirect {
 
 	const COOKIE = 'gtrans_user_lang';
 
+	/** Query arg the switchers add to the default-language link. */
+	const CHOICE_PARAM = 'gtrans_lang';
+
 	public static function init() {
+		// Before the country/browser redirects, so an explicit choice always wins.
+		add_action( 'template_redirect', [ __CLASS__, 'apply_explicit_choice' ], -1 );
 		add_action( 'template_redirect', [ __CLASS__, 'maybe_redirect' ], 1 );
 
 		// Capture chosen language into the cookie when the switcher is used.
@@ -32,6 +37,28 @@ class BrowserRedirect {
 		$raw = get_option( GTRANS_SETTINGS_NAME, '{}' );
 		$cfg = json_decode( $raw, true ) ?: [];
 		return ! empty( $cfg['auto_redirect_browser_lang'] );
+	}
+
+	/**
+	 * The visitor picked the default language in a switcher. Remember it (the
+	 * cookie otherwise bounces them back to the language they just left) and
+	 * drop the query arg so the clean URL is what they land on.
+	 */
+	public static function apply_explicit_choice() {
+		if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) || ( defined( 'DOING_CRON' ) && DOING_CRON ) ) {
+			return;
+		}
+		if ( ! isset( $_GET[ self::CHOICE_PARAM ] ) ) {
+			return;
+		}
+		$lang = sanitize_key( wp_unslash( $_GET[ self::CHOICE_PARAM ] ) );
+		if ( '' === $lang || ! Context::is_active( $lang ) || ! Context::is_default() ) {
+			return;
+		}
+		self::write_cookie( $lang );
+		\GemTranslate\Cache\NoCache::send();
+		wp_safe_redirect( remove_query_arg( self::CHOICE_PARAM ), 302 );
+		exit;
 	}
 
 	public static function maybe_redirect() {
