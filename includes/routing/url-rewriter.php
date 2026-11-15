@@ -139,6 +139,20 @@ class UrlRewriter {
 		return $home . '/' . $lang . ( '/' === $path ? '/' : $path );
 	}
 
+	/**
+	 * URL for a switcher link. Same as current_url_for_language(), but the link
+	 * to the default language carries the visitor's explicit choice
+	 * (`?gtrans_lang=`): without it, a stored language cookie sends the visitor
+	 * straight back to the language they were trying to leave.
+	 */
+	public function switcher_url_for_language( $lang ) {
+		$url = $this->current_url_for_language( $lang );
+		if ( $lang === Context::default_code() ) {
+			$url = add_query_arg( BrowserRedirect::CHOICE_PARAM, rawurlencode( $lang ), $url );
+		}
+		return $url;
+	}
+
 	private function current_path_without_lang() {
 		if ( empty( $_SERVER['REQUEST_URI'] ) ) {
 			return '/';

@@ -90,7 +90,7 @@ class CountryContext {
 		return is_array( $cfg ) ? $cfg : [];
 	}
 
-	private static function detector_for( $key ) {
+	public static function detector_for( $key ) {
 		switch ( $key ) {
 			case 'cf_header':
 				return new CloudflareDetector();

@@ -153,7 +153,7 @@ class LanguageSwitcher {
 			$items[] = sprintf(
 				'<li class="gtrans-switcher-item%s"><a href="%s" hreflang="%s" lang="%s"%s>%s</a></li>',
 				$is_current ? ' is-current' : '',
-				esc_url( $rewriter->current_url_for_language( $row['code'] ) ),
+				esc_url( $rewriter->switcher_url_for_language( $row['code'] ) ),
 				esc_attr( $row['code'] ),
 				esc_attr( str_replace( '_', '-', $row['locale'] ) ),
 				$is_current ? ' aria-current="true"' : '',

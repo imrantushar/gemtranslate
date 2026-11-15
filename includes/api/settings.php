@@ -46,6 +46,7 @@ class Settings extends Controller {
 		'geo_cookie_ttl_days',
 		'geo_auto_redirect_country',
 		'geo_trusted_proxies',
+		'geo_trust_proxy_headers',
 	];
 
 	public static function init() {
@@ -190,6 +191,8 @@ class Settings extends Controller {
 			'geo_country_picker_banner' => false,
 			'geo_cookie_ttl_days'       => 90,
 			'geo_auto_redirect_country' => false,
+			'geo_trusted_proxies'       => '',
+			'geo_trust_proxy_headers'   => false,
 		];
 		$saved = json_decode( get_option( GTRANS_SETTINGS_NAME, '{}' ), true );
 		if ( ! is_array( $saved ) ) {
