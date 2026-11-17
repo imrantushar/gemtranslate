@@ -1,13 +1,13 @@
 <?php
-namespace Zentranslate\Translation;
+namespace GemTranslate\Translation;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Helper;
-use Zentranslate\Language\Context;
-use Zentranslate\Language\CountryContext;
+use GemTranslate\Helper;
+use GemTranslate\Language\Context;
+use GemTranslate\Language\CountryContext;
 
 /**
  * Looks up translations by post ID, language, and visitor country. Lookups are
@@ -52,8 +52,9 @@ class TranslationLoader {
 		if ( $post_id <= 0 ) {
 			return null;
 		}
-		$lang    = Context::current();
-		$country = self::normalize_country( $country !== null ? $country : self::detect_country() );
+		$lang             = Context::current();
+		$auto_country     = null === $country;
+		$country          = self::normalize_country( $country !== null ? $country : self::detect_country() );
 
 		$memo_key = $post_id . ':' . $lang . ':' . $country;
 		if ( array_key_exists( $memo_key, self::$memo ) ) {
@@ -64,6 +65,13 @@ class TranslationLoader {
 		if ( ! $group_id ) {
 			self::$memo[ $memo_key ] = false;
 			return null;
+		}
+
+		// The variant is picked from the visitor's country, not the URL. A page
+		// cache would store one country's variant and serve it to everyone, so
+		// such responses are marked uncacheable.
+		if ( $auto_country && CountryContext::enabled() && self::has_country_variant( $group_id ) ) {
+			\GemTranslate\Cache\NoCache::send();
 		}
 
 		$row = self::fetch_row( $group_id, $lang, $country );
@@ -214,14 +222,14 @@ class TranslationLoader {
 		);
 		$new_group = (int) $wpdb->insert_id;
 		if ( $new_group ) {
-			update_post_meta( $post_id, '_ztrans_group_id', $new_group );
-			update_post_meta( $post_id, '_ztrans_source_lang', $source );
+			update_post_meta( $post_id, '_gtrans_group_id', $new_group );
+			update_post_meta( $post_id, '_gtrans_source_lang', $source );
 		}
 		return $new_group;
 	}
 
 	public static function group_id_for_post( $post_id ) {
-		$group = (int) get_post_meta( (int) $post_id, '_ztrans_group_id', true );
+		$group = (int) get_post_meta( (int) $post_id, '_gtrans_group_id', true );
 		return $group > 0 ? $group : 0;
 	}
 
@@ -252,6 +260,22 @@ class TranslationLoader {
 		}
 	}
 
+	/**
+	 * Does this translation group have any country-specific variant?
+	 */
+	private static function has_country_variant( $group_id ) {
+		static $memo = [];
+		if ( ! array_key_exists( $group_id, $memo ) ) {
+			$memo[ $group_id ] = (bool) array_filter(
+				self::known_countries_for_group( $group_id ),
+				static function ( $c ) {
+					return '' !== $c;
+				}
+			);
+		}
+		return $memo[ $group_id ];
+	}
+
 	private static function known_countries_for_group( $group_id ) {
 		global $wpdb;
 		$table = Helper::table( 'post_translations' );
@@ -265,7 +289,7 @@ class TranslationLoader {
 	}
 
 	/**
-	 * Hash of the source content. Stored as `_ztrans_source_hash` post meta on
+	 * Hash of the source content. Stored as `_gtrans_source_hash` post meta on
 	 * the source post; translations record the hash they were derived from in
 	 * the `source_hash` column. Translation is "stale" when those differ.
 	 */
@@ -280,7 +304,7 @@ class TranslationLoader {
 	}
 
 	public static function get_source_hash( $post_id ) {
-		return (string) get_post_meta( (int) $post_id, '_ztrans_source_hash', true );
+		return (string) get_post_meta( (int) $post_id, '_gtrans_source_hash', true );
 	}
 
 	/**
@@ -293,7 +317,7 @@ class TranslationLoader {
 		if ( $fresh === $current ) {
 			return false;
 		}
-		update_post_meta( (int) $post_id, '_ztrans_source_hash', $fresh );
+		update_post_meta( (int) $post_id, '_gtrans_source_hash', $fresh );
 		return true;
 	}
 
@@ -398,9 +422,9 @@ class TranslationLoader {
 			'country_code'     => $country,
 			'post_id'          => $post_id,
 			'shadow_post_id'   => $shadow_post_id,
-			'title'            => (string) ( $fields['title'] ?? '' ),
-			'content'          => (string) ( $fields['content'] ?? '' ),
-			'excerpt'          => (string) ( $fields['excerpt'] ?? '' ),
+			'title'            => Helper::sanitize_markup( $fields['title'] ?? '' ),
+			'content'          => Helper::sanitize_markup( $fields['content'] ?? '' ),
+			'excerpt'          => Helper::sanitize_markup( $fields['excerpt'] ?? '' ),
 			'slug'             => $slug,
 			'status'           => (string) ( $fields['status'] ?? 'publish' ),
 			'translation_mode' => $mode,
@@ -465,7 +489,7 @@ class TranslationLoader {
 		}
 
 		$context   = self::string_context_for_group( $group_id );
-		$string_id = StringTranslator::register_string( $source, 'ztrans:post', $context );
+		$string_id = StringTranslator::register_string( $source, 'gtrans:post', $context );
 		if ( ! $string_id ) {
 			return false;
 		}
@@ -507,7 +531,7 @@ class TranslationLoader {
 				   AND s.context = %s
 				   AND t.language_code = %s
 				   AND t.value <> ''",
-				'ztrans:post',
+				'gtrans:post',
 				self::string_context_for_group( $group_id ),
 				strtolower( $language_code )
 			),

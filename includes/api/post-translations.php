@@ -1,16 +1,19 @@
 <?php
-namespace Zentranslate\API;
+namespace GemTranslate\API;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Language\Context;
-use Zentranslate\Translation\BlockParser;
-use Zentranslate\Translation\MetaTranslator;
-use Zentranslate\Translation\PostFieldTranslator;
-use Zentranslate\Translation\ShadowPostSync;
-use Zentranslate\Translation\TranslationLoader;
+use GemTranslate\Language\Context;
+use GemTranslate\Translation\BlockParser;
+use GemTranslate\Translation\BlockUnits;
+use GemTranslate\Translation\ElementorTranslator;
+use GemTranslate\Translation\MetaTranslator;
+use GemTranslate\Translation\PostFieldTranslator;
+use GemTranslate\Translation\ShadowPostSync;
+use GemTranslate\Translation\TranslationLoader;
+use GemTranslate\Translation\TranslationHistory;
 
 class PostTranslations extends Controller {
 
@@ -28,7 +31,7 @@ class PostTranslations extends Controller {
 			[
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'list_post_types' ],
-				'permission_callback' => [ $this, 'permissions_translate' ],
+				'permission_callback' => [ $this, 'permissions_translate_post' ],
 			]
 		);
 
@@ -39,7 +42,7 @@ class PostTranslations extends Controller {
 			[
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'index' ],
-				'permission_callback' => [ $this, 'permissions_translate' ],
+				'permission_callback' => [ $this, 'permissions_translate_post' ],
 				'args'                => [
 					'page'      => [ 'type' => 'integer', 'default' => 1 ],
 					'per_page'  => [ 'type' => 'integer', 'default' => 20 ],
@@ -56,7 +59,7 @@ class PostTranslations extends Controller {
 			[
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_translations' ],
-				'permission_callback' => [ $this, 'permissions_translate' ],
+				'permission_callback' => [ $this, 'permissions_translate_post' ],
 			]
 		);
 
@@ -68,12 +71,30 @@ class PostTranslations extends Controller {
 				[
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'get_fields' ],
-					'permission_callback' => [ $this, 'permissions_translate' ],
+					'permission_callback' => [ $this, 'permissions_translate_post' ],
 				],
 				[
 					'methods'             => 'PUT',
 					'callback'            => [ $this, 'save_fields' ],
-					'permission_callback' => [ $this, 'permissions_translate' ],
+					'permission_callback' => [ $this, 'permissions_translate_post' ],
+				],
+			]
+		);
+
+		// Block-wise units (Gutenberg blocks / Elementor widget settings).
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>\d+)/units/(?P<lang>[a-z0-9\-]{2,10})',
+			[
+				[
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'get_units' ],
+					'permission_callback' => [ $this, 'permissions_translate_post' ],
+				],
+				[
+					'methods'             => 'PUT',
+					'callback'            => [ $this, 'save_units' ],
+					'permission_callback' => [ $this, 'permissions_translate_post' ],
 				],
 			]
 		);
@@ -87,52 +108,13 @@ class PostTranslations extends Controller {
 				[
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'get_confirmed_segments' ],
-					'permission_callback' => [ $this, 'permissions_translate' ],
+					'permission_callback' => [ $this, 'permissions_translate_post' ],
 				],
 				[
 					'methods'             => 'PUT',
 					'callback'            => [ $this, 'save_confirmed_segments' ],
-					'permission_callback' => [ $this, 'permissions_translate' ],
+					'permission_callback' => [ $this, 'permissions_translate_post' ],
 				],
-			]
-		);
-
-		// Review queue for "Translate Everything" (held translations).
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/review-queue',
-			[
-				'methods'             => \WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'review_queue' ],
-				'permission_callback' => [ $this, 'permissions_translate' ],
-			]
-		);
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/(?P<id>\d+)/translations/(?P<lang>[a-z0-9\-]{2,10})/approve',
-			[
-				'methods'             => \WP_REST_Server::CREATABLE,
-				'callback'            => [ $this, 'approve_translation' ],
-				'permission_callback' => [ $this, 'permissions_translate' ],
-			]
-		);
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/(?P<id>\d+)/translations/(?P<lang>[a-z0-9\-]{2,10})/reject',
-			[
-				'methods'             => \WP_REST_Server::CREATABLE,
-				'callback'            => [ $this, 'reject_translation' ],
-				'permission_callback' => [ $this, 'permissions_translate' ],
-			]
-		);
-		// Backfill: enqueue auto-translation for existing published content.
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/backfill-auto',
-			[
-				'methods'             => \WP_REST_Server::CREATABLE,
-				'callback'            => [ $this, 'backfill_auto' ],
-				'permission_callback' => [ $this, 'permissions_translate' ],
 			]
 		);
 
@@ -143,7 +125,7 @@ class PostTranslations extends Controller {
 			[
 				'methods'             => \WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'promote_to_layout' ],
-				'permission_callback' => [ $this, 'permissions_translate' ],
+				'permission_callback' => [ $this, 'permissions_translate_post' ],
 			]
 		);
 		register_rest_route(
@@ -152,7 +134,7 @@ class PostTranslations extends Controller {
 			[
 				'methods'             => \WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'demote_to_strings' ],
-				'permission_callback' => [ $this, 'permissions_translate' ],
+				'permission_callback' => [ $this, 'permissions_translate_post' ],
 			]
 		);
 
@@ -164,12 +146,12 @@ class PostTranslations extends Controller {
 				[
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'list_variants' ],
-					'permission_callback' => [ $this, 'permissions_translate' ],
+					'permission_callback' => [ $this, 'permissions_translate_post' ],
 				],
 				[
 					'methods'             => \WP_REST_Server::CREATABLE,
 					'callback'            => [ $this, 'create_variant' ],
-					'permission_callback' => [ $this, 'permissions_translate' ],
+					'permission_callback' => [ $this, 'permissions_translate_post' ],
 				],
 			]
 		);
@@ -181,12 +163,12 @@ class PostTranslations extends Controller {
 				[
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'get_meta' ],
-					'permission_callback' => [ $this, 'permissions_translate' ],
+					'permission_callback' => [ $this, 'permissions_translate_post' ],
 				],
 				[
 					'methods'             => 'PUT',
 					'callback'            => [ $this, 'save_meta' ],
-					'permission_callback' => [ $this, 'permissions_translate' ],
+					'permission_callback' => [ $this, 'permissions_translate_post' ],
 				],
 			]
 		);
@@ -198,17 +180,17 @@ class PostTranslations extends Controller {
 				[
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'show_translation' ],
-					'permission_callback' => [ $this, 'permissions_translate' ],
+					'permission_callback' => [ $this, 'permissions_translate_post' ],
 				],
 				[
 					'methods'             => 'PUT',
 					'callback'            => [ $this, 'save_translation' ],
-					'permission_callback' => [ $this, 'permissions_translate' ],
+					'permission_callback' => [ $this, 'permissions_translate_post' ],
 				],
 				[
 					'methods'             => \WP_REST_Server::DELETABLE,
 					'callback'            => [ $this, 'delete_translation' ],
-					'permission_callback' => [ $this, 'permissions_translate' ],
+					'permission_callback' => [ $this, 'permissions_translate_post' ],
 				],
 			]
 		);
@@ -225,7 +207,7 @@ class PostTranslations extends Controller {
 			if ( 'attachment' === $type->name ) {
 				continue;
 			}
-			if ( ! current_user_can( $type->cap->edit_posts ?? 'edit_posts' ) ) {
+			if ( ! current_user_can( $type->cap->edit_posts ?? 'edit_posts' ) && ! current_user_can( self::CAP_TRANSLATE ) ) {
 				continue;
 			}
 			$out[] = [
@@ -239,6 +221,14 @@ class PostTranslations extends Controller {
 	public function index( $request ) {
 		$post_type = $request->get_param( 'post_type' ) ?: 'post';
 
+		// Only public post types are translatable; anything else (orders,
+		// templates, other plugins' private types) must not be enumerable here.
+		$type_object = get_post_type_object( $post_type );
+		if ( ! $type_object || ! $type_object->public || 'attachment' === $post_type ) {
+			return $this->fail( 'gtrans_bad_post_type', __( 'Unknown or non-translatable post type.', 'gemtranslate' ), 422 );
+		}
+		$can_edit_type = current_user_can( $type_object->cap->edit_posts ?? 'edit_posts' );
+
 		// Academy LMS stores lessons in a custom table when HP lesson mode is active.
 		if ( 'academy_lessons' === $post_type && $this->is_academy_hp_mode() ) {
 			return $this->index_academy_hp_lessons( $request );
@@ -246,13 +236,18 @@ class PostTranslations extends Controller {
 
 		$args = [
 			'post_type'      => $post_type,
-			'post_status'    => $request->get_param( 'status' ) ?: 'any',
+			'post_status'    => $can_edit_type ? ( $request->get_param( 'status' ) ?: 'any' ) : 'publish',
 			'posts_per_page' => max( 1, min( 100, (int) $request->get_param( 'per_page' ) ) ),
 			'paged'          => max( 1, (int) $request->get_param( 'page' ) ),
 			's'              => (string) $request->get_param( 'search' ),
 			'orderby'        => 'date',
 			'order'          => 'DESC',
 		];
+
+		if ( ! $can_edit_type ) {
+			// Translators without edit rights never see protected posts.
+			$args['has_password'] = false;
+		}
 
 		$query = new \WP_Query( $args );
 		$rows  = [];
@@ -377,7 +372,7 @@ class PostTranslations extends Controller {
 		$post_id = (int) $request['id'];
 		$post    = get_post( $post_id ) ?? $this->get_academy_hp_lesson_as_post( $post_id );
 		if ( ! $post ) {
-			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
+			return $this->fail( 'gtrans_not_found', __( 'Post not found.', 'gemtranslate' ), 404 );
 		}
 
 		// Group rows by language; default-country row is the "primary".
@@ -434,7 +429,7 @@ class PostTranslations extends Controller {
 			}
 		}
 		if ( ! $match ) {
-			return $this->fail( 'ztrans_not_found', __( 'Translation not found.', 'zentranslate' ), 404 );
+			return $this->fail( 'gtrans_not_found', __( 'Translation not found.', 'gemtranslate' ), 404 );
 		}
 		return $this->ok( $this->prepare_translation_row( $match ) );
 	}
@@ -443,10 +438,10 @@ class PostTranslations extends Controller {
 		$post_id = (int) $request['id'];
 		$lang    = strtolower( $request['lang'] );
 		if ( ! Context::is_active( $lang ) ) {
-			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_invalid_lang', __( 'Language is not active.', 'gemtranslate' ), 422 );
 		}
 		if ( ! get_post( $post_id ) && ! $this->get_academy_hp_lesson_as_post( $post_id ) ) {
-			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
+			return $this->fail( 'gtrans_not_found', __( 'Post not found.', 'gemtranslate' ), 404 );
 		}
 
 		$body    = $request->get_json_params() ?: $request->get_params();
@@ -461,7 +456,7 @@ class PostTranslations extends Controller {
 			'translation_mode' => $body['translation_mode'] ?? TranslationLoader::MODE_CUSTOM_LAYOUT,
 		] );
 		if ( ! $ok ) {
-			return $this->fail( 'ztrans_save_failed', __( 'Could not save translation.', 'zentranslate' ), 500 );
+			return $this->fail( 'gtrans_save_failed', __( 'Could not save translation.', 'gemtranslate' ), 500 );
 		}
 		return $this->show_translation( $request );
 	}
@@ -486,7 +481,7 @@ class PostTranslations extends Controller {
 		$lang    = strtolower( $request['lang'] );
 		$post    = get_post( $post_id ) ?? $this->get_academy_hp_lesson_as_post( $post_id );
 		if ( ! $post ) {
-			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
+			return $this->fail( 'gtrans_not_found', __( 'Post not found.', 'gemtranslate' ), 404 );
 		}
 		$fields = PostFieldTranslator::enumerate_fields( $post, $lang );
 		return $this->ok( [
@@ -500,11 +495,11 @@ class PostTranslations extends Controller {
 		$post_id = (int) $request['id'];
 		$lang    = strtolower( $request['lang'] );
 		if ( ! Context::is_active( $lang ) ) {
-			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_invalid_lang', __( 'Language is not active.', 'gemtranslate' ), 422 );
 		}
 		$post = get_post( $post_id ) ?? $this->get_academy_hp_lesson_as_post( $post_id );
 		if ( ! $post ) {
-			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
+			return $this->fail( 'gtrans_not_found', __( 'Post not found.', 'gemtranslate' ), 404 );
 		}
 
 		$body    = $request->get_json_params() ?: $request->get_params();
@@ -512,10 +507,23 @@ class PostTranslations extends Controller {
 		$country = $this->country_param( $request );
 		$saved   = 0;
 
+		// Revision history is a Pro feature. "Strings only" mode (the default
+		// editor) has no single title/content blob to snapshot the way the
+		// Custom layout save path does — the translated values live per-string
+		// in wp_gtrans_string_translations — so snapshot the current field map
+		// here before this batch overwrites it.
+		if ( class_exists( TranslationHistory::class ) && ! empty( $rows ) ) {
+			TranslationHistory::snapshot_string_fields( $post_id, $lang, $country );
+		}
+
 		foreach ( $rows as $r ) {
 			$path        = (string) ( $r['path'] ?? '' );
 			$translation = (string) ( $r['value'] ?? '' );
 			$source      = (string) ( $r['source'] ?? '' );
+			// An image path (`….html.src`) stores a replacement URL, not text.
+			if ( '.html.src' === substr( $path, -9 ) ) {
+				$translation = esc_url_raw( $translation );
+			}
 			if ( '' === $path ) {
 				continue;
 			}
@@ -531,13 +539,68 @@ class PostTranslations extends Controller {
 		return $this->get_fields( $request );
 	}
 
+	public function get_units( $request ) {
+		$post = get_post( (int) $request['id'] );
+		if ( ! $post ) {
+			return $this->fail( 'gtrans_not_found', __( 'Post not found.', 'gemtranslate' ), 404 );
+		}
+		return $this->ok( BlockUnits::enumerate( $post, strtolower( $request['lang'] ) ) );
+	}
+
+	public function save_units( $request ) {
+		$post_id = (int) $request['id'];
+		$lang    = strtolower( $request['lang'] );
+		if ( ! Context::is_active( $lang ) ) {
+			return $this->fail( 'gtrans_invalid_lang', __( 'Language is not active.', 'gemtranslate' ), 422 );
+		}
+		$post = get_post( $post_id );
+		if ( ! $post ) {
+			return $this->fail( 'gtrans_not_found', __( 'Post not found.', 'gemtranslate' ), 404 );
+		}
+
+		$body    = $request->get_json_params() ?: $request->get_params();
+		$rows    = (array) ( $body['units'] ?? [] );
+		$country = $this->country_param( $request );
+
+		if ( class_exists( TranslationHistory::class ) && ! empty( $rows ) ) {
+			TranslationHistory::snapshot_string_fields( $post_id, $lang, $country );
+		}
+
+		// Resolve every id against the live source so the storage key can't be
+		// forged or drift from what the render path derives.
+		$sources = [];
+		$images  = [];
+		foreach ( BlockUnits::enumerate( $post, $lang )['units'] as $u ) {
+			$sources[ $u['id'] ] = $u['source'];
+			if ( 'image' === $u['kind'] ) {
+				$images[ $u['id'] ] = true;
+			}
+		}
+		foreach ( $rows as $r ) {
+			$id = (string) ( $r['id'] ?? '' );
+			if ( '' === $id || ! isset( $sources[ $id ] ) ) {
+				continue;
+			}
+			$value = (string) ( $r['value'] ?? '' );
+			// An image unit stores a replacement URL, not text.
+			if ( isset( $images[ $id ] ) ) {
+				$value = esc_url_raw( $value );
+			}
+			TranslationLoader::save_string_translation( $post_id, $lang, $id, $sources[ $id ], $value, $country );
+		}
+		PostFieldTranslator::flush_memo();
+		ElementorTranslator::flush_memo();
+
+		return $this->get_units( $request );
+	}
+
 	/**
 	 * Post-meta key holding the set of confirmed segment hashes for a
 	 * (language, country) pair. Country-default uses the bare lang suffix.
 	 */
 	private function confirmed_meta_key( $lang, $country ) {
 		$suffix = $country ? $lang . '_' . strtolower( $country ) : $lang;
-		return '_ztrans_seg_confirmed_' . $suffix;
+		return '_gtrans_seg_confirmed_' . $suffix;
 	}
 
 	public function get_confirmed_segments( $request ) {
@@ -545,7 +608,7 @@ class PostTranslations extends Controller {
 		$lang    = strtolower( $request['lang'] );
 		$country = $this->country_param( $request );
 		if ( ! get_post( $post_id ) ) {
-			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
+			return $this->fail( 'gtrans_not_found', __( 'Post not found.', 'gemtranslate' ), 404 );
 		}
 		$stored = get_post_meta( $post_id, $this->confirmed_meta_key( $lang, $country ), true );
 		$list   = is_array( $stored ) ? array_values( array_filter( array_map( 'strval', $stored ) ) ) : [];
@@ -557,7 +620,7 @@ class PostTranslations extends Controller {
 		$lang    = strtolower( $request['lang'] );
 		$country = $this->country_param( $request );
 		if ( ! get_post( $post_id ) ) {
-			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
+			return $this->fail( 'gtrans_not_found', __( 'Post not found.', 'gemtranslate' ), 404 );
 		}
 		$body = $request->get_json_params() ?: $request->get_params();
 		$raw  = (array) ( $body['confirmed'] ?? [] );
@@ -573,147 +636,6 @@ class PostTranslations extends Controller {
 		$clean = array_slice( array_keys( $clean ), 0, 2000 );
 		update_post_meta( $post_id, $this->confirmed_meta_key( $lang, $country ), $clean );
 		return $this->ok( [ 'confirmed' => $clean ] );
-	}
-
-	// -----------------------------------------------------------------------
-	// Review queue (Translate Everything)
-	// -----------------------------------------------------------------------
-
-	public function review_queue( $request ) {
-		if ( $err = $this->require_pro( 'translate_everything' ) ) {
-			return $err;
-		}
-		global $wpdb;
-		$page     = max( 1, (int) $request->get_param( 'page' ) ?: 1 );
-		$per_page = max( 1, min( 100, (int) $request->get_param( 'per_page' ) ?: 20 ) );
-		$offset   = ( $page - 1 ) * $per_page;
-
-		$pt    = \Zentranslate\Helper::table( 'post_translations' );
-		$posts = $wpdb->posts;
-
-		$rows = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT pt.post_id, pt.language_code, pt.country_code, pt.title, pt.content, pt.updated_at,
-				        p.post_title AS source_title, p.post_type
-				 FROM $pt pt
-				 INNER JOIN $posts p ON p.ID = pt.post_id
-				 WHERE pt.status = 'needs_review'
-				 ORDER BY pt.updated_at DESC
-				 LIMIT %d OFFSET %d",
-				$per_page,
-				$offset
-			),
-			ARRAY_A
-		) ?: [];
-
-		$total = (int) $wpdb->get_var(
-			"SELECT COUNT(*) FROM $pt pt INNER JOIN $posts p ON p.ID = pt.post_id WHERE pt.status = 'needs_review'"
-		);
-
-		$items = array_map(
-			function ( $r ) {
-				$snippet = trim( wp_strip_all_tags( (string) $r['content'] ) );
-				if ( '' === $snippet ) {
-					$snippet = (string) $r['title'];
-				}
-				return [
-					'post_id'       => (int) $r['post_id'],
-					'language_code' => (string) $r['language_code'],
-					'country_code'  => (string) $r['country_code'],
-					'source_title'  => (string) $r['source_title'],
-					'translated_title' => (string) $r['title'],
-					'post_type'     => (string) $r['post_type'],
-					'snippet'       => wp_trim_words( $snippet, 24, '…' ),
-					'updated_at'    => (string) $r['updated_at'],
-				];
-			},
-			$rows
-		);
-
-		return $this->ok(
-			[
-				'rows' => $items,
-				'meta' => [ 'total' => $total, 'page' => $page, 'per_page' => $per_page, 'total_pages' => (int) ceil( $total / $per_page ) ],
-			]
-		);
-	}
-
-	public function approve_translation( $request ) {
-		if ( $err = $this->require_pro( 'translate_everything' ) ) {
-			return $err;
-		}
-		$post_id = (int) $request['id'];
-		$lang    = strtolower( $request['lang'] );
-		$country = $this->country_param( $request );
-		$ok      = TranslationLoader::set_translation_status( $post_id, $lang, 'publish', $country );
-		if ( ! $ok ) {
-			return $this->fail( 'ztrans_approve_failed', __( 'Could not approve this translation.', 'zentranslate' ), 500 );
-		}
-		return $this->ok( [ 'approved' => true, 'status' => 'publish' ] );
-	}
-
-	public function reject_translation( $request ) {
-		if ( $err = $this->require_pro( 'translate_everything' ) ) {
-			return $err;
-		}
-		$post_id = (int) $request['id'];
-		$lang    = strtolower( $request['lang'] );
-		$country = $this->country_param( $request );
-		TranslationLoader::delete_translation( $post_id, $lang, $country );
-		return $this->ok( [ 'rejected' => true ] );
-	}
-
-	public function backfill_auto( $request ) {
-		if ( $err = $this->require_pro( 'translate_everything' ) ) {
-			return $err;
-		}
-		$body     = $request->get_json_params() ?: $request->get_params();
-		$limit    = max( 1, min( 500, (int) ( $body['limit'] ?? 200 ) ) );
-		$offset   = max( 0, (int) ( $body['offset'] ?? 0 ) );
-		$targets  = \Zentranslate\Translation\AutoTranslate::target_languages();
-		if ( empty( $targets ) ) {
-			return $this->fail( 'ztrans_no_targets', __( 'No target languages are configured.', 'zentranslate' ), 422 );
-		}
-
-		$types = (array) \Zentranslate\Helper::get_settings( 'auto_translate_post_types', [ 'post', 'page' ] );
-		$query = new \WP_Query(
-			[
-				'post_type'      => $types,
-				'post_status'    => 'publish',
-				'posts_per_page' => $limit,
-				'offset'         => $offset,
-				'fields'         => 'ids',
-				'orderby'        => 'ID',
-				'order'          => 'ASC',
-				'no_found_rows'  => false,
-				'meta_query'     => [
-					[
-						'key'     => \Zentranslate\Translation\AutoTranslate::META_SOURCE,
-						'compare' => 'NOT EXISTS',
-					],
-				],
-			]
-		);
-
-		$queued = 0;
-		foreach ( $query->posts as $pid ) {
-			$queued += \Zentranslate\Translation\AutoTranslate::enqueue_for_post( (int) $pid, $targets, false );
-		}
-
-		$scanned   = count( $query->posts );
-		$total     = (int) $query->found_posts;
-		$next      = $offset + $scanned;
-		$done      = $next >= $total || 0 === $scanned;
-
-		return $this->ok(
-			[
-				'queued'  => $queued,
-				'scanned' => $scanned,
-				'offset'  => $next,
-				'total'   => $total,
-				'done'    => $done,
-			]
-		);
 	}
 
 	/**
@@ -753,12 +675,31 @@ class PostTranslations extends Controller {
 		$country = $this->country_param( $request );
 		$post    = get_post( $post_id );
 		if ( ! $post ) {
-			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
+			return $this->fail( 'gtrans_not_found', __( 'Post not found.', 'gemtranslate' ), 404 );
 		}
-		// Snapshot current rendered string-only output as the starting custom layout.
-		$rebuilt = PostFieldTranslator::rebuild_content( $post_id, (string) $post->post_content, $lang );
-		$title   = PostFieldTranslator::translated_title( $post_id, (string) $post->post_title, $lang );
-		$excerpt = PostFieldTranslator::translated_excerpt( $post_id, (string) $post->post_excerpt, $lang );
+		// What the new custom layout starts from:
+		//   translated — the source with stored translations applied (default)
+		//   source     — an untouched copy of the source page
+		//   blank      — no content; the title is kept (WordPress refuses a post
+		//                with an empty title, content and excerpt)
+		$body       = $request->get_json_params() ?: [];
+		$start_from = sanitize_key( (string) ( $body['start_from'] ?? $request->get_param( 'start_from' ) ?? 'translated' ) );
+		if ( ! in_array( $start_from, [ 'translated', 'source', 'blank' ], true ) ) {
+			$start_from = 'translated';
+		}
+
+		$title = PostFieldTranslator::translated_title( $post_id, (string) $post->post_title, $lang );
+		if ( 'source' === $start_from ) {
+			$rebuilt = (string) $post->post_content;
+			$title   = (string) $post->post_title;
+			$excerpt = (string) $post->post_excerpt;
+		} elseif ( 'blank' === $start_from ) {
+			$rebuilt = '';
+			$excerpt = '';
+		} else {
+			$rebuilt = PostFieldTranslator::rebuild_content( $post_id, (string) $post->post_content, $lang );
+			$excerpt = PostFieldTranslator::translated_excerpt( $post_id, (string) $post->post_excerpt, $lang );
+		}
 
 		// Create (or reuse) the shadow WP post that the admin will edit in
 		// Gutenberg / page builder. ensure_for() also writes the row.
@@ -774,7 +715,7 @@ class PostTranslations extends Controller {
 			]
 		);
 		if ( ! $shadow_id ) {
-			return $this->fail( 'ztrans_save_failed', __( 'Could not create shadow post.', 'zentranslate' ), 500 );
+			return $this->fail( 'gtrans_save_failed', __( 'Could not create shadow post.', 'gemtranslate' ), 500 );
 		}
 		return $this->show_translation( $request );
 	}
@@ -859,7 +800,7 @@ class PostTranslations extends Controller {
 			]
 		);
 		if ( ! $ok ) {
-			return $this->fail( 'ztrans_save_failed', __( 'Could not demote translation.', 'zentranslate' ), 500 );
+			return $this->fail( 'gtrans_save_failed', __( 'Could not demote translation.', 'gemtranslate' ), 500 );
 		}
 		// Trash the shadow post; admin can restore from wp-admin Trash if needed.
 		ShadowPostSync::trash_for( $post_id, $lang, $country );
@@ -888,7 +829,7 @@ class PostTranslations extends Controller {
 		$body    = $request->get_json_params() ?: $request->get_params();
 		$country = strtoupper( (string) ( $body['country_code'] ?? '' ) );
 		if ( ! preg_match( '/^[A-Z]{2}$/', $country ) ) {
-			return $this->fail( 'ztrans_invalid_country', __( 'country_code must be an ISO 3166-1 alpha-2 code.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_invalid_country', __( 'country_code must be an ISO 3166-1 alpha-2 code.', 'gemtranslate' ), 422 );
 		}
 		// Seed from the language-default row if one exists.
 		$seed = null;
@@ -912,7 +853,7 @@ class PostTranslations extends Controller {
 			]
 		);
 		if ( ! $ok ) {
-			return $this->fail( 'ztrans_save_failed', __( 'Could not create country variant.', 'zentranslate' ), 500 );
+			return $this->fail( 'gtrans_save_failed', __( 'Could not create country variant.', 'gemtranslate' ), 500 );
 		}
 		return $this->list_variants( $request );
 	}
@@ -928,7 +869,7 @@ class PostTranslations extends Controller {
 		$post_id = (int) $request['id'];
 		$lang    = strtolower( $request['lang'] );
 		if ( ! get_post( $post_id ) && ! $this->get_academy_hp_lesson_as_post( $post_id ) ) {
-			return $this->fail( 'ztrans_not_found', __( 'Post not found.', 'zentranslate' ), 404 );
+			return $this->fail( 'gtrans_not_found', __( 'Post not found.', 'gemtranslate' ), 404 );
 		}
 
 		$fields       = MetaTranslator::enumerate_fields( $post_id );
@@ -957,7 +898,7 @@ class PostTranslations extends Controller {
 		$post_id = (int) $request['id'];
 		$lang    = strtolower( $request['lang'] );
 		if ( ! Context::is_active( $lang ) ) {
-			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_invalid_lang', __( 'Language is not active.', 'gemtranslate' ), 422 );
 		}
 		$body = $request->get_json_params() ?: $request->get_params();
 		$rows = (array) ( $body['fields'] ?? [] );
@@ -1006,6 +947,7 @@ class PostTranslations extends Controller {
 		if ( $full ) {
 			$out['content'] = (string) $post->post_content;
 			$out['excerpt'] = (string) $post->post_excerpt;
+			$out['builder'] = $post instanceof \WP_Post ? BlockUnits::detect_builder( $post ) : BlockUnits::BUILDER_CLASSIC;
 		}
 		return $out;
 	}

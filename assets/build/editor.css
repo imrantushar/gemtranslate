@@ -1,5 +1,5 @@
 /* Minimal styling for the editor sidebar — most of it uses @wordpress/components defaults. */
-.components-panel__body .ztrans-pill {
+.components-panel__body .gtrans-pill {
 	padding: 2px 6px;
 	border-radius: 999px;
 	background: #f3f4f6;

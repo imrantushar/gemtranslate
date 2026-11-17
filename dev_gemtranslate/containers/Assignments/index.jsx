@@ -1,0 +1,381 @@
+import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { __ } from '@wordpress/i18n';
+
+import PageHeader from '../../components/PageHeader';
+import Card from '../../components/Card';
+import Modal from '../../components/Modal';
+import { Table } from '../../components/ui/Table';
+import Button from '../../components/Button';
+import OptionMenu from '../../components/OptionMenu';
+import StatusTabs from '../../components/StatusTabs';
+
+import Toast from '../../components/Toast';
+import StatusPill from '../../components/StatusPill';
+import { Field, TextInput, TextArea } from '../../components/Input';
+import { Select } from '../../components/ui/Select';
+import { TableSkeleton } from '../../components/Skeleton';
+import {
+	useAssignments,
+	useCreateAssignment,
+	useUpdateAssignment,
+	useDeleteAssignment,
+} from '../../hooks/useAssignments';
+import { usePosts } from '../../hooks/usePosts';
+import { usePostTypes } from '../../hooks/usePostTypes';
+import { useLanguages } from '../../hooks/useLanguages';
+import { useTranslators } from '../../hooks/useTranslators';
+import { formatErrorMessage, truncate } from '../../lib/format';
+
+const canManage = !!(
+	window.gtrans &&
+	window.gtrans.currentUser &&
+	window.gtrans.currentUser.canManage
+);
+
+const STATUS_TONE = {
+	assigned: 'pending',
+	in_progress: 'draft',
+	completed: 'translated',
+	cancelled: 'none',
+};
+const statusLabel = (s) =>
+	({
+		assigned: __('Assigned', 'gemtranslate'),
+		in_progress: __('In progress', 'gemtranslate'),
+		completed: __('Completed', 'gemtranslate'),
+		cancelled: __('Cancelled', 'gemtranslate'),
+	})[s] || s;
+
+const modalSelectStyles = {
+	menuPortal: (base) => ({ ...base, zIndex: 100001 }),
+};
+
+export default function AssignmentsPage() {
+	const [scope, setScope] = useState(canManage ? 'all' : 'mine');
+	const [status, setStatus] = useState('');
+	const [newContributorOpen, setNewContributorOpen] = useState(false);
+	const params = useMemo(() => ({ scope, ...(status ? { status } : {}) }), [scope, status]);
+	const list = useAssignments(params);
+	const update = useUpdateAssignment();
+	const remove = useDeleteAssignment();
+	const [toast, setToast] = useState(null);
+
+	const rows = list.data?.rows || [];
+
+	const act = async (fn, okMsg) => {
+		try {
+			await fn();
+			if (okMsg) setToast({ tone: 'success', message: okMsg });
+		} catch (err) {
+			setToast({ tone: 'error', message: formatErrorMessage(err) });
+		}
+	};
+
+	return (
+		<>
+			<PageHeader
+				title={__('Contributor', 'gemtranslate')}
+				actions={
+					canManage && (
+						<Button size="sm" onClick={() => setNewContributorOpen(true)}>
+							{__('Add New Contributor', 'gemtranslate')}
+						</Button>
+					)
+				}
+				description={
+					canManage
+						? __('Assign posts to contributors and track their progress.', 'gemtranslate')
+						: __(
+								'Translation work assigned to you. Open a post to translate it, then mark it complete.',
+								'gemtranslate'
+						  )
+				}
+			/>
+
+			{canManage && newContributorOpen && (
+				<NewAssignment
+					open
+					onClose={() => setNewContributorOpen(false)}
+					onToast={setToast}
+				/>
+			)}
+
+			<Card table>
+				<Table.Toolbar variant="tabs">
+					<StatusTabs
+						value={status}
+						onChange={setStatus}
+						tabs={[
+							{ value: '', label: __('All', 'gemtranslate') },
+							{ value: 'open', label: __('Open', 'gemtranslate') },
+							{ value: 'assigned', label: __('Assigned', 'gemtranslate') },
+							{ value: 'in_progress', label: __('In progress', 'gemtranslate') },
+							{ value: 'completed', label: __('Completed', 'gemtranslate') },
+							{ value: 'cancelled', label: __('Cancelled', 'gemtranslate') },
+						]}
+					/>
+					{canManage && (
+						<div className="gtrans-flex gtrans-gap-2 gtrans-py-2">
+							{['all', 'mine'].map((sc) => (
+								<Button
+									key={sc}
+									size="sm"
+									variant={scope === sc ? 'light' : 'secondary'}
+									onClick={() => setScope(sc)}
+								>
+									{sc === 'all' ? __('Everyone', 'gemtranslate') : __('Assigned by me', 'gemtranslate')}
+								</Button>
+							))}
+						</div>
+					)}
+				</Table.Toolbar>
+
+				{list.isLoading ? (
+					<TableSkeleton />
+				) : rows.length === 0 ? (
+					<Table.Empty columns={[__('Content', 'gemtranslate'), __('Language', 'gemtranslate'), __('Contributor', 'gemtranslate'), __('Status', 'gemtranslate'), '']}>
+						{__('No contributor work yet.', 'gemtranslate')}
+					</Table.Empty>
+				) : (
+					<Table.Root>
+						<Table.Header>
+							<Table.Row>
+								<Table.ColumnHeader>{__('Content', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader>{__('Language', 'gemtranslate')}</Table.ColumnHeader>
+								{canManage && (
+									<Table.ColumnHeader>{__('Contributor', 'gemtranslate')}</Table.ColumnHeader>
+								)}
+								<Table.ColumnHeader>{__('Status', 'gemtranslate')}</Table.ColumnHeader>
+								<Table.ColumnHeader className="gtrans-text-right">
+									{__('Actions', 'gemtranslate')}
+								</Table.ColumnHeader>
+							</Table.Row>
+						</Table.Header>
+						<Table.Body>
+							{rows.map((r) => (
+								<Table.Row key={r.id}>
+									<Table.Cell className="gtrans-max-w-[280px]">
+										<div className="gtrans-font-medium gtrans-text-ink">
+											{truncate(r.post_title, 60)}
+										</div>
+										{r.note && (
+											<div className="gtrans-text-xs gtrans-text-muted">
+												{truncate(r.note, 80)}
+											</div>
+										)}
+									</Table.Cell>
+									<Table.Cell>
+										{r.language_name}
+										{r.country_code ? ` · ${r.country_code}` : ''}
+									</Table.Cell>
+									{canManage && <Table.Cell>{r.translator_name}</Table.Cell>}
+									<Table.Cell>
+										<StatusPill tone={STATUS_TONE[r.status]}>{statusLabel(r.status)}</StatusPill>
+									</Table.Cell>
+									<Table.Cell>
+										<div className="gtrans-flex gtrans-items-center gtrans-justify-end gtrans-gap-2">
+											<Link
+												to={`/posts/${r.post_id}`}
+												className="gtrans-rounded-md gtrans-border gtrans-border-line gtrans-bg-surface gtrans-px-3 gtrans-py-1.5 gtrans-text-xs gtrans-text-label gtrans-no-underline hover:gtrans-bg-body"
+											>
+												{__('Open', 'gemtranslate')}
+											</Link>
+											{!canManage && r.status === 'assigned' && (
+												<Button
+													size="sm"
+													variant="ghost"
+													onClick={() =>
+														act(() => update.mutateAsync({ id: r.id, status: 'in_progress' }))
+													}
+												>
+													{__('Start', 'gemtranslate')}
+												</Button>
+											)}
+											{!canManage && (r.status === 'assigned' || r.status === 'in_progress') && (
+												<Button
+													size="sm"
+													onClick={() =>
+														act(
+															() => update.mutateAsync({ id: r.id, status: 'completed' }),
+															__('Marked complete.', 'gemtranslate')
+														)
+													}
+												>
+													{__('Complete', 'gemtranslate')}
+												</Button>
+											)}
+											{canManage && (
+												<OptionMenu
+													label={__('Assignment actions', 'gemtranslate')}
+													options={[
+														r.status !== 'cancelled' &&
+															r.status !== 'completed' && {
+																label: __('Cancel', 'gemtranslate'),
+																icon: 'x',
+																hasBorder: true,
+																onClick: () => act(() => update.mutateAsync({ id: r.id, status: 'cancelled' })),
+															},
+														{
+															label: __('Delete', 'gemtranslate'),
+															icon: 'trash',
+															danger: true,
+															onClick: () => act(() => remove.mutateAsync(r.id)),
+														},
+													]}
+												/>
+											)}
+										</div>
+									</Table.Cell>
+								</Table.Row>
+							))}
+						</Table.Body>
+					</Table.Root>
+				)}
+			</Card>
+
+			<Toast message={toast?.message} tone={toast?.tone} onClear={() => setToast(null)} />
+		</>
+	);
+}
+
+/** Manager-only: assign a post + language to a translator. */
+function NewAssignment({ open, onClose, onToast }) {
+	const postTypes = usePostTypes();
+	const [postType, setPostType] = useState('post');
+	const [search, setSearch] = useState('');
+	const posts = usePosts({ post_type: postType, per_page: 20, search });
+	const languages = useLanguages();
+	const translators = useTranslators();
+	const create = useCreateAssignment();
+
+	const [postId, setPostId] = useState('');
+	const [lang, setLang] = useState('');
+	const [translatorId, setTranslatorId] = useState('');
+	const [note, setNote] = useState('');
+
+	const nonDefault = (languages.data || []).filter((l) => !l.is_default && l.active);
+	const postRows = posts.data?.rows || [];
+	const types = postTypes.data || [];
+
+	const submit = async () => {
+		if (!postId || !lang || !translatorId) {
+			onToast({
+				tone: 'error',
+				message: __('Pick a post, language and contributor.', 'gemtranslate'),
+			});
+			return;
+		}
+		try {
+			await create.mutateAsync({
+				post_id: Number(postId),
+				language_code: lang,
+				translator_id: Number(translatorId),
+				note,
+			});
+			setPostId('');
+			setNote('');
+			onToast({
+				tone: 'success',
+				message: __('Contributor work created and the contributor notified.', 'gemtranslate'),
+			});
+			onClose();
+		} catch (err) {
+			onToast({ tone: 'error', message: formatErrorMessage(err) });
+		}
+	};
+
+	return (
+		<Modal
+			open={open}
+			onClose={onClose}
+			title={__('Add New Contributor', 'gemtranslate')}
+			size="lg"
+			footer={
+				<>
+					<Button variant="secondary" onClick={onClose}>
+						{__('Cancel', 'gemtranslate')}
+					</Button>
+					<Button onClick={submit} loading={create.isPending}>
+						{__('Assign & notify', 'gemtranslate')}
+					</Button>
+				</>
+			}
+		>
+			<div className="gtrans-grid gtrans-gap-3 md:gtrans-grid-cols-2">
+				<Field label={__('Post type', 'gemtranslate')}>
+					<Select
+						styles={modalSelectStyles}
+						value={postType}
+						onChange={(e) => {
+							setPostType(e.target.value);
+							setPostId('');
+						}}
+					>
+						{types.length === 0 ? (
+							<>
+								<option value="post">{__('Posts', 'gemtranslate')}</option>
+								<option value="page">{__('Pages', 'gemtranslate')}</option>
+							</>
+						) : (
+							types.map((t) => (
+								<option key={t.name} value={t.name}>
+									{t.label}
+								</option>
+							))
+						)}
+					</Select>
+				</Field>
+				<Field label={__('Search content', 'gemtranslate')}>
+					<TextInput
+						value={search}
+						onChange={(e) => setSearch(e.target.value)}
+						placeholder={__('Filter by title…', 'gemtranslate')}
+					/>
+				</Field>
+				<Field label={__('Content', 'gemtranslate')}>
+					<Select styles={modalSelectStyles} value={postId} onChange={(e) => setPostId(e.target.value)}>
+						<option value="">{__('— Pick content —', 'gemtranslate')}</option>
+						{postRows.map((p) => (
+							<option key={p.id} value={p.id}>
+								{truncate(p.title, 70)}
+							</option>
+						))}
+					</Select>
+				</Field>
+				<Field label={__('Language', 'gemtranslate')}>
+					<Select styles={modalSelectStyles} value={lang} onChange={(e) => setLang(e.target.value)}>
+						<option value="">{__('— Pick language —', 'gemtranslate')}</option>
+						{nonDefault.map((l) => (
+							<option key={l.code} value={l.code}>
+								{l.name}
+							</option>
+						))}
+					</Select>
+				</Field>
+				<Field label={__('Contributor', 'gemtranslate')}>
+					<Select
+						styles={modalSelectStyles}
+						value={translatorId}
+						onChange={(e) => setTranslatorId(e.target.value)}
+					>
+						<option value="">{__('— Pick contributor —', 'gemtranslate')}</option>
+						{(translators.data || []).map((t) => (
+							<option key={t.id} value={t.id}>
+								{t.name}
+							</option>
+						))}
+					</Select>
+				</Field>
+				<Field label={__('Note (optional)', 'gemtranslate')}>
+					<TextArea
+						rows={2}
+						value={note}
+						onChange={(e) => setNote(e.target.value)}
+						placeholder={__('Instructions for the contributor…', 'gemtranslate')}
+					/>
+				</Field>
+			</div>
+		</Modal>
+	);
+}

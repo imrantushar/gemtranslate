@@ -1,12 +1,12 @@
 <?php
-namespace Zentranslate\Translation;
+namespace GemTranslate\Translation;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Helper;
-use Zentranslate\Language\Context;
+use GemTranslate\Helper;
+use GemTranslate\Language\Context;
 
 /**
  * Runtime gettext override. Translates __() / _e() / esc_html__() etc.
@@ -27,6 +27,87 @@ class StringTranslator {
 		add_filter( 'gettext', [ $self, 'filter_gettext' ], 10, 3 );
 		add_filter( 'gettext_with_context', [ $self, 'filter_gettext_with_context' ], 10, 4 );
 		add_filter( 'ngettext', [ $self, 'filter_ngettext' ], 10, 5 );
+		add_filter( 'pre_load_script_translations', [ $self, 'filter_script_translations' ], 10, 4 );
+	}
+
+	/**
+	 * Feed saved translations to `wp.i18n` for scripts that call
+	 * wp_set_script_translations() — React/Gutenberg-based admin screens render
+	 * their text in the browser, so the PHP gettext filters above never see it.
+	 *
+	 * Returns WordPress's Jed JSON for the script's text domain, built from our
+	 * table and layered over the plugin's own .json file when it ships one.
+	 *
+	 * @param string|null $translations Jed JSON, or null to let WordPress load it.
+	 * @param string|false $file        Path WordPress would read.
+	 * @param string       $handle      Script handle.
+	 * @param string       $domain      Text domain.
+	 */
+	public function filter_script_translations( $translations, $file, $handle, $domain ) {
+		if ( null !== $translations || Context::is_default() ) {
+			return $translations;
+		}
+		$lang    = Context::current();
+		$entries = self::entries_for_domain( (string) $domain, $lang );
+		if ( ! $entries ) {
+			return $translations;
+		}
+
+		$locale = (string) ( Context::active_languages()[ $lang ]['locale'] ?? $lang );
+		$data   = [
+			'' => [
+				'domain'       => (string) $domain,
+				'lang'         => $locale,
+				'plural-forms' => 'nplurals=2; plural=n != 1;',
+			],
+		];
+
+		// Keep whatever the plugin already ships (e.g. community translations).
+		if ( $file && is_readable( $file ) ) {
+			$existing = json_decode( (string) file_get_contents( $file ), true );
+			$bundle   = $existing['locale_data'][ $domain ] ?? $existing['locale_data']['messages'] ?? null;
+			if ( is_array( $bundle ) ) {
+				$data = array_merge( $bundle, $data );
+				if ( isset( $bundle['']['plural-forms'] ) ) {
+					$data['']['plural-forms'] = $bundle['']['plural-forms'];
+				}
+			}
+		}
+
+		foreach ( $entries as $row ) {
+			// Jed keys a contextual string as "context\u0004source".
+			$key          = '' !== $row['context'] ? $row['context'] . "\x04" . $row['source'] : $row['source'];
+			$data[ $key ] = [ $row['value'] ];
+		}
+
+		return wp_json_encode( [
+			'translation-revision-date' => gmdate( 'Y-m-d H:i:sO' ),
+			'generator'                 => 'gemtranslate',
+			'domain'                    => 'messages',
+			'locale_data'               => [ 'messages' => $data ],
+		] );
+	}
+
+	/**
+	 * Saved translations for one text domain in one language.
+	 *
+	 * @return array<array{source:string,context:string,value:string}>
+	 */
+	private static function entries_for_domain( $domain, $lang ) {
+		global $wpdb;
+		$st  = Helper::table( 'strings' );
+		$stt = Helper::table( 'string_translations' );
+		return $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT s.source, s.context, t.value
+				 FROM $stt AS t
+				 INNER JOIN $st AS s ON s.string_id = t.string_id
+				 WHERE s.domain = %s AND t.language_code = %s AND t.status != 'draft' AND t.value <> ''",
+				$domain,
+				$lang
+			),
+			ARRAY_A
+		) ?: [];
 	}
 
 	public function filter_gettext( $translation, $text, $domain ) {
@@ -137,7 +218,7 @@ class StringTranslator {
 		$data  = [
 			'string_id'     => (int) $string_id,
 			'language_code' => $lang,
-			'value'         => (string) $value,
+			'value'         => Helper::sanitize_markup( $value ),
 			'status'        => (string) $status,
 			'updated_at'    => Helper::get_time(),
 		];

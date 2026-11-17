@@ -1,5 +1,5 @@
 <?php
-namespace Zentranslate\Io;
+namespace GemTranslate\Io;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -30,7 +30,7 @@ class Xliff {
 		$doc->appendChild( $root );
 
 		$file = $doc->createElement( 'file' );
-		$file->setAttribute( 'id', 'zentranslate' );
+		$file->setAttribute( 'id', 'gemtranslate' );
 		$root->appendChild( $file );
 
 		foreach ( $units as $u ) {
@@ -60,11 +60,31 @@ class Xliff {
 	/**
 	 * @return array<array{id:string,source:string,target:string}>
 	 */
+	/** Largest XLIFF document accepted, in bytes. */
+	const MAX_BYTES = 5 * MB_IN_BYTES;
+
 	public static function parse( $xml_string ) {
-		$prev = libxml_use_internal_errors( true );
-		$doc  = new \DOMDocument();
-		$ok   = $doc->loadXML( $xml_string );
-		libxml_use_internal_errors( $prev );
+		$xml_string = (string) $xml_string;
+		if ( '' === $xml_string || strlen( $xml_string ) > self::MAX_BYTES ) {
+			return [];
+		}
+		// XLIFF 2.1 never needs a DTD or entity declarations. Refusing them
+		// closes entity-expansion and external-entity (XXE) attacks regardless
+		// of the libxml version PHP was built against.
+		if ( preg_match( '/<!(DOCTYPE|ENTITY)/i', $xml_string ) ) {
+			return [];
+		}
+		$prev_errors = libxml_use_internal_errors( true );
+		// PHP < 8.0 resolves external entities unless told otherwise.
+		$prev_loader = \PHP_VERSION_ID < 80000 && function_exists( 'libxml_disable_entity_loader' )
+			? libxml_disable_entity_loader( true ) // phpcs:ignore PHPCompatibility.FunctionUse.RemovedFunctions
+			: null;
+		$doc = new \DOMDocument();
+		$ok  = $doc->loadXML( $xml_string, LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING );
+		if ( null !== $prev_loader ) {
+			libxml_disable_entity_loader( $prev_loader ); // phpcs:ignore PHPCompatibility.FunctionUse.RemovedFunctions
+		}
+		libxml_use_internal_errors( $prev_errors );
 		if ( ! $ok ) {
 			return [];
 		}

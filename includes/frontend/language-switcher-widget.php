@@ -1,5 +1,5 @@
 <?php
-namespace Zentranslate\Frontend;
+namespace GemTranslate\Frontend;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -13,9 +13,9 @@ class LanguageSwitcherWidget extends \WP_Widget {
 
 	public function __construct() {
 		parent::__construct(
-			'zentranslate_language_switcher',
-			__( 'Zentranslate language switcher', 'zentranslate' ),
-			[ 'description' => __( 'Switch between all active languages.', 'zentranslate' ) ]
+			'gemtranslate_language_switcher',
+			__( 'GemTranslate language switcher', 'gemtranslate' ),
+			[ 'description' => __( 'Switch between all active languages.', 'gemtranslate' ) ]
 		);
 	}
 
@@ -48,27 +48,27 @@ class LanguageSwitcherWidget extends \WP_Widget {
 		$show_native = ! empty( $instance['show_native'] );
 		?>
 		<p>
-			<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_html_e( 'Title', 'zentranslate' ); ?></label>
+			<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_html_e( 'Title', 'gemtranslate' ); ?></label>
 			<input class="widefat" type="text" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" value="<?php echo esc_attr( $title ); ?>" />
 		</p>
 		<p>
-			<label for="<?php echo esc_attr( $this->get_field_id( 'display' ) ); ?>"><?php esc_html_e( 'Display', 'zentranslate' ); ?></label>
+			<label for="<?php echo esc_attr( $this->get_field_id( 'display' ) ); ?>"><?php esc_html_e( 'Display', 'gemtranslate' ); ?></label>
 			<select class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'display' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'display' ) ); ?>">
-				<option value="inline" <?php selected( $display, 'inline' ); ?>><?php esc_html_e( 'Inline list', 'zentranslate' ); ?></option>
-				<option value="dropdown" <?php selected( $display, 'dropdown' ); ?>><?php esc_html_e( 'Dropdown', 'zentranslate' ); ?></option>
+				<option value="inline" <?php selected( $display, 'inline' ); ?>><?php esc_html_e( 'Inline list', 'gemtranslate' ); ?></option>
+				<option value="dropdown" <?php selected( $display, 'dropdown' ); ?>><?php esc_html_e( 'Dropdown', 'gemtranslate' ); ?></option>
 			</select>
 		</p>
 		<p>
 			<input type="checkbox" id="<?php echo esc_attr( $this->get_field_id( 'show_flag' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'show_flag' ) ); ?>" value="1" <?php checked( $show_flag ); ?> />
-			<label for="<?php echo esc_attr( $this->get_field_id( 'show_flag' ) ); ?>"><?php esc_html_e( 'Show flag', 'zentranslate' ); ?></label>
+			<label for="<?php echo esc_attr( $this->get_field_id( 'show_flag' ) ); ?>"><?php esc_html_e( 'Show flag', 'gemtranslate' ); ?></label>
 		</p>
 		<p>
 			<input type="checkbox" id="<?php echo esc_attr( $this->get_field_id( 'show_name' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'show_name' ) ); ?>" value="1" <?php checked( $show_name ); ?> />
-			<label for="<?php echo esc_attr( $this->get_field_id( 'show_name' ) ); ?>"><?php esc_html_e( 'Show English name', 'zentranslate' ); ?></label>
+			<label for="<?php echo esc_attr( $this->get_field_id( 'show_name' ) ); ?>"><?php esc_html_e( 'Show English name', 'gemtranslate' ); ?></label>
 		</p>
 		<p>
 			<input type="checkbox" id="<?php echo esc_attr( $this->get_field_id( 'show_native' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'show_native' ) ); ?>" value="1" <?php checked( $show_native ); ?> />
-			<label for="<?php echo esc_attr( $this->get_field_id( 'show_native' ) ); ?>"><?php esc_html_e( 'Show native name', 'zentranslate' ); ?></label>
+			<label for="<?php echo esc_attr( $this->get_field_id( 'show_native' ) ); ?>"><?php esc_html_e( 'Show native name', 'gemtranslate' ); ?></label>
 		</p>
 		<?php
 	}

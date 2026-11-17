@@ -1,5 +1,5 @@
 <?php
-namespace Zentranslate\API;
+namespace GemTranslate\API;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -19,12 +19,6 @@ class Settings extends Controller {
 		'onboarding_complete',
 		'auto_redirect_browser_lang',
 		'translate_emails',
-		// Translate Everything (auto-translation).
-		'auto_translate',
-		'auto_translate_strategy',
-		'auto_translate_post_types',
-		'auto_translate_languages',
-		'auto_retranslate_on_update',
 		// Language switcher appearance.
 		'switcher_display',
 		'switcher_show_flag',
@@ -33,6 +27,14 @@ class Settings extends Controller {
 		'switcher_show_code',
 		'switcher_hide_current',
 		'switcher_show_if_single',
+		// Footer switcher.
+		'footer_switcher_enabled',
+		'footer_switcher_display',
+		'footer_switcher_show_flag',
+		'footer_switcher_show_name',
+		'footer_switcher_show_native',
+		'footer_switcher_show_code',
+		'footer_switcher_hide_current',
 		// Floating switcher.
 		'float_switcher_enabled',
 		'float_switcher_position',
@@ -43,6 +45,8 @@ class Settings extends Controller {
 		'geo_country_picker_banner',
 		'geo_cookie_ttl_days',
 		'geo_auto_redirect_country',
+		'geo_trusted_proxies',
+		'geo_trust_proxy_headers',
 	];
 
 	public static function init() {
@@ -92,14 +96,14 @@ class Settings extends Controller {
 		if ( is_user_logged_in() ) {
 			return true;
 		}
-		return new \WP_Error( 'ztrans_unauth', __( 'Login required.', 'zentranslate' ), [ 'status' => 401 ] );
+		return new \WP_Error( 'gtrans_unauth', __( 'Login required.', 'gemtranslate' ), [ 'status' => 401 ] );
 	}
 
 	public function show_my_language() {
 		$user_id = get_current_user_id();
 		return $this->ok(
 			[
-				'language' => (string) get_user_meta( $user_id, \Zentranslate\Admin\ProfileField::META_KEY, true ),
+				'language' => (string) get_user_meta( $user_id, \GemTranslate\Admin\ProfileField::META_KEY, true ),
 			]
 		);
 	}
@@ -110,12 +114,12 @@ class Settings extends Controller {
 		$lang    = isset( $body['language'] ) ? sanitize_key( $body['language'] ) : '';
 
 		if ( '' === $lang ) {
-			delete_user_meta( $user_id, \Zentranslate\Admin\ProfileField::META_KEY );
+			delete_user_meta( $user_id, \GemTranslate\Admin\ProfileField::META_KEY );
 			delete_user_meta( $user_id, 'locale' );
-		} elseif ( \Zentranslate\Language\Context::is_active( $lang ) ) {
-			update_user_meta( $user_id, \Zentranslate\Admin\ProfileField::META_KEY, $lang );
+		} elseif ( \GemTranslate\Language\Context::is_active( $lang ) ) {
+			update_user_meta( $user_id, \GemTranslate\Admin\ProfileField::META_KEY, $lang );
 			// Sync to WP's native user locale so determine_locale() at boot uses it.
-			$languages = \Zentranslate\Language\Context::active_languages();
+			$languages = \GemTranslate\Language\Context::active_languages();
 			$locale    = $languages[ $lang ]['locale'] ?? '';
 			if ( $locale ) {
 				$site_locale = get_option( 'WPLANG', '' ) ?: 'en_US';
@@ -126,7 +130,7 @@ class Settings extends Controller {
 				}
 			}
 		} else {
-			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_invalid_lang', __( 'Language is not active.', 'gemtranslate' ), 422 );
 		}
 
 		return $this->show_my_language();
@@ -144,9 +148,9 @@ class Settings extends Controller {
 				$merged[ $key ] = $body[ $key ];
 			}
 		}
-		update_option( ZTRANS_SETTINGS_NAME, wp_json_encode( $merged ) );
+		update_option( GTRANS_SETTINGS_NAME, wp_json_encode( $merged ) );
 		// Refresh global settings cache for the rest of this request.
-		$GLOBALS['ztrans_settings'] = (object) $merged;
+		$GLOBALS['gtrans_settings'] = (object) $merged;
 		return $this->ok( $merged );
 	}
 
@@ -161,12 +165,6 @@ class Settings extends Controller {
 			'onboarding_complete'      => false,
 			'auto_redirect_browser_lang' => false,
 			'translate_emails'          => false,
-			// Translate Everything (auto-translation).
-			'auto_translate'             => false,
-			'auto_translate_strategy'    => 'review',
-			'auto_translate_post_types'  => [ 'post', 'page' ],
-			'auto_translate_languages'   => [],
-			'auto_retranslate_on_update' => false,
 			// Language switcher appearance.
 			'switcher_display'          => 'inline',
 			'switcher_show_flag'        => true,
@@ -175,6 +173,14 @@ class Settings extends Controller {
 			'switcher_show_code'        => false,
 			'switcher_hide_current'     => false,
 			'switcher_show_if_single'   => false,
+			// Footer switcher.
+			'footer_switcher_enabled'      => false,
+			'footer_switcher_display'      => 'inline',
+			'footer_switcher_show_flag'    => true,
+			'footer_switcher_show_name'    => true,
+			'footer_switcher_show_native'  => false,
+			'footer_switcher_show_code'    => false,
+			'footer_switcher_hide_current' => false,
 			// Floating switcher.
 			'float_switcher_enabled'    => false,
 			'float_switcher_position'   => 'bottom-right',
@@ -185,8 +191,10 @@ class Settings extends Controller {
 			'geo_country_picker_banner' => false,
 			'geo_cookie_ttl_days'       => 90,
 			'geo_auto_redirect_country' => false,
+			'geo_trusted_proxies'       => '',
+			'geo_trust_proxy_headers'   => false,
 		];
-		$saved = json_decode( get_option( ZTRANS_SETTINGS_NAME, '{}' ), true );
+		$saved = json_decode( get_option( GTRANS_SETTINGS_NAME, '{}' ), true );
 		if ( ! is_array( $saved ) ) {
 			$saved = [];
 		}

@@ -1,5 +1,5 @@
 <?php
-namespace Zentranslate;
+namespace GemTranslate;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -16,8 +16,8 @@ class Database {
 	}
 
 	public function maybe_flush_rewrite_rules() {
-		if ( 'yes' === get_option( 'ztrans_required_rewrite_flush' ) ) {
-			update_option( 'ztrans_required_rewrite_flush', 'no' );
+		if ( 'yes' === get_option( 'gtrans_required_rewrite_flush' ) ) {
+			update_option( 'gtrans_required_rewrite_flush', 'no' );
 			flush_rewrite_rules();
 		}
 	}

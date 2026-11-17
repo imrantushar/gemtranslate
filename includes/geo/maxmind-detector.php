@@ -1,5 +1,5 @@
 <?php
-namespace Zentranslate\Geo;
+namespace GemTranslate\Geo;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -51,22 +51,7 @@ class MaxmindDetector implements Detector {
 	}
 
 	private function visitor_ip() {
-		$candidates = [
-			$_SERVER['HTTP_CF_CONNECTING_IP'] ?? '',
-			$_SERVER['HTTP_X_FORWARDED_FOR']  ?? '',
-			$_SERVER['HTTP_X_REAL_IP']        ?? '',
-			$_SERVER['REMOTE_ADDR']           ?? '',
-		];
-		foreach ( $candidates as $value ) {
-			if ( '' === $value ) {
-				continue;
-			}
-			// XFF can be a comma-separated chain; first entry is the client.
-			$first = trim( explode( ',', (string) $value )[0] );
-			if ( filter_var( $first, FILTER_VALIDATE_IP ) ) {
-				return $first;
-			}
-		}
-		return '';
+		// Forwarded headers are only believed from a trusted proxy.
+		return TrustedProxy::client_ip();
 	}
 }

@@ -1,12 +1,12 @@
 <?php
-namespace Zentranslate\Translation;
+namespace GemTranslate\Translation;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Helper;
-use Zentranslate\Language\Context;
+use GemTranslate\Helper;
+use GemTranslate\Language\Context;
 
 /**
  * Translates taxonomy term names, descriptions, and slugs for the current
@@ -129,7 +129,7 @@ class TermTranslator {
 		global $wpdb;
 		$table = Helper::table( 'term_translations' );
 
-		$group_id = (int) get_term_meta( $term_id, '_ztrans_group_id', true );
+		$group_id = (int) get_term_meta( $term_id, '_gtrans_group_id', true );
 		if ( ! $group_id ) {
 			$wpdb->insert(
 				Helper::table( 'translation_groups' ),
@@ -140,7 +140,7 @@ class TermTranslator {
 				]
 			);
 			$group_id = (int) $wpdb->insert_id;
-			update_term_meta( $term_id, '_ztrans_group_id', $group_id );
+			update_term_meta( $term_id, '_gtrans_group_id', $group_id );
 		}
 
 		$data = [
@@ -148,8 +148,8 @@ class TermTranslator {
 			'language_code' => $lang,
 			'term_id'       => $term_id,
 			'taxonomy'      => $term->taxonomy,
-			'name'          => (string) ( $fields['name'] ?? '' ),
-			'description'   => (string) ( $fields['description'] ?? '' ),
+			'name'          => Helper::sanitize_markup( $fields['name'] ?? '' ),
+			'description'   => Helper::sanitize_markup( $fields['description'] ?? '' ),
 			'slug'          => sanitize_title( $fields['slug'] ?? '' ),
 			'updated_at'    => Helper::get_time(),
 		];

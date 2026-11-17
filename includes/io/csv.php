@@ -1,5 +1,5 @@
 <?php
-namespace Zentranslate\Io;
+namespace GemTranslate\Io;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -20,10 +20,10 @@ class Csv {
 		fputcsv( $buf, [ 'id', 'source', 'target', 'note' ] );
 		foreach ( $rows as $r ) {
 			fputcsv( $buf, [
-				(string) ( $r['id']     ?? '' ),
-				(string) ( $r['source'] ?? '' ),
-				(string) ( $r['target'] ?? '' ),
-				(string) ( $r['note']   ?? '' ),
+				self::neutralise( (string) ( $r['id']     ?? '' ) ),
+				self::neutralise( (string) ( $r['source'] ?? '' ) ),
+				self::neutralise( (string) ( $r['target'] ?? '' ) ),
+				self::neutralise( (string) ( $r['note']   ?? '' ) ),
 			] );
 		}
 		rewind( $buf );
@@ -48,9 +48,9 @@ class Csv {
 		$map = array_flip( array_map( 'strtolower', $header ) );
 		$out = [];
 		while ( ( $row = fgetcsv( $buf ) ) !== false ) {
-			$id     = $row[ $map['id']     ?? 0 ] ?? '';
-			$source = $row[ $map['source'] ?? 1 ] ?? '';
-			$target = $row[ $map['target'] ?? 2 ] ?? '';
+			$id     = self::restore( $row[ $map['id']     ?? 0 ] ?? '' );
+			$source = self::restore( $row[ $map['source'] ?? 1 ] ?? '' );
+			$target = self::restore( $row[ $map['target'] ?? 2 ] ?? '' );
 			if ( '' === $id ) {
 				continue;
 			}
@@ -58,5 +58,28 @@ class Csv {
 		}
 		fclose( $buf );
 		return $out;
+	}
+
+	/**
+	 * Spreadsheet apps run a cell as a formula when it starts with = + - @ or a
+	 * tab/CR. Translated text is attacker-influenced, so export such cells with
+	 * a leading apostrophe, which spreadsheets treat as "text, not a formula".
+	 */
+	private static function neutralise( $value ) {
+		if ( '' !== $value && false !== strpos( "=+-@\t\r", $value[0] ) ) {
+			return "'" . $value;
+		}
+		return $value;
+	}
+
+	/**
+	 * Undo neutralise() on import so an export/import round trip is lossless.
+	 */
+	private static function restore( $value ) {
+		$value = (string) $value;
+		if ( strlen( $value ) > 1 && "'" === $value[0] && false !== strpos( "=+-@\t\r", $value[1] ) ) {
+			return substr( $value, 1 );
+		}
+		return $value;
 	}
 }

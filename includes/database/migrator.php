@@ -1,5 +1,5 @@
 <?php
-namespace Zentranslate\Database;
+namespace GemTranslate\Database;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -17,7 +17,7 @@ class Migrator {
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
 		global $wpdb;
-		$prefix          = $wpdb->prefix . ZTRANS_DB_PREFIX;
+		$prefix          = $wpdb->prefix . GTRANS_DB_PREFIX;
 		$charset_collate = $wpdb->get_charset_collate();
 
 		// dbDelta can add columns and indexes but cannot drop or replace a
@@ -28,9 +28,8 @@ class Migrator {
 		self::ensure_country_code_column( $prefix );
 		self::ensure_post_translations_pk( $prefix );
 
-		// Free-tier tables. Pro tables (jobs, translation_memory, glossary,
-		// seo_meta, post_meta_translations, post_translation_revisions) are
-		// created by zentranslate-pro's own migrator.
+		// Free-tier tables. Pro tables (seo_meta, post_meta_translations, post_translation_revisions) are
+		// created by gemtranslate-pro's own migrator.
 		CreateLanguagesTable::up( $prefix, $charset_collate );
 		CreateTranslationGroupsTable::up( $prefix, $charset_collate );
 		CreatePostTranslationsTable::up( $prefix, $charset_collate );
@@ -40,7 +39,7 @@ class Migrator {
 		CreateStringTranslationsTable::up( $prefix, $charset_collate );
 		CreateSlugsTable::up( $prefix, $charset_collate );
 
-		update_option( 'ztrans_db_version', ZTRANS_DB_VERSION );
+		update_option( 'gtrans_db_version', GTRANS_DB_VERSION );
 	}
 
 	private static function ensure_country_code_column( $prefix ) {
@@ -69,8 +68,8 @@ class Migrator {
 	 * Run schema upgrades on `init` if the stored db version is behind.
 	 */
 	public static function maybe_upgrade() {
-		$current = get_option( 'ztrans_db_version' );
-		if ( $current === ZTRANS_DB_VERSION ) {
+		$current = get_option( 'gtrans_db_version' );
+		if ( $current === GTRANS_DB_VERSION ) {
 			return;
 		}
 		self::install();
@@ -84,6 +83,11 @@ class Migrator {
 		global $wpdb;
 		$table = $prefix . 'post_translations';
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$exists = (bool) $wpdb->get_var( "SHOW TABLES LIKE '$table'" );
+		if ( ! $exists ) {
+			return; // Fresh install: dbDelta will create the table with the right PK.
+		}
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$rows = $wpdb->get_results( "SHOW KEYS FROM `$table` WHERE Key_name = 'PRIMARY'", ARRAY_A );
 		if ( ! is_array( $rows ) || empty( $rows ) ) {

@@ -1,5 +1,5 @@
 <?php
-namespace Zentranslate;
+namespace GemTranslate;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -18,10 +18,10 @@ class Installer {
 
 	/**
 	 * Grant translator capability to admin and editor roles, and create a
-	 * dedicated `ztrans_translator` role. Idempotent.
+	 * dedicated `gtrans_translator` role. Idempotent.
 	 */
 	public function add_capabilities() {
-		$cap = 'ztrans_translate_content';
+		$cap = 'gtrans_translate_content';
 		foreach ( [ 'administrator', 'editor' ] as $role_name ) {
 			$role = get_role( $role_name );
 			if ( $role && ! $role->has_cap( $cap ) ) {
@@ -29,13 +29,13 @@ class Installer {
 			}
 		}
 		// Dedicated translator role.
-		if ( ! get_role( 'ztrans_translator' ) ) {
+		if ( ! get_role( 'gtrans_translator' ) ) {
 			add_role(
-				'ztrans_translator',
-				__( 'Translator', 'zentranslate' ),
+				'gtrans_translator',
+				__( 'Translator', 'gemtranslate' ),
 				[
 					'read'                     => true,
-					'ztrans_translate_content' => true,
+					'gtrans_translate_content' => true,
 				]
 			);
 		}
@@ -73,14 +73,14 @@ class Installer {
 	}
 
 	public function save_option() {
-		if ( ! get_option( 'ztrans_version' ) ) {
-			add_option( 'ztrans_version', ZTRANS_VERSION );
+		if ( ! get_option( 'gtrans_version' ) ) {
+			add_option( 'gtrans_version', GTRANS_VERSION );
 		}
-		if ( ! get_option( 'ztrans_db_version' ) ) {
-			add_option( 'ztrans_db_version', ZTRANS_DB_VERSION );
+		if ( ! get_option( 'gtrans_db_version' ) ) {
+			add_option( 'gtrans_db_version', GTRANS_DB_VERSION );
 		}
-		if ( ! get_option( 'ztrans_first_install_time' ) ) {
-			add_option( 'ztrans_first_install_time', Helper::get_time() );
+		if ( ! get_option( 'gtrans_first_install_time' ) ) {
+			add_option( 'gtrans_first_install_time', Helper::get_time() );
 		}
 	}
 

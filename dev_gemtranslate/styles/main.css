@@ -1,0 +1,333 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import './tokens.css';
+
+/* Full-bleed shell: strip wp-admin's content gutters and footer on our page. */
+body.toplevel_page_gemtranslate #wpcontent {
+	padding-left: 0;
+}
+body.toplevel_page_gemtranslate #wpbody-content {
+	padding-bottom: 0;
+}
+body.toplevel_page_gemtranslate #wpfooter {
+	display: none;
+}
+
+#gemtranslate-admin-root {
+	--gtrans-topbar-h: 72px;
+	margin: 0;
+	/* GemCRM body default: 14px / 20px (wp-admin's 13px is too small). */
+	font-size: 14px;
+	line-height: 20px;
+	font-family: var(--gtrans-font);
+	color: var(--gtrans-font-color);
+	background: var(--gtrans-body-background);
+	min-height: calc(100vh - 32px);
+}
+
+/* Heading / title scale — mirrors .gemcrm-heading / .gemcrm-title / .gemcrm-sub-title */
+#gemtranslate-admin-root .gtrans-heading {
+	font-size: 18px;
+	font-weight: 500;
+	line-height: 24px;
+	margin: 0 0 24px 0;
+	color: var(--gtrans-font-color);
+}
+#gemtranslate-admin-root .gtrans-section-title {
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 20px;
+	margin: 0;
+	color: var(--gtrans-font-color);
+}
+#gemtranslate-admin-root .gtrans-subtitle {
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 18px;
+	margin: 0;
+	color: var(--gtrans-warn-muted);
+}
+
+/* Topbar stays pinned under the wp-admin bar while the page scrolls. */
+#gemtranslate-admin-root .gtrans-topbar {
+	position: sticky;
+	top: var(--wp-admin--admin-bar--height, 32px);
+	z-index: 100;
+}
+
+#gemtranslate-admin-root .gtrans-app {
+	@apply gtrans-flex gtrans-flex-col gtrans-min-h-[calc(100vh-32px)];
+}
+
+/* Preflight is off, so `border` utilities only set a width and the browser's
+   default `border-style: none` swallows them — card outlines, table row lines,
+   the topbar divider and the button spinner were all invisible. Restore
+   Tailwind's base (zero width, solid style, themed colour). `:where` keeps this at the
+   lowest specificity so utilities and WP/form styles still win. */
+#gemtranslate-admin-root :where(*, *::before, *::after),
+.gtrans-select__menu :where(*, *::before, *::after) {
+	border-width: 0;
+	border-style: solid;
+	border-color: var(--gtrans-border-color);
+}
+
+/* Tailwind preflight is off, so buttons keep the browser's default `outset`
+   border — which, once a utility sets a 1px width, renders as a 3D bevel.
+   Reset them to flat; utilities (higher specificity) re-add borders. */
+#gemtranslate-admin-root :where(button, [role="button"]) {
+	box-sizing: border-box;
+	border: 0 solid var(--gtrans-border-color);
+	background-color: transparent;
+	color: inherit;
+	box-shadow: none;
+	text-shadow: none;
+}
+
+#gemtranslate-admin-root button:not(.gtrans-bare),
+#gemtranslate-admin-root .gtrans-btn {
+	font: inherit;
+}
+
+#gemtranslate-admin-root input,
+#gemtranslate-admin-root textarea,
+#gemtranslate-admin-root select {
+	@apply gtrans-rounded gtrans-border gtrans-border-line gtrans-bg-surface gtrans-px-3 gtrans-py-2 gtrans-text-sm gtrans-text-ink hover:gtrans-border-primary focus:gtrans-border-primary focus:gtrans-ring-0 focus:gtrans-outline-none;
+}
+
+#gemtranslate-admin-root code {
+	@apply gtrans-rounded gtrans-bg-gray-100 gtrans-px-1.5 gtrans-py-0.5 gtrans-text-xs gtrans-text-gray-700;
+}
+
+/* Nav active state — override WP admin's global <a> colour/decoration rules. */
+#gemtranslate-admin-root nav a[aria-current="page"],
+#gemtranslate-admin-root nav a[aria-current="page"]:hover,
+#gemtranslate-admin-root nav a[aria-current="page"]:focus,
+#gemtranslate-admin-root nav a[aria-current="page"]:visited {
+	background-color: var(--gtrans-nav-active-bg) !important;
+	color: var(--gtrans-primary-color) !important;
+	text-decoration: none !important;
+}
+
+/* Keep inactive nav links from inheriting WP admin link colours. */
+#gemtranslate-admin-root nav a:not([aria-current="page"]),
+#gemtranslate-admin-root nav a:not([aria-current="page"]):visited {
+	color: var(--gtrans-label-color) !important;
+	text-decoration: none !important;
+}
+
+/* wp-admin paints a blue box-shadow ring on every focused link/button/input.
+   Drop it — the app has its own hover/active states — and keep a plain
+   outline for keyboard users only. */
+#gemtranslate-admin-root :is(a, button, input, select, textarea, [role="button"]):focus {
+	box-shadow: none !important;
+	outline: none !important;
+}
+#gemtranslate-admin-root :is(a, button, [role="button"]):not(nav a):focus-visible {
+	outline: 2px solid var(--gtrans-primary-color) !important;
+	outline-offset: -2px;
+}
+#gemtranslate-admin-root :is(input, textarea):focus {
+	border-color: var(--gtrans-primary-color);
+}
+/* Sidebar links never draw a focus box; the active/hover background is the cue. */
+#gemtranslate-admin-root nav a:focus,
+#gemtranslate-admin-root nav a:focus-visible {
+	outline: none !important;
+	box-shadow: none !important;
+}
+/* react-select's inner search input must not draw its own box. */
+#gemtranslate-admin-root .gtrans-select__input {
+	min-height: 0 !important;
+	height: auto !important;
+	line-height: inherit !important;
+	border: 0 !important;
+	background: transparent !important;
+	box-shadow: none !important;
+	padding: 0 !important;
+}
+
+/* Flat, themed checkboxes (wp-admin's default is a white bevelled box). */
+#gemtranslate-admin-root input[type="checkbox"]:not([role="switch"]) {
+	-webkit-appearance: none;
+	appearance: none;
+	position: relative;
+	box-sizing: border-box;
+	flex-shrink: 0;
+	float: none;
+	width: 16px;
+	height: 16px;
+	min-width: 16px;
+	margin: 0;
+	padding: 0;
+	vertical-align: middle;
+	cursor: pointer;
+	border: 1px solid var(--gtrans-border-color);
+	border-radius: 4px;
+	background: var(--gtrans-background);
+	box-shadow: none;
+}
+#gemtranslate-admin-root input[type="checkbox"]:not([role="switch"]):checked {
+	border-color: var(--gtrans-primary-color);
+	background: var(--gtrans-primary-color);
+}
+#gemtranslate-admin-root input[type="checkbox"]:not([role="switch"]):checked::before {
+	content: "";
+	position: absolute;
+	left: 4px;
+	top: 1px;
+	width: 4px;
+	height: 8px;
+	margin: 0;
+	border: solid #fff;
+	border-width: 0 2px 2px 0;
+	background: none;
+	transform: rotate(45deg);
+}
+
+/* Selects never collapse to their placeholder width inside shrink-wrapped flex rows. */
+.gtrans-select {
+	width: 100%;
+	min-width: 180px;
+}
+
+/* react-select (classNamePrefix="gtrans-select"). Menu is portaled to
+   <body> (outside #gemtranslate-admin-root), so these rules are global. */
+.gtrans-select__control,
+.gtrans-select__menu {
+	font-size: 14px;
+	line-height: 20px;
+}
+.gtrans-select__control {
+	background-color: var(--gtrans-background) !important;
+	/* react-select's own 1px border loses to the border-width reset above. */
+	border-width: 1px !important;
+	border-style: solid !important;
+	border-color: var(--gtrans-border-color) !important;
+	min-height: 40px !important;
+	border-radius: 4px;
+	box-shadow: none !important;
+}
+.gtrans-select__control--is-focused,
+.gtrans-select__control:hover {
+	border-color: var(--gtrans-primary-color) !important;
+}
+.gtrans-select__single-value,
+.gtrans-select__input-container,
+.gtrans-select__input {
+	color: var(--gtrans-font-color) !important;
+}
+.gtrans-select__placeholder {
+	color: var(--gtrans-placeholder) !important;
+}
+.gtrans-select__menu {
+	background-color: var(--gtrans-background) !important;
+	color: var(--gtrans-font-color) !important;
+	border: 1px solid var(--gtrans-border-color);
+	z-index: 9999;
+}
+.gtrans-select__option {
+	background-color: transparent !important;
+	color: var(--gtrans-font-color) !important;
+	cursor: pointer;
+}
+.gtrans-select__option--is-focused {
+	background-color: var(--gtrans-secondary-color) !important;
+}
+.gtrans-select__option--is-selected {
+	background-color: var(--gtrans-primary-color) !important;
+	color: #fff !important;
+}
+.gtrans-select__multi-value {
+	background-color: var(--gtrans-secondary-color) !important;
+}
+.gtrans-select__multi-value__label {
+	color: var(--gtrans-font-color) !important;
+}
+.gtrans-select__indicator-separator {
+	background-color: var(--gtrans-border-color) !important;
+}
+.gtrans-select__indicator {
+	color: var(--gtrans-placeholder) !important;
+}
+
+/* Native file picker button follows the theme. */
+#gemtranslate-admin-root input[type="file"]::file-selector-button {
+	margin-right: 10px;
+	padding: 4px 12px;
+	cursor: pointer;
+	color: var(--gtrans-font-color);
+	background: var(--gtrans-body-background);
+	border: 1px solid var(--gtrans-border-color);
+	border-radius: 4px;
+}
+
+/* Disabled control + hovered indicator keep the themed palette. */
+.gtrans-select__control--is-disabled {
+	opacity: 0.6;
+}
+.gtrans-select__indicator:hover {
+	color: var(--gtrans-font-color) !important;
+}
+
+/* ---- Advanced editor: token-aware contentEditable field ---- */
+/* Preflight is off, so a w-full field with padding + border would otherwise be
+   content-box and spill past its column by the padding width. */
+#gemtranslate-admin-root .gtrans-tokenfield {
+	box-sizing: border-box;
+}
+#gemtranslate-admin-root .gtrans-tokenfield:empty::before {
+	content: attr(data-placeholder);
+	color: var(--gtrans-placeholder);
+	pointer-events: none;
+}
+#gemtranslate-admin-root .gtrans-tokenfield:focus {
+	box-shadow: 0 0 0 1px var(--gtrans-primary-color);
+}
+#gemtranslate-admin-root .gtrans-tok {
+	line-height: 1.4;
+	cursor: default;
+}
+
+/* A page's title, filters and column headings stay put while a long list scrolls
+   underneath. The negative margins cover main's 24px padding so rows never show
+   above or beside the pinned block. */
+#gemtranslate-admin-root .gtrans-sticky-head {
+	position: sticky;
+	top: calc(var(--wp-admin--admin-bar--height, 32px) + var(--gtrans-topbar-h));
+	z-index: 20;
+	margin: -24px -24px 0;
+	padding: 24px 24px 0;
+	background: var(--gtrans-body-background);
+}
+#gemtranslate-admin-root .gtrans-sticky-head--gap {
+	padding-bottom: 12px;
+}
+
+/* Setup welcome marquee: two rows of capability cards drifting in opposite
+   directions. Keyframes + mask-image can't be expressed as utilities. */
+#gemtranslate-admin-root .gtrans-marquee-row {
+	overflow: hidden;
+	-webkit-mask-image: linear-gradient(to right, transparent 0, #000 64px, #000 calc(100% - 64px), transparent 100%);
+	mask-image: linear-gradient(to right, transparent 0, #000 64px, #000 calc(100% - 64px), transparent 100%);
+}
+#gemtranslate-admin-root .gtrans-marquee-track {
+	display: flex;
+	width: max-content;
+	gap: 12px;
+	animation: gtrans-marquee 36s linear infinite;
+}
+#gemtranslate-admin-root .gtrans-marquee-row--reverse .gtrans-marquee-track {
+	animation-direction: reverse;
+}
+#gemtranslate-admin-root .gtrans-marquee-row:hover .gtrans-marquee-track {
+	animation-play-state: paused;
+}
+@keyframes gtrans-marquee {
+	from { transform: translateX(0); }
+	to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+	#gemtranslate-admin-root .gtrans-marquee-track { animation: none; }
+}

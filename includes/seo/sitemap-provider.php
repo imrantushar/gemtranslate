@@ -1,12 +1,12 @@
 <?php
-namespace Zentranslate\SEO;
+namespace GemTranslate\SEO;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Language\Context;
-use Zentranslate\Routing\UrlRewriter;
+use GemTranslate\Language\Context;
+use GemTranslate\Routing\UrlRewriter;
 
 /**
  * Adds language-suffixed URLs to WordPress's core XML sitemap.
@@ -52,7 +52,7 @@ class SitemapProvider {
 				'href'     => $rewriter->prepend_language( $original_url, $code === $default ? '' : $code ),
 			];
 		}
-		$entry['ztrans_alternates'] = $alternates;
+		$entry['gtrans_alternates'] = $alternates;
 		return $entry;
 	}
 }

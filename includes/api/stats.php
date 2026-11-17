@@ -1,13 +1,12 @@
 <?php
-namespace Zentranslate\API;
+namespace GemTranslate\API;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\AI\TranslationMemory;
-use Zentranslate\Helper;
-use Zentranslate\Language\Context;
+use GemTranslate\Helper;
+use GemTranslate\Language\Context;
 
 class Stats extends Controller {
 
@@ -63,7 +62,6 @@ class Stats extends Controller {
 				'term_translations' => $term_translations,
 				'strings_total'     => $strings_total,
 				'strings_translated' => $strings_translated,
-				'tm'                => class_exists( TranslationMemory::class ) ? TranslationMemory::stats() : [ 'entries' => 0, 'hits' => 0 ],
 				'per_language'      => $per_lang,
 			]
 		);

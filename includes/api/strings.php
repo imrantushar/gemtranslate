@@ -1,17 +1,17 @@
 <?php
-namespace Zentranslate\API;
+namespace GemTranslate\API;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\AI\TranslationMemory;
-use Zentranslate\AI\TranslatorFactory;
-use Zentranslate\I18n\PackGenerator;
-use Zentranslate\I18n\WporgImporter;
-use Zentranslate\Language\Context;
-use Zentranslate\StringScanner\FileWalker;
-use Zentranslate\Translation\StringTranslator;
+use GemTranslate\Io\AiImporter;
+use GemTranslate\I18n\PackGenerator;
+use GemTranslate\I18n\WporgImporter;
+use GemTranslate\Language\Context;
+use GemTranslate\StringScanner\Auditor;
+use GemTranslate\StringScanner\FileWalker;
+use GemTranslate\Translation\StringTranslator;
 
 class Strings extends Controller {
 
@@ -94,6 +94,13 @@ class Strings extends Controller {
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'list_packages' ],
 				'permission_callback' => [ $this, 'permissions_translate' ],
+				'args'                => [
+					'page'     => [ 'type' => 'integer', 'default' => 1 ],
+					'per_page' => [ 'type' => 'integer', 'default' => 20 ],
+					'search'   => [ 'type' => 'string', 'default' => '' ],
+					'type'     => [ 'type' => 'string', 'default' => '' ],
+					'slug'     => [ 'type' => 'string', 'default' => '' ],
+				],
 			]
 		);
 
@@ -109,11 +116,28 @@ class Strings extends Controller {
 
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/packages/(?P<slug>[A-Za-z0-9_\-]+)/(?P<lang>[a-z0-9\-]{2,10})/translate-all',
+			'/' . $this->rest_base . '/packages/(?P<slug>[A-Za-z0-9_\-]+)/(?P<lang>[a-z0-9\-]{2,10})/csv-import',
 			[
 				'methods'             => \WP_REST_Server::CREATABLE,
-				'callback'            => [ $this, 'translate_all_in_package' ],
+				'callback'            => [ $this, 'csv_import' ],
 				'permission_callback' => [ $this, 'permissions_translate' ],
+			]
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/packages/(?P<slug>[A-Za-z0-9_\-]+)/audit',
+			[
+				[
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'get_audit' ],
+					'permission_callback' => [ $this, 'permissions_check' ],
+				],
+				[
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => [ $this, 'run_audit' ],
+					'permission_callback' => [ $this, 'permissions_check' ],
+				],
 			]
 		);
 
@@ -123,16 +147,6 @@ class Strings extends Controller {
 			[
 				'methods'             => \WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'export_package' ],
-				'permission_callback' => [ $this, 'permissions_translate' ],
-			]
-		);
-
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/packages/(?P<slug>[A-Za-z0-9_\-]+)/(?P<lang>[a-z0-9\-]{2,10})/memory-suggestions',
-			[
-				'methods'             => \WP_REST_Server::CREATABLE,
-				'callback'            => [ $this, 'memory_suggestions' ],
 				'permission_callback' => [ $this, 'permissions_translate' ],
 			]
 		);
@@ -166,14 +180,14 @@ class Strings extends Controller {
 		$id   = (int) $request['id'];
 		$lang = strtolower( $request['lang'] );
 		if ( ! Context::is_active( $lang ) ) {
-			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_invalid_lang', __( 'Language is not active.', 'gemtranslate' ), 422 );
 		}
 		$body   = $request->get_json_params() ?: $request->get_params();
 		$value  = (string) ( $body['value'] ?? '' );
 		$status = (string) ( $body['status'] ?? 'translated' );
 		$ok     = StringTranslator::save_translation( $id, $lang, $value, $status );
 		if ( ! $ok ) {
-			return $this->fail( 'ztrans_save_failed', __( 'Could not save translation.', 'zentranslate' ), 500 );
+			return $this->fail( 'gtrans_save_failed', __( 'Could not save translation.', 'gemtranslate' ), 500 );
 		}
 		return $this->ok( [ 'saved' => true, 'string_id' => $id, 'language_code' => $lang ] );
 	}
@@ -186,6 +200,11 @@ class Strings extends Controller {
 			$lang = strtolower( (string) ( $row['language_code'] ?? '' ) );
 			$id   = (int) ( $row['string_id'] ?? 0 );
 			if ( ! $id || ! Context::is_active( $lang ) ) {
+				continue;
+			}
+			// The route has no `:lang` segment, so permissions_translate() could
+			// not scope-check it. Check every row against the user's assignment.
+			if ( ! \GemTranslate\Admin\LanguageScope::can_translate( $lang ) ) {
 				continue;
 			}
 			if ( StringTranslator::save_translation( $id, $lang, (string) ( $row['value'] ?? '' ), (string) ( $row['status'] ?? 'translated' ) ) ) {
@@ -207,13 +226,19 @@ class Strings extends Controller {
 				$dir = WP_PLUGIN_DIR;
 				break;
 			case 'custom':
-				$dir = wp_normalize_path( $path );
-				if ( ! $dir || ! is_dir( $dir ) ) {
-					return $this->fail( 'ztrans_bad_path', __( 'Directory does not exist.', 'zentranslate' ), 422 );
+				// An arbitrary server path is an admin-only, wp-content-only tool.
+				if ( ! current_user_can( 'manage_options' ) ) {
+					return $this->fail( 'gtrans_forbidden', __( 'You do not have permission to scan custom paths.', 'gemtranslate' ), 403 );
 				}
+				$real = $path ? realpath( $path ) : false;
+				$root = realpath( WP_CONTENT_DIR );
+				if ( ! $real || ! $root || ! is_dir( $real ) || 0 !== strpos( wp_normalize_path( $real ) . '/', wp_normalize_path( $root ) . '/' ) ) {
+					return $this->fail( 'gtrans_bad_path', __( 'Directory does not exist or is outside wp-content.', 'gemtranslate' ), 422 );
+				}
+				$dir = wp_normalize_path( $real );
 				break;
 			default:
-				return $this->fail( 'ztrans_bad_target', __( 'Unknown scan target.', 'zentranslate' ), 422 );
+				return $this->fail( 'gtrans_bad_target', __( 'Unknown scan target.', 'gemtranslate' ), 422 );
 		}
 
 		$result = FileWalker::scan_directory( $dir );
@@ -238,15 +263,10 @@ class Strings extends Controller {
 			}
 		}
 
-		$packages = [];
-		foreach ( $this->collect_plugins() as $pkg ) {
-			$pkg['per_lang'] = StringTranslator::translation_progress( $pkg['text_domain'], $lang_codes );
-			$packages[]     = $pkg;
-		}
-		foreach ( $this->collect_themes() as $pkg ) {
-			$pkg['per_lang'] = StringTranslator::translation_progress( $pkg['text_domain'], $lang_codes );
-			$packages[]     = $pkg;
-		}
+		$summaries = get_option( self::AUDIT_SUMMARIES_OPTION, [] );
+		$summaries = is_array( $summaries ) ? $summaries : [];
+
+		$packages = array_merge( $this->collect_plugins(), $this->collect_themes() );
 
 		usort( $packages, function ( $a, $b ) {
 			// Group: themes after plugins; alphabetical within each.
@@ -257,7 +277,53 @@ class Strings extends Controller {
 			return strcasecmp( $a['name'], $b['name'] );
 		} );
 
-		return $this->ok( $packages, [ 'languages' => $lang_codes ] );
+		$counts = [ 'all' => count( $packages ), 'plugin' => 0, 'theme' => 0 ];
+		foreach ( $packages as $pkg ) {
+			$counts[ $pkg['type'] ] = ( $counts[ $pkg['type'] ] ?? 0 ) + 1;
+		}
+
+		$type     = (string) $request->get_param( 'type' );
+		$search   = strtolower( trim( (string) $request->get_param( 'search' ) ) );
+		$slug     = (string) $request->get_param( 'slug' );
+		$packages = array_values( array_filter( $packages, function ( $pkg ) use ( $type, $search, $slug ) {
+			if ( '' !== $slug && $pkg['slug'] !== $slug ) {
+				return false;
+			}
+			if ( '' !== $type && 'all' !== $type && $pkg['type'] !== $type ) {
+				return false;
+			}
+			if ( '' === $search ) {
+				return true;
+			}
+			return false !== strpos( strtolower( $pkg['name'] ), $search )
+				|| false !== strpos( strtolower( $pkg['text_domain'] ), $search )
+				|| false !== strpos( strtolower( $pkg['slug'] ), $search );
+		} ) );
+
+		$per_page    = max( 1, min( 100, (int) $request->get_param( 'per_page' ) ) );
+		$total       = count( $packages );
+		$total_pages = max( 1, (int) ceil( $total / $per_page ) );
+		$page        = min( max( 1, (int) $request->get_param( 'page' ) ), $total_pages );
+		$packages    = array_slice( $packages, ( $page - 1 ) * $per_page, $per_page );
+
+		// Per-language progress is the expensive part: only compute it for the returned page.
+		foreach ( $packages as &$pkg ) {
+			$pkg['per_lang'] = StringTranslator::translation_progress( $pkg['text_domain'], $lang_codes );
+			$pkg['audit']    = $summaries[ $pkg['slug'] ] ?? null;
+		}
+		unset( $pkg );
+
+		return $this->ok(
+			$packages,
+			[
+				'languages'   => $lang_codes,
+				'total'       => $total,
+				'total_pages' => $total_pages,
+				'page'        => $page,
+				'per_page'    => $per_page,
+				'counts'      => $counts,
+			]
+		);
 	}
 
 	private function collect_plugins() {
@@ -333,91 +399,122 @@ class Strings extends Controller {
 	}
 
 	/**
-	 * Bulk-AI-translate every untranslated row for a package in a language.
-	 * Returns counts; uses TranslationMemory so already-translated-elsewhere
-	 * strings are filled instantly without an AI call.
+	 * Import a CSV (typically translated by an external AI model) into one
+	 * plugin/theme. With `commit` false it only reports what would happen.
 	 */
-	public function translate_all_in_package( $request ) {
-		// Bulk AI string translation (with TM + pack generation) is Pro; manual
-		// per-string editing stays free.
-		if ( $err = $this->require_pro( 'ai_bulk' ) ) {
-			return $err;
-		}
+	public function csv_import( $request ) {
 		$pkg = $this->resolve_package( (string) $request['slug'] );
 		if ( is_wp_error( $pkg ) ) {
 			return $pkg;
 		}
 		$lang = strtolower( (string) $request['lang'] );
-		if ( ! Context::is_active( $lang ) ) {
-			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );
+		if ( ! Context::is_active( $lang ) || $lang === Context::default_code() ) {
+			return $this->fail( 'gtrans_invalid_lang', __( 'Pick an active, non-default language.', 'gemtranslate' ), 422 );
 		}
 
-		$body         = $request->get_json_params() ?: $request->get_params();
-		$status_value = (string) ( $body['status'] ?? 'draft' );
+		$body      = $request->get_json_params() ?: $request->get_params();
+		$rows      = AiImporter::parse( (string) ( $body['csv'] ?? '' ) );
+		$overwrite = ! empty( $body['overwrite'] );
+		$commit    = ! empty( $body['commit'] );
 
-		// Find every untranslated row for this domain.
-		$listing = StringTranslator::list_strings( [
-			'domain'   => $pkg['text_domain'],
-			'lang'     => $lang,
-			'status'   => 'untranslated',
-			'page'     => 1,
-			'per_page' => 10000,
-		] );
-		$rows = $listing['rows'] ?? [];
-		if ( empty( $rows ) ) {
-			return $this->ok( [ 'translated' => 0, 'total' => 0, 'from_memory' => 0, 'from_ai' => 0 ] );
+		if ( ! $rows ) {
+			return $this->fail( 'gtrans_empty_csv', __( 'No CSV rows found. Paste the full CSV, including the header line (id,source,context,target).', 'gemtranslate' ), 422 );
 		}
 
-		$source_lang = Context::default_code();
-		$translator  = TranslatorFactory::default_translator();
-		$from_memory = 0;
-		$from_ai     = 0;
-		$translated  = 0;
+		$result = AiImporter::analyze( $rows, $pkg['text_domain'], $lang, $overwrite );
 
-		// First pass: TranslationMemory.
-		$ai_queue = [];
-		foreach ( $rows as $row ) {
-			$source = (string) $row['source'];
-			$cached = TranslationMemory::get( $source, $source_lang, $lang );
-			if ( null !== $cached && '' !== $cached ) {
-				if ( StringTranslator::save_translation( (int) $row['string_id'], $lang, $cached, $status_value ) ) {
-					$from_memory++;
-					$translated++;
-				}
-			} elseif ( $translator ) {
-				$ai_queue[ (int) $row['string_id'] ] = $source;
-			}
-		}
-
-		// Second pass: AI in batches.
-		if ( $translator && ! empty( $ai_queue ) ) {
-			$ids   = array_keys( $ai_queue );
-			$texts = array_values( $ai_queue );
-			foreach ( array_chunk( $texts, 25, true ) as $chunk_offset => $chunk ) {
-				$result = $translator->translate( $chunk, $source_lang, $lang, [ 'preserve_html' => false ] );
-				if ( is_wp_error( $result ) ) {
-					return $result;
-				}
-				foreach ( $chunk as $rel_i => $text ) {
-					$abs_i = $chunk_offset * 25 + $rel_i;
-					$value = $result['translations'][ $rel_i ] ?? '';
-					if ( '' === $value || ! isset( $ids[ $abs_i ] ) ) {
-						continue;
-					}
-					if ( StringTranslator::save_translation( $ids[ $abs_i ], $lang, $value, $status_value ) ) {
-						$from_ai++;
-						$translated++;
-						TranslationMemory::set( $text, $value, $source_lang, $lang, $result['provider'] ?? '' );
-					}
+		$saved = 0;
+		if ( $commit ) {
+			foreach ( $result['valid'] as $id => $target ) {
+				if ( StringTranslator::save_translation( $id, $lang, $target, 'translated' ) ) {
+					$saved++;
 				}
 			}
 		}
 
 		return $this->ok( [
-			'translated'  => $translated,
-			'total'       => count( $rows ),
-			'from_memory' => $from_memory,
-			'from_ai'     => $from_ai,
+			'committed' => $commit,
+			'saved'     => $saved,
+			'counts'    => $result['counts'],
+			'issues'    => $result['issues'],
+		] );
+	}
+
+	// =====================================================================
+	// Translation-readiness audit (missing/wrong text domain, hardcoded text)
+	// =====================================================================
+
+	const AUDIT_SUMMARIES_OPTION = 'gtrans_audit_summaries';
+	const AUDIT_MAX_FINDINGS     = 3000;
+
+	private function audit_option( $slug ) {
+		return 'gtrans_audit_' . sanitize_key( $slug );
+	}
+
+	/** Stored findings + summary for one package (null when never audited). */
+	public function get_audit( $request ) {
+		$pkg = $this->resolve_package( (string) $request['slug'] );
+		if ( is_wp_error( $pkg ) ) {
+			return $pkg;
+		}
+		$stored = get_option( $this->audit_option( $pkg['slug'] ), null );
+		return $this->ok( $stored ?: null );
+	}
+
+	/**
+	 * Run one chunk of the audit. The client calls this repeatedly, passing the
+	 * returned `next_offset`, until `done` is true. offset=0 starts afresh.
+	 */
+	public function run_audit( $request ) {
+		$pkg = $this->resolve_package( (string) $request['slug'] );
+		if ( is_wp_error( $pkg ) ) {
+			return $pkg;
+		}
+		$body   = $request->get_json_params() ?: $request->get_params();
+		$offset = max( 0, (int) ( $body['offset'] ?? 0 ) );
+		$key    = $this->audit_option( $pkg['slug'] );
+
+		$chunk = Auditor::run_chunk( $pkg['path'], $pkg['text_domain'], $offset );
+
+		$data = ( $offset > 0 ) ? get_option( $key, null ) : null;
+		if ( ! is_array( $data ) ) {
+			$data = [
+				'counts'   => [ 'missing_domain' => 0, 'wrong_domain' => 0, 'hardcoded' => 0, 'calls' => 0 ],
+				'findings' => [],
+			];
+		}
+		foreach ( $chunk['counts'] as $type => $n ) {
+			$data['counts'][ $type ] = ( $data['counts'][ $type ] ?? 0 ) + $n;
+		}
+		// Counts stay exact; the stored list is capped to keep the option small.
+		$room = max( 0, self::AUDIT_MAX_FINDINGS - count( $data['findings'] ) );
+		$data['findings'] = array_merge( $data['findings'], array_slice( $chunk['findings'], 0, $room ) );
+
+		$data['text_domain']  = $pkg['text_domain'];
+		$data['total_files']  = $chunk['total_files'];
+		$data['scanned_files'] = $chunk['next_offset'];
+		$data['truncated']    = $data['counts']['missing_domain'] + $data['counts']['wrong_domain'] + $data['counts']['hardcoded'] > count( $data['findings'] );
+		$data['updated_at']   = time();
+		update_option( $key, $data, false );
+
+		if ( $chunk['done'] ) {
+			$summaries = get_option( self::AUDIT_SUMMARIES_OPTION, [] );
+			$summaries = is_array( $summaries ) ? $summaries : [];
+			$summaries[ $pkg['slug'] ] = [
+				'missing_domain' => $data['counts']['missing_domain'],
+				'wrong_domain'   => $data['counts']['wrong_domain'],
+				'hardcoded'      => $data['counts']['hardcoded'],
+				'calls'          => $data['counts']['calls'],
+				'updated_at'     => $data['updated_at'],
+			];
+			update_option( self::AUDIT_SUMMARIES_OPTION, $summaries, false );
+		}
+
+		return $this->ok( [
+			'done'          => $chunk['done'],
+			'next_offset'   => $chunk['next_offset'],
+			'total_files'   => $chunk['total_files'],
+			'audit'         => $chunk['done'] ? $data : null,
 		] );
 	}
 
@@ -428,61 +525,24 @@ class Strings extends Controller {
 		}
 		$lang = strtolower( (string) $request['lang'] );
 		if ( ! Context::is_active( $lang ) ) {
-			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_invalid_lang', __( 'Language is not active.', 'gemtranslate' ), 422 );
 		}
 		$locale = $this->locale_for( $lang );
 		if ( '' === $locale ) {
-			return $this->fail( 'ztrans_no_locale', __( 'Language has no locale configured.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_no_locale', __( 'Language has no locale configured.', 'gemtranslate' ), 422 );
 		}
 
-		$body          = $request->get_json_params() ?: $request->get_params();
-		$exclude       = (string) ( $body['exclude_status'] ?? '' );
-		$ai_fill       = isset( $body['ai_fill'] ) ? (bool) $body['ai_fill'] : false;
+		$body    = $request->get_json_params() ?: $request->get_params();
+		$exclude = (string) ( $body['exclude_status'] ?? '' );
 
 		$result = PackGenerator::generate( $lang, $locale, [
 			'domain'         => $pkg['text_domain'],
-			'ai_fill'        => $ai_fill,
 			'exclude_status' => $exclude,
 		] );
 		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
 		return $this->ok( $result );
-	}
-
-	public function memory_suggestions( $request ) {
-		if ( $err = $this->require_pro( 'translation_memory' ) ) {
-			return $err;
-		}
-		$lang = strtolower( (string) $request['lang'] );
-		if ( ! Context::is_active( $lang ) ) {
-			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );
-		}
-		$body       = $request->get_json_params() ?: $request->get_params();
-		$string_ids = array_map( 'intval', (array) ( $body['string_ids'] ?? [] ) );
-		if ( empty( $string_ids ) ) {
-			return $this->ok( new \stdClass() );
-		}
-
-		// Fetch source text for each id, then probe TM.
-		global $wpdb;
-		$table = \Zentranslate\Helper::table( 'strings' );
-		$placeholders = implode( ',', array_fill( 0, count( $string_ids ), '%d' ) );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$rows = $wpdb->get_results(
-			$wpdb->prepare( "SELECT string_id, source FROM $table WHERE string_id IN ($placeholders)", $string_ids ),
-			ARRAY_A
-		) ?: [];
-
-		$source_lang = Context::default_code();
-		$out = [];
-		foreach ( $rows as $r ) {
-			$hit = TranslationMemory::get( (string) $r['source'], $source_lang, $lang );
-			if ( null !== $hit && '' !== $hit ) {
-				$out[ (string) (int) $r['string_id'] ] = (string) $hit;
-			}
-		}
-		return $this->ok( $out ?: new \stdClass() );
 	}
 
 	// =====================================================================
@@ -492,7 +552,7 @@ class Strings extends Controller {
 	private function resolve_package( $slug ) {
 		$slug = sanitize_key( $slug );
 		if ( '' === $slug ) {
-			return $this->fail( 'ztrans_bad_slug', __( 'Invalid package slug.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_bad_slug', __( 'Invalid package slug.', 'gemtranslate' ), 422 );
 		}
 		// Try plugin first.
 		foreach ( $this->collect_plugins() as $pkg ) {
@@ -505,7 +565,7 @@ class Strings extends Controller {
 				return $pkg;
 			}
 		}
-		return $this->fail( 'ztrans_not_found', __( 'Package not found.', 'zentranslate' ), 404 );
+		return $this->fail( 'gtrans_not_found', __( 'Package not found.', 'gemtranslate' ), 404 );
 	}
 
 	private function locale_for( $lang ) {

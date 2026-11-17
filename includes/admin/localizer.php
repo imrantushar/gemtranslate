@@ -1,14 +1,14 @@
 <?php
-namespace Zentranslate\Admin;
+namespace GemTranslate\Admin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Language\Context;
+use GemTranslate\Language\Context;
 
 /**
- * Bridges Zentranslate's per-user language preference to WordPress's locale
+ * Bridges GemTranslate's per-user language preference to WordPress's locale
  * system inside the admin. With the locale filter in place:
  *
  * - WP core admin strings load from their `.mo` file for the chosen locale
@@ -16,7 +16,7 @@ use Zentranslate\Language\Context;
  * - Plugin/theme strings using gettext flow through StringTranslator as
  *   usual; the locale filter aligns the underlying domain loading.
  * - `wp_set_script_translations` picks up the user's locale for the
- *   Zentranslate React admin, loading the matching `-{locale}-{handle}.json`.
+ *   GemTranslate React admin, loading the matching `-{locale}-{handle}.json`.
  */
 class Localizer {
 
@@ -36,15 +36,33 @@ class Localizer {
 	}
 
 	/**
-	 * Switch the admin locale to the current user's preferred Zentranslate
+	 * Switch the admin locale to the current user's preferred GemTranslate
 	 * language. Front-end requests are untouched.
 	 */
 	public static function filter_admin_locale( $locale ) {
 		if ( ! is_admin() ) {
 			return $locale;
 		}
+		if ( self::is_site_language_field() ) {
+			// Other plugins can switch the global locale to the user's language
+			// before this point, so read the stored site locale directly.
+			return (string) get_option( 'WPLANG', '' ) ?: 'en_US';
+		}
 		$mapped = self::current_user_locale();
 		return $mapped ?: $locale;
+	}
+
+	/**
+	 * True while Settings → General renders its body. The Site Language
+	 * dropdown preselects `get_locale()`, so overriding the locale there would
+	 * show the user's admin language instead of the stored site language, and
+	 * saving the page would then overwrite WPLANG with the wrong value.
+	 * Admin strings are already loaded by `in_admin_header`, so the page
+	 * itself stays in the user's language.
+	 */
+	private static function is_site_language_field() {
+		global $pagenow;
+		return 'options-general.php' === $pagenow && did_action( 'in_admin_header' ) > 0;
 	}
 
 	/**

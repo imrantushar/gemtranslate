@@ -1,12 +1,12 @@
 <?php
-namespace Zentranslate\Routing;
+namespace GemTranslate\Routing;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Language\Context;
-use Zentranslate\Language\CountryContext;
+use GemTranslate\Language\Context;
+use GemTranslate\Language\CountryContext;
 
 /**
  * First-visit redirect based on detected country.
@@ -19,7 +19,7 @@ use Zentranslate\Language\CountryContext;
  * Runs BEFORE BrowserRedirect (template_redirect priority 0 vs 1) so that
  * country-based decisions take precedence when both signals are available.
  *
- * Always persists the detected country to `ztrans_user_country` cookie,
+ * Always persists the detected country to `gtrans_user_country` cookie,
  * regardless of whether a language redirect actually fires — this is how the
  * cookie detector picks up the value on subsequent requests.
  */
@@ -126,8 +126,21 @@ class CountryRedirector {
 		// Write the language cookie so BrowserRedirect doesn't bounce the
 		// visitor back on subsequent visits.
 		if ( ! headers_sent() ) {
-			setcookie( BrowserRedirect::COOKIE, sanitize_key( $lang ), time() + ( 30 * DAY_IN_SECONDS ), COOKIEPATH ?: '/', COOKIE_DOMAIN ?: '' );
+			setcookie(
+				BrowserRedirect::COOKIE,
+				sanitize_key( $lang ),
+				[
+					'expires'  => time() + ( 30 * DAY_IN_SECONDS ),
+					'path'     => COOKIEPATH ?: '/',
+					'domain'   => COOKIE_DOMAIN ?: '',
+					'secure'   => is_ssl(),
+					'samesite' => 'Lax',
+				]
+			);
 		}
+		// The target depends on this visitor's country, so a shared cache must
+		// not remember the redirect for the next visitor.
+		\GemTranslate\Cache\NoCache::send();
 		wp_safe_redirect( $target, 302 );
 		exit;
 	}

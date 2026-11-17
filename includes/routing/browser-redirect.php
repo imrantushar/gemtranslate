@@ -1,16 +1,16 @@
 <?php
-namespace Zentranslate\Routing;
+namespace GemTranslate\Routing;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Language\Context;
+use GemTranslate\Language\Context;
 
 /**
  * First-visit redirect based on `Accept-Language`.
  *
- * On the very first hit (no `ztrans_user_lang` cookie set) and ONLY on
+ * On the very first hit (no `gtrans_user_lang` cookie set) and ONLY on
  * default-language URLs, we match the visitor's preferred languages
  * against active site languages and 302 to the matched language root.
  *
@@ -19,9 +19,14 @@ use Zentranslate\Language\Context;
  */
 class BrowserRedirect {
 
-	const COOKIE = 'ztrans_user_lang';
+	const COOKIE = 'gtrans_user_lang';
+
+	/** Query arg the switchers add to the default-language link. */
+	const CHOICE_PARAM = 'gtrans_lang';
 
 	public static function init() {
+		// Before the country/browser redirects, so an explicit choice always wins.
+		add_action( 'template_redirect', [ __CLASS__, 'apply_explicit_choice' ], -1 );
 		add_action( 'template_redirect', [ __CLASS__, 'maybe_redirect' ], 1 );
 
 		// Capture chosen language into the cookie when the switcher is used.
@@ -29,9 +34,31 @@ class BrowserRedirect {
 	}
 
 	public static function enabled() {
-		$raw = get_option( ZTRANS_SETTINGS_NAME, '{}' );
+		$raw = get_option( GTRANS_SETTINGS_NAME, '{}' );
 		$cfg = json_decode( $raw, true ) ?: [];
 		return ! empty( $cfg['auto_redirect_browser_lang'] );
+	}
+
+	/**
+	 * The visitor picked the default language in a switcher. Remember it (the
+	 * cookie otherwise bounces them back to the language they just left) and
+	 * drop the query arg so the clean URL is what they land on.
+	 */
+	public static function apply_explicit_choice() {
+		if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) || ( defined( 'DOING_CRON' ) && DOING_CRON ) ) {
+			return;
+		}
+		if ( ! isset( $_GET[ self::CHOICE_PARAM ] ) ) {
+			return;
+		}
+		$lang = sanitize_key( wp_unslash( $_GET[ self::CHOICE_PARAM ] ) );
+		if ( '' === $lang || ! Context::is_active( $lang ) || ! Context::is_default() ) {
+			return;
+		}
+		self::write_cookie( $lang );
+		\GemTranslate\Cache\NoCache::send();
+		wp_safe_redirect( remove_query_arg( self::CHOICE_PARAM ), 302 );
+		exit;
 	}
 
 	public static function maybe_redirect() {
@@ -79,6 +106,9 @@ class BrowserRedirect {
 		$relative = '/' . ltrim( $relative, '/' );
 		$target   = home_url( '/' . $lang . $relative );
 		self::write_cookie( $lang );
+		// The target depends on this visitor's headers, so a shared cache must
+		// not remember the redirect for the next visitor.
+		\GemTranslate\Cache\NoCache::send();
 		wp_safe_redirect( $target, 302 );
 		exit;
 	}
@@ -87,7 +117,17 @@ class BrowserRedirect {
 		if ( headers_sent() ) {
 			return;
 		}
-		setcookie( self::COOKIE, sanitize_key( $lang ), time() + ( 30 * DAY_IN_SECONDS ), COOKIEPATH ?: '/', COOKIE_DOMAIN ?: '' );
+		setcookie(
+			self::COOKIE,
+			sanitize_key( $lang ),
+			[
+				'expires'  => time() + ( 30 * DAY_IN_SECONDS ),
+				'path'     => COOKIEPATH ?: '/',
+				'domain'   => COOKIE_DOMAIN ?: '',
+				'secure'   => is_ssl(),
+				'samesite' => 'Lax',
+			]
+		);
 	}
 
 	private static function best_match_from_accept_language() {

@@ -1,12 +1,12 @@
 <?php
-namespace Zentranslate\API;
+namespace GemTranslate\API;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Zentranslate\Language\Context;
-use Zentranslate\Translation\MenuTranslator;
+use GemTranslate\Language\Context;
+use GemTranslate\Translation\MenuTranslator;
 
 class Menus extends Controller {
 
@@ -35,6 +35,10 @@ class Menus extends Controller {
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'items' ],
 				'permission_callback' => [ $this, 'permissions_translate' ],
+				'args'                => [
+					'page'     => [ 'type' => 'integer', 'default' => 1 ],
+					'per_page' => [ 'type' => 'integer', 'default' => 50 ],
+				],
 			]
 		);
 
@@ -67,11 +71,16 @@ class Menus extends Controller {
 		$menu_id = (int) $request['id'];
 		$items   = wp_get_nav_menu_items( $menu_id );
 		if ( false === $items ) {
-			return $this->fail( 'ztrans_not_found', __( 'Menu not found.', 'zentranslate' ), 404 );
+			return $this->fail( 'gtrans_not_found', __( 'Menu not found.', 'gemtranslate' ), 404 );
 		}
 
-		$default = Context::default_code();
-		$rows    = [];
+		$default     = Context::default_code();
+		$rows        = [];
+		$per_page    = max( 1, min( 200, (int) $request->get_param( 'per_page' ) ) );
+		$total       = count( $items );
+		$total_pages = max( 1, (int) ceil( $total / $per_page ) );
+		$page        = min( max( 1, (int) $request->get_param( 'page' ) ), $total_pages );
+		$items       = array_slice( $items, ( $page - 1 ) * $per_page, $per_page );
 		foreach ( $items as $item ) {
 			$translations = MenuTranslator::all_for_item( $item->ID );
 			$by_lang      = [];
@@ -86,19 +95,28 @@ class Menus extends Controller {
 				'translations' => $by_lang,
 			];
 		}
-		return $this->ok( $rows, [ 'default_lang' => $default ] );
+		return $this->ok(
+			$rows,
+			[
+				'default_lang' => $default,
+				'total'        => $total,
+				'total_pages'  => $total_pages,
+				'page'         => $page,
+				'per_page'     => $per_page,
+			]
+		);
 	}
 
 	public function save_item( $request ) {
 		$item_id = (int) $request['item_id'];
 		$lang    = strtolower( $request['lang'] );
 		if ( ! Context::is_active( $lang ) ) {
-			return $this->fail( 'ztrans_invalid_lang', __( 'Language is not active.', 'zentranslate' ), 422 );
+			return $this->fail( 'gtrans_invalid_lang', __( 'Language is not active.', 'gemtranslate' ), 422 );
 		}
 		$body = $request->get_json_params() ?: $request->get_params();
 		$ok   = MenuTranslator::save( $item_id, $lang, $body );
 		if ( ! $ok ) {
-			return $this->fail( 'ztrans_save_failed', __( 'Could not save translation.', 'zentranslate' ), 500 );
+			return $this->fail( 'gtrans_save_failed', __( 'Could not save translation.', 'gemtranslate' ), 500 );
 		}
 		return $this->ok( [ 'saved' => true, 'menu_item_id' => $item_id, 'language_code' => $lang ] );
 	}

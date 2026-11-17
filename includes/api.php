@@ -1,5 +1,5 @@
 <?php
-namespace Zentranslate;
+namespace GemTranslate;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -12,12 +12,12 @@ class API {
 		API\TermTranslations::init();
 		API\Menus::init();
 		API\Strings::init();
-		API\AI::init();
+		API\Layout::init();
 		API\Migration::init();
 		API\Settings::init();
 		API\Stats::init();
 		API\Geo::init();
-		// Pro API controllers (SEO meta, Jobs, Translators, Revisions, Import/Export)
-		// are registered by zentranslate-pro on `ztrans_init`.
+		// Pro API controllers (SEO meta, Translators, Revisions, Import/Export)
+		// are registered by gemtranslate-pro on `gtrans_init`.
 	}
 }
