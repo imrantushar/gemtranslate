@@ -1013,6 +1013,10 @@ input:where([type='file']):focus{
 #gemtranslate-admin-root .gtrans-gap-8{
 	gap: 2rem;
 }
+#gemtranslate-admin-root .gtrans-gap-x-10{
+	-moz-column-gap: 2.5rem;
+	     column-gap: 2.5rem;
+}
 #gemtranslate-admin-root .gtrans-gap-x-2{
 	-moz-column-gap: 0.5rem;
 	     column-gap: 0.5rem;
@@ -1034,6 +1038,9 @@ input:where([type='file']):focus{
 }
 #gemtranslate-admin-root .gtrans-gap-y-2{
 	row-gap: 0.5rem;
+}
+#gemtranslate-admin-root .gtrans-gap-y-4{
+	row-gap: 1rem;
 }
 #gemtranslate-admin-root :is(.gtrans-divide-y > :not([hidden]) ~ :not([hidden])){
 	--tw-divide-y-reverse: 0;
@@ -1089,6 +1096,9 @@ input:where([type='file']):focus{
 }
 #gemtranslate-admin-root .gtrans-break-words{
 	overflow-wrap: break-word;
+}
+#gemtranslate-admin-root .gtrans-break-all{
+	word-break: break-all;
 }
 #gemtranslate-admin-root .gtrans-rounded{
 	border-radius: 0.25rem;

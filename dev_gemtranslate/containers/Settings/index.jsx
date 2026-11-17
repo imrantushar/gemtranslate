@@ -13,6 +13,7 @@ import { PageSkeleton } from '../../components/Skeleton';
 import { useSettings, useSaveSettings } from '../../hooks/useSettings';
 import { useLanguages } from '../../hooks/useLanguages';
 import { formatErrorMessage } from '../../lib/format';
+import License, { sdk as licenseSdk } from '../../components/License';
 
 // ---------------------------------------------------------------------------
 // Inline flag-emoji helper (mirrors the PHP version).
@@ -169,6 +170,18 @@ const TABS = () => [
 		hint: __('Performance and data', 'gemtranslate'),
 		description: __('Caching, diagnostics and what happens to your data on uninstall.', 'gemtranslate'),
 	},
+	// Only present when GemTranslate Pro has registered its licensing client.
+	...(licenseSdk
+		? [
+				{
+					key: 'license',
+					icon: 'settings',
+					label: __('License', 'gemtranslate'),
+					hint: __('Activation and updates', 'gemtranslate'),
+					description: __('Activate GemTranslate Pro, check for updates and manage versions.', 'gemtranslate'),
+				},
+		  ]
+		: []),
 ];
 
 /** Every shortcode the plugin registers. Keep in sync with includes/frontend/*.php. */
@@ -255,11 +268,13 @@ export default function SettingsPage() {
 
 	return (
 		<>
-			<TopbarActions>
-				<Button onClick={submit} loading={save.isPending}>
-					{__('Save settings', 'gemtranslate')}
-				</Button>
-			</TopbarActions>
+			{tab !== 'license' && (
+				<TopbarActions>
+					<Button onClick={submit} loading={save.isPending}>
+						{__('Save settings', 'gemtranslate')}
+					</Button>
+				</TopbarActions>
+			)}
 
 			<SidebarLayout nav={<SidebarNav items={tabs} active={tab} onSelect={(key) => setParams({ tab: key })} />}>
 				<Panel divided title={current.label} description={current.description}>
@@ -568,6 +583,8 @@ export default function SettingsPage() {
 							)}
 						</>
 					)}
+
+					{tab === 'license' && <License />}
 
 					{tab === 'advanced' && (
 						<>
