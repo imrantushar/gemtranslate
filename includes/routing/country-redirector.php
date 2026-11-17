@@ -82,10 +82,40 @@ class CountryRedirector {
 			return;
 		}
 		$lang = self::language_for_country( $country );
-		if ( '' === $lang || $lang === Context::default_code() ) {
+		if ( '' === $lang ) {
+			return;
+		}
+		if ( $lang === Context::default_code() ) {
+			// The country maps to the default language, so stay here. Remember
+			// that choice: otherwise BrowserRedirect (which runs next) sees no
+			// language cookie and bounces the visitor to their browser's
+			// language, e.g. a Bangladeshi visitor with an English browser
+			// landing on /en/ even though bn is the default for BD.
+			self::write_lang_cookie( $lang );
+			\GemTranslate\Cache\NoCache::send();
 			return;
 		}
 		self::redirect_to( $lang );
+	}
+
+	private static function write_lang_cookie( $lang ) {
+		// setcookie() only affects the response; BrowserRedirect runs later in
+		// this same request and reads $_COOKIE, so mirror the value there.
+		$_COOKIE[ BrowserRedirect::COOKIE ] = sanitize_key( $lang );
+		if ( headers_sent() ) {
+			return;
+		}
+		setcookie(
+			BrowserRedirect::COOKIE,
+			sanitize_key( $lang ),
+			[
+				'expires'  => time() + ( 30 * DAY_IN_SECONDS ),
+				'path'     => COOKIEPATH ?: '/',
+				'domain'   => COOKIE_DOMAIN ?: '',
+				'secure'   => is_ssl(),
+				'samesite' => 'Lax',
+			]
+		);
 	}
 
 	private static function language_for_country( $iso ) {

@@ -98,6 +98,7 @@ class FloatingSwitcher {
 
 		$pos_class = 'gtrans-float gtrans-float--' . esc_attr( $position );
 
+		echo FlagFont::style_tag(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo $this->styles(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		?>
 		<div id="gtrans-float" class="<?php echo esc_attr( $pos_class ); ?>" dir="auto">

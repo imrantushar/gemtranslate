@@ -167,10 +167,12 @@ class LanguageSwitcher {
 
 		$class = 'gtrans-switcher gtrans-switcher--' . sanitize_html_class( $atts['display'] );
 
+		$flag_css = '1' === (string) $atts['show_flag'] ? FlagFont::style_tag() : '';
+
 		if ( 'dropdown' === $atts['display'] ) {
-			return $this->render_dropdown( $items, $class );
+			return $flag_css . $this->render_dropdown( $items, $class );
 		}
-		return '<ul class="' . esc_attr( $class ) . '">' . implode( '', $items ) . '</ul>';
+		return $flag_css . '<ul class="' . esc_attr( $class ) . '">' . implode( '', $items ) . '</ul>';
 	}
 
 	/**
