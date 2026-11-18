@@ -16,6 +16,7 @@ class AdminMenu {
 		// at the bottom, below any License entry Pro re-parented here.
 		add_action( 'admin_menu', [ $self, 'register_get_pro' ], 99 );
 		add_action( 'current_screen', [ $self, 'maybe_redirect_to_pro' ] );
+		add_action( 'admin_head', [ $self, 'print_get_pro_css' ] );
 	}
 
 	public function register_menu() {
@@ -97,6 +98,16 @@ class AdminMenu {
 			'gemtranslate-get-pro',
 			'__return_null'
 		);
+	}
+
+	public function print_get_pro_css() {
+		if ( defined( 'GTRANS_PRO_VERSION' ) ) {
+			return;
+		}
+		echo '<style>'
+			. 'a[href*="page=gemtranslate-get-pro"]{background:#FFA500!important;color:#000!important;font-weight:600;box-shadow:none!important;}'
+			. 'a[href*="page=gemtranslate-get-pro"] .dashicons{color:#000!important;}'
+			. '</style>';
 	}
 
 	public function maybe_redirect_to_pro( $screen ) {
