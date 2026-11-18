@@ -164,9 +164,20 @@ export default function License() {
 
 	if (!client) {
 		return (
-			<p className="gtrans-m-0 gtrans-py-4 gtrans-text-sm gtrans-text-muted">
-				{__('Activate GemTranslate Pro to manage its license here.', 'gemtranslate')}
-			</p>
+			<div className="gtrans-flex gtrans-flex-col gtrans-gap-3 gtrans-py-4">
+				<p className="gtrans-m-0 gtrans-text-sm gtrans-text-ink">
+					{sdk?.pending
+						? __('License management for GemTranslate Pro will appear here once the product is published on the store.', 'gemtranslate')
+						: __('Activate GemTranslate Pro to manage its license here.', 'gemtranslate')}
+				</p>
+				{(sdk?.purchase_url || sdk?.store_dashboard_url) && (
+					<p className="gtrans-m-0 gtrans-text-sm">
+						<a href={sdk.purchase_url || sdk.store_dashboard_url} target="_blank" rel="noreferrer">
+							{__('Open the store', 'gemtranslate')}
+						</a>
+					</p>
+				)}
+			</div>
 		);
 	}
 
