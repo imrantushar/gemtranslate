@@ -1167,6 +1167,10 @@ input:where([type='file']):focus{
 #gemtranslate-admin-root .gtrans-border-none{
 	border-style: none;
 }
+#gemtranslate-admin-root .gtrans-border-amber-200{
+	--tw-border-opacity: 1;
+	border-color: rgb(253 230 138 / var(--tw-border-opacity, 1));
+}
 #gemtranslate-admin-root .gtrans-border-amber-300{
 	--tw-border-opacity: 1;
 	border-color: rgb(252 211 77 / var(--tw-border-opacity, 1));
@@ -1640,6 +1644,10 @@ input:where([type='file']):focus{
 #gemtranslate-admin-root .gtrans-text-amber-800{
 	--tw-text-opacity: 1;
 	color: rgb(146 64 14 / var(--tw-text-opacity, 1));
+}
+#gemtranslate-admin-root .gtrans-text-amber-900{
+	--tw-text-opacity: 1;
+	color: rgb(120 53 15 / var(--tw-text-opacity, 1));
 }
 #gemtranslate-admin-root .gtrans-text-blue-800{
 	--tw-text-opacity: 1;

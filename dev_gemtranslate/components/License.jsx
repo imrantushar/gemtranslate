@@ -117,6 +117,16 @@ export default function License() {
 				setToast({ tone: 'error', message: __('Enter your license key first.', 'gemtranslate') });
 				return;
 			}
+			if (!client) {
+				setToast({
+					tone: 'error',
+					message: __(
+						'Licensing isn’t live yet — the Pro product is still being published on the store. Keep your key safe; this form will activate it as soon as it’s available.',
+						'gemtranslate'
+					),
+				});
+				return;
+			}
 			const result = await post('license/activate', { license: key.trim() });
 			setLicense(result?.license || result);
 			setKey('');
@@ -133,6 +143,10 @@ export default function License() {
 
 	const check = () =>
 		run('check', async () => {
+			if (!client) {
+				setToast({ tone: 'error', message: __('Updates aren’t live yet.', 'gemtranslate') });
+				return;
+			}
 			const result = await post('updates/check-now');
 			setUpdate(result);
 			setToast({
@@ -162,29 +176,17 @@ export default function License() {
 			setTimeout(() => window.location.reload(), 1500);
 		});
 
-	if (!client) {
+	// Nothing to render if Pro isn't installed at all — the Settings tab is
+	// already hidden in that case, but guard against a stale window global.
+	if (!sdk) {
 		return (
-			<div className="gtrans-py-4">
-				<div className="gtrans-rounded-md gtrans-border gtrans-border-line gtrans-bg-surface gtrans-p-6 gtrans-shadow-sm">
-					<p className="gtrans-m-0 gtrans-text-sm gtrans-text-ink">
-						{sdk?.pending
-							? __(
-									'License management for GemTranslate Pro will appear here once the product is published on the store.',
-									'gemtranslate'
-							  )
-							: __('Activate GemTranslate Pro to manage its license here.', 'gemtranslate')}
-					</p>
-					{(sdk?.purchase_url || sdk?.store_dashboard_url) && (
-						<p className="gtrans-mb-0 gtrans-mt-3 gtrans-text-sm">
-							<a href={sdk.purchase_url || sdk.store_dashboard_url} target="_blank" rel="noreferrer">
-								{__('Open the store', 'gemtranslate')}
-							</a>
-						</p>
-					)}
-				</div>
-			</div>
+			<p className="gtrans-m-0 gtrans-py-4 gtrans-text-sm gtrans-text-muted">
+				{__('Activate GemTranslate Pro to manage its license here.', 'gemtranslate')}
+			</p>
 		);
 	}
+
+	const pending = !client;
 
 	const expires = formatDate(license?.expires);
 	const checked = formatDate(update?.last_checked_at);
@@ -220,6 +222,22 @@ export default function License() {
 
 	return (
 		<div className="gtrans-py-4">
+			{pending && (
+				<div className="gtrans-mb-6 gtrans-rounded-md gtrans-border gtrans-border-amber-200 gtrans-bg-amber-50 gtrans-px-4 gtrans-py-3 gtrans-text-sm gtrans-text-amber-900">
+					<p className="gtrans-m-0">
+						{__(
+							'Pro licensing is being set up — the GemTranslate Pro product is still being published on the store. You can keep your license key below and it will activate as soon as the service is live.',
+							'gemtranslate'
+						)}{' '}
+						{sdk.purchase_url && (
+							<a href={sdk.purchase_url} target="_blank" rel="noreferrer">
+								{__('Open the store', 'gemtranslate')}
+							</a>
+						)}
+					</p>
+				</div>
+			)}
+
 			{/* -------------------------------------------------- */}
 			{/* Updates card — hero with Installed → Latest */}
 			{/* -------------------------------------------------- */}
@@ -370,8 +388,9 @@ export default function License() {
 			</div>
 
 			{/* -------------------------------------------------- */}
-			{/* Version history card */}
+			{/* Version history card — only once the SDK is live. */}
 			{/* -------------------------------------------------- */}
+			{!pending && (
 			<div className={cardClass}>
 				<div className={cardHeaderClass}>
 					<div>
@@ -432,6 +451,7 @@ export default function License() {
 				)}
 				</div>
 			</div>
+			)}
 
 			<Toast message={toast?.message} tone={toast?.tone} onClear={() => setToast(null)} />
 		</div>
