@@ -84,11 +84,20 @@ export function useSubmenus() {
 			: []),
 	].map((c) => ({ ...c, to: `/terms?tax=${c.key}`, param: 'tax', isDefault: c.key === 'category', icon: 'tag', hint: TAXONOMY_HINTS()[c.key] || __('Translate terms', 'gemtranslate') }));
 
-	const patterns = [
-		{ key: 'template_part', label: __('Header & footer', 'gemtranslate'), hint: __('Template parts', 'gemtranslate'), icon: 'panel' },
-		{ key: 'pattern', label: __('Patterns', 'gemtranslate'), hint: __('Synced patterns', 'gemtranslate'), icon: 'file' },
-		{ key: 'navigation', label: __('Navigation', 'gemtranslate'), hint: __('Menus built with blocks', 'gemtranslate'), icon: 'menu' },
-	].map((c) => ({ ...c, to: `/patterns?type=${c.key}`, param: 'type', isDefault: c.key === 'template_part' }));
+	// Block themes translate template parts; classic themes keep their header /
+	// footer text in widgets and the Customizer instead.
+	const patterns = (
+		window.gtrans?.isClassic
+			? [
+					{ key: 'widget', label: __('Widgets', 'gemtranslate'), hint: __('Header & footer widgets', 'gemtranslate'), icon: 'panel' },
+					{ key: 'customizer', label: __('Theme options', 'gemtranslate'), hint: __('Site title, tagline, footer text', 'gemtranslate'), icon: 'settings' },
+				]
+			: [
+					{ key: 'template_part', label: __('Header & footer', 'gemtranslate'), hint: __('Template parts', 'gemtranslate'), icon: 'panel' },
+					{ key: 'pattern', label: __('Patterns', 'gemtranslate'), hint: __('Synced patterns', 'gemtranslate'), icon: 'file' },
+					{ key: 'navigation', label: __('Navigation', 'gemtranslate'), hint: __('Menus built with blocks', 'gemtranslate'), icon: 'menu' },
+				]
+	).map((c, i) => ({ ...c, to: `/patterns?type=${c.key}`, param: 'type', isDefault: i === 0 }));
 
 	const settings = [
 		{ key: 'general', label: __('General', 'gemtranslate') },

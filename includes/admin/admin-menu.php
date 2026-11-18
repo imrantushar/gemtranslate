@@ -69,10 +69,15 @@ class AdminMenu {
 		$children = [
 			'/posts'      => $this->post_type_children(),
 			'/terms'      => $this->taxonomy_children(),
-			'/patterns'   => [
-				[ '/patterns?type=pattern', __( 'Patterns', 'gemtranslate' ) ],
-				[ '/patterns?type=navigation', __( 'Navigation', 'gemtranslate' ) ],
-			],
+			// Classic themes: widgets + customizer text (Widgets is the parent's default). Block themes: template parts.
+			'/patterns'   => \GemTranslate\Translation\ClassicLayout::is_classic()
+				? [
+					[ '/patterns?type=customizer', __( 'Theme options', 'gemtranslate' ) ],
+				]
+				: [
+					[ '/patterns?type=pattern', __( 'Patterns', 'gemtranslate' ) ],
+					[ '/patterns?type=navigation', __( 'Navigation', 'gemtranslate' ) ],
+				],
 			'/tools'      => [
 				[ '/io', __( 'Import & Export', 'gemtranslate' ) ],
 				[ '/migration', __( 'Migration', 'gemtranslate' ) ],

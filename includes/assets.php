@@ -109,6 +109,7 @@ class Assets {
 				'adminUrl'     => admin_url(),
 				'pluginUrl'    => GTRANS_PLUGIN_ROOT_URI,
 				'version'      => GTRANS_VERSION,
+				'isClassic'    => \GemTranslate\Translation\ClassicLayout::is_classic(),
 				'currentUser'  => [
 					'id'         => get_current_user_id(),
 					'language'   => (string) get_user_meta( get_current_user_id(), 'gtrans_preferred_language', true ),

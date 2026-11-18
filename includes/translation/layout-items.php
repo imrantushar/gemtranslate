@@ -29,6 +29,10 @@ class LayoutItems {
 	 */
 	public static function all() {
 		$items = [];
+		// Classic themes have no template parts: their header / footer text lives in widgets and the Customizer.
+		if ( ClassicLayout::is_classic() ) {
+			$items = ClassicLayout::items();
+		}
 		if ( ! self::is_supported() ) {
 			return $items;
 		}
@@ -131,6 +135,9 @@ class LayoutItems {
 	 * @return array<int,array{source:string,label:string,tokens:array}>|null Null when the item is unknown.
 	 */
 	public static function sources( $id ) {
+		if ( ClassicLayout::owns( $id ) ) {
+			return ClassicLayout::sources( $id );
+		}
 		$content = self::content( $id );
 		if ( null === $content ) {
 			return null;
