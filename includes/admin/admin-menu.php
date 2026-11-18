@@ -15,7 +15,11 @@ class AdminMenu {
 		// Runs after SDK's add_settings_page (priority 10) so "Get Pro" lands
 		// at the bottom, below any License entry Pro re-parented here.
 		add_action( 'admin_menu', [ $self, 'register_get_pro' ], 99 );
-		add_action( 'current_screen', [ $self, 'maybe_redirect_to_pro' ] );
+		// Hooked on admin_init so it fires before any screen is rendered and
+		// before the submenu's own page callback would run. current_screen is
+		// too late on some submenus whose hook_suffix depends on the parent
+		// menu title, so we match on the `page` query value instead.
+		add_action( 'admin_init', [ $self, 'maybe_redirect_to_pro' ] );
 		add_action( 'admin_head', [ $self, 'print_get_pro_css' ] );
 	}
 
@@ -110,8 +114,10 @@ class AdminMenu {
 			. '</style>';
 	}
 
-	public function maybe_redirect_to_pro( $screen ) {
-		if ( ! $screen || 'gemtranslate_page_gemtranslate-get-pro' !== $screen->id ) {
+	public function maybe_redirect_to_pro() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- navigation, no state change.
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
+		if ( 'gemtranslate-get-pro' !== $page ) {
 			return;
 		}
 		$url = add_query_arg(
@@ -125,7 +131,9 @@ class AdminMenu {
 			],
 			'https://store.kodezen.com/product/gemtranslate-pro'
 		);
-		wp_safe_redirect( $url );
+		// External host — wp_safe_redirect would block it. Use wp_redirect
+		// with the allow-list filter StoreEngine uses, then exit.
+		wp_redirect( $url ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
 		exit;
 	}
 
