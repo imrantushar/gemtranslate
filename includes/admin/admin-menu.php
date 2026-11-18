@@ -58,20 +58,75 @@ class AdminMenu {
 			[ '/menus',        __( 'Menus', 'gemtranslate' ) ],
 			[ '/patterns',     __( 'Patterns', 'gemtranslate' ) ],
 			[ '/translators',  __( 'Translators', 'gemtranslate' ) ],
-			[ '/migration',    __( 'Migration', 'gemtranslate' ) ],
-			[ '/io',           __( 'Import & Export', 'gemtranslate' ) ],
+			[ '/tools',        __( 'Tools', 'gemtranslate' ) ],
 			[ '/settings',     __( 'Settings', 'gemtranslate' ) ],
 		];
 
+		// Nested entries mirror the in-app dropdowns. They are listed right
+		// after their parent, indented with an en dash. Default children
+		// (Posts, Categories, ...) are skipped: the parent already opens them.
+		$children = [
+			'/posts'      => $this->post_type_children(),
+			'/terms'      => $this->taxonomy_children(),
+			'/patterns'   => [
+				[ '/patterns?type=pattern', __( 'Patterns', 'gemtranslate' ) ],
+				[ '/patterns?type=navigation', __( 'Navigation', 'gemtranslate' ) ],
+			],
+			'/tools'      => [
+				[ '/io', __( 'Import & Export', 'gemtranslate' ) ],
+				[ '/migration', __( 'Migration', 'gemtranslate' ) ],
+			],
+			'/settings'   => [
+				[ '/settings?tab=switcher', __( 'Language switcher', 'gemtranslate' ) ],
+				[ '/settings?tab=geo', __( 'Country detection', 'gemtranslate' ) ],
+				[ '/settings?tab=floating', __( 'Floating switcher', 'gemtranslate' ) ],
+				[ '/settings?tab=advanced', __( 'Advanced', 'gemtranslate' ) ],
+			],
+		];
+
+		$all = [];
 		foreach ( $items as $item ) {
-			list( $route, $label ) = $item;
+			$all[] = [ $item[0], $item[1], false ];
+			foreach ( $children[ $item[0] ] ?? [] as $child ) {
+				$all[] = [ $child[0], $child[1], true ];
+			}
+		}
+
+		foreach ( $all as $item ) {
+			list( $route, $label, $nested ) = $item;
 			// The first entry reuses the parent slug so WordPress renames it from "GemTranslate".
 			$slug = '' === $route
 				? $page
 				: admin_url( 'admin.php?page=' . $page ) . '#' . $route;
+			$title = $label;
+			if ( $nested ) {
+				$label = '– ' . $label;
+			}
 
-			add_submenu_page( $page, $label, $label, 'manage_options', $slug, '' === $route ? [ $this, 'render_page' ] : '' );
+			add_submenu_page( $page, $title, $label, 'manage_options', $slug, '' === $route ? [ $this, 'render_page' ] : '' );
 		}
+	}
+
+	/** Public post types other than "post" (the Posts & Pages parent opens that). */
+	private function post_type_children() {
+		$out = [];
+		foreach ( get_post_types( [ 'public' => true ], 'objects' ) as $type ) {
+			if ( in_array( $type->name, [ 'post', 'attachment' ], true ) ) {
+				continue;
+			}
+			$out[] = [ '/posts?type=' . $type->name, $type->labels->name ?? $type->label ];
+		}
+		return $out;
+	}
+
+	/** Tags, plus the WooCommerce product taxonomies when they exist. */
+	private function taxonomy_children() {
+		$out = [ [ '/terms?tax=post_tag', __( 'Tags', 'gemtranslate' ) ] ];
+		if ( post_type_exists( 'product' ) ) {
+			$out[] = [ '/terms?tax=product_cat', __( 'Product categories', 'gemtranslate' ) ];
+			$out[] = [ '/terms?tax=product_tag', __( 'Product tags', 'gemtranslate' ) ];
+		}
+		return $out;
 	}
 
 	public function render_page() {

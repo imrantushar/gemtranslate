@@ -4,7 +4,7 @@ import { __ } from '@wordpress/i18n';
 import Icon from './Icon';
 import HeaderNav from './HeaderNav';
 import { TOPBAR_ACTIONS_ID } from './TopbarActions';
-import { NAV } from './nav';
+import { NAV, navMatches } from './nav';
 import { useThemeMode } from '../lib/theme';
 import { canManage } from '../lib/currentUser';
 
@@ -12,7 +12,7 @@ export default function Topbar() {
 	const { pathname } = useLocation();
 	const { isDark, toggle: toggleTheme } = useThemeMode();
 	const themeLabel = isDark ? __('Switch to light mode', 'gemtranslate') : __('Switch to dark mode', 'gemtranslate');
-	const current = NAV.find((item) => pathname === item.to || pathname.startsWith(`${item.to}/`));
+	const current = NAV.find((item) => navMatches(item, pathname));
 
 	return (
 		<header className="gtrans-topbar gtrans-flex gtrans-h-[72px] gtrans-flex-shrink-0 gtrans-items-center gtrans-justify-between gtrans-gap-4 gtrans-border-b gtrans-border-edge gtrans-bg-surface gtrans-px-5">

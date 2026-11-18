@@ -2,28 +2,34 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import Topbar from './Topbar';
-import { NAV } from './nav';
+import { NAV, navMatches } from './nav';
 
 /**
  * Mirror the current route onto the wp-admin sidebar's GemTranslate submenu,
  * which links to `admin.php?page=gemtranslate#/route` (see AdminMenu).
  */
 function useSyncAdminMenu() {
-	const { pathname } = useLocation();
+	const { pathname, search } = useLocation();
 
 	useEffect(() => {
 		const items = document.querySelectorAll('#toplevel_page_gemtranslate .wp-submenu li');
 		if (!items.length) return;
 
-		const routes = NAV.map((n) => n.to).sort((a, b) => b.length - a.length);
-		const match = routes.find((to) => pathname === to || pathname.startsWith(`${to}/`));
+		const hashes = Array.from(items).map((li) => {
+				const href = li.querySelector('a')?.getAttribute('href') || '';
+				return href.includes('#') ? href.split('#')[1] : '/dashboard';
+			});
+			// Prefer the exact child entry (e.g. /posts?type=page); otherwise
+			// fall back to the parent route.
+			const full = pathname + search;
+			const parent = NAV.find((n) => navMatches(n, pathname))?.to;
+			const exact = hashes.find((h) => h === full);
+			const target = exact || parent || '/dashboard';
 
-		items.forEach((li) => {
-			const href = li.querySelector('a')?.getAttribute('href') || '';
-			const hash = href.includes('#') ? href.split('#')[1] : '/dashboard';
-			li.classList.toggle('current', hash === (match || '/dashboard'));
-		});
-	}, [pathname]);
+			items.forEach((li, i) => {
+				li.classList.toggle('current', hashes[i] === target);
+			});
+		}, [pathname, search]);
 }
 
 export default function Layout({ children }) {

@@ -120,6 +120,7 @@ function ManagerApp() {
 						</ProGate>
 					}
 				/>
+				<Route path="/tools" element={<Navigate to="/io" replace />} />
 				<Route path="/migration" element={<MigrationPage />} />
 				<Route
 					path="/io"

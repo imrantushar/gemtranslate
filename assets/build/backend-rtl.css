@@ -1430,6 +1430,9 @@ input:where([type='file']):focus{
 	padding-top: 1.5rem;
 	padding-bottom: 1.5rem;
 }
+#gemtranslate-admin-root .gtrans-pb-1{
+	padding-bottom: 0.25rem;
+}
 #gemtranslate-admin-root .gtrans-pb-10{
 	padding-bottom: 2.5rem;
 }
@@ -1448,6 +1451,9 @@ input:where([type='file']):focus{
 #gemtranslate-admin-root .gtrans-pl-3{
 	padding-right: 0.75rem;
 }
+#gemtranslate-admin-root .gtrans-pl-6{
+	padding-right: 1.5rem;
+}
 #gemtranslate-admin-root .gtrans-pr-11{
 	padding-left: 2.75rem;
 }
@@ -1465,6 +1471,9 @@ input:where([type='file']):focus{
 }
 #gemtranslate-admin-root .gtrans-pt-16{
 	padding-top: 4rem;
+}
+#gemtranslate-admin-root .gtrans-pt-2{
+	padding-top: 0.5rem;
 }
 #gemtranslate-admin-root .gtrans-pt-2\.5{
 	padding-top: 0.625rem;
