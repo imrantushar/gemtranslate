@@ -829,6 +829,9 @@ input:where([type='file']):focus{
 #gemtranslate-admin-root .gtrans-min-w-\[34px\]{
 	min-width: 34px;
 }
+#gemtranslate-admin-root .gtrans-min-w-\[96px\]{
+	min-width: 96px;
+}
 #gemtranslate-admin-root .gtrans-max-w-2xl{
 	max-width: 42rem;
 }
@@ -1009,6 +1012,9 @@ input:where([type='file']):focus{
 }
 #gemtranslate-admin-root .gtrans-gap-6{
 	gap: 1.5rem;
+}
+#gemtranslate-admin-root .gtrans-gap-7{
+	gap: 1.75rem;
 }
 #gemtranslate-admin-root .gtrans-gap-8{
 	gap: 2rem;
@@ -1484,6 +1490,9 @@ input:where([type='file']):focus{
 #gemtranslate-admin-root .gtrans-pt-4{
 	padding-top: 1rem;
 }
+#gemtranslate-admin-root .gtrans-pt-5{
+	padding-top: 1.25rem;
+}
 #gemtranslate-admin-root .gtrans-text-left{
 	text-align: right;
 }
@@ -1592,6 +1601,10 @@ input:where([type='file']):focus{
 #gemtranslate-admin-root .gtrans-italic{
 	font-style: italic;
 }
+#gemtranslate-admin-root .gtrans-tabular-nums{
+	--tw-numeric-spacing: tabular-nums;
+	font-variant-numeric: var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction);
+}
 #gemtranslate-admin-root .gtrans-leading-9{
 	line-height: 2.25rem;
 }
@@ -1612,6 +1625,9 @@ input:where([type='file']):focus{
 }
 #gemtranslate-admin-root .gtrans-tracking-wide{
 	letter-spacing: 0.025em;
+}
+#gemtranslate-admin-root .gtrans-tracking-wider{
+	letter-spacing: 0.05em;
 }
 #gemtranslate-admin-root .gtrans-text-\[\#7c5cff\]{
 	--tw-text-opacity: 1;
@@ -1659,6 +1675,9 @@ input:where([type='file']):focus{
 }
 #gemtranslate-admin-root .gtrans-text-label{
 	color: var(--gtrans-label-color);
+}
+#gemtranslate-admin-root .gtrans-text-line{
+	color: var(--gtrans-border-color);
 }
 #gemtranslate-admin-root .gtrans-text-muted{
 	color: var(--gtrans-warn-muted);
@@ -1720,6 +1739,11 @@ input:where([type='file']):focus{
 #gemtranslate-admin-root .gtrans-shadow-lg{
 	--tw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 	--tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);
+	box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+#gemtranslate-admin-root .gtrans-shadow-sm{
+	--tw-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+	--tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
 	box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 #gemtranslate-admin-root .gtrans-shadow-xl{
@@ -2263,6 +2287,9 @@ body:has(.gtrans-onboarding) {
 	}
 	#gemtranslate-admin-root .lg\:gtrans-grid-cols-2{
 		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+	#gemtranslate-admin-root .lg\:gtrans-grid-cols-4{
+		grid-template-columns: repeat(4, minmax(0, 1fr));
 	}
 	#gemtranslate-admin-root .lg\:gtrans-grid-cols-\[280px_1fr\]{
 		grid-template-columns: 280px 1fr;

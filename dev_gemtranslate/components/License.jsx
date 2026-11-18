@@ -164,105 +164,224 @@ export default function License() {
 
 	if (!client) {
 		return (
-			<div className="gtrans-flex gtrans-flex-col gtrans-gap-3 gtrans-py-4">
-				<p className="gtrans-m-0 gtrans-text-sm gtrans-text-ink">
-					{sdk?.pending
-						? __('License management for GemTranslate Pro will appear here once the product is published on the store.', 'gemtranslate')
-						: __('Activate GemTranslate Pro to manage its license here.', 'gemtranslate')}
-				</p>
-				{(sdk?.purchase_url || sdk?.store_dashboard_url) && (
-					<p className="gtrans-m-0 gtrans-text-sm">
-						<a href={sdk.purchase_url || sdk.store_dashboard_url} target="_blank" rel="noreferrer">
-							{__('Open the store', 'gemtranslate')}
-						</a>
+			<div className="gtrans-py-4">
+				<div className="gtrans-rounded-md gtrans-border gtrans-border-line gtrans-bg-surface gtrans-p-6 gtrans-shadow-sm">
+					<p className="gtrans-m-0 gtrans-text-sm gtrans-text-ink">
+						{sdk?.pending
+							? __(
+									'License management for GemTranslate Pro will appear here once the product is published on the store.',
+									'gemtranslate'
+							  )
+							: __('Activate GemTranslate Pro to manage its license here.', 'gemtranslate')}
 					</p>
-				)}
+					{(sdk?.purchase_url || sdk?.store_dashboard_url) && (
+						<p className="gtrans-mb-0 gtrans-mt-3 gtrans-text-sm">
+							<a href={sdk.purchase_url || sdk.store_dashboard_url} target="_blank" rel="noreferrer">
+								{__('Open the store', 'gemtranslate')}
+							</a>
+						</p>
+					)}
+				</div>
 			</div>
 		);
 	}
 
 	const expires = formatDate(license?.expires);
 	const checked = formatDate(update?.last_checked_at);
+	const latest = update?.latest_version;
+	const updateAvailable = !!update?.update_available;
+
+	// ----------------------------------------------------------------
+	// Shared card primitives — the storeengine-pro license panel's
+	// visual language: soft-shadow card, divider header, roomy body.
+	// ----------------------------------------------------------------
+	const cardClass =
+		'gtrans-mb-6 gtrans-rounded-md gtrans-border gtrans-border-line gtrans-bg-surface gtrans-shadow-sm';
+	const cardHeaderClass =
+		'gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-justify-between gtrans-gap-4 gtrans-border-b gtrans-border-divider gtrans-bg-body gtrans-px-6 gtrans-py-4';
+	const cardTitleClass = 'gtrans-m-0 gtrans-text-base gtrans-font-semibold gtrans-text-ink';
+	const cardSubtitleClass = 'gtrans-mb-0 gtrans-mt-1 gtrans-text-xs gtrans-text-muted';
+	const cardBodyClass = 'gtrans-px-6 gtrans-py-6';
+
+	const VersionBlock = ({ label, value, highlight }) => (
+		<div className="gtrans-flex gtrans-min-w-[96px] gtrans-flex-col gtrans-gap-1">
+			<span className="gtrans-text-[11px] gtrans-font-medium gtrans-uppercase gtrans-tracking-wider gtrans-text-muted">
+				{label}
+			</span>
+			<span
+				className={`gtrans-font-mono gtrans-text-2xl gtrans-font-semibold gtrans-tabular-nums ${
+					highlight ? 'gtrans-text-primary' : 'gtrans-text-ink'
+				}`}
+			>
+				{value || '—'}
+			</span>
+		</div>
+	);
 
 	return (
-		<div className="gtrans-flex gtrans-flex-col gtrans-gap-8 gtrans-py-4">
-			<section>
-				<div className="gtrans-flex gtrans-items-center gtrans-justify-between">
-					<h3 className="gtrans-m-0 gtrans-text-sm gtrans-font-semibold gtrans-text-ink">{__('Updates', 'gemtranslate')}</h3>
-					<Button onClick={check} loading={'check' === busy}>
-						{__('Check for updates', 'gemtranslate')}
-					</Button>
-				</div>
-				<div className="gtrans-mt-4 gtrans-flex gtrans-flex-wrap gtrans-gap-x-10 gtrans-gap-y-4">
-					<Stat label={__('Installed', 'gemtranslate')}>{update?.current_version || sdk.package?.version || '—'}</Stat>
-					<Stat label={__('Latest', 'gemtranslate')}>
-						{update?.latest_version || '—'}{' '}
-						{update?.update_available && <StatusPill tone="draft">{__('Update available', 'gemtranslate')}</StatusPill>}
-					</Stat>
-					{checked && <Stat label={__('Last checked', 'gemtranslate')}>{checked}</Stat>}
-				</div>
-			</section>
-
-			<section>
-				<div className="gtrans-flex gtrans-items-center gtrans-justify-between">
-					<h3 className="gtrans-m-0 gtrans-text-sm gtrans-font-semibold gtrans-text-ink">{__('License', 'gemtranslate')}</h3>
-					<StatusPill tone={active ? 'publish' : 'none'}>{active ? __('Active', 'gemtranslate') : __('Not activated', 'gemtranslate')}</StatusPill>
-				</div>
-				{active ? (
-					<div className="gtrans-mt-4 gtrans-flex gtrans-flex-col gtrans-gap-4">
-						<div className="gtrans-flex gtrans-flex-wrap gtrans-gap-x-10 gtrans-gap-y-4">
-							<Stat label={__('Key', 'gemtranslate')}>
-								<span className="gtrans-break-all gtrans-font-mono">{license?.license || '—'}</span>
-							</Stat>
-							<Stat label={__('Sites', 'gemtranslate')}>
-								{license?.unlimited
-									? __('Unlimited', 'gemtranslate')
-									: /* translators: 1: sites in use, 2: sites allowed. */ sprintf(__('%1$s of %2$s in use', 'gemtranslate'), license?.activations ?? 0, license?.limit ?? 1)}
-							</Stat>
-							<Stat label={__('Expires', 'gemtranslate')}>{expires || __('Never', 'gemtranslate')}</Stat>
-						</div>
-						<div>
-							<Button variant="danger" onClick={deactivate} loading={'deactivate' === busy}>
-								{__('Deactivate on this site', 'gemtranslate')}
-							</Button>
-						</div>
+		<div className="gtrans-py-4">
+			{/* -------------------------------------------------- */}
+			{/* Updates card — hero with Installed → Latest */}
+			{/* -------------------------------------------------- */}
+			<div className={cardClass}>
+				<div className={cardHeaderClass}>
+					<div>
+						<h3 className={cardTitleClass}>{__('Updates', 'gemtranslate')}</h3>
+						<p className={cardSubtitleClass}>
+							{__('Check for new releases of GemTranslate Pro.', 'gemtranslate')}
+						</p>
 					</div>
-				) : (
-					<form
-						className="gtrans-mt-4 gtrans-flex gtrans-flex-col gtrans-gap-4"
-						onSubmit={(e) => {
-							e.preventDefault();
-							activate();
-						}}
-					>
-						<Field label={__('License key', 'gemtranslate')} hint={__('Find it in your Kodezen store dashboard.', 'gemtranslate')}>
-							<TextInput
-								value={key}
-								onChange={(e) => setKey(e.target.value)}
-								placeholder={__('Paste your license key', 'gemtranslate')}
-								autoComplete="off"
-								spellCheck={false}
-							/>
-						</Field>
-						<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-4">
-							<Button type="submit" loading={'activate' === busy}>
-								{__('Activate license', 'gemtranslate')}
-							</Button>
-							{(sdk.purchase_url || sdk.store_dashboard_url) && (
-								<a className="gtrans-text-sm" href={sdk.purchase_url || sdk.store_dashboard_url} target="_blank" rel="noreferrer">
-									{__('Don’t have a key? Get one', 'gemtranslate')}
-								</a>
-							)}
-						</div>
-					</form>
-				)}
-			</section>
+					<div className="gtrans-flex gtrans-items-center gtrans-gap-4">
+						{checked && (
+							<span className="gtrans-text-xs gtrans-text-muted">
+								{/* translators: %s: date string. */ sprintf(__('Last checked %s', 'gemtranslate'), checked)}
+							</span>
+						)}
+						<Button variant="secondary" onClick={check} loading={'check' === busy}>
+							{__('Check for updates', 'gemtranslate')}
+						</Button>
+					</div>
+				</div>
+				<div className={cardBodyClass}>
+					<div className="gtrans-flex gtrans-flex-wrap gtrans-items-end gtrans-gap-7">
+						<VersionBlock label={__('Installed', 'gemtranslate')} value={installed} />
+						{updateAvailable && (
+							<span aria-hidden="true" className="gtrans-text-3xl gtrans-leading-none gtrans-text-line">
+								→
+							</span>
+						)}
+						{updateAvailable && (
+							<VersionBlock label={__('Latest', 'gemtranslate')} value={latest} highlight />
+						)}
+						{!updateAvailable && latest && (
+							<VersionBlock label={__('Latest', 'gemtranslate')} value={latest} />
+						)}
+						{updateAvailable && (
+							<div className="gtrans-ml-auto">
+								<StatusPill tone="draft">{__('Update available', 'gemtranslate')}</StatusPill>
+							</div>
+						)}
+					</div>
+				</div>
+			</div>
 
-			<section>
-				<h3 className="gtrans-m-0 gtrans-text-sm gtrans-font-semibold gtrans-text-ink">{__('Version history', 'gemtranslate')}</h3>
-				<p className="gtrans-mb-3 gtrans-mt-1 gtrans-text-xs gtrans-text-muted">
-					{__('Install a release or roll back to an earlier one.', 'gemtranslate')}
-				</p>
+			{/* -------------------------------------------------- */}
+			{/* License card */}
+			{/* -------------------------------------------------- */}
+			<div className={cardClass}>
+				<div className={cardHeaderClass}>
+					<div>
+						<h3 className={cardTitleClass}>{__('License', 'gemtranslate')}</h3>
+						<p className={cardSubtitleClass}>
+							{active
+								? __('Your site is activated and receiving updates.', 'gemtranslate')
+								: __('Activate your license key to enable updates and support.', 'gemtranslate')}
+						</p>
+					</div>
+					<StatusPill tone={active ? 'publish' : 'none'}>
+						{active ? __('Active', 'gemtranslate') : __('Not activated', 'gemtranslate')}
+					</StatusPill>
+				</div>
+				<div className={cardBodyClass}>
+					{active ? (
+						<div className="gtrans-flex gtrans-flex-col gtrans-gap-6">
+							<div className="gtrans-grid gtrans-grid-cols-1 gtrans-gap-x-10 gtrans-gap-y-4 md:gtrans-grid-cols-2 lg:gtrans-grid-cols-4">
+								<Stat label={__('Key', 'gemtranslate')}>
+									<span className="gtrans-break-all gtrans-font-mono gtrans-text-xs">
+										{license?.license || '—'}
+									</span>
+								</Stat>
+								<Stat label={__('Sites', 'gemtranslate')}>
+									{license?.unlimited
+										? __('Unlimited', 'gemtranslate')
+										: /* translators: 1: sites in use, 2: sites allowed. */ sprintf(
+												__('%1$s of %2$s in use', 'gemtranslate'),
+												license?.activations ?? 0,
+												license?.limit ?? 1
+										  )}
+								</Stat>
+								<Stat label={__('Expires', 'gemtranslate')}>{expires || __('Never', 'gemtranslate')}</Stat>
+								<Stat label={__('Automatic updates', 'gemtranslate')}>
+									{__('Enabled', 'gemtranslate')}
+								</Stat>
+							</div>
+							<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-4 gtrans-border-t gtrans-border-divider gtrans-pt-5">
+								<Button variant="danger" onClick={deactivate} loading={'deactivate' === busy}>
+									{__('Deactivate on this site', 'gemtranslate')}
+								</Button>
+								{sdk.store_dashboard_url && (
+									<a
+										className="gtrans-text-sm"
+										href={sdk.store_dashboard_url}
+										target="_blank"
+										rel="noreferrer"
+									>
+										{__('Manage license on store →', 'gemtranslate')}
+									</a>
+								)}
+							</div>
+						</div>
+					) : (
+						<form
+							className="gtrans-flex gtrans-flex-col gtrans-gap-5"
+							onSubmit={(e) => {
+								e.preventDefault();
+								activate();
+							}}
+						>
+							<Field
+								label={__('License key', 'gemtranslate')}
+								hint={__('Find it in your Kodezen store dashboard, under License keys.', 'gemtranslate')}
+							>
+								<TextInput
+									value={key}
+									onChange={(e) => setKey(e.target.value)}
+									placeholder={__('Enter your license key to activate', 'gemtranslate')}
+									autoComplete="off"
+									spellCheck={false}
+								/>
+							</Field>
+							<div className="gtrans-flex gtrans-flex-wrap gtrans-items-center gtrans-gap-4">
+								<Button type="submit" loading={'activate' === busy}>
+									{__('Activate license', 'gemtranslate')}
+								</Button>
+								{sdk.store_dashboard_url && (
+									<a
+										className="gtrans-text-sm"
+										href={sdk.store_dashboard_url}
+										target="_blank"
+										rel="noreferrer"
+									>
+										{__('Manage license', 'gemtranslate')}
+									</a>
+								)}
+							</div>
+							{sdk.purchase_url && (
+								<p className="gtrans-mb-0 gtrans-mt-2 gtrans-text-sm gtrans-text-muted">
+									{__('Don’t have a license key?', 'gemtranslate')}{' '}
+									<a href={sdk.purchase_url} target="_blank" rel="noreferrer">
+										{__('Purchase one here', 'gemtranslate')}
+									</a>
+								</p>
+							)}
+						</form>
+					)}
+				</div>
+			</div>
+
+			{/* -------------------------------------------------- */}
+			{/* Version history card */}
+			{/* -------------------------------------------------- */}
+			<div className={cardClass}>
+				<div className={cardHeaderClass}>
+					<div>
+						<h3 className={cardTitleClass}>{__('Version history', 'gemtranslate')}</h3>
+						<p className={cardSubtitleClass}>
+							{__('Install a release or roll back to an earlier one.', 'gemtranslate')}
+						</p>
+					</div>
+				</div>
+				<div className={cardBodyClass}>
 				{null === versions && <p className="gtrans-m-0 gtrans-text-sm gtrans-text-muted">{__('Loading…', 'gemtranslate')}</p>}
 				{versionsError && <p className="gtrans-m-0 gtrans-text-sm gtrans-text-muted">{versionsError}</p>}
 				{versions && !versionsError && 0 === versions.length && (
@@ -311,7 +430,8 @@ export default function License() {
 						</tbody>
 					</table>
 				)}
-			</section>
+				</div>
+			</div>
 
 			<Toast message={toast?.message} tone={toast?.tone} onClear={() => setToast(null)} />
 		</div>
