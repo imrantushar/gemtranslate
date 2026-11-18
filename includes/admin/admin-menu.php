@@ -11,7 +11,11 @@ class AdminMenu {
 
 	public static function init() {
 		$self = new self();
-		add_action( 'admin_menu', [ $self, 'register_menu' ] );
+		add_action( 'admin_menu', [ $self, 'register_menu' ], 10 );
+		// Runs after SDK's add_settings_page (priority 10) so "Get Pro" lands
+		// at the bottom, below any License entry Pro re-parented here.
+		add_action( 'admin_menu', [ $self, 'register_get_pro' ], 99 );
+		add_action( 'current_screen', [ $self, 'maybe_redirect_to_pro' ] );
 	}
 
 	public function register_menu() {
@@ -74,6 +78,44 @@ class AdminMenu {
 
 			add_submenu_page( $page, $label, $label, 'manage_options', $slug, '' === $route ? [ $this, 'render_page' ] : '' );
 		}
+	}
+
+	/**
+	 * "Get Pro" sidebar entry, free-only. Clicking it hits a screen whose
+	 * callback redirects to the store page with UTM (same pattern StoreEngine uses).
+	 */
+	public function register_get_pro() {
+		if ( defined( 'GTRANS_PRO_VERSION' ) ) {
+			return;
+		}
+
+		add_submenu_page(
+			self::PAGE_SLUG,
+			__( 'Get Pro', 'gemtranslate' ),
+			'<span class="dashicons dashicons-awards" style="color:#f0b849"></span> ' . __( 'Get Pro', 'gemtranslate' ),
+			'manage_options',
+			'gemtranslate-get-pro',
+			'__return_null'
+		);
+	}
+
+	public function maybe_redirect_to_pro( $screen ) {
+		if ( ! $screen || 'gemtranslate_page_gemtranslate-get-pro' !== $screen->id ) {
+			return;
+		}
+		$url = add_query_arg(
+			[
+				'utm_source'   => 'gemtranslate-plugin',
+				'utm_medium'   => 'admin-dashboard',
+				'utm_campaign' => 'upgrade-to-pro',
+				'utm_content'  => 'get-pro-button',
+				'utm_term'     => 'free-user',
+				'locale'       => get_locale(),
+			],
+			'https://store.kodezen.com/product/gemtranslate-pro'
+		);
+		wp_safe_redirect( $url );
+		exit;
 	}
 
 	public function render_page() {
