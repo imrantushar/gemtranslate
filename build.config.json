@@ -1,0 +1,14 @@
+{
+  "slug": "gemtranslate",
+  "textdomain": "gemtranslate",
+  "mainFile": "gemtranslate.php",
+  "languages": "languages",
+  "zipName": "{slug}.{version}.zip",
+  "outputDir": "..",
+
+  "steps": { "js": true, "composer": false, "strauss": false, "pot": false, "zip": true },
+
+  "js": { "install": "auto", "buildScript": "build" },
+
+  "autoDownloadTools": false
+}
