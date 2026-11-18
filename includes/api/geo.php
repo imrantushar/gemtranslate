@@ -60,13 +60,18 @@ class Geo extends Controller {
 		$iso = CountryContext::current();
 		// Detector configuration is not exposed: it tells an attacker which
 		// signals (headers, MaxMind, cookie) decide the visitor's content.
-		return $this->ok(
+		$response = $this->ok(
 			[
 				'country'        => $iso,
 				'enabled'        => CountryContext::enabled(),
 				'language_match' => '' !== $iso ? $this->match_language( $iso ) : '',
 			]
 		);
+		// Per-visitor payload; must not be shared by a page cache or CDN.
+		if ( $response instanceof \WP_REST_Response ) {
+			$response->header( 'Cache-Control', 'no-store, private' );
+		}
+		return $response;
 	}
 
 	/**
@@ -155,7 +160,11 @@ class Geo extends Controller {
 		if ( ! $ok ) {
 			return $this->fail( 'gtrans_cookie_failed', __( 'Could not set country cookie.', 'gemtranslate' ), 500 );
 		}
-		return $this->ok( [ 'country' => $country ] );
+		$response = $this->ok( [ 'country' => $country ] );
+		if ( $response instanceof \WP_REST_Response ) {
+			$response->header( 'Cache-Control', 'no-store, private' );
+		}
+		return $response;
 	}
 
 	/**

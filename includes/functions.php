@@ -80,6 +80,11 @@ if ( ! function_exists( 'gtrans_flush_rewrite_rules' ) ) {
 	 * Schedule a rewrite-rules flush at the next `init`.
 	 */
 	function gtrans_flush_rewrite_rules() {
+		// Keep this flag off the autoload cache — it's only read at `init`.
+		if ( false === get_option( 'gtrans_required_rewrite_flush', false ) ) {
+			add_option( 'gtrans_required_rewrite_flush', 'yes', '', false );
+			return;
+		}
 		update_option( 'gtrans_required_rewrite_flush', 'yes' );
 	}
 }
