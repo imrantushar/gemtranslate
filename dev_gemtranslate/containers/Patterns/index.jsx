@@ -34,7 +34,7 @@ export default function PatternsPage() {
 	const [filters, setFilters] = useState({ page: 1, per_page: 20, search: '', status: 'all' });
 	const [params, setParams] = useSearchParams();
 	const { patterns } = useSubmenus();
-	const type = params.get('type') || 'template_part';
+	const type = params.get('type') || patterns[0]?.key || 'template_part';
 	const items = usePatternItems();
 
 	const rows = items.data?.rows || [];
@@ -48,6 +48,9 @@ export default function PatternsPage() {
 	const ofType = useMemo(() => rows.filter((r) => r.type === type), [rows, type]);
 	const counts = useMemo(() => {
 		const c = { all: ofType.length, untranslated: 0, progress: 0, translated: 0 };
+		// Without a non-default language nothing can be translated, and the list
+		// below is an empty state: don't advertise items that aren't shown.
+		if (langCodes.length === 0) return { ...c, all: 0 };
 		ofType.forEach((r) => { c[overallStatus(r, langCodes)] += 1; });
 		return c;
 	}, [ofType, langCodes]);
@@ -100,13 +103,21 @@ export default function PatternsPage() {
 				{items.isLoading ? (
 					<TableSkeleton />
 				) : langCodes.length === 0 ? (
-					<Table.Empty columns={[__('Name', 'gemtranslate'), '']}>
-						{__('Add at least one non-default language to start translating patterns.', 'gemtranslate')}
+					<Table.Empty
+						columns={[__('Name', 'gemtranslate'), '']}
+						title={__('No language to translate into yet', 'gemtranslate')}
+					>
+						{__('Add at least one non-default language to start translating patterns.', 'gemtranslate')}{' '}
+						<Link to="/languages" className="gtrans-font-medium gtrans-text-primary">
+							{__('Add a language', 'gemtranslate')}
+						</Link>
 					</Table.Empty>
 				) : filtered.length === 0 ? (
 					<Table.Empty columns={[__('Name', 'gemtranslate'), __('Texts', 'gemtranslate'), '']}>
 						{ofType.length === 0
-							? __('Nothing to translate here. This needs a block theme with text in its template parts, patterns or navigation.', 'gemtranslate')
+							? window.gtrans?.isClassic
+								? __('Nothing to translate here. Add text widgets to a sidebar (Appearance → Widgets) or set a site title and tagline.', 'gemtranslate')
+								: __('Nothing to translate here. This needs a block theme with text in its template parts, patterns or navigation.', 'gemtranslate')
 							: __('No matches.', 'gemtranslate')}
 					</Table.Empty>
 				) : (

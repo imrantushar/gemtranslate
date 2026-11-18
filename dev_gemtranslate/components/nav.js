@@ -23,12 +23,12 @@ const MANAGER_NAV = [
 		pro: 'translators',
 		children: 'translators',
 	},
-	{ to: '/migration', label: () => __('Migration', 'gemtranslate'), icon: 'swap' },
 	{
-		to: '/io',
-		label: () => __('Import & Export', 'gemtranslate'),
-		icon: 'upload',
-		pro: 'import_export',
+		to: '/tools',
+		match: ['/tools', '/migration', '/io'],
+		label: () => __('Tools', 'gemtranslate'),
+		icon: 'swap',
+		children: 'tools',
 	},
 	{ to: '/settings', label: () => __('Settings', 'gemtranslate'), icon: 'settings', children: 'settings' },
 ];
@@ -39,6 +39,10 @@ const TRANSLATOR_NAV = [
 ];
 
 export const NAV = canManage ? MANAGER_NAV : TRANSLATOR_NAV;
+
+/** True when `pathname` belongs to a nav item (its own route or any grouped route). */
+export const navMatches = (item, pathname) =>
+	(item.match || [item.to]).some((to) => pathname === to || pathname.startsWith(`${to}/`));
 
 // One-line hints shown under each entry in the sidebar layouts.
 const POST_TYPE_HINTS = () => ({
@@ -80,11 +84,20 @@ export function useSubmenus() {
 			: []),
 	].map((c) => ({ ...c, to: `/terms?tax=${c.key}`, param: 'tax', isDefault: c.key === 'category', icon: 'tag', hint: TAXONOMY_HINTS()[c.key] || __('Translate terms', 'gemtranslate') }));
 
-	const patterns = [
-		{ key: 'template_part', label: __('Header & footer', 'gemtranslate'), hint: __('Template parts', 'gemtranslate'), icon: 'panel' },
-		{ key: 'pattern', label: __('Patterns', 'gemtranslate'), hint: __('Synced patterns', 'gemtranslate'), icon: 'file' },
-		{ key: 'navigation', label: __('Navigation', 'gemtranslate'), hint: __('Menus built with blocks', 'gemtranslate'), icon: 'menu' },
-	].map((c) => ({ ...c, to: `/patterns?type=${c.key}`, param: 'type', isDefault: c.key === 'template_part' }));
+	// Block themes translate template parts; classic themes keep their header /
+	// footer text in widgets and the Customizer instead.
+	const patterns = (
+		window.gtrans?.isClassic
+			? [
+					{ key: 'widget', label: __('Widgets', 'gemtranslate'), hint: __('Header & footer widgets', 'gemtranslate'), icon: 'panel' },
+					{ key: 'customizer', label: __('Theme options', 'gemtranslate'), hint: __('Site title, tagline, footer text', 'gemtranslate'), icon: 'settings' },
+				]
+			: [
+					{ key: 'template_part', label: __('Header & footer', 'gemtranslate'), hint: __('Template parts', 'gemtranslate'), icon: 'panel' },
+					{ key: 'pattern', label: __('Patterns', 'gemtranslate'), hint: __('Synced patterns', 'gemtranslate'), icon: 'file' },
+					{ key: 'navigation', label: __('Navigation', 'gemtranslate'), hint: __('Menus built with blocks', 'gemtranslate'), icon: 'menu' },
+				]
+	).map((c, i) => ({ ...c, to: `/patterns?type=${c.key}`, param: 'type', isDefault: i === 0 }));
 
 	const settings = [
 		{ key: 'general', label: __('General', 'gemtranslate') },
@@ -98,8 +111,13 @@ export function useSubmenus() {
 		{ key: 'contributor', label: __('Contributor', 'gemtranslate'), to: '/assignments', badge: 'assignments' },
 	];
 
-	return { postTypes: posts, taxonomies, patterns, settings, translators };
+	const tools = [
+		{ key: 'io', label: __('Import & Export', 'gemtranslate'), to: '/io', pro: 'import_export' },
+		{ key: 'migration', label: __('Migration', 'gemtranslate'), to: '/migration' },
+	];
+
+	return { postTypes: posts, taxonomies, patterns, settings, translators, tools };
 }
 
 // Items shown directly in the header; everything else lives under "More".
-export const MORE_PATHS = ['/translators', '/migration', '/io'];
+export const MORE_PATHS = ['/translators', '/tools'];

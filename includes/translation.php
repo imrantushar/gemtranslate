@@ -13,6 +13,7 @@ class Translation {
 		Translation\StringTranslator::init();
 		Translation\LayoutTranslator::init();
 		Translation\LayoutVariants::init();
+		Translation\ClassicLayout::init();
 		Translation\ShadowPostSync::init();
 		Translation\ElementorTranslator::init();
 		// MetaTranslator (custom fields/ACF) is Pro — registered by gemtranslate-pro on `gtrans_init`.

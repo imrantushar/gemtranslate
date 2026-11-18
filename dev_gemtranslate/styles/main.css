@@ -331,3 +331,23 @@ body.toplevel_page_gemtranslate #wpfooter {
 @media (prefers-reduced-motion: reduce) {
 	#gemtranslate-admin-root .gtrans-marquee-track { animation: none; }
 }
+
+/* Setup (onboarding) overlay. Preflight is off, so there is no global
+   border-box: `w-full` + `px-6` made the header and body 48px wider than the
+   screen (horizontal scrollbar, clipped Skip / close buttons). Scoped here so
+   the rest of the app's layout is untouched. */
+.gtrans-onboarding,
+.gtrans-onboarding *,
+.gtrans-onboarding *::before,
+.gtrans-onboarding *::after {
+	box-sizing: border-box;
+}
+.gtrans-onboarding {
+	overflow-x: hidden;
+	overscroll-behavior: contain;
+}
+/* The overlay scrolls itself; stop the wp-admin page behind it from showing a second scrollbar. */
+html:has(.gtrans-onboarding),
+body:has(.gtrans-onboarding) {
+	overflow: hidden;
+}

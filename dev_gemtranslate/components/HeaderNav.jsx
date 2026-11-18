@@ -5,7 +5,7 @@ import clsx from 'clsx';
 
 import Icon from './Icon';
 import { ProBadge } from './ProGate';
-import { NAV, MORE_PATHS, useSubmenus } from './nav';
+import { NAV, MORE_PATHS, navMatches, useSubmenus } from './nav';
 import { useAssignmentCounts } from '../hooks/useAssignments';
 import { hasFeature } from '../hooks/useFeatures';
 
@@ -105,7 +105,7 @@ export default function HeaderNav() {
 
 	const renderItem = (item) => {
 		const kids = item.children ? submenus[item.children] : null;
-		const active = isActivePath(pathname, item.to);
+		const active = navMatches(item, pathname);
 
 		if (!kids) {
 			return (
@@ -139,6 +139,7 @@ export default function HeaderNav() {
 						{kids.map((child) => (
 							<MenuLink key={child.key} to={child.to} active={childActive(child)}>
 								{child.label}
+								{child.pro && !hasFeature(child.pro) && <ProBadge />}
 								{child.badge === 'assignments' && openAssignments > 0 && (
 									<span className="gtrans-rounded-full gtrans-bg-primary-light gtrans-px-2 gtrans-py-0.5 gtrans-text-11 gtrans-font-medium gtrans-text-primary">
 										{openAssignments}
@@ -153,7 +154,7 @@ export default function HeaderNav() {
 	};
 
 	const moreOpen = openKey === '__more';
-	const moreActive = more.some((i) => isActivePath(pathname, i.to));
+	const moreActive = more.some((i) => navMatches(i, pathname));
 
 	return (
 		<nav
@@ -178,15 +179,35 @@ export default function HeaderNav() {
 					</button>
 					{moreOpen && (
 						<Panel align="right">
-							{more.map((item) => (
-								<MenuLink key={item.to} to={item.to} active={isActivePath(pathname, item.to)}>
-									<span className="gtrans-flex gtrans-items-center gtrans-gap-2">
-										<Icon name={item.icon} size={14} />
-										{item.label()}
-									</span>
-									{item.pro && !hasFeature(item.pro) && <ProBadge />}
-								</MenuLink>
-							))}
+							{more.map((item) => {
+									// Tools lists its pages (Import & Export, Migration) as
+									// indented sub-items instead of one flat link.
+									const kids = item.children === 'tools' ? submenus.tools : null;
+									return (
+										<div key={item.to}>
+											{kids ? (
+												<div className="gtrans-flex gtrans-items-center gtrans-gap-2 gtrans-px-3 gtrans-pt-2 gtrans-pb-1 gtrans-text-11 gtrans-font-medium gtrans-uppercase gtrans-text-muted">
+													<Icon name={item.icon} size={14} />
+													{item.label()}
+												</div>
+											) : (
+												<MenuLink to={item.to} active={navMatches(item, pathname)}>
+													<span className="gtrans-flex gtrans-items-center gtrans-gap-2">
+														<Icon name={item.icon} size={14} />
+														{item.label()}
+													</span>
+													{item.pro && !hasFeature(item.pro) && <ProBadge />}
+												</MenuLink>
+											)}
+											{kids?.map((child) => (
+												<MenuLink key={child.key} to={child.to} active={pathname === child.to}>
+													<span className="gtrans-pl-6">{child.label}</span>
+													{child.pro && !hasFeature(child.pro) && <ProBadge />}
+												</MenuLink>
+											))}
+										</div>
+									);
+								})}
 						</Panel>
 					)}
 				</div>
