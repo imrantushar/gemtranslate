@@ -11,8 +11,7 @@
 .idea/
 .github/
 
-# Build tooling & dependencies (source + package.json + webpack/tailwind configs ship
-# in the zip: WordPress.org requires human-readable source for compiled assets)
+# Build tooling & dependencies
 node_modules/
 package-lock.json
 pnpm-lock.yaml
@@ -22,6 +21,9 @@ composer.lock
 vendor/
 .npmrc
 .nvmrc
+
+# React source — compiled assets ship via build/
+dev_gemtranslate/
 
 
 # Linters / formatters
