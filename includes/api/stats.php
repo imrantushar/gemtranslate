@@ -35,10 +35,10 @@ class Stats extends Controller {
 		$languages = Context::active_languages();
 		$default   = Context::default_code();
 
-		$post_translations = (int) $wpdb->get_var( "SELECT COUNT(*) FROM " . Helper::table( 'post_translations' ) );
-		$term_translations = (int) $wpdb->get_var( "SELECT COUNT(*) FROM " . Helper::table( 'term_translations' ) );
-		$strings_total     = (int) $wpdb->get_var( "SELECT COUNT(*) FROM " . Helper::table( 'strings' ) );
-		$strings_translated = (int) $wpdb->get_var( "SELECT COUNT(DISTINCT string_id) FROM " . Helper::table( 'string_translations' ) . " WHERE value <> ''" );
+		$post_translations = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', Helper::table( 'post_translations' ) ) );
+		$term_translations = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', Helper::table( 'term_translations' ) ) );
+		$strings_total     = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', Helper::table( 'strings' ) ) );
+		$strings_translated = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(DISTINCT string_id) FROM %i WHERE value <> ''", Helper::table( 'string_translations' ) ) );
 
 		// Per-language post coverage.
 		$per_lang = [];
@@ -48,7 +48,8 @@ class Stats extends Controller {
 			}
 			$count = (int) $wpdb->get_var(
 				$wpdb->prepare(
-					"SELECT COUNT(*) FROM " . Helper::table( 'post_translations' ) . " WHERE language_code = %s AND status = 'publish'",
+					"SELECT COUNT(*) FROM %i WHERE language_code = %s AND status = 'publish'",
+					Helper::table( 'post_translations' ),
 					$code
 				)
 			);

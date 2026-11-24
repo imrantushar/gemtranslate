@@ -31,12 +31,14 @@ class LanguageSwitcherWidget extends \WP_Widget {
 			echo $args['before_title'] . esc_html( $instance['title'] ) . $args['after_title']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 		$switcher = new LanguageSwitcher();
-		echo $switcher->render_shortcode( [
-			'display'     => $instance['display'] ?? 'inline',
+		$display  = in_array( $instance['display'] ?? 'inline', [ 'inline', 'dropdown' ], true ) ? $instance['display'] : 'inline';
+		$markup   = $switcher->render_shortcode( [
+			'display'     => $display,
 			'show_flag'   => ! empty( $instance['show_flag'] ) ? '1' : '0',
 			'show_name'   => ! empty( $instance['show_name'] ) ? '1' : '0',
 			'show_native' => ! empty( $instance['show_native'] ) ? '1' : '0',
-		] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		] );
+		echo wp_kses( $markup, LanguageSwitcher::allowed_html() );
 		echo $args['after_widget']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 

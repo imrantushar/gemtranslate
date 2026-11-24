@@ -95,14 +95,14 @@ class StringTranslator {
 	 */
 	private static function entries_for_domain( $domain, $lang ) {
 		global $wpdb;
-		$st  = Helper::table( 'strings' );
-		$stt = Helper::table( 'string_translations' );
 		return $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT s.source, s.context, t.value
-				 FROM $stt AS t
-				 INNER JOIN $st AS s ON s.string_id = t.string_id
+				 FROM %i AS t
+				 INNER JOIN %i AS s ON s.string_id = t.string_id
 				 WHERE s.domain = %s AND t.language_code = %s AND t.status != 'draft' AND t.value <> ''",
+				Helper::table( 'string_translations' ),
+				Helper::table( 'strings' ),
 				$domain,
 				$lang
 			),
@@ -151,16 +151,18 @@ class StringTranslator {
 		self::$map    = [];
 		global $wpdb;
 		$lang  = Context::current();
-		$st    = Helper::table( 'strings' );
-		$stt   = Helper::table( 'string_translations' );
-		$query = $wpdb->prepare(
-			"SELECT s.source, s.context, s.domain, t.value
-			 FROM $stt AS t
-			 INNER JOIN $st AS s ON s.string_id = t.string_id
-			 WHERE t.language_code = %s AND t.status != 'draft' AND t.value <> ''",
-			$lang
-		);
-		$rows = $wpdb->get_results( $query, ARRAY_A ) ?: [];
+		$rows  = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT s.source, s.context, s.domain, t.value
+				 FROM %i AS t
+				 INNER JOIN %i AS s ON s.string_id = t.string_id
+				 WHERE t.language_code = %s AND t.status != 'draft' AND t.value <> ''",
+				Helper::table( 'string_translations' ),
+				Helper::table( 'strings' ),
+				$lang
+			),
+			ARRAY_A
+		) ?: [];
 		foreach ( $rows as $row ) {
 			$key = self::hash( $row['source'], $row['context'], $row['domain'] );
 			self::$map[ $key ] = $row['value'];
@@ -271,7 +273,8 @@ class StringTranslator {
 		$join_params = [];
 		if ( '' !== $lang ) {
 			$select       .= ", t.value AS translation, t.status AS translation_status";
-			$join          = " LEFT JOIN $stt AS t ON t.string_id = s.string_id AND t.language_code = %s ";
+			$join          = ' LEFT JOIN %i AS t ON t.string_id = s.string_id AND t.language_code = %s ';
+			$join_params[] = $stt;
 			$join_params[] = $lang;
 
 			if ( 'untranslated' === $status_filter ) {
@@ -281,15 +284,17 @@ class StringTranslator {
 			}
 		}
 
-		$params  = array_merge( $join_params, $where_params );
-		$sql     = $select . " FROM $st AS s " . $join . $where . " ORDER BY s.string_id DESC LIMIT %d OFFSET %d";
-		$params2 = array_merge( $params, [ $per_page, $offset ] );
-		$prepared = $params2 ? $wpdb->prepare( $sql, $params2 ) : $sql;
-		$rows     = $wpdb->get_results( $prepared, ARRAY_A ) ?: [];
+		// The clauses above are fixed fragments with %s / %i placeholders only;
+		// every dynamic value travels through $params.
+		$params = array_merge( [ $st ], $join_params, $where_params );
+		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
+		$sql  = $select . ' FROM %i AS s ' . $join . $where . ' ORDER BY s.string_id DESC LIMIT %d OFFSET %d';
+		$rows = $wpdb->get_results( $wpdb->prepare( $sql, array_merge( $params, [ $per_page, $offset ] ) ), ARRAY_A ) ?: [];
 
 		// Apply the same WHERE + JOIN to the COUNT query so total matches filter.
-		$count_sql = "SELECT COUNT(*) FROM $st AS s " . $join . $where;
-		$total     = (int) ( $params ? $wpdb->get_var( $wpdb->prepare( $count_sql, $params ) ) : $wpdb->get_var( $count_sql ) );
+		$count_sql = 'SELECT COUNT(*) FROM %i AS s ' . $join . $where;
+		$total     = (int) $wpdb->get_var( $wpdb->prepare( $count_sql, $params ) );
+		// phpcs:enable
 
 		return [
 			'rows'     => $rows,
@@ -355,10 +360,12 @@ class StringTranslator {
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT t.language_code, t.status, COUNT(*) AS n
-				 FROM $st AS s
-				 INNER JOIN $stt AS t ON t.string_id = s.string_id
+				 FROM %i AS s
+				 INNER JOIN %i AS t ON t.string_id = s.string_id
 				 WHERE s.domain = %s AND t.value <> ''
 				 GROUP BY t.language_code, t.status",
+				$st,
+				$stt,
 				(string) $domain
 			),
 			ARRAY_A

@@ -177,8 +177,10 @@ class LayoutTranslator {
 		$codes = $wpdb->get_col(
 			$wpdb->prepare(
 				"SELECT DISTINCT t.language_code
-				 FROM $st AS s INNER JOIN $stt AS t ON t.string_id = s.string_id
+				 FROM %i AS s INNER JOIN %i AS t ON t.string_id = s.string_id
 				 WHERE s.domain = %s AND s.context = %s AND t.language_code LIKE %s AND t.value <> ''",
+				$st,
+				$stt,
 				self::DOMAIN,
 				self::CONTEXT,
 				$wpdb->esc_like( strtolower( (string) $language ) . '_' ) . '__'
@@ -200,9 +202,11 @@ class LayoutTranslator {
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT s.source, t.value
-				 FROM $st AS s
-				 INNER JOIN $stt AS t ON t.string_id = s.string_id
+				 FROM %i AS s
+				 INNER JOIN %i AS t ON t.string_id = s.string_id
 				 WHERE s.domain = %s AND s.context = %s AND t.language_code = %s AND t.value <> ''",
+				$st,
+				$stt,
 				self::DOMAIN,
 				self::CONTEXT,
 				$key

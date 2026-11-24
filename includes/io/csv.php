@@ -16,19 +16,21 @@ class Csv {
 	 * @param array<array{id:string,source:string,target:string,note?:string}> $rows
 	 */
 	public static function build( $rows ) {
-		$buf = fopen( 'php://temp', 'w+' );
-		fputcsv( $buf, [ 'id', 'source', 'target', 'note' ] );
+		$buf = new \SplTempFileObject();
+		$buf->fputcsv( [ 'id', 'source', 'target', 'note' ] );
 		foreach ( $rows as $r ) {
-			fputcsv( $buf, [
+			$buf->fputcsv( [
 				self::neutralise( (string) ( $r['id']     ?? '' ) ),
 				self::neutralise( (string) ( $r['source'] ?? '' ) ),
 				self::neutralise( (string) ( $r['target'] ?? '' ) ),
 				self::neutralise( (string) ( $r['note']   ?? '' ) ),
 			] );
 		}
-		rewind( $buf );
-		$out = stream_get_contents( $buf );
-		fclose( $buf );
+		$buf->rewind();
+		$out = '';
+		while ( ! $buf->eof() ) {
+			$out .= $buf->fgets();
+		}
 		return $out;
 	}
 
@@ -36,18 +38,24 @@ class Csv {
 	 * @return array<array{id:string,source:string,target:string}>
 	 */
 	public static function parse( $text ) {
-		$buf = fopen( 'php://temp', 'w+' );
-		fwrite( $buf, (string) $text );
-		rewind( $buf );
+		$buf = new \SplTempFileObject();
+		$buf->fwrite( (string) $text );
+		$buf->rewind();
+		$buf->setFlags( \SplFileObject::READ_CSV | \SplFileObject::SKIP_EMPTY | \SplFileObject::READ_AHEAD );
 
-		$header = fgetcsv( $buf );
-		if ( ! $header ) {
-			fclose( $buf );
+		$header = $buf->current();
+		if ( ! $header || ! is_array( $header ) ) {
 			return [];
 		}
 		$map = array_flip( array_map( 'strtolower', $header ) );
 		$out = [];
-		while ( ( $row = fgetcsv( $buf ) ) !== false ) {
+		$buf->next();
+		while ( $buf->valid() ) {
+			$row = $buf->current();
+			$buf->next();
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
 			$id     = self::restore( $row[ $map['id']     ?? 0 ] ?? '' );
 			$source = self::restore( $row[ $map['source'] ?? 1 ] ?? '' );
 			$target = self::restore( $row[ $map['target'] ?? 2 ] ?? '' );
@@ -56,7 +64,6 @@ class Csv {
 			}
 			$out[] = [ 'id' => $id, 'source' => $source, 'target' => $target ];
 		}
-		fclose( $buf );
 		return $out;
 	}
 

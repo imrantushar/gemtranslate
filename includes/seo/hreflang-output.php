@@ -48,7 +48,16 @@ class HreflangOutput {
 			esc_url( $rewriter->current_url_for_language( $default ) )
 		);
 
-		echo "\n" . implode( "\n", $tags ) . "\n";
+		echo "\n" . wp_kses(
+			implode( "\n", $tags ),
+			[
+				'link' => [
+					'rel'      => true,
+					'hreflang' => true,
+					'href'     => true,
+				],
+			]
+		) . "\n";
 	}
 
 	private function build_hreflang( $code, $lang ) {

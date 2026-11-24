@@ -130,10 +130,10 @@ class TranslationLoader {
 		$row       = TranslationCache::get( TranslationCache::GROUP_POSTS, $cache_key );
 		if ( false === $row ) {
 			global $wpdb;
-			$table = Helper::table( 'post_translations' );
 			$row   = $wpdb->get_row(
 				$wpdb->prepare(
-					"SELECT * FROM $table WHERE group_id = %d AND language_code = %s AND country_code = %s LIMIT 1",
+					'SELECT * FROM %i WHERE group_id = %d AND language_code = %s AND country_code = %s LIMIT 1',
+					Helper::table( 'post_translations' ),
 					$group_id,
 					$lang,
 					$country
@@ -520,17 +520,17 @@ class TranslationLoader {
 			return [];
 		}
 		global $wpdb;
-		$st  = Helper::table( 'strings' );
-		$stt = Helper::table( 'string_translations' );
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT s.source, t.value
-				 FROM $st AS s
-				 INNER JOIN $stt AS t ON t.string_id = s.string_id
+				 FROM %i AS s
+				 INNER JOIN %i AS t ON t.string_id = s.string_id
 				 WHERE s.domain = %s
 				   AND s.context = %s
 				   AND t.language_code = %s
 				   AND t.value <> ''",
+				Helper::table( 'strings' ),
+				Helper::table( 'string_translations' ),
 				'gtrans:post',
 				self::string_context_for_group( $group_id ),
 				strtolower( $language_code )
@@ -632,8 +632,9 @@ class TranslationLoader {
 		// Find the post_id so we can invalidate caches.
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT post_id FROM " . Helper::table( 'post_translations' ) . "
+				"SELECT post_id FROM %i
 				 WHERE group_id = %d AND language_code = %s AND country_code = %s LIMIT 1",
+				Helper::table( 'post_translations' ),
 				$group_id,
 				strtolower( $language_code ),
 				self::normalize_country( $country_code )

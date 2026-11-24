@@ -69,7 +69,7 @@ class ClassicLayout {
 		$items = [];
 
 		global $wp_registered_sidebars;
-		foreach ( (array) wp_get_sidebars_widgets() as $sidebar => $widget_ids ) {
+		foreach ( (array) get_option( 'sidebars_widgets', [] ) as $sidebar => $widget_ids ) {
 			if ( 'wp_inactive_widgets' === $sidebar || ! is_array( $widget_ids ) ) {
 				continue;
 			}

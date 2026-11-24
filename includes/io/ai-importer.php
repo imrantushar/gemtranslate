@@ -85,9 +85,11 @@ class AiImporter {
 			$data = $wpdb->get_results(
 				$wpdb->prepare(
 					"SELECT s.string_id, s.source, t.value
-					 FROM $st AS s
-					 LEFT JOIN $stt AS t ON t.string_id = s.string_id AND t.language_code = %s
+					 FROM %i AS s
+					 LEFT JOIN %i AS t ON t.string_id = s.string_id AND t.language_code = %s
 					 WHERE s.domain = %s AND s.string_id IN ($in)",
+					$st,
+					$stt,
 					strtolower( $lang ),
 					$domain
 				),
