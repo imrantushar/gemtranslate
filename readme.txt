@@ -2,7 +2,7 @@
 Contributors: kodezen, tusharimran
 Tags: multilingual, translation, language switcher, i18n, woocommerce
 Requires at least: 6.0
-Tested up to: 6.9
+Tested up to: 7.1
 Requires PHP: 7.4
 Stable tag: 1.0.0
 License: GPLv3 or later
@@ -92,4 +92,6 @@ When you use the "Import community translations" tool in GemTranslate, the plugi
 
 == Source code ==
 
-The admin app in `assets/build/` is compiled from the readable source in the `dev_gemtranslate/` folder of this plugin. Build it with `npm install` followed by `npm run build` (uses @wordpress/scripts, Tailwind and webpack; see `package.json`).
+The full, human-readable source code of GemTranslate is publicly available on GitHub: https://github.com/imrantushar/gemtranslate
+
+The compiled admin app in `assets/build/` is built from the source in the `dev_gemtranslate/` folder of that repository. To build it, run `npm install` followed by `npm run build` (uses @wordpress/scripts, Tailwind and webpack; see `package.json`).

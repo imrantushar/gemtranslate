@@ -62,11 +62,6 @@ final class GemTranslate {
 	}
 
 	public function load_dependency() {
-		// Bundled StoreEngine SDK (licensing/updates). Must load at plugin load
-		// time: the SDK registers itself on plugins_loaded priority 0.
-		if ( is_readable( GTRANS_ROOT_DIR_PATH . 'vendor/autoload.php' ) ) {
-			require_once GTRANS_ROOT_DIR_PATH . 'vendor/autoload.php';
-		}
 		require_once GTRANS_INCLUDES_DIR_PATH . 'autoload.php';
 		require_once GTRANS_INCLUDES_DIR_PATH . 'functions.php';
 		require_once GTRANS_INCLUDES_DIR_PATH . 'hooks.php';
@@ -78,7 +73,6 @@ final class GemTranslate {
 
 	public function init_plugin() {
 		do_action( 'gtrans_before_init' );
-		new GemTranslate\SeSdk();
 		$this->dispatch_hooks();
 		do_action( 'gtrans_init' );
 	}
