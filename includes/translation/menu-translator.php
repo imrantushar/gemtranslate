@@ -31,16 +31,16 @@ class MenuTranslator {
 
 		global $wpdb;
 		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
-		$table        = Helper::table( 'menu_translations' );
 
 		// One query for the whole menu.
-		$query = $wpdb->prepare(
-			"SELECT menu_item_id, title, url_override
-			 FROM $table
-			 WHERE language_code = %s AND menu_item_id IN ($placeholders)",
-			array_merge( [ $lang ], array_map( 'intval', $ids ) )
-		);
-		$rows  = $wpdb->get_results( $query, ARRAY_A ) ?: [];
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- placeholders built from a counted list.
+				"SELECT menu_item_id, title, url_override FROM %i WHERE language_code = %s AND menu_item_id IN ($placeholders)",
+				array_merge( [ Helper::table( 'menu_translations' ), $lang ], array_map( 'intval', $ids ) )
+			),
+			ARRAY_A
+		) ?: [];
 		$by_id = [];
 		foreach ( $rows as $row ) {
 			$by_id[ (int) $row['menu_item_id'] ] = $row;

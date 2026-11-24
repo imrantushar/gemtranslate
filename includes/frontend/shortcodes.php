@@ -118,7 +118,8 @@ class Shortcodes {
 			global $wpdb;
 			$value = $wpdb->get_var(
 				$wpdb->prepare(
-					'SELECT value FROM ' . Helper::table( 'string_translations' ) . " WHERE string_id = %d AND language_code = %s AND status != 'draft' AND value <> ''",
+					"SELECT value FROM %i WHERE string_id = %d AND language_code = %s AND status != 'draft' AND value <> ''",
+					Helper::table( 'string_translations' ),
 					$string_id,
 					Context::current()
 				)

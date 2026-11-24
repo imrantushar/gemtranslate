@@ -10,6 +10,11 @@
  * It creates temporary languages, posts, a user and strings, and deletes them
  * in a `finally` block. Do not run it on a production site.
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use GemTranslate\Language\Context;
 use GemTranslate\Translation\TranslationLoader;
 use GemTranslate\Translation\ShadowPostSync;

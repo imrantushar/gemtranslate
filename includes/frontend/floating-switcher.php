@@ -150,8 +150,12 @@ class FloatingSwitcher {
 		if ( strlen( $region ) !== 2 ) {
 			return strtoupper( $code );
 		}
-		return mb_chr( 0x1F1E6 + ord( $region[0] ) - ord( 'A' ) )
-			. mb_chr( 0x1F1E6 + ord( $region[1] ) - ord( 'A' ) );
+		// Regional-indicator symbols, built from HTML entities.
+		return html_entity_decode(
+			'&#' . ( 0x1F1E6 + ord( $region[0] ) - ord( 'A' ) ) . ';&#' . ( 0x1F1E6 + ord( $region[1] ) - ord( 'A' ) ) . ';',
+			ENT_NOQUOTES,
+			'UTF-8'
+		);
 	}
 
 	private function styles() {

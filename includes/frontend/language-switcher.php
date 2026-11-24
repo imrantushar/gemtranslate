@@ -38,6 +38,38 @@ class LanguageSwitcher {
 		add_shortcode( 'gemtranslate_language_switcher', [ $self, 'render_shortcode' ] );
 	}
 
+	/**
+	 * Tags and attributes the switcher markup is allowed to contain; used to
+	 * escape its output where it is echoed.
+	 *
+	 * @return array<string,array<string,bool>>
+	 */
+	public static function allowed_html() {
+		$common = [
+			'class'      => true,
+			'id'         => true,
+			'lang'       => true,
+			'style'      => true,
+			'role'       => true,
+			'aria-label' => true,
+		];
+		return [
+			'ul'      => $common,
+			'li'      => $common,
+			'span'    => $common + [ 'aria-current' => true, 'aria-hidden' => true ],
+			'details' => $common + [ 'open' => true ],
+			'summary' => $common,
+			'a'       => $common + [
+				'href'          => true,
+				'hreflang'      => true,
+				'rel'           => true,
+				'aria-current'  => true,
+				'data-lang'     => true,
+			],
+			'style'   => [],
+		];
+	}
+
 	public function render_shortcode( $atts ) {
 		$atts = is_array( $atts ) ? $atts : [];
 
@@ -195,7 +227,8 @@ class LanguageSwitcher {
 			global $wpdb;
 			$rows  = $wpdb->get_col(
 				$wpdb->prepare(
-					'SELECT DISTINCT language_code FROM ' . Helper::table( 'post_translations' ) . " WHERE group_id = %d AND status <> 'draft'",
+					"SELECT DISTINCT language_code FROM %i WHERE group_id = %d AND status <> 'draft'",
+					Helper::table( 'post_translations' ),
 					$group
 				)
 			);
@@ -279,8 +312,11 @@ class LanguageSwitcher {
 		if ( strlen( $region ) !== 2 ) {
 			return strtoupper( $code );
 		}
-		$first  = mb_chr( 0x1F1E6 + ord( $region[0] ) - ord( 'A' ) );
-		$second = mb_chr( 0x1F1E6 + ord( $region[1] ) - ord( 'A' ) );
-		return $first . $second;
+		// Regional-indicator symbols, built from HTML entities.
+		return html_entity_decode(
+			'&#' . ( 0x1F1E6 + ord( $region[0] ) - ord( 'A' ) ) . ';&#' . ( 0x1F1E6 + ord( $region[1] ) - ord( 'A' ) ) . ';',
+			ENT_NOQUOTES,
+			'UTF-8'
+		);
 	}
 }

@@ -220,7 +220,8 @@ class PackGenerator {
 		$pattern = 'gemtranslate-' . $locale;
 		$removed = 0;
 		foreach ( glob( $dir . $pattern . '*' ) as $path ) {
-			if ( @unlink( $path ) ) {
+			wp_delete_file( $path );
+			if ( ! file_exists( $path ) ) {
 				$removed++;
 			}
 		}
